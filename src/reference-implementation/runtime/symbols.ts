@@ -9,51 +9,55 @@ import * as QueryHelpers from '../query/helpers'
 
 export type RuntimeExpression<T = any> = (ctx: Query.Context, ...args: RuntimeExpression[]) => T
 
-const symbols: [SymbolInfo, RuntimeExpression][] = [
+export type Attribute = 'const-expr'
+
+const constAttribute: Attribute[] = ['const-expr']
+
+const symbols: ([SymbolInfo, RuntimeExpression] | [SymbolInfo, RuntimeExpression, Attribute[]])[] = [
     ////////////////////////////////////
     // Primitives
     [Symbols.primitive.constructor.list, (ctx, ...xs) => {
         const list: any[] = [];
         for (const x of xs) list[list.length] = x(ctx);
         return list;
-    }],
+    }, constAttribute],
     [Symbols.primitive.constructor.set, (ctx, ...xs) => {
         const set = new Set<any>();
         for (const x of xs) set.add(x(ctx));
         return set;
-    }],
+    }, constAttribute],
     [Symbols.primitive.constructor.map, (ctx, ...xs) => {
         const map = new Map<any, any>();
         for (let i = 0; i < xs.length; i += 2) map.set(xs[i](ctx), xs[i + 1](ctx));
         return map;
-    }],
+    }, constAttribute],
 
-    [Symbols.primitive.operator.not, (ctx, x) => !x(ctx)],
+    [Symbols.primitive.operator.not, (ctx, x) => !x(ctx), constAttribute],
     [Symbols.primitive.operator.and, (ctx, ...xs) => {
         for (const x of xs) if (!x(ctx)) return false;
         return true;
-    }],
+    }, constAttribute],
     [Symbols.primitive.operator.or, (ctx, ...xs) => {
         for (const x of xs) if (x(ctx)) return true;
         return false;
-    }],
-    [Symbols.primitive.operator.eq, (ctx, x, y) => x(ctx) === y(ctx)],
-    [Symbols.primitive.operator.neq, (ctx, x, y) => x(ctx) !== y(ctx)],
-    [Symbols.primitive.operator.lt, (ctx, x, y) => x(ctx) < y(ctx)],
-    [Symbols.primitive.operator.lte, (ctx, x, y) => x(ctx) <= y(ctx)],
-    [Symbols.primitive.operator.gr, (ctx, x, y) => x(ctx) > y(ctx)],
-    [Symbols.primitive.operator.gre, (ctx, x, y) => x(ctx) >= y(ctx)],
+    }, constAttribute],
+    [Symbols.primitive.operator.eq, (ctx, x, y) => x(ctx) === y(ctx), constAttribute],
+    [Symbols.primitive.operator.neq, (ctx, x, y) => x(ctx) !== y(ctx), constAttribute],
+    [Symbols.primitive.operator.lt, (ctx, x, y) => x(ctx) < y(ctx), constAttribute],
+    [Symbols.primitive.operator.lte, (ctx, x, y) => x(ctx) <= y(ctx), constAttribute],
+    [Symbols.primitive.operator.gr, (ctx, x, y) => x(ctx) > y(ctx), constAttribute],
+    [Symbols.primitive.operator.gre, (ctx, x, y) => x(ctx) >= y(ctx), constAttribute],
     [Symbols.primitive.operator.plus, (ctx, ...xs) => {
         let ret = 0;
         for (const x of xs) ret += x(ctx);
         return ret;
-    }],
-    [Symbols.primitive.operator.div, (ctx, x, y) => x(ctx) / y(ctx)],
-    [Symbols.primitive.operator.inRange, (ctx, x, a, b) => { const v = x(ctx); return v >= a(ctx) && v <= b(ctx) }],
+    }, constAttribute],
+    [Symbols.primitive.operator.div, (ctx, x, y) => x(ctx) / y(ctx), constAttribute],
+    [Symbols.primitive.operator.inRange, (ctx, x, a, b) => { const v = x(ctx); return v >= a(ctx) && v <= b(ctx) }, constAttribute],
 
     ////////////////////////////////////
     // Structure
-    [Symbols.structure.constructor.elementSymbol, (ctx, s: RuntimeExpression<string>) => RuntimeHelpers.normalizeElementSymbol(s(ctx))],
+    [Symbols.structure.constructor.elementSymbol, (ctx, s: RuntimeExpression<string>) => RuntimeHelpers.normalizeElementSymbol(s(ctx)), constAttribute],
 
     [Symbols.structure.property.atom.id, ctx => ctx.columns.id.getInteger(ctx.element.current.atom)],
     [Symbols.structure.property.atom.label_atom_id, ctx => ctx.columns.label_asym_id.getString(ctx.element.current.atom)],
@@ -109,12 +113,15 @@ const symbols: [SymbolInfo, RuntimeExpression][] = [
     }],
 ];
 
-const table = (function () {
-    const table: { [name: string]: RuntimeExpression } = {};
+const { table, attributes } = (function () {
+    const table: { [name: string]: RuntimeExpression } = Object.create(null);
+    const attributes: { [name: string]: Attribute[] } = Object.create(null);
     for (const s of symbols) {
         table[s[0].name] = s[1];
+        if (s[2]) attributes[s[0].name] = s[2] as Attribute[];
     }
-    return table;
+    return { table, attributes };
 })();
 
+export const Attributes = attributes;
 export default table;

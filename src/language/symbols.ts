@@ -90,7 +90,7 @@ const primitive = {
             type: Type.value,
             args: [['min', Type.value], ['max', Type.value], ['value', Type.value]]
         }),
-        setHas: symbol({
+        inSet: symbol({
             type: Type.value,
             args: [['set', Type.Primitive.set], ['value', Type.value]]
         }),

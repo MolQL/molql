@@ -6,7 +6,7 @@ import * as fs from 'fs'
 
 import { Expression } from './language/expression'
 import * as Query from './reference-implementation/query/data-model'
-import compile from './reference-implementation/minimal-compiler/compiler'
+import compile from './reference-implementation/compiler/compile'
 import Q from './reference-implementation/query/builder'
 import * as Molecule from './reference-implementation/molecule/data-model'
 
