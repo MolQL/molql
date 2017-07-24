@@ -1,0 +1,18 @@
+{
+  "name": "pq",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^8.0.15",
+    "typescript": "^2.4.2"
+  },
+  "dependencies": {
+    "ciftools.js": "github:dsehnal/CIFTools.js.git#34cd913"
+  }
+}
