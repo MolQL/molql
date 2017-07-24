@@ -1,10 +1,14 @@
+/*
+ * Copyright (c) 2017 David Sehnal, licensed under MIT, See LICENSE file for more info.
+ */
+
 import * as fs from 'fs'
 
 import { Expression } from './language/expression'
-import * as Query from './toy-implementation/query'
-import compile from './toy-implementation/minimal-compiler'
-import Q from './toy-implementation/language'
-import * as Molecule from './toy-implementation/molecule'
+import * as Query from './reference-implementation/query/data-model'
+import compile from './reference-implementation/minimal-compiler/compiler'
+import Q from './reference-implementation/query/builder'
+import * as Molecule from './reference-implementation/molecule/data-model'
 
 function run(model: Molecule.Model) {
     // for (const c of Molecule.AtomSiteColumns) {

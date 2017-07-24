@@ -1,5 +1,9 @@
-import Expression from '../language/expression'
-import Runtime, { RuntimeExpression } from './runtime'
+/*
+ * Copyright (c) 2017 David Sehnal, licensed under MIT, See LICENSE file for more info.
+ */
+
+import Expression from '../../language/expression'
+import Runtime, { RuntimeExpression } from '../runtime/symbols'
 
 function compileSymbol(name: string) {
     if (!Runtime[name]) throw new Error(`Could not find symbol '${name}'.`);
@@ -10,8 +14,8 @@ function compileApply(symbol: RuntimeExpression, slots: any[]): RuntimeExpressio
     return function (ctx) { slots[0] = ctx; return symbol.apply(null, slots); };
 }
 
-function compileValue(v: any): RuntimeExpression { 
-    return function (ctx) { return v; }; 
+function compileValue(v: any): RuntimeExpression {
+    return function (ctx) { return v; };
 }
 
 export default function compile(expr: Expression): RuntimeExpression {

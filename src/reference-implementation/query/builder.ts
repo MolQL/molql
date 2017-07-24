@@ -1,6 +1,10 @@
-import Expression from '../language/expression'
-import Type from '../language/type-system'
-import Symbols, { SymbolInfo, isSymbolInfo } from '../language/symbols'
+/*
+ * Copyright (c) 2017 David Sehnal, licensed under MIT, See LICENSE file for more info.
+ */
+
+import Expression from '../../language/expression'
+import Type from '../../language/type-system'
+import Symbols, { SymbolInfo, isSymbolInfo } from '../../language/symbols'
 
 namespace Language {
     export type E<T extends Type = Type> = (Expression) & { '@type'?: T }

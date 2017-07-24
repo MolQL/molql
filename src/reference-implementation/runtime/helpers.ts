@@ -1,7 +1,11 @@
-import * as Query from '../query'
-import * as QueryUtils from './query'
-import { FastMap } from './collections'
-import { RuntimeExpression } from '../runtime'
+/*
+ * Copyright (c) 2017 David Sehnal, licensed under MIT, See LICENSE file for more info.
+ */
+
+import * as Query from '../query/data-model'
+import * as QueryHelpers from '../query/helpers'
+import { FastMap } from '../utils/collections'
+import { RuntimeExpression } from './symbols'
 
 const elementSymbolCache: { [value: string]: string } = Object.create(null);
 
@@ -43,9 +47,9 @@ export function groupingGenerator(ctx: Query.Context, pred: RuntimeExpression, g
     }
     Query.Iterator.end(ctx.element);
 
-    const result = new QueryUtils.HashAtomSetSeqBuilder(ctx);
+    const result = new QueryHelpers.HashAtomSetSeqBuilder(ctx);
     for (const set of atomSetSeq) {
-        result.add(QueryUtils.AtomSet.ofUnsortedIndices(ctx, set));
+        result.add(QueryHelpers.AtomSet.ofUnsortedIndices(ctx, set));
     }
 
     return result.getSeq();

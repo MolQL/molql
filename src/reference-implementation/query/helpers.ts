@@ -1,5 +1,9 @@
-import * as Query from '../query'
-import { UniqueArrayBuilder, sortAsc, FastMap } from './collections'
+/*
+ * Copyright (c) 2017 David Sehnal, licensed under MIT, See LICENSE file for more info.
+ */
+
+import * as Query from './data-model'
+import { UniqueArrayBuilder, sortAsc, FastMap } from '../utils/collections'
 
 export class AtomSet implements Query.AtomSet {
     private _hashCode = 0;

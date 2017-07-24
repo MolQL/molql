@@ -1,3 +1,6 @@
+/*
+ * Copyright (c) 2017 David Sehnal, licensed under MIT, See LICENSE file for more info.
+ */
 
 export interface UniqueArrayBuilder<T> { _keys: any, array: T[] }
 export function UniqueArrayBuilder<T>(): UniqueArrayBuilder<T> { return { _keys: Object.create(null), array: [] } }

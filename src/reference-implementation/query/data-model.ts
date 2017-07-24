@@ -1,6 +1,10 @@
-import * as Molecule from './molecule'
-import * as Helpers from './helpers/query'
-import Mask from './helpers/mask'
+/*
+ * Copyright (c) 2017 David Sehnal, licensed under MIT, See LICENSE file for more info.
+ */
+
+import * as Molecule from '../molecule/data-model'
+import * as Helpers from './helpers'
+import Mask from '../utils/mask'
 
 export interface AtomSet {
     readonly context: Context,

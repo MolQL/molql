@@ -1,7 +1,11 @@
-import Symbols, { SymbolInfo } from '../language/symbols'
-import * as Query from './query'
-import * as RuntimeHelpers from './helpers/runtime'
-import * as QueryHelpers from './helpers/query'
+/*
+ * Copyright (c) 2017 David Sehnal, licensed under MIT, See LICENSE file for more info.
+ */
+
+import Symbols, { SymbolInfo } from '../../language/symbols'
+import * as Query from '../query/data-model'
+import * as RuntimeHelpers from '../runtime/helpers'
+import * as QueryHelpers from '../query/helpers'
 
 export type RuntimeExpression<T = any> = (ctx: Query.Context, ...args: RuntimeExpression[]) => T
 
