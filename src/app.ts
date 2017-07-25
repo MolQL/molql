@@ -4,11 +4,21 @@
 
 import * as fs from 'fs'
 
-import { Expression } from './language/expression'
+import Expression from './language/expression'
+import S from './language/symbols'
 import * as Query from './reference-implementation/query/data-model'
 import compile from './reference-implementation/compiler/compile'
 import Q from './reference-implementation/query/builder'
 import * as Molecule from './reference-implementation/molecule/data-model'
+
+//function symb(s: { name: string }) { return Expression.symbol(s.name); }
+//console.log('symb', S.primitive.functional.partial.symbol);
+function apply(s: string | Expression.Symbol, args?: any[]) { return Expression.symbol(s, args) }
+const expr = apply(apply(S.primitive.functional.partial.name, [apply(S.primitive.operator.plus.name), 1, 2, 3, 4]), [5])
+//const expr = apply(S.primitive.operator.plus, 1, 2)
+console.log(Expression.format(expr));
+const comp = compile(expr);
+console.log(comp(0 as any));
 
 function run(model: Molecule.Model) {
     // for (const c of Molecule.AtomSiteColumns) {
@@ -22,6 +32,7 @@ function run(model: Molecule.Model) {
         true, //Q.equal(Q.props.residue.label_comp_id, 'HEM'), 
         Q.structProp.residue.uniqueId);
     //const query = Q.filter(residues, Q.lt(Q.structProp.atomSet.atomCount, 7));
+    //const query = residues;
     const query = Q.filter(
         Q.atoms(true, Q.structProp.residue.uniqueId),
         Q.lt(
@@ -40,7 +51,7 @@ function run(model: Molecule.Model) {
     //     console.log(set.atomIndices);
 }
 
-fs.readFile('c:/test/quick/1tqn_updated.cif', 'utf-8', (err, data) => {
+fs.readFile('e:/test/quick/1tqn_updated.cif', 'utf-8', (err, data) => {
     if (err) {
         console.error(err);
         return;

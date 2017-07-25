@@ -37,6 +37,8 @@ export function groupingGenerator(ctx: Query.Context, pred: RuntimeExpression, g
     const groups = FastMap.create<number, number[]>();
     const atomSetSeq: number[][] = [];
 
+    console.log(groupBy.toString());
+
     Query.Iterator.begin(ctx.element, Query.Iterator.Element())
     for (let i = 0, _i = ctx.model.atoms.count; i < _i; i++) {
         if (!ctx.mask.has(i)) continue;

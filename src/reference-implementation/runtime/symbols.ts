@@ -19,40 +19,42 @@ const symbols: ([SymbolInfo, RuntimeExpression] | [SymbolInfo, RuntimeExpression
     // Primitives
     [
         Symbols.primitive.constructor.list,
-        (ctx, ...xs) => {
+        function (ctx) {
             const list: any[] = [];
-            for (const x of xs) list[list.length] = x(ctx);
+            for (let i = 1; i < arguments.length; i++) list[list.length] = arguments[i](ctx);
             return list;
         },
         constAttribute
     ],
     [
         Symbols.primitive.constructor.set,
-        (ctx, ...xs) => {
+        function(ctx) {
             const set = FastSet.create();
-            for (const x of xs) set.add(x(ctx));
+            for (let i = 1; i < arguments.length; i++) set.add(arguments[i](ctx));
             return set;
         },
         constAttribute
     ],
     [
         Symbols.primitive.constructor.map,
-        (ctx, ...xs) => {
+        function (ctx) {
             const map = FastMap.create<any, any>();
-            for (let i = 0; i < xs.length; i += 2) map.set(xs[i](ctx), xs[i + 1](ctx));
+            for (let i = 1; i < arguments.length; i += 2) map.set(arguments[i](ctx), arguments[i + 1](ctx));
             return map;
         },
         constAttribute
     ],
 
     [
-        Symbols.primitive.functional.applyPartial,
-        (ctx, f, ...xs) => {
-            const func = f(ctx) as Function;
-            const xArgs = xs.map(RuntimeHelpers.applyArg, ctx);
-            return (ctx: Query.Context, ...ys: RuntimeExpression[]) => {
-                const yArgs = ys.map(RuntimeHelpers.applyArg, ctx);
-                return func.apply(null, [ctx, ...xArgs, ...yArgs]);
+        Symbols.primitive.functional.partial,
+        function (ctx, f: RuntimeExpression) {
+            const first: any[] = [void 0];
+            for (let i = 2; i < arguments.length; i++) first[i - 1] = arguments[i];
+            return function (ctx: Query.Context) {
+                const second = [...first];
+                second[0] = ctx;
+                for (let i = 1; i < arguments.length; i++) second.push(arguments[i]);
+                return f.apply(null, second);
             };
         }
     ],
@@ -61,16 +63,16 @@ const symbols: ([SymbolInfo, RuntimeExpression] | [SymbolInfo, RuntimeExpression
     [Symbols.primitive.operator.not, (ctx, x) => !x(ctx), constAttribute],
     [
         Symbols.primitive.operator.and,
-        (ctx, ...xs) => {
-            for (const x of xs) if (!x(ctx)) return false;
+        function (ctx) {
+            for (let i = 1; i < arguments.length; i++) if (!arguments[i](ctx)) return false;
             return true;
         },
         constAttribute
     ],
     [
         Symbols.primitive.operator.or,
-        (ctx, ...xs) => {
-            for (const x of xs) if (x(ctx)) return true;
+        function (ctx) {
+            for (let i = 1; i < arguments.length; i++) if (arguments[i](ctx)) return true;
             return false;
         },
         constAttribute
@@ -83,9 +85,9 @@ const symbols: ([SymbolInfo, RuntimeExpression] | [SymbolInfo, RuntimeExpression
     [Symbols.primitive.operator.gre, (ctx, x, y) => x(ctx) >= y(ctx), constAttribute],
     [
         Symbols.primitive.operator.plus,
-        (ctx, ...xs) => {
+        function(ctx) {
             let ret = 0;
-            for (const x of xs) ret += x(ctx);
+            for (let i = 1; i < arguments.length; i++) ret += arguments[i](ctx);
             return ret;
         },
         constAttribute
@@ -179,7 +181,7 @@ const symbols: ([SymbolInfo, RuntimeExpression] | [SymbolInfo, RuntimeExpression
 
     [
         Symbols.structure.primitive.generate,
-        (ctx, pred: RuntimeExpression<boolean>, grouping?: RuntimeExpression) => {
+        (ctx, pred: RuntimeExpression, grouping?: RuntimeExpression) => {
             if (grouping) return RuntimeHelpers.groupingGenerator(ctx, pred, grouping);
             return RuntimeHelpers.nonGroupingGenerator(ctx, pred);
         }
@@ -220,11 +222,12 @@ const { table, attributes } = (function () {
     const table: { [name: string]: RuntimeExpression } = Object.create(null);
     const attributes: { [name: string]: Attribute[] } = Object.create(null);
     for (const s of symbols) {
-        if (table[s[0].name]) {
-            throw new Error(`You've already implemented ${s[0].name}, dummy.`);
+        const name = s[0].name;
+        if (table[name]) {
+            throw new Error(`You've already implemented ${name}, dummy.`);
         }
-        table[s[0].name] = s[1];
-        if (s[2]) attributes[s[0].name] = s[2] as Attribute[];
+        table[name] = s[1];
+        if (s[2]) attributes[name] = s[2] as Attribute[];
     }
     return { table, attributes };
 })();

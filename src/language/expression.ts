@@ -4,34 +4,43 @@
 
 export type Expression =
     | Expression.Literal
-    | Expression.Apply
+    | Expression.Symbol
 
 export namespace Expression {
     export type Literal = string | number | boolean
-    export type Apply = { head: Expression, args?: Expression[] }
+    export interface Symbol { symbol: string | Symbol, args?: Expression[] }
 
-    export function apply(head: Expression, args?: Expression[]): Apply { return { head, args }; }
-    export function isLiteral(e: Expression): e is Expression.Literal { return !(e as Apply).head && !(e as Apply).args; }
+    export function symbol(symbol: string | Symbol, args?: Expression[]): Symbol { return { symbol, args }; }
 
-    function formatLiteral(e: Literal, prefix: string) {
-        if (typeof e === 'string') {
-            return prefix + (e.indexOf(' ') >= 0 ? `\`${e}\`` : e);
+    export function isLiteral(e: Expression): e is Expression.Literal { return !(e as Symbol).symbol && !(e as Symbol).args; }
+
+    function isValueLike(e: Expression) {
+        if (isLiteral(e)) return true;
+        return isLiteral(e.symbol) && (!e.args || !e.args.length);
+    }
+
+    function formatValueLike(e: Expression, prefix: string) {
+        if (isLiteral(e)) {
+            if (typeof e === 'string') {
+                return prefix + (e.indexOf(' ') >= 0 ? `\`${e}\`` : e);
+            }
+            return `${prefix}${e}`;
         }
-        return `${prefix}${e}`;
+        return `${prefix}${e.symbol}`;
     }
 
     function _format(e: Expression, lines: string[], prefix: string): string[] {
         if (isLiteral(e)) {
-            lines.push(formatLiteral(e, prefix));
+            lines.push(formatValueLike(e, prefix));
             return lines;
         }
-        const head = _format(e.head, [], '');
+        const head = _format(e.symbol, [], '');
         if (!e.args || !e.args.length) {
             head.forEach(l => lines.push(`${prefix}${l}`));
             return lines;
         }
-        if (e.args.every(a => isLiteral(a))) {
-            const args = e.args.map(a => formatLiteral(a as Literal, '')).join(' ');
+        if (e.args.every(a => isValueLike(a))) {
+            const args = e.args.map(a => formatValueLike(a, '')).join(' ');
             if (head.length === 1) {
                 lines.push(`${prefix}(${head[0]} ${args})`);
             } else {

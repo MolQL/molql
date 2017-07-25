@@ -3,6 +3,7 @@
  */
 
 import Type from './type-system'
+import Expression from './expression'
 
 export type ArgSpec = [string, Type, string] | [string, Type]
 
@@ -27,7 +28,7 @@ export function isSymbolInfo(x: any): x is SymbolInfo {
 }
 
 function symbol(info: SymbolSpec): SymbolInfo {
-    return { name: '', shortName: '', ...info, isSymbol: true };
+    return { isSymbol: true, name: '', shortName: info.name || '', type: info.type, description: info.description, args: info.args };
 }
 
 const valuesArg: ArgSpec = ['values', Type.zeroOrMore(Type.value), 'A list of values.'];
@@ -67,7 +68,7 @@ const primitive = {
     },
     functional: {
         header: 'Functional Operators',
-        applyPartial: symbol({
+        partial: symbol({
             type: Type.value,
             args: [
                 ['f', Type.fn(Type.zeroOrMore(Type.value), Type.value)],
@@ -243,7 +244,7 @@ function formatKey(key: string) {
 
 function normalizeName(prefix: string, key: string, obj: any) {
     if (isSymbolInfo(obj)) {
-        obj.shortName = `${obj.name || formatKey(key)}`;
+        obj.shortName = obj.shortName || formatKey(key);
         obj.name = `${prefix}.${obj.shortName}`;
 
         return;
