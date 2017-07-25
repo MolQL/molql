@@ -16,7 +16,7 @@ import * as Molecule from './reference-implementation/molecule/data-model'
 function apply(s: string | Expression.Symbol, args?: any[]) { return Expression.symbol(s, args) }
 const expr = apply(apply(S.primitive.functional.partial.name, [apply(S.primitive.operator.add.name), 1, 2, 3, 4]), [5])
 //const expr = apply(S.primitive.operator.plus, 1, 2)
-console.log(Expression.format(expr));
+console.log(Expression.lispFormat(expr));
 const comp = compile(expr);
 console.log(comp(0 as any));
 
@@ -45,7 +45,7 @@ function run(model: Molecule.Model) {
             40));
     query = cOnHEM;
     console.log(JSON.stringify(query, null, 2));
-    console.log(Expression.format(query));
+    console.log(Expression.lispFormat(query));
     const compiled = compile(query);
     const ctx = Query.Context.ofModel(model);
 

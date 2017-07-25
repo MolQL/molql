@@ -12,6 +12,13 @@ export namespace Expression {
 
     export function symbol(symbol: string | Symbol, args?: Expression[]): Symbol { return { symbol, args }; }
     export function isLiteral(e: Expression): e is Expression.Literal { return !(e as Symbol).symbol && !(e as Symbol).args; }
+    export function isSymbol(e: Expression): e is Expression.Symbol { return !isLiteral(e); }
+
+    export function lispFormat(e: Expression) {
+        const lines: string[] = [];
+        _format(e, lines, '');
+        return lines.join('\n');
+    }
 
     function isValueLike(e: Expression) {
         if (isLiteral(e)) return true;
@@ -62,12 +69,6 @@ export namespace Expression {
             if (idx === e.args.length) lines[lines.length - 1] += ')';
         }
         return lines;
-    }
-
-    export function format(e: Expression) {
-        const lines: string[] = [];
-        _format(e, lines, '');
-        return lines.join('\n');
     }
 }
 
