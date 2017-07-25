@@ -81,10 +81,7 @@ export namespace Iterator {
     }
 
     export function endSlot(ctx: Context, index: number) {
-        const { slots } = ctx;
-        let slot = slots[index];
-        end(slot);
-        if (!slot.stack.length) delete slots[index];
+        end(ctx.slots[index]);
     }
 }
 

@@ -11,17 +11,20 @@ export namespace Expression {
     export type Apply = { head: Expression, args?: Expression[] }
 
     export function apply(head: Expression, args?: Expression[]): Apply { return { head, args }; }
-    export function isLiteral(e: Expression): e is Expression.Literal { return typeof (e as any).symbol !== 'string'; }
+    export function isLiteral(e: Expression): e is Expression.Literal { return !(e as Apply).head && !(e as Apply).args; }
 
     export function format(e: Expression): string {
         if (isLiteral(e)) {
             if (typeof e === 'string') {
-                return `\`${e}\``;
+                return e.indexOf(' ') >= 0 ? `\`${e}\`` : e;
             }
             return `${e}`;
         }
-        if (!e.args || !e.args.length) return `${e.head}`;
-        return `(${e.head} ${e.args.map(a => format(a)).join(' ')})`;
+        const head = format(e.head);
+        if (!e.args || !e.args.length) {
+            return head;
+        }
+        return `(${isLiteral(e.head) ? head : `(${head})`} ${e.args.map(a => format(a)).join(' ')})`;
     }
 }
 

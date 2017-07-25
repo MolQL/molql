@@ -126,6 +126,7 @@ const structure = {
     property: {
         header: 'Properties',
         atom: {
+            header: 'Atoms',
             id: value(),
             label_atom_id: value(),
             type_symbol: value(),
@@ -133,25 +134,26 @@ const structure = {
             operatorName: value('Returns the name of the symmetry operator applied to this atom.')
         },
         residue: {
+            header: 'Residues',
             uniqueId: value(),
             label_seq_id: value(),
             label_comp_id: value()
         },
         chain: {
+            header: 'Chains',
             label_asym_id: value()
         },
         atomSet: {
+            header: 'Atom Sets',
             namespace: Type.Structure.atomSet.kind,
             atomCount: value(),
-            accumulate: {
-                foldl: symbol({
-                    type: Type.value,
-                    args: [['f', Type.value], ['initial', Type.value]]
-                }),
-                value: value()
-            }
+            reduce: symbol({
+                type: Type.value,
+                args: [['f', Type.fn(Type.value, Type.value)], ['initial', Type.value]]
+            })
         },
         atomSetSeq: {
+            header: 'Atom Set Sequences',
             namespace: Type.Structure.atomSetSeq.kind,
             length: symbol({
                 type: Type.Structure.atomSetSeq,

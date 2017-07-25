@@ -10,6 +10,11 @@ Table of Contents
    * [Molecular Structure Queries](#molecular-structure-queries)
      * [Constructors](#constructors)
      * [Properties](#properties)
+       * [Atoms](#atoms)
+       * [Residues](#residues)
+       * [Chains](#chains)
+       * [Atom Sets](#atom-sets)
+       * [Atom Set Sequences](#atom-set-sequences)
      * [Query Primitives](#query-primitives)
      * [Atom Set Modifiers](#atom-set-modifiers)
      * [Sequence Combinators](#sequence-combinators)
@@ -46,9 +51,9 @@ Has reference implementation: *yes*
 
 ### apply-partial
 
-``primitive.functional.apply-partial :: (f: value+->value) -> value``
+``primitive.functional.apply-partial :: (f: value*->value, args: value*) -> value``
 
-Has reference implementation: *no*
+Has reference implementation: *yes*
 
 -------------------
 
@@ -56,7 +61,7 @@ Has reference implementation: *no*
 
 ``primitive.functional.slot :: (index: value) -> value``
 
-Has reference implementation: *no*
+Has reference implementation: *yes*
 
 -------------------
 
@@ -244,6 +249,8 @@ Has reference implementation: *no*
 
 ## Properties
 
+### Atoms
+
 ### id
 
 ``structure.property.atom.id :: value``
@@ -286,6 +293,8 @@ Has reference implementation: *no*
 
 -------------------
 
+### Residues
+
 ### unique-id
 
 ``structure.property.residue.unique-id :: value``
@@ -310,6 +319,8 @@ Has reference implementation: *yes*
 
 -------------------
 
+### Chains
+
 ### label_asym_id
 
 ``structure.property.chain.label_asym_id :: value``
@@ -317,6 +328,8 @@ Has reference implementation: *yes*
 Has reference implementation: *yes*
 
 -------------------
+
+### Atom Sets
 
 ### atom-count
 
@@ -326,21 +339,15 @@ Has reference implementation: *yes*
 
 -------------------
 
-### foldl
+### reduce
 
-``structure.property.atom-set.accumulate.foldl :: (f: value, initial: value) -> value``
-
-Has reference implementation: *yes*
-
--------------------
-
-### value
-
-``structure.property.atom-set.accumulate.value :: value``
+``structure.property.atom-set.reduce :: (f: value->value, initial: value) -> value``
 
 Has reference implementation: *yes*
 
 -------------------
+
+### Atom Set Sequences
 
 ### length
 

@@ -40,7 +40,8 @@ namespace Language {
         return apply(Symbols.structure.primitive.generate, pred ? groupBy ? [pred, groupBy] : [pred] : void 0);
     }
 
-    export function foldl(f: Varg, initial: Varg): V { return apply(Symbols.structure.property.atomSet.accumulate.foldl, [f, initial]); }
+    export function foldl(f: Varg, initial: Varg): V { return apply(Symbols.structure.property.atomSet.reduce, [f, initial]); }
+    export function slot(index = 0): V { return apply(Symbols.primitive.functional.slot, [index]); }
     export const structProp = Symbols.structure.property
 }
 

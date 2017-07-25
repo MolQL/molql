@@ -79,21 +79,18 @@ const symbols: ([SymbolInfo, RuntimeExpression] | [SymbolInfo, RuntimeExpression
     [Symbols.structure.property.chain.label_asym_id, ctx => ctx.columns.label_asym_id.getString(ctx.element.current.atom)],
 
     [Symbols.structure.property.atomSet.atomCount, ctx => ctx.atomSet.current.atomIndices.length],
-    [Symbols.structure.property.atomSet.accumulate.foldl, (ctx, f: RuntimeExpression<any>, initial: RuntimeExpression<any>) => {
-        const iterator = ctx.value;
+    [Symbols.structure.property.atomSet.reduce, (ctx, f: RuntimeExpression<any>, initial: RuntimeExpression<any>) => {
+        const slot = Query.Iterator.beginSlot(ctx, 0, initial(ctx));
         Query.Iterator.begin(ctx.element, Query.Iterator.Element());
-        Query.Iterator.begin(iterator, void 0);
-        iterator.current = initial(ctx);
         for (const atom of ctx.atomSet.current.atomIndices) {
             Query.Iterator.setAtomElement(ctx, atom);
-            iterator.current = f(ctx);
+            slot.current = f(ctx);
         }
-        const reduced = iterator.current;
-        Query.Iterator.end(iterator);
+        const reduced = slot.current;
+        Query.Iterator.endSlot(ctx, 0);
         Query.Iterator.end(ctx.element);
         return reduced;
     }],
-    [Symbols.structure.property.atomSet.accumulate.value, ctx => ctx.value.current],
     [Symbols.structure.property.atomSetSeq.length, (ctx, seq: RuntimeExpression<Query.AtomSetSeq>) => seq(ctx).atomSets.length],
 
     [Symbols.structure.primitive.generate, (ctx, pred: RuntimeExpression<boolean>, grouping?: RuntimeExpression) => {

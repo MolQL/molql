@@ -23,10 +23,10 @@ function run(model: Molecule.Model) {
         Q.structProp.residue.uniqueId);
     //const query = Q.filter(residues, Q.lt(Q.structProp.atomSet.atomCount, 7));
     const query = Q.filter(
-        Q.atoms(true, Q.structProp.residue.uniqueId), 
+        Q.atoms(true, Q.structProp.residue.uniqueId),
         Q.lt(
             Q.div(
-                Q.foldl(Q.plus(Q.structProp.atomSet.accumulate.value, Q.structProp.atom.B_iso_or_equiv), 0),
+                Q.foldl(Q.plus(Q.slot(), Q.structProp.atom.B_iso_or_equiv), 0),
                 Q.structProp.atomSet.atomCount),
             40));
     console.log(JSON.stringify(query, null, 2));
