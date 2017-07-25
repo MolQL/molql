@@ -19,33 +19,32 @@ export function AtomSet(ctx: Context, indices: number[]): AtomSet { return new H
 export interface AtomSetSeq { readonly context: Context, readonly atomSets: ReadonlyArray<AtomSet> }
 export function AtomSetSeq(context: Context, atomSets: AtomSet[]): AtomSetSeq { return { context, atomSets }; }
 
-export interface Iterator<T> {
-    current: T,
-    stack: T[]
-}
+export interface Iterator<T> { value: T }
 
 export function Iterator<T>(): Iterator<T> {
-    return { current: void 0 as any, stack: [] };
+    const impl: Iterator<T> & { stack: T[] } = { value: void 0 as any, stack: [] };
+    return impl;
 }
 
 export namespace Iterator {
+    interface Impl extends Iterator<any> { stack: any[] }
     export interface Element { atom: number, residue: number, chain: number }
     export function Element(): Element { return { atom: 0, residue: 0, chain: 0 } }
 
     export function begin<T>(iterator: Iterator<T>, initial: T | undefined) {
-        if (iterator.current) iterator.stack.push(iterator.current);
-        iterator.current = initial as any;
+        if (iterator.value) (iterator as Impl).stack.push(iterator.value);
+        iterator.value = initial as any;
         return initial;
     }
 
     export function end<T>(iterator: Iterator<T>) {
-        iterator.current = void 0 as any;
-        if (iterator.stack.length) iterator.stack.pop();
+        iterator.value = void 0 as any;
+        if ((iterator as Impl).stack.length) (iterator as Impl).stack.pop();
     }
 
     export function setAtomElement(ctx: Context, atomIndex: number) {
         const { atoms: { residueIndex }, residues: { chainIndex } } = ctx.model;
-        const element = ctx.element.current!;
+        const element = ctx.element.value!;
         element.atom = atomIndex;
         element.residue = residueIndex[atomIndex];
         element.chain = chainIndex[element.residue];
@@ -53,7 +52,7 @@ export namespace Iterator {
 
     export function setResidueElement(ctx: Context, residue: number) {
         const { residues: { atomStartIndex, chainIndex } } = ctx.model;
-        const element = ctx.element.current!;
+        const element = ctx.element.value!;
         element.atom = atomStartIndex[residue];
         element.residue = residue;
         element.chain = chainIndex[residue];
@@ -61,7 +60,7 @@ export namespace Iterator {
 
     export function setChainElement(ctx: Context, chain: number) {
         const { residues: { atomStartIndex }, chains: { residueStartIndex } } = ctx.model;
-        const element = ctx.element.current!;
+        const element = ctx.element.value!;
         element.chain = chain;
         element.residue = residueStartIndex[chain];
         element.atom = atomStartIndex[element.residue];
@@ -92,8 +91,7 @@ export interface Context {
 
     element: Iterator<Iterator.Element>,
     atomSet: Iterator<AtomSet>,
-    slots: { [index: number]: Iterator<any> },
-    value: Iterator<any>
+    slots: { [index: number]: Iterator<any> }
 }
 
 export function Context(model: Molecule.Model, mask: Mask): Context {
@@ -104,8 +102,7 @@ export function Context(model: Molecule.Model, mask: Mask): Context {
 
         element: Iterator<Iterator.Element>(),
         atomSet: Iterator<AtomSet>(),
-        slots: Object.create(null),
-        value: Iterator<any>()
+        slots: Object.create(null)
     };
 }
 

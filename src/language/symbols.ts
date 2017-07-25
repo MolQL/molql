@@ -120,8 +120,8 @@ const structure = {
     constructor: {
         header: 'Constructors',
         elementSymbol: ctor(Type.Structure.elementSymbol, [['symbol', Type.value]]),
-        atomSet: ctor(Type.Structure.atomSet, [['atom-indices', Type.oneOrMore(Type.value)]]),
-        atomSetSeq: ctor(Type.Structure.atomSetSeq, [['sets', Type.zeroOrMore(Type.Structure.atomSet)]])
+        //atomSet: ctor(Type.Structure.atomSet, [['atom-indices', Type.oneOrMore(Type.value)]]),
+        //atomSetSeq: ctor(Type.Structure.atomSetSeq, [['sets', Type.zeroOrMore(Type.Structure.atomSet)]])
     },
     property: {
         header: 'Properties',
