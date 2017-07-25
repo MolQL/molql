@@ -32,6 +32,15 @@ const symbols: ([SymbolInfo, RuntimeExpression] | [SymbolInfo, RuntimeExpression
         return map;
     }, constAttribute],
 
+    [Symbols.primitive.functional.applyPartial, (ctx, f, ...xs) => {
+        const func = f(ctx) as Function;
+        const xArgs = xs.map(RuntimeHelpers.applyArg, ctx);
+        return (ctx: Query.Context, ...ys: RuntimeExpression[]) => {
+            const yArgs = ys.map(RuntimeHelpers.applyArg, ctx);
+            return func.apply(null, [ctx, ...xArgs, ...yArgs]);
+        };
+    }],
+
     [Symbols.primitive.operator.not, (ctx, x) => !x(ctx), constAttribute],
     [Symbols.primitive.operator.and, (ctx, ...xs) => {
         for (const x of xs) if (!x(ctx)) return false;

@@ -4,6 +4,7 @@
 
 import Symbols, { isSymbolInfo, ArgSpec, SymbolInfo } from '../language/symbols'
 import Type from '../language/type-system'
+import Runtime from '../reference-implementation/runtime/symbols'
 
 const ToC: string[] = [`
 Table of Contents
@@ -20,11 +21,12 @@ function formatSymbol(symbol: SymbolInfo) {
     const header = symbol.args && symbol.args.length
         ? `${symbol.name} :: (${formatArgs(symbol.args)}) -> ${Type.format(symbol.type)}`
         : `${symbol.name} :: ${Type.format(symbol.type)}`;
-    lines.push(`**${symbol.shortName}**\n`);
+    lines.push(`### ${symbol.shortName}\n`);
     lines.push(`\`\`${header}\`\`\n`);
     if (symbol.description) {
-        lines.push(`*${symbol.description}*\n`);
+        lines.push(`> ${symbol.description}\n`);
     }
+    lines.push(`Has reference implementation: *${Runtime[symbol.name] ? 'yes' : 'no'}*\n`);
     lines.push(`-------------------\n`);
 }
 

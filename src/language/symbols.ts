@@ -65,6 +65,20 @@ const primitive = {
         set: ctor(Type.Primitive.set, [valuesArg]),
         map: ctor(Type.Primitive.map, [valuesArg]),
     },
+    functional: {
+        header: 'Functional Operators',
+        applyPartial: symbol({
+            type: Type.value,
+            args: [
+                ['f', Type.fn(Type.zeroOrMore(Type.value), Type.value)],
+                ['args', Type.zeroOrMore(Type.value)]
+            ]
+        }),
+        slot: symbol({
+            type: Type.value,
+            args: [['index', Type.value]]
+        })
+    },
     operator: {
         header: 'Operators',
         not: symbol({ type: Type.value, args: [['a', Type.value]] }),

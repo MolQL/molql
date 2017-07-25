@@ -10,6 +10,7 @@ type Type =
     | Type.Structure.ElementSymbol
     | Type.Structure.AtomSet
     | Type.Structure.AtomSetSeq
+    | Type.Function
     | Type.Tuple
     | Type.ZeroOrMore
     | Type.OneOrMore
@@ -42,12 +43,14 @@ namespace Type {
         export const atomSetSeq: AtomSetSeq = { kind: 'atom-set-seq' };
     }
 
+    export interface Function { kind: 'function', args: Type, result: Type }
     export interface Optional { kind: 'optional', type: Type }
     export interface Tuple { kind: 'tuple', types: Type[] }
     export interface OneOrMore { kind: 'one-or-more', type: Type }
     export interface ZeroOrMore { kind: 'zero-or-more', type: Type }
     export interface ListOf { kind: 'list-of', type: Type }
 
+    export function fn(args: Type, result: Type): Function { return { kind: 'function', args, result }; }
     export function optional(type: Type): Optional { return { kind: 'optional', type }; }
     export function zeroOrMore(type: Type): ZeroOrMore { return { kind: 'zero-or-more', type }; }
     export function oneOrMore(type: Type): OneOrMore { return { kind: 'one-or-more', type }; }
@@ -61,6 +64,7 @@ namespace Type {
             case 'one-or-more': return `${format(type.type)}+`;
             case 'list-of': return `list-of<${format(type.type)}>`;
             case 'tuple': return `(${type.types.map(t => format(t)).join(' ')})`;
+            case 'function': return `${format(type.args)}->${format(type.result)}`;
             default: return type.prefix ? `${type.prefix}.${type.kind}` : type.kind;
         }
     }

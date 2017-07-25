@@ -7,6 +7,10 @@ import * as QueryHelpers from '../query/helpers'
 import { FastMap } from '../utils/collections'
 import { RuntimeExpression } from './symbols'
 
+export function applyArg(this: Query.Context, x: RuntimeExpression) {
+    return x(this);
+}
+
 const elementSymbolCache: { [value: string]: string } = Object.create(null);
 
 export function normalizeElementSymbol(symbol: any): string {

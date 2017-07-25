@@ -5,6 +5,7 @@ Table of Contents
 
    * [Langauge Primitives](#langauge-primitives)
      * [Constructors](#constructors)
+     * [Functional Operators](#functional-operators)
      * [Operators](#operators)
    * [Molecular Structure Queries](#molecular-structure-queries)
      * [Constructors](#constructors)
@@ -17,137 +18,199 @@ Table of Contents
 
 ## Constructors
 
-**list**
+### list
 
 ``primitive.constructor.list :: (values: value*) -> list``
 
+Has reference implementation: *yes*
+
 -------------------
 
-**set**
+### set
 
 ``primitive.constructor.set :: (values: value*) -> set``
 
+Has reference implementation: *yes*
+
 -------------------
 
-**map**
+### map
 
 ``primitive.constructor.map :: (values: value*) -> map``
+
+Has reference implementation: *yes*
+
+-------------------
+
+## Functional Operators
+
+### apply-partial
+
+``primitive.functional.apply-partial :: (f: value+->value) -> value``
+
+Has reference implementation: *no*
+
+-------------------
+
+### slot
+
+``primitive.functional.slot :: (index: value) -> value``
+
+Has reference implementation: *no*
 
 -------------------
 
 ## Operators
 
-**not**
+### not
 
 ``primitive.operator.not :: (a: value) -> value``
 
+Has reference implementation: *yes*
+
 -------------------
 
-**and**
+### and
 
 ``primitive.operator.and :: (args: value+) -> value``
 
+Has reference implementation: *yes*
+
 -------------------
 
-**or**
+### or
 
 ``primitive.operator.or :: (args: value+) -> value``
 
+Has reference implementation: *yes*
+
 -------------------
 
-**plus**
+### plus
 
 ``primitive.operator.plus :: (args: value+) -> value``
 
+Has reference implementation: *yes*
+
 -------------------
 
-**minus**
+### minus
 
 ``primitive.operator.minus :: (a: value, b: value) -> value``
 
+Has reference implementation: *no*
+
 -------------------
 
-**times**
+### times
 
 ``primitive.operator.times :: (args: value+) -> value``
 
+Has reference implementation: *no*
+
 -------------------
 
-**div**
+### div
 
 ``primitive.operator.div :: (a: value, b: value) -> value``
 
+Has reference implementation: *yes*
+
 -------------------
 
-**power**
+### power
 
 ``primitive.operator.power :: (a: value, b: value) -> value``
 
+Has reference implementation: *no*
+
 -------------------
 
-**min**
+### min
 
 ``primitive.operator.min :: (args: value+) -> value``
 
+Has reference implementation: *no*
+
 -------------------
 
-**max**
+### max
 
 ``primitive.operator.max :: (args: value+) -> value``
 
+Has reference implementation: *no*
+
 -------------------
 
-**eq**
+### eq
 
 ``primitive.operator.eq :: (a: value, b: value) -> value``
 
+Has reference implementation: *yes*
+
 -------------------
 
-**neq**
+### neq
 
 ``primitive.operator.neq :: (a: value, b: value) -> value``
 
+Has reference implementation: *yes*
+
 -------------------
 
-**lt**
+### lt
 
 ``primitive.operator.lt :: (a: value, b: value) -> value``
 
+Has reference implementation: *yes*
+
 -------------------
 
-**lte**
+### lte
 
 ``primitive.operator.lte :: (a: value, b: value) -> value``
 
+Has reference implementation: *yes*
+
 -------------------
 
-**gr**
+### gr
 
 ``primitive.operator.gr :: (a: value, b: value) -> value``
 
+Has reference implementation: *yes*
+
 -------------------
 
-**gre**
+### gre
 
 ``primitive.operator.gre :: (a: value, b: value) -> value``
 
+Has reference implementation: *yes*
+
 -------------------
 
-**in-range**
+### in-range
 
 ``primitive.operator.in-range :: (min: value, max: value, value: value) -> value``
 
--------------------
-
-**set-has**
-
-``primitive.operator.set-has :: (set: set, value: value) -> value``
+Has reference implementation: *yes*
 
 -------------------
 
-**map-get**
+### in-set
+
+``primitive.operator.in-set :: (set: set, value: value) -> value``
+
+Has reference implementation: *no*
+
+-------------------
+
+### map-get
 
 ``primitive.operator.map-get :: (map: map, key: value, default: value) -> value``
+
+Has reference implementation: *no*
 
 -------------------
 
@@ -155,207 +218,261 @@ Table of Contents
 
 ## Constructors
 
-**element-symbol**
+### element-symbol
 
 ``structure.constructor.element-symbol :: (symbol: value) -> element-symbol``
 
+Has reference implementation: *yes*
+
 -------------------
 
-**atom-set**
+### atom-set
 
 ``structure.constructor.atom-set :: (atom-indices: value+) -> atom-set``
 
+Has reference implementation: *no*
+
 -------------------
 
-**atom-set-seq**
+### atom-set-seq
 
 ``structure.constructor.atom-set-seq :: (sets: atom-set*) -> atom-set-seq``
+
+Has reference implementation: *no*
 
 -------------------
 
 ## Properties
 
-**id**
+### id
 
 ``structure.property.atom.id :: value``
 
+Has reference implementation: *yes*
+
 -------------------
 
-**label_atom_id**
+### label_atom_id
 
 ``structure.property.atom.label_atom_id :: value``
 
+Has reference implementation: *yes*
+
 -------------------
 
-**type_symbol**
+### type_symbol
 
 ``structure.property.atom.type_symbol :: value``
 
+Has reference implementation: *yes*
+
 -------------------
 
-**B_iso_or_equiv**
+### B_iso_or_equiv
 
 ``structure.property.atom.B_iso_or_equiv :: value``
 
+Has reference implementation: *yes*
+
 -------------------
 
-**operator-name**
+### operator-name
 
 ``structure.property.atom.operator-name :: value``
 
-*Returns the name of the symmetry operator applied to this atom.*
+> Returns the name of the symmetry operator applied to this atom.
+
+Has reference implementation: *no*
 
 -------------------
 
-**unique-id**
+### unique-id
 
 ``structure.property.residue.unique-id :: value``
 
-*unique-id*
+Has reference implementation: *yes*
 
 -------------------
 
-**label_seq_id**
+### label_seq_id
 
 ``structure.property.residue.label_seq_id :: value``
 
+Has reference implementation: *yes*
+
 -------------------
 
-**label_comp_id**
+### label_comp_id
 
 ``structure.property.residue.label_comp_id :: value``
 
+Has reference implementation: *yes*
+
 -------------------
 
-**label_asym_id**
+### label_asym_id
 
 ``structure.property.chain.label_asym_id :: value``
 
+Has reference implementation: *yes*
+
 -------------------
 
-**atom-count**
+### atom-count
 
 ``structure.property.atom-set.atom-count :: value``
 
-*atom-count*
+Has reference implementation: *yes*
 
 -------------------
 
-**foldl**
+### foldl
 
 ``structure.property.atom-set.accumulate.foldl :: (f: value, initial: value) -> value``
 
+Has reference implementation: *yes*
+
 -------------------
 
-**value**
+### value
 
 ``structure.property.atom-set.accumulate.value :: value``
 
+Has reference implementation: *yes*
+
 -------------------
 
-**length**
+### length
 
 ``structure.property.atom-set-seq.length :: (seq: atom-set-seq) -> atom-set-seq``
+
+Has reference implementation: *yes*
 
 -------------------
 
 ## Query Primitives
 
-**generate**
+### generate
 
 ``structure.primitive.generate :: (predicate: ?value, group-by: ?value) -> atom-set-seq``
 
+Has reference implementation: *yes*
+
 -------------------
 
-**modify**
+### modify
 
 ``structure.primitive.modify :: (seq: atom-set-seq, f: atom-set-seq) -> atom-set-seq``
 
+Has reference implementation: *yes*
+
 -------------------
 
-**combine**
+### combine
 
 ``structure.primitive.combine :: (combinator: atom-set-seq, seqs: atom-set-seq+) -> atom-set-seq``
 
+Has reference implementation: *no*
+
 -------------------
 
-**in-context**
+### in-context
 
 ``structure.primitive.in-context :: (context: value, query: atom-set-seq) -> atom-set-seq``
 
-*Executes the query inside a different context. This query cannot be used inside a generator or modifier sequence.*
+> Executes the query inside a different context. This query cannot be used inside a generator or modifier sequence.
+
+Has reference implementation: *yes*
 
 -------------------
 
 ## Atom Set Modifiers
 
-**filter**
+### filter
 
 ``structure.modifier.filter :: (predicate: value) -> atom-set-seq``
 
+Has reference implementation: *yes*
+
 -------------------
 
-**within**
+### within
 
 ``structure.modifier.within :: (radius: value, seq: atom-set-seq) -> atom-set-seq``
 
+Has reference implementation: *no*
+
 -------------------
 
-**find**
+### find
 
 ``structure.modifier.find :: (query: atom-set-seq) -> atom-set-seq``
 
-*Executes the specified query in the context induced by each of the atoms sets in the sequence.*
+> Executes the specified query in the context induced by each of the atoms sets in the sequence.
+
+Has reference implementation: *no*
 
 -------------------
 
 ## Sequence Combinators
 
-**merge**
+### merge
 
 ``structure.combinator.merge :: atom-set-seq``
 
+Has reference implementation: *no*
+
 -------------------
 
-**union**
+### union
 
 ``structure.combinator.union :: atom-set-seq``
 
-*Collects all atom sets in the sequence into a single atom set.*
+> Collects all atom sets in the sequence into a single atom set.
+
+Has reference implementation: *no*
 
 -------------------
 
-**near**
+### near
 
 ``structure.combinator.near :: (max-distance: value) -> atom-set-seq``
 
-*Merges all tuples of atom sets that are mutually no further than the specified threshold.*
+> Merges all tuples of atom sets that are mutually no further than the specified threshold.
+
+Has reference implementation: *no*
 
 -------------------
 
 ## Context Updates
 
-**inside**
+### inside
 
 ``structure.context.inside :: (query: atom-set-seq) -> value``
 
-*Create a context induced by the query.*
+> Create a context induced by the query.
+
+Has reference implementation: *no*
 
 -------------------
 
-**assembly**
+### assembly
 
 ``structure.context.assembly :: (name: value) -> value``
 
-*Creates a context by applying assembly operators.*
+> Creates a context by applying assembly operators.
+
+Has reference implementation: *no*
 
 -------------------
 
-**symmetry-mates**
+### symmetry-mates
 
 ``structure.context.symmetry-mates :: (radius: value) -> value``
 
-*Creates a context by adding symmetry mates that are within *radius* angstroms.*
+> Creates a context by adding symmetry mates that are within *radius* angstroms.
+
+Has reference implementation: *no*
 
 -------------------
 
