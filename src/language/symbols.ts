@@ -131,7 +131,7 @@ const structure = {
             label_atom_id: value(),
             type_symbol: value(),
             B_iso_or_equiv: value(),
-            operatorName: value('Returns the name of the symmetry operator applied to this atom.')
+            operatorName: value('Returns the name of the symmetry operator applied to this atom (e.g., 4_455). Atoms from the loaded asymmetric always return 1_555')
         },
         residue: {
             header: 'Residues',

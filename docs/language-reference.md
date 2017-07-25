@@ -207,7 +207,7 @@ Has reference implementation: *yes*
 
 ``primitive.operator.in-set :: (set: set, value: value) -> value``
 
-Has reference implementation: *no*
+Has reference implementation: *yes*
 
 -------------------
 
@@ -215,7 +215,7 @@ Has reference implementation: *no*
 
 ``primitive.operator.map-get :: (map: map, key: value, default: value) -> value``
 
-Has reference implementation: *no*
+Has reference implementation: *yes*
 
 -------------------
 
@@ -228,22 +228,6 @@ Has reference implementation: *no*
 ``structure.constructor.element-symbol :: (symbol: value) -> element-symbol``
 
 Has reference implementation: *yes*
-
--------------------
-
-### atom-set
-
-``structure.constructor.atom-set :: (atom-indices: value+) -> atom-set``
-
-Has reference implementation: *no*
-
--------------------
-
-### atom-set-seq
-
-``structure.constructor.atom-set-seq :: (sets: atom-set*) -> atom-set-seq``
-
-Has reference implementation: *no*
 
 -------------------
 

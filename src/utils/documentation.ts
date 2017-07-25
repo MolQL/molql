@@ -24,7 +24,7 @@ function formatSymbol(symbol: SymbolInfo) {
     lines.push(`### ${symbol.shortName}\n`);
     lines.push(`\`\`${header}\`\`\n`);
     if (symbol.description) {
-        lines.push(`> ${symbol.description}\n`);
+        lines.push(`*${symbol.description}*\n`);
     }
     lines.push(`Has reference implementation: *${Runtime[symbol.name] ? 'yes' : 'no'}*\n`);
     lines.push(`-------------------\n`);
