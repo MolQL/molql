@@ -14,7 +14,7 @@ import * as Molecule from './reference-implementation/molecule/data-model'
 //function symb(s: { name: string }) { return Expression.symbol(s.name); }
 //console.log('symb', S.primitive.functional.partial.symbol);
 function apply(s: string | Expression.Symbol, args?: any[]) { return Expression.symbol(s, args) }
-const expr = apply(apply(S.primitive.functional.partial.name, [apply(S.primitive.operator.plus.name), 1, 2, 3, 4]), [5])
+const expr = apply(apply(S.primitive.functional.partial.name, [apply(S.primitive.operator.add.name), 1, 2, 3, 4]), [5])
 //const expr = apply(S.primitive.operator.plus, 1, 2)
 console.log(Expression.format(expr));
 const comp = compile(expr);
@@ -31,15 +31,19 @@ function run(model: Molecule.Model) {
     const residues = Q.atoms(
         true, //Q.equal(Q.props.residue.label_comp_id, 'HEM'), 
         Q.structProp.residue.uniqueId);
+    const cOnHEM = Q.atoms(
+        Q.and(Q.eq(Q.structProp.residue.label_comp_id, 'HEM'), Q.eq(Q.structProp.atom.type_symbol, Q.element('C'))),
+        Q.structProp.residue.uniqueId);
     //const query = Q.filter(residues, Q.lt(Q.structProp.atomSet.atomCount, 7));
     //const query = residues;
-    const query = Q.filter(
+    let query = Q.filter(
         Q.atoms(true, Q.structProp.residue.uniqueId),
         Q.lt(
             Q.div(
                 Q.foldl(Q.plus(Q.slot(), Q.structProp.atom.B_iso_or_equiv), 0),
                 Q.structProp.atomSet.atomCount),
             40));
+    query = cOnHEM;
     console.log(JSON.stringify(query, null, 2));
     console.log(Expression.format(query));
     const compiled = compile(query);

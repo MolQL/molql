@@ -10,13 +10,16 @@ import * as QueryHelpers from '../query/helpers'
 
 export type RuntimeExpression<T = any> = (ctx: Query.Context, ...args: RuntimeExpression[]) => T
 
-export type Attribute = 'const-expr'
+export type Attribute =
+    'static-expr' // static expressions are independent from context if their children are also independent from context.
 
-const constAttribute: Attribute[] = ['const-expr']
+const staticAttribute: Attribute[] = ['static-expr']
 
 const symbols: ([SymbolInfo, RuntimeExpression] | [SymbolInfo, RuntimeExpression, Attribute[]])[] = [
     ////////////////////////////////////
     // Primitives
+
+    // ============= CONSTRUCTORS =============
     [
         Symbols.primitive.constructor.list,
         function (ctx) {
@@ -24,7 +27,7 @@ const symbols: ([SymbolInfo, RuntimeExpression] | [SymbolInfo, RuntimeExpression
             for (let i = 1; i < arguments.length; i++) list[list.length] = arguments[i](ctx);
             return list;
         },
-        constAttribute
+        staticAttribute
     ],
     [
         Symbols.primitive.constructor.set,
@@ -33,7 +36,7 @@ const symbols: ([SymbolInfo, RuntimeExpression] | [SymbolInfo, RuntimeExpression
             for (let i = 1; i < arguments.length; i++) set.add(arguments[i](ctx));
             return set;
         },
-        constAttribute
+        staticAttribute
     ],
     [
         Symbols.primitive.constructor.map,
@@ -42,9 +45,10 @@ const symbols: ([SymbolInfo, RuntimeExpression] | [SymbolInfo, RuntimeExpression
             for (let i = 1; i < arguments.length; i += 2) map.set(arguments[i](ctx), arguments[i + 1](ctx));
             return map;
         },
-        constAttribute
+        staticAttribute
     ],
 
+    // ============= FUNCTIONAL =============
     [
         Symbols.primitive.functional.partial,
         function (ctx, f: RuntimeExpression) {
@@ -60,14 +64,15 @@ const symbols: ([SymbolInfo, RuntimeExpression] | [SymbolInfo, RuntimeExpression
     ],
     [Symbols.primitive.functional.slot, (ctx, index: RuntimeExpression<number>) => ctx.slots[index(ctx)].value],
 
-    [Symbols.primitive.operator.not, (ctx, x) => !x(ctx), constAttribute],
+    // ============= OPERATORS =============
+    [Symbols.primitive.operator.not, (ctx, x) => !x(ctx), staticAttribute],
     [
         Symbols.primitive.operator.and,
         function (ctx) {
             for (let i = 1; i < arguments.length; i++) if (!arguments[i](ctx)) return false;
             return true;
         },
-        constAttribute
+        staticAttribute
     ],
     [
         Symbols.primitive.operator.or,
@@ -75,53 +80,97 @@ const symbols: ([SymbolInfo, RuntimeExpression] | [SymbolInfo, RuntimeExpression
             for (let i = 1; i < arguments.length; i++) if (arguments[i](ctx)) return true;
             return false;
         },
-        constAttribute
+        staticAttribute
     ],
-    [Symbols.primitive.operator.eq, (ctx, x, y) => x(ctx) === y(ctx), constAttribute],
-    [Symbols.primitive.operator.neq, (ctx, x, y) => x(ctx) !== y(ctx), constAttribute],
-    [Symbols.primitive.operator.lt, (ctx, x, y) => x(ctx) < y(ctx), constAttribute],
-    [Symbols.primitive.operator.lte, (ctx, x, y) => x(ctx) <= y(ctx), constAttribute],
-    [Symbols.primitive.operator.gr, (ctx, x, y) => x(ctx) > y(ctx), constAttribute],
-    [Symbols.primitive.operator.gre, (ctx, x, y) => x(ctx) >= y(ctx), constAttribute],
+    [Symbols.primitive.operator.eq, (ctx, x, y) => x(ctx) === y(ctx), staticAttribute],
+    [Symbols.primitive.operator.neq, (ctx, x, y) => x(ctx) !== y(ctx), staticAttribute],
+    [Symbols.primitive.operator.lt, (ctx, x, y) => x(ctx) < y(ctx), staticAttribute],
+    [Symbols.primitive.operator.lte, (ctx, x, y) => x(ctx) <= y(ctx), staticAttribute],
+    [Symbols.primitive.operator.gr, (ctx, x, y) => x(ctx) > y(ctx), staticAttribute],
+    [Symbols.primitive.operator.gre, (ctx, x, y) => x(ctx) >= y(ctx), staticAttribute],
     [
-        Symbols.primitive.operator.plus,
+        Symbols.primitive.operator.add,
         function(ctx) {
             let ret = 0;
             for (let i = 1; i < arguments.length; i++) ret += arguments[i](ctx);
             return ret;
         },
-        constAttribute
+        staticAttribute
     ],
-    [Symbols.primitive.operator.div, (ctx, x, y) => x(ctx) / y(ctx), constAttribute],
+    [Symbols.primitive.operator.sub, (ctx, x, y) => x(ctx) - y(ctx), staticAttribute],
+    [
+        Symbols.primitive.operator.mult,
+        function(ctx) {
+            let ret = 1;
+            for (let i = 1; i < arguments.length; i++) ret *= arguments[i](ctx);
+            return ret;
+        },
+        staticAttribute
+    ],
+    [Symbols.primitive.operator.div, (ctx, x, y) => x(ctx) / y(ctx), staticAttribute],
+    [Symbols.primitive.operator.pow, (ctx, x, y) => Math.pow(x(ctx), y(ctx)), staticAttribute],
+    [
+        Symbols.primitive.operator.min,
+        function(ctx) {
+            let ret = 0;
+            for (let i = 1; i < arguments.length; i++) ret = Math.min(arguments[i](ctx), ret);
+            return ret;
+        },
+        staticAttribute
+    ],
+    [
+        Symbols.primitive.operator.max,
+        function(ctx) {
+            let ret = 0;
+            for (let i = 1; i < arguments.length; i++) ret = Math.max(arguments[i](ctx), ret);
+            return ret;
+        },
+        staticAttribute
+    ],
+    [
+        Symbols.primitive.operator.stringJoin,
+        function(ctx) {
+            const ret: string[] = [];
+            for (let i = 1; i < arguments.length; i++) ret.push('' + arguments[i](ctx));
+            return ret.join('');
+        },
+        staticAttribute
+    ],
     [
         Symbols.primitive.operator.inRange,
         (ctx, x, a, b) => { const v = x(ctx); return v >= a(ctx) && v <= b(ctx) },
-        constAttribute
+        staticAttribute
     ],
     [
         Symbols.primitive.operator.inSet,
         (ctx, set: RuntimeExpression<FastSet<any>>, v) => set(ctx).has(v(ctx)),
-        constAttribute
+        staticAttribute
     ],
     [
         Symbols.primitive.operator.mapGet,
         (ctx, map: RuntimeExpression<FastMap<any, any>>, key, def) => {
-            const m = map(ctx);
-            const k = key(ctx);
+            const m = map(ctx), k = key(ctx);
             if (m.has(k)) return m.get(k);
             return def(ctx);
         },
-        constAttribute
+        staticAttribute
     ],
 
     ////////////////////////////////////
     // Structure
+
+    // ============= CONSTRUCTORS =============
     [
         Symbols.structure.constructor.elementSymbol,
         (ctx, s: RuntimeExpression<string>) => RuntimeHelpers.normalizeElementSymbol(s(ctx)),
-        constAttribute
+        staticAttribute
     ],
 
+    // ============= ATOM PROPERTIES =============
+    [
+        Symbols.structure.property.atom.uniqueId,
+        ctx => ctx.element.value.atom
+    ],
     [
         Symbols.structure.property.atom.id,
         ctx => ctx.columns.id.getInteger(ctx.element.value.atom)
@@ -138,6 +187,8 @@ const symbols: ([SymbolInfo, RuntimeExpression] | [SymbolInfo, RuntimeExpression
         Symbols.structure.property.atom.B_iso_or_equiv,
         ctx => ctx.columns.B_iso_or_equiv.getFloat(ctx.element.value.atom)
     ],
+
+    // ============= RESIDUE PROPERTIES =============
     [
         Symbols.structure.property.residue.uniqueId,
         ctx => ctx.element.value.residue
@@ -150,11 +201,14 @@ const symbols: ([SymbolInfo, RuntimeExpression] | [SymbolInfo, RuntimeExpression
         Symbols.structure.property.residue.label_seq_id,
         ctx => ctx.columns.label_seq_id.getInteger(ctx.element.value.atom)
     ],
+
+    // ============= CHAIN PROPERTIES =============
     [
         Symbols.structure.property.chain.label_asym_id,
         ctx => ctx.columns.label_asym_id.getString(ctx.element.value.atom)
     ],
 
+    // ============= ATOM SET PROPERTIES =============
     [
         Symbols.structure.property.atomSet.atomCount,
         ctx => ctx.atomSet.value.atomIndices.length
@@ -174,18 +228,14 @@ const symbols: ([SymbolInfo, RuntimeExpression] | [SymbolInfo, RuntimeExpression
             return reduced;
         }
     ],
+
+    // ============= ATOM SEQ SEQ PROPERTIES =============
     [
         Symbols.structure.property.atomSetSeq.length,
         (ctx, seq: RuntimeExpression<Query.AtomSetSeq>) => seq(ctx).atomSets.length
     ],
 
-    [
-        Symbols.structure.primitive.generate,
-        (ctx, pred: RuntimeExpression, grouping?: RuntimeExpression) => {
-            if (grouping) return RuntimeHelpers.groupingGenerator(ctx, pred, grouping);
-            return RuntimeHelpers.nonGroupingGenerator(ctx, pred);
-        }
-    ],
+    // ============= PRIMITIVES =============    
     [
         Symbols.structure.primitive.modify,
         (ctx, seq: RuntimeExpression<Query.AtomSetSeq>, f: RuntimeExpression<Query.AtomSetSeq>) => {
@@ -209,6 +259,17 @@ const symbols: ([SymbolInfo, RuntimeExpression] | [SymbolInfo, RuntimeExpression
             return query(newCtx(ctx));
         }
     ],
+
+    // ============= GENERATORS =============
+    [
+        Symbols.structure.generator.atomGroups,
+        (ctx, pred: RuntimeExpression, grouping?: RuntimeExpression) => {
+            if (grouping) return RuntimeHelpers.groupingGenerator(ctx, pred, grouping);
+            return RuntimeHelpers.nonGroupingGenerator(ctx, pred);
+        }
+    ],
+
+    // ============= MODIFIERS =============
     [
         Symbols.structure.modifier.filter,
         (ctx, pred: RuntimeExpression<boolean>) => {

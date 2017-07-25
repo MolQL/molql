@@ -8,15 +8,14 @@ export type Expression =
 
 export namespace Expression {
     export type Literal = string | number | boolean
-    export interface Symbol { symbol: string | Symbol, args?: Expression[] }
+    export interface Symbol { readonly symbol: string | Symbol, readonly args?: Expression[] }
 
     export function symbol(symbol: string | Symbol, args?: Expression[]): Symbol { return { symbol, args }; }
-
     export function isLiteral(e: Expression): e is Expression.Literal { return !(e as Symbol).symbol && !(e as Symbol).args; }
 
     function isValueLike(e: Expression) {
         if (isLiteral(e)) return true;
-        return isLiteral(e.symbol) && (!e.args || !e.args.length);
+        return typeof e.symbol === 'string' && (!e.args || !e.args.length);
     }
 
     function formatValueLike(e: Expression, prefix: string) {

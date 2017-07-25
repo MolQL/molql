@@ -86,11 +86,11 @@ const primitive = {
         and: binOp(),
         or: binOp(),
 
-        plus: binOp(),
-        minus: binRel(),
-        times: binOp(),
+        add: binOp(),
+        sub: binRel(),
+        mult: binOp(),
         div: binRel(),
-        power: binRel(),
+        pow: binRel(),
         min: binOp(),
         max: binOp(),
 
@@ -100,6 +100,8 @@ const primitive = {
         lte: binRel(),
         gr: binRel(),
         gre: binRel(),
+
+        stringJoin: binOp(),
 
         inRange: symbol({
             type: Type.value,
@@ -128,6 +130,7 @@ const structure = {
         header: 'Properties',
         atom: {
             header: 'Atoms',
+            uniqueId: value(),
             id: value(),
             label_atom_id: value(),
             type_symbol: value(),
@@ -162,12 +165,7 @@ const structure = {
             })
         }
     },
-    primitive: {
-        header: 'Query Primitives',
-        generate: symbol({
-            type: Type.Structure.atomSetSeq,
-            args: [['predicate', Type.optional(Type.value)], ['group-by', Type.optional(Type.value)]]
-        }),
+    primitive: {        
         modify: symbol({
             type: Type.Structure.atomSetSeq,
             args: [['seq', Type.Structure.atomSetSeq], ['f', Type.Structure.atomSetSeq]]
@@ -181,6 +179,13 @@ const structure = {
             type: Type.Structure.atomSetSeq,
             args: [['context', Type.value], ['query', Type.Structure.atomSetSeq]]
         })
+    },
+    generator: {
+        header: 'Generators',
+        atomGroups: symbol({
+            type: Type.Structure.atomSetSeq,
+            args: [['predicate', Type.optional(Type.value)], ['group-by', Type.optional(Type.value)]]
+        }),
     },
     modifier: {
         header: 'Atom Set Modifiers',

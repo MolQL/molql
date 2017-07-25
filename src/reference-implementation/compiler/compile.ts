@@ -25,8 +25,6 @@ function applyExpression(expression: RuntimeExpression, slots: any[]): RuntimeEx
         case 2: return function (ctx) { return expression(ctx)(ctx, slots[1]); };
         case 3: return function (ctx) { return expression(ctx)(ctx, slots[1], slots[2]); };
         case 4: return function (ctx) { return expression(ctx)(ctx, slots[1], slots[2], slots[3]); };
-        case 5: return function (ctx) { return expression(ctx)(ctx, slots[1], slots[2], slots[3], slots[4]); };
-        case 6: return function (ctx) { return expression(ctx)(ctx, slots[1], slots[2], slots[3], slots[4], slots[5]); };
         default: return function (ctx) { slots[0] = ctx; return expression(ctx).apply(null, slots); };
     }
 }
@@ -39,15 +37,17 @@ function applyRuntime(runtime: RuntimeExpression, slots: any[]): RuntimeExpressi
         case 2: return function (ctx) { return runtime(ctx, slots[1]); };
         case 3: return function (ctx) { return runtime(ctx, slots[1], slots[2]); };
         case 4: return function (ctx) { return runtime(ctx, slots[1], slots[2], slots[3]); };
-        case 5: return function (ctx) { return runtime(ctx, slots[1], slots[2], slots[3], slots[4]); };
-        case 6: return function (ctx) { return runtime(ctx, slots[1], slots[2], slots[3], slots[4], slots[5]); };
         default: return function (ctx) { slots[0] = ctx; return runtime.apply(null, slots); };
     }
 }
 
 function _compile(expr: Expression, isHead: boolean): RuntimeExpression {
+    if (isHead && typeof expr === 'string') {
+         return symbol(expr)
+    }
+
     if (Expression.isLiteral(expr)) {
-        return isHead && typeof expr === 'string' ? symbol(expr) : value(expr);
+        return value(expr);
     }
 
     const head = _compile(expr.symbol, true);

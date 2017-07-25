@@ -13,7 +13,6 @@ namespace Language {
     type V = E<Type.Value>
     type Varg = V | SymbolInfo
 
-    
     function symbol<T extends E>(symbol: SymbolInfo, args?: (E | SymbolInfo)[]): T {
         const normalizedArgs = args && args.map(a => isSymbolInfo(a) ? Expression.symbol(a.name) : a);
         return Expression.symbol(symbol.name, normalizedArgs as Expression[]) as T;
@@ -23,7 +22,7 @@ namespace Language {
 
     export function or(...xs: Varg[]): V { return symbol(Symbols.primitive.operator.or, xs); }
     export function and(...xs: Varg[]): V { return symbol(Symbols.primitive.operator.and, xs); }
-    export function plus(...xs: Varg[]): V { return symbol(Symbols.primitive.operator.plus, xs); }
+    export function plus(...xs: Varg[]): V { return symbol(Symbols.primitive.operator.add, xs); }
     export function div(x: Varg, y: Varg): V { return symbol(Symbols.primitive.operator.div, [x, y]); }
 
     export function eq(a: Varg, b: Varg): V { return symbol(Symbols.primitive.operator.eq, [a, b]); }
@@ -38,7 +37,7 @@ namespace Language {
     }
 
     export function atoms(pred?: Varg, groupBy?: Varg): Q {
-        return symbol(Symbols.structure.primitive.generate, pred ? groupBy ? [pred, groupBy] : [pred] : void 0);
+        return symbol(Symbols.structure.generator.atomGroups, pred ? groupBy ? [pred, groupBy] : [pred] : void 0);
     }
 
     export function foldl(f: Varg, initial: Varg): V { return symbol(Symbols.structure.property.atomSet.reduce, [f, initial]); }

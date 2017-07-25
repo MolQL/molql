@@ -61,7 +61,7 @@ export class AtomSet implements Query.AtomSet {
 export namespace AtomSet {
     export function areEqual(a: Query.AtomSet, b: Query.AtomSet) {
         const xs = a.atomIndices, ys = b.atomIndices;
-        if (xs.length != ys.length) return false;
+        if (xs.length !== ys.length) return false;
         for (let i = 0, _i = xs.length; i < _i; i++) {
             if (xs[i] !== ys[i]) return false;
         }
