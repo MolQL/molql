@@ -66,8 +66,27 @@ export namespace Iterator {
         element.residue = residueStartIndex[chain];
         element.atom = atomStartIndex[element.residue];
     }
-}
 
+    export function beginSlot(ctx: Context, index: number, initialValue?: any) {
+        const { slots } = ctx;
+        let slot = slots[index];
+        if (slot) {
+            begin(slot, initialValue);
+        } else {
+            slot = Iterator<any>();
+            slots[index] = slot;
+            begin(slot, initialValue);
+        }
+        return slot;
+    }
+
+    export function endSlot(ctx: Context, index: number) {
+        const { slots } = ctx;
+        let slot = slots[index];
+        end(slot);
+        if (!slot.stack.length) delete slots[index];
+    }
+}
 
 export interface Context {
     readonly model: Molecule.Model,
@@ -76,6 +95,7 @@ export interface Context {
 
     element: Iterator<Iterator.Element>,
     atomSet: Iterator<AtomSet>,
+    slots: { [index: number]: Iterator<any> },
     value: Iterator<any>
 }
 
@@ -87,6 +107,7 @@ export function Context(model: Molecule.Model, mask: Mask): Context {
 
         element: Iterator<Iterator.Element>(),
         atomSet: Iterator<AtomSet>(),
+        slots: Object.create(null),
         value: Iterator<any>()
     };
 }

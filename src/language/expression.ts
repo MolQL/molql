@@ -8,9 +8,9 @@ export type Expression =
 
 export namespace Expression {
     export type Literal = string | number | boolean
-    export type Apply = { symbol: string, args?: Expression[] }
+    export type Apply = { head: Expression, args?: Expression[] }
 
-    export function apply(symbol: string, args?: Expression[]): Apply { return { symbol, args }; }
+    export function apply(head: Expression, args?: Expression[]): Apply { return { head, args }; }
     export function isLiteral(e: Expression): e is Expression.Literal { return typeof (e as any).symbol !== 'string'; }
 
     export function format(e: Expression): string {
@@ -20,8 +20,8 @@ export namespace Expression {
             }
             return `${e}`;
         }
-        if (!e.args || !e.args.length) return `${e.symbol}`;
-        return `(${e.symbol} ${e.args.map(a => format(a)).join(' ')})`;
+        if (!e.args || !e.args.length) return `${e.head}`;
+        return `(${e.head} ${e.args.map(a => format(a)).join(' ')})`;
     }
 }
 

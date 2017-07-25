@@ -40,6 +40,7 @@ const symbols: ([SymbolInfo, RuntimeExpression] | [SymbolInfo, RuntimeExpression
             return func.apply(null, [ctx, ...xArgs, ...yArgs]);
         };
     }],
+    [Symbols.primitive.functional.slot, (ctx, index: RuntimeExpression<number>) => ctx.slots[index(ctx)].current],
 
     [Symbols.primitive.operator.not, (ctx, x) => !x(ctx), constAttribute],
     [Symbols.primitive.operator.and, (ctx, ...xs) => {

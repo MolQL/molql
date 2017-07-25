@@ -22,7 +22,7 @@ export default function compile(expr: Expression): RuntimeExpression {
     if (Expression.isLiteral(expr)) {
         return compileValue(expr);
     }
-    const symbol = compileSymbol(expr.symbol);
+    const symbol = Expression.isLiteral(expr.head) ? compileSymbol(expr.head as string) : compile(expr.head);
     if (!expr.args || !expr.args.length) return symbol;
     const slots: any[] = [void 0];
     for (let i = 0; i < expr.args.length; i++) slots[i + 1] = compile(expr.args[i]);
