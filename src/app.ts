@@ -9,17 +9,59 @@ import S from './language/symbols'
 import * as Query from './reference-implementation/query/data-model'
 import compile from './reference-implementation/compiler/compile'
 import Q from './reference-implementation/query/builder'
-import * as Molecule from './reference-implementation/molecule/data-model'
+import * as Molecule from './reference-implementation/molecule/model'
 import { lispFormat } from './reference-implementation/utils/expression'
 
 //function symb(s: { name: string }) { return Expression.symbol(s.name); }
 //console.log('symb', S.primitive.functional.partial.symbol);
 function apply(s: string | Expression.Symbol, args?: any[]) { return Expression.symbol(s, args) }
-const expr = apply(apply(S.primitive.functional.partial.name, [apply(S.primitive.operator.arithmetic.add.name), 1, 2, 3, 4]), [5])
+//const expr = apply(apply(S.primitive.functional.partial.name, [apply(S.primitive.operator.arithmetic.add.name), 1, 2, 3, 4]), [5])
+
+const expr = apply(S.primitive.operator.arithmetic.add.name, [1, 2, 3, 4, 5])
+
 //const expr = apply(S.primitive.operator.plus, 1, 2)
 console.log(lispFormat(expr));
 const comp = compile(expr);
 console.log(comp(0 as any));
+
+
+function bb() {
+    const v = compile(expr);
+    let ret = 0;
+    for (let i = 0; i < 1000000; i++) {
+        ret += v(void 0 as any);
+    }
+    return ret;
+}
+function add(...args: number[]): number;
+function add() {
+    let ret = 0;
+    for (let i = 0; i < arguments.length; i++) ret += arguments[i];
+    return ret;
+}
+function fff(i: number) {
+    return i + 1;
+}
+function bl() {
+    let ret = 0;
+    for (let i = 0; i < 1000000; i++) {
+        ret += add.apply(null, [fff(i), fff(i), fff(i  -1 ), fff(i + 3), fff(i +9)]);
+    }
+    return ret;
+}
+
+console.time('bb');
+bb();
+console.timeEnd('bb');
+console.time('bb');
+bb();
+console.timeEnd('bb');
+console.time('bl');
+bl();
+console.timeEnd('bl');
+console.time('bl');
+bl();
+console.timeEnd('bl');
 
 function run(model: Molecule.Model) {
     // for (const c of Molecule.AtomSiteColumns) {
@@ -29,31 +71,31 @@ function run(model: Molecule.Model) {
     // (generator (always) (map-get (map 'ALA' 1 'HEM' 1) residue_name 0))
     // { 'ALA': 1, ''}
 
-    const residues = Q.atoms(
-        true, //Q.equal(Q.props.residue.label_comp_id, 'HEM'), 
-        Q.structProp.residue.uniqueId);
-    const cOnHEM = Q.atoms(
-        Q.and(Q.eq(Q.structProp.residue.label_comp_id, 'HEM'), Q.eq(Q.structProp.atom.type_symbol, Q.element('C'))),
-        Q.structProp.residue.uniqueId);
-    //const query = Q.filter(residues, Q.lt(Q.structProp.atomSet.atomCount, 7));
-    //const query = residues;
-    let query = Q.filter(
-        Q.atoms(true, Q.structProp.residue.uniqueId),
-        Q.lt(
-            Q.div(
-                Q.foldl(Q.plus(Q.slot(), Q.structProp.atom.B_iso_or_equiv), 0),
-                Q.structProp.atomSet.atomCount),
-            40));
-    query = cOnHEM;
-    console.log(JSON.stringify(query, null, 2));
-    console.log(lispFormat(query));
-    const compiled = compile(query);
-    const ctx = Query.Context.ofModel(model);
+    // const residues = Q.atoms(
+    //     true, //Q.equal(Q.props.residue.label_comp_id, 'HEM'), 
+    //     Q.structProp.residue.uniqueId);
+    // const cOnHEM = Q.atoms(
+    //     Q.and(Q.eq(Q.structProp.residue.label_comp_id, 'HEM'), Q.eq(Q.structProp.atom.type_symbol, Q.element('C'))),
+    //     Q.structProp.residue.uniqueId);
+    // //const query = Q.filter(residues, Q.lt(Q.structProp.atomSet.atomCount, 7));
+    // //const query = residues;
+    // let query = Q.filter(
+    //     Q.atoms(true, Q.structProp.residue.uniqueId),
+    //     Q.lt(
+    //         Q.div(
+    //             Q.foldl(Q.plus(Q.slot(), Q.structProp.atom.B_iso_or_equiv), 0),
+    //             Q.structProp.atomSet.atomCount),
+    //         40));
+    // query = cOnHEM;
+    // console.log(JSON.stringify(query, null, 2));
+    // console.log(lispFormat(query));
+    // const compiled = compile(query);
+    // const ctx = Query.Context.ofModel(model);
 
-    const result = compiled(ctx) as Query.AtomSetSeq;
-    console.log(result.atomSets.length, result.atomSets[0].atomIndices);
-    // for (const set of result.atomSets)
-    //     console.log(set.atomIndices);
+    // const result = compiled(ctx) as Query.AtomSetSeq;
+    // console.log(result.atomSets.length, result.atomSets[0].atomIndices);
+    // // for (const set of result.atomSets)
+    // //     console.log(set.atomIndices);
 }
 
 fs.readFile('e:/test/quick/1tqn_updated.cif', 'utf-8', (err, data) => {
@@ -64,7 +106,7 @@ fs.readFile('e:/test/quick/1tqn_updated.cif', 'utf-8', (err, data) => {
 
     try {
         const mol = Molecule.parseCIF(data);
-        run(mol.models[0]);
+        //run(mol.models[0]);
     } catch (e) {
         console.error(e);
         return;

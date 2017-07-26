@@ -1,13 +1,16 @@
 {
-  "name": "pq",
+  "name": "molql",
   "version": "1.0.0",
   "description": "",
   "main": "app.js",
   "scripts": {
+    "build": "./node_modules/.bin/tsc",
+    "watch": "./node_modules/.bin/tsc -watch",
+    "docs": "node ./build/utils/documentation.js > ./docs/language-reference.md",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
     "@types/node": "^8.0.16",
     "typescript": "^2.4.2"

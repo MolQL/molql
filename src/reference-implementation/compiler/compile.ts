@@ -3,61 +3,70 @@
  */
 
 import Expression from '../../language/expression'
-import Runtime, { RuntimeExpression } from '../runtime/symbols'
+import Symbols, { SymbolRuntime } from '../runtime/symbols'
+import RuntimeExpression from '../runtime/expression'
+import Environment from '../runtime/environment'
+//import Runtime, { RuntimeExpression } from '../runtime/symbols'
 
-function value(v: any): RuntimeExpression {
-    return function (ctx) { return v; };
+interface CompileContext {
+    id: number
 }
 
-function symbol(name: string): RuntimeExpression {
-    if (!Runtime[name]) throw new Error(`Could not find implementation of symbol '${name}'.`);
-    return Runtime[name];
+function getRuntime(name: string): SymbolRuntime {
+    if (!Symbols[name]) throw new Error(`Could not find implementation of symbol '${name}'.`);
+    return Symbols[name];
 }
 
-function applySymbol(symbol: RuntimeExpression, slots: any[]): RuntimeExpression {
-    return function (ctx) { slots[0] = ctx; return symbol.apply(null, slots); };
+function wrap(ctx: CompileContext, f: RuntimeExpression) {
+    return RuntimeExpression(f, { id: ctx.id++ });
 }
 
-function applyExpression(expression: RuntimeExpression, slots: any[]): RuntimeExpression {
+function value(ctx: CompileContext, v: any): RuntimeExpression {
+    return RuntimeExpression(v, { id: ctx.id++, runtimeHint: 'const' });
+}
+
+function symbol(ctx: CompileContext, runtime: SymbolRuntime): RuntimeExpression {
+    return RuntimeExpression(runtime, { id: ctx.id++, runtimeHint: 'const' });
+}
+
+function _apply(expression: RuntimeExpression, slots: any[]): RuntimeExpression {
+    return function (env) { slots[0] = env; return expression(env).apply(null, slots); };
+}
+
+function apply(expression: RuntimeExpression, args: RuntimeExpression[]): RuntimeExpression {
     // An optimization to call a function directly for a low number of arguments.
-    switch (slots.length) {
-        case 1: return function (ctx) { return expression(ctx)(ctx); };
-        case 2: return function (ctx) { return expression(ctx)(ctx, slots[1]); };
-        case 3: return function (ctx) { return expression(ctx)(ctx, slots[1], slots[2]); };
-        case 4: return function (ctx) { return expression(ctx)(ctx, slots[1], slots[2], slots[3]); };
-        default: return function (ctx) { slots[0] = ctx; return expression(ctx).apply(null, slots); };
+    switch (args.length) {
+        case 0: return function (env) { return expression(env)(env); };
+        case 1: return function (env) { return expression(env)(env, args[0]); };
+        case 2: return function (env) { return expression(env)(env, args[0], args[1]); };
+        case 3: return function (env) { return expression(env)(env, args[0], args[1], args[2]); };
+        case 4: return function (env) { return expression(env)(env, args[0], args[1], args[2], args[3]); };
+        case 5: return function (env) { return expression(env)(env, args[0], args[1], args[2], args[3], args[4]); };
+        default: return _apply(expression, [void 0, ...args]);
     }
 }
 
-function applyRuntime(runtime: RuntimeExpression, slots: any[]): RuntimeExpression {
-    // An optimization to call a function directly for a low number of arguments.
-    // Plus an optimization to call runtime directly.
-    switch (slots.length) {
-        case 1: return function (ctx) { return runtime(ctx); };
-        case 2: return function (ctx) { return runtime(ctx, slots[1]); };
-        case 3: return function (ctx) { return runtime(ctx, slots[1], slots[2]); };
-        case 4: return function (ctx) { return runtime(ctx, slots[1], slots[2], slots[3]); };
-        default: return function (ctx) { slots[0] = ctx; return runtime.apply(null, slots); };
-    }
+function onlyStringLiteralsCanBeApplied() {
+    throw new Error('Only string literals can be applied.');
 }
 
-function _compile(expr: Expression, isSymbol: boolean): RuntimeExpression {
-    if (isSymbol && typeof expr === 'string') {
-         return symbol(expr)
-    }
-
+function _compile(ctx: CompileContext, expr: Expression, isSymbol: boolean): RuntimeExpression {
     if (Expression.isLiteral(expr)) {
-        return value(expr);
+        if (isSymbol) {
+            if (typeof expr !== 'string') onlyStringLiteralsCanBeApplied();
+            return symbol(ctx, getRuntime(expr as string));
+        }
+        return value(ctx, expr);
     }
 
-    const head = _compile(expr.symbol, true);
-    if (!expr.args || !expr.args.length) return head;
+    const head = _compile(ctx, expr.symbol, true);
+    if (!expr.args || !expr.args.length) return wrap(ctx, head);
 
-    const slots: any[] = [void 0];
-    if (expr.args) for (let i = 0; i < expr.args.length; i++) slots[i + 1] = _compile(expr.args[i], false);
-    return typeof expr.symbol === 'string' ? applyRuntime(symbol(expr.symbol), slots) : applyExpression(head, slots);
+    const slots: any[] = [];
+    if (expr.args) for (let i = 0; i < expr.args.length; i++) slots[i] = _compile(ctx, expr.args[i], false);
+    return wrap(ctx, apply(head, slots));
 }
 
 export default function compile(expr: Expression): RuntimeExpression {
-    return _compile(expr, false);
+    return _compile({ id: 0 }, expr, false);
 }

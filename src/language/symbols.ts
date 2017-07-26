@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 David Sehnal, licensed under MIT, See LICENSE file for more info.
+ * Copyright (c) 2017 MolQL contributors, licensed under MIT, See LICENSE file for more info.
  */
 
 import Type from './type-system'
@@ -57,7 +57,7 @@ const primitive = {
         header: 'Operators',
         logic: {
             header: 'Logic',
-            not: symbol({ type: Type.value, args: [['a', Type.value]] }),
+            not: unaryOp(),
             and: binOp(),
             or: binOp(),
         },
@@ -66,12 +66,31 @@ const primitive = {
             header: 'Arithmetic',
             add: binOp(),
             sub: binRel(),
-            minus: symbol({ type: Type.value, args: [['a', Type.value]] }),
+            minus: unaryOp(),
             mult: binOp(),
             div: binRel(),
             pow: binRel(),
+
             min: binOp(),
-            max: binOp()
+            max: binOp(),
+
+            floor: unaryOp(),
+            ceil: unaryOp(),
+            roundInt: unaryOp(),
+            abs: unaryOp(),
+            sin: unaryOp(),
+            cos: unaryOp(),
+            tan: unaryOp(),
+            asin: unaryOp(),
+            acos: unaryOp(),
+            atan: unaryOp(),
+            atan2: symbol({ type: Type.value, args: [['index', Type.value]] }),
+            sinh: unaryOp(),
+            cosh: unaryOp(),
+            tanh: unaryOp(),
+            exp: unaryOp(),
+            log: unaryOp(),
+            log10: unaryOp()
         },
 
         relational: {
@@ -190,22 +209,46 @@ const structure = {
         header: 'Properties',
         atom: {
             header: 'Atoms',
-            uniqueId: value(),
+            uniqueId: value('Returns an implementation specific unique identifier of the current atom.'),
+
+            Cartn_x: value(),
+            Cartn_y: value(),
+            Cartn_z: value(),
             id: value(),
             label_atom_id: value(),
             type_symbol: value(),
+            occupancy: value(),
             B_iso_or_equiv: value(),
             operatorName: value('Returns the name of the symmetry operator applied to this atom (e.g., 4_455). Atoms from the loaded asymmetric always return 1_555')
         },
         residue: {
             header: 'Residues',
-            uniqueId: value(),
+            uniqueId: value('Returns an implementation specific unique identifier of the current residue.'),
+
+            group_PDB: value(),
             label_seq_id: value(),
-            label_comp_id: value()
+            label_comp_id: value(),
+            pdbx_PDB_ins_code: value()
         },
         chain: {
             header: 'Chains',
+            uniqueId: value('Returns an implementation specific unique identifier of the current chain.'),
+
             label_asym_id: value()
+        },
+        entity: {
+            header: 'Entities',
+            uniqueId: value('Returns an implementation specific unique identifier of the current entity.'),
+
+            id: value()
+        },
+        model: {
+            header: 'Model',
+            pdbx_PDB_model_num: value()
+        },
+        secondaryStructure: {
+            header: 'Secondary Structure',
+            uniqueId: value('Returns an implementation specific unique identifier of the current secondary structure element.'),
         },
         atomSet: {
             header: 'Atom Sets',
@@ -222,7 +265,12 @@ const structure = {
             length: symbol({
                 type: Type.Structure.atomSetSeq,
                 args: [ ['seq', Type.Structure.atomSetSeq] ]
-            })
+            }),
+            propertySet: symbol({
+                type: Type.Primitive.set,
+                args: [ ['prop', Type.value], ['seq', Type.Structure.atomSetSeq] ],
+                description: 'Returns a set of unique properties from all atoms within the source sequence.'
+            }),
         }
     }
 }
@@ -247,6 +295,17 @@ function ctor(type: Type, args: ArgSpec[], description?: string) {
 function value(description?: string) {
     return symbol({ type: Type.value, description });
 }
+
+function unaryOp(description?: string) {
+    return symbol({
+        type: Type.value,
+        description,
+        args: [
+            ['args', Type.value]
+        ]
+    });
+}
+
 
 function binOp(description?: string) {
     return symbol({

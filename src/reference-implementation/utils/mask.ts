@@ -22,7 +22,7 @@ namespace Mask {
 
     class BitMask implements Mask {
         has(i: number) { return <any>this.mask[i]; }
-        constructor(private mask: Int8Array, public size: number) { }
+        constructor(private mask: number[], public size: number) { }
     }
 
     class AllMask implements Mask {
@@ -57,7 +57,11 @@ namespace Mask {
         for (const i of (indices as number[])) {
             mask[i] = 1;
         }
-        return new BitMask(mask, len);
+        return new BitMask(mask as any, len);
+    }
+
+    export function ofMask(mask: number[], size: number): Mask {
+        return new BitMask(mask, size);
     }
 
     export function hasAny(mask: Mask, xs: number[]) {

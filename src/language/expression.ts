@@ -1,12 +1,12 @@
 /*
- * Copyright (c) 2017 David Sehnal, licensed under MIT, See LICENSE file for more info.
+ * Copyright (c) 2017 MolQL contributors, licensed under MIT, See LICENSE file for more info.
  */
 
-export type Expression =
+type Expression =
     | Expression.Literal
     | Expression.Symbol
 
-export namespace Expression {
+namespace Expression {
     export type Literal = string | number | boolean
     export interface Symbol { readonly symbol: string | Symbol, readonly args?: Expression[] }
 

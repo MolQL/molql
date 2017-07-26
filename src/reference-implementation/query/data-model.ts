@@ -2,7 +2,7 @@
  * Copyright (c) 2017 David Sehnal, licensed under MIT, See LICENSE file for more info.
  */
 
-import * as Molecule from '../molecule/data-model'
+import * as Molecule from '../molecule/model'
 import * as Helpers from './helpers'
 import Mask from '../utils/mask'
 
