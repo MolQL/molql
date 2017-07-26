@@ -11,25 +11,29 @@ import compile from './reference-implementation/compiler/compile'
 import Q from './reference-implementation/query/builder'
 import * as Molecule from './reference-implementation/molecule/model'
 import { lispFormat } from './reference-implementation/utils/expression'
+import Env from './reference-implementation/runtime/environment'
 
 //function symb(s: { name: string }) { return Expression.symbol(s.name); }
 //console.log('symb', S.primitive.functional.partial.symbol);
 function symb(s: string | Expression.Symbol, args?: any[]) { return Expression.symbol(s, args) }
 //const expr = symb(symb(S.primitive.functional.partial.name, [symb(S.primitive.operator.arithmetic.add.name), 1, 2, 3]), [4, 5])
 
-const expr = symb(S.primitive.operator.arithmetic.mult.name, [1, 2, 3, 4, 5])
+const expr = symb(S.primitive.operator.collections.inSet.name, [symb(S.primitive.constructor.set.name, [1,2,3,4,5]), 4]);
+
+//symb(S.primitive.operator.arithmetic.mult.name, [symb(S.primitive.operator.arithmetic.add.name, [3, 4, 5]), 2, 3, 4, 5])
 
 //const expr = apply(S.primitive.operator.plus, 1, 2)
 console.log(lispFormat(expr));
 const comp = compile(expr);
-console.log(comp(0 as any));
+console.log(comp(Env()));
 
 
 function bb() {
     const v = compile(expr);
-    let ret = 0;
+    let ret: any = [];
+    const env = Env();
     for (let i = 0; i < 1000000; i++) {
-        ret += v(void 0 as any);
+        ret = v(env);
     }
     return ret;
 }

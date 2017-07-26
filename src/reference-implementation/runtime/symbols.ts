@@ -7,21 +7,24 @@ import { FastSet, FastMap } from '../utils/collections'
 import Environment from './environment'
 import RuntimeExpression from './expression'
 
-// import * as Query from '../query/data-model'
-// import * as RuntimeHelpers from '../runtime/helpers'
-// import * as QueryHelpers from '../query/helpers'
-
-// export type RuntimeExpression<T = any> = (env: Environment, ...args: RuntimeExpression[]) => T
-
 export type SymbolRuntime<T = any> = (env: Environment, ...args: RuntimeExpression[]) => T
 
-export type Attribute =
-    | 'static-expr' // static expressions are independent from context if their children are also independent from context.
-    | 'loop-invariant' // can be cached in loops becuase it will always yield the same answer
+export namespace SymbolRuntime {
+    export type Attribute =
+        | 'static-expr' // static expressions are independent from context if their children are also independent from context.
+        | 'loop-invariant' // can be cached in loops becuase it will always yield the same answer
 
-const staticAttribute: Attribute[] = ['static-expr']
+    export interface Info {
+        symbol: SymbolInfo,
+        runtime: SymbolRuntime,
+        attributes: Attribute[]
+    }
+}
 
-type CompileInfo = [SymbolInfo, SymbolRuntime] | [SymbolInfo, SymbolRuntime, Attribute[]]
+
+export const staticAttribute: SymbolRuntime.Attribute[] = ['static-expr']
+
+type CompileInfo = [SymbolInfo, SymbolRuntime] | [SymbolInfo, SymbolRuntime, SymbolRuntime.Attribute[]]
 const symbols: CompileInfo[] = [
     ////////////////////////////////////
     // Primitives
@@ -175,6 +178,11 @@ const symbols: CompileInfo[] = [
         },
         staticAttribute
     ],
+    [
+        Symbols.primitive.operator.string.match,
+        (env, regex: RuntimeExpression<RegExp>, str: RuntimeExpression<string>) => regex(env).test(str(env)),
+        staticAttribute
+    ],
 
     [
         Symbols.primitive.operator.collections.inSet,
@@ -191,8 +199,8 @@ const symbols: CompileInfo[] = [
         staticAttribute
     ],
 
-    // ////////////////////////////////////
-    // // Structure
+    ////////////////////////////////////
+    // Structure
 
     // // ============= CONSTRUCTORS =============
     // [
@@ -318,19 +326,16 @@ function unary(symbol: SymbolInfo, f: (v: any) => any): CompileInfo {
     return [symbol, (env, v) => f(v(env)), staticAttribute];
 }
 
-const { table, attributes } = (function () {
-    const table: { [name: string]: SymbolRuntime } = Object.create(null);
-    const attributes: { [name: string]: Attribute[] } = Object.create(null);
+const table = (function () {
+    const table: { [name: string]: SymbolRuntime.Info } = Object.create(null);
     for (const s of symbols) {
         const name = s[0].name;
         if (table[name]) {
             throw new Error(`You've already implemented ${name}, dummy.`);
         }
-        table[name] = s[1];
-        if (s[2]) attributes[name] = s[2] as Attribute[];
+        table[name] = { symbol: s[0], runtime: s[1], attributes: s[2] as SymbolRuntime.Attribute[] || [] };
     }
-    return { table, attributes };
+    return table;
 })();
 
-export const Attributes = attributes;
 export default table;

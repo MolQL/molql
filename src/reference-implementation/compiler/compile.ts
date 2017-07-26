@@ -3,70 +3,72 @@
  */
 
 import Expression from '../../language/expression'
-import Symbols, { SymbolRuntime } from '../runtime/symbols'
+import RuntimeInfo, { SymbolRuntime } from '../runtime/symbols'
 import RuntimeExpression from '../runtime/expression'
 import Environment from '../runtime/environment'
-//import Runtime, { RuntimeExpression } from '../runtime/symbols'
+import * as Optimizer from './optimizer'
 
-interface CompileContext {
-    id: number
+export default function compile(expr: Expression): RuntimeExpression {
+    return _compile({ id: 0, staticEnv: Environment() }, expr, false).runtime;
 }
 
-function getRuntime(name: string): SymbolRuntime {
-    if (!Symbols[name]) throw new Error(`Could not find implementation of symbol '${name}'.`);
-    return Symbols[name];
-}
+export type CompiledExpression =
+    | { kind: 'value', runtime: RuntimeExpression }
+    | { kind: 'symbol', runtime: RuntimeExpression, info: SymbolRuntime.Info }
+    | { kind: 'apply', runtime: RuntimeExpression, head: CompiledExpression, args: CompiledExpression[] }
 
-function wrap(ctx: CompileContext, f: RuntimeExpression) {
-    return RuntimeExpression(f, { id: ctx.id++ });
-}
-
-function value(ctx: CompileContext, v: any): RuntimeExpression {
-    return RuntimeExpression(v, { id: ctx.id++, hint: 'const' });
-}
-
-function symbol(ctx: CompileContext, runtime: SymbolRuntime): RuntimeExpression {
-    return RuntimeExpression(runtime, { id: ctx.id++, hint: 'const' });
-}
-
-function _apply(expression: RuntimeExpression, slots: any[]): RuntimeExpression {
-    return function (env) { slots[0] = env; return expression(env).apply(null, slots); };
-}
-
-function apply(expression: RuntimeExpression, args: RuntimeExpression[]): RuntimeExpression {
-    // An optimization to call a function directly for a low number of arguments.
-    switch (args.length) {
-        case 0: return function (env) { return expression(env)(env); };
-        case 1: return function (env) { return expression(env)(env, args[0]); };
-        case 2: return function (env) { return expression(env)(env, args[0], args[1]); };
-        case 3: return function (env) { return expression(env)(env, args[0], args[1], args[2]); };
-        case 4: return function (env) { return expression(env)(env, args[0], args[1], args[2], args[3]); };
-        case 5: return function (env) { return expression(env)(env, args[0], args[1], args[2], args[3], args[4]); };
-        default: return _apply(expression, [void 0, ...args]);
+export namespace CompiledExpression {
+    export function value(runtime: RuntimeExpression): CompiledExpression { return { kind: 'value', runtime } }
+    export function symbol(runtime: RuntimeExpression, info: SymbolRuntime.Info ): CompiledExpression { return { kind: 'symbol', runtime, info } }
+    export function apply(runtime: RuntimeExpression, head: CompiledExpression, args: CompiledExpression[]): CompiledExpression {
+        return { kind: 'apply', runtime, head, args };
     }
+}
+
+export interface CompileContext {
+    id: number,
+    staticEnv: Environment
+}
+
+
+function getRuntimeInfo(name: string): SymbolRuntime.Info {
+    if (!RuntimeInfo[name]) throw new Error(`Could not find implementation of symbol '${name}'.`);
+    return RuntimeInfo[name];
+}
+
+export function value(ctx: CompileContext, v: any): CompiledExpression {
+    return CompiledExpression.value(RuntimeExpression(v, { id: ctx.id++, hint: 'const' }));
+}
+
+export function symbol(ctx: CompileContext, info: SymbolRuntime.Info): CompiledExpression {
+    return CompiledExpression.symbol(RuntimeExpression(info.runtime, { id: ctx.id++, hint: 'const' }), info);
+}
+
+function apply(ctx: CompileContext, head: CompiledExpression, args: CompiledExpression[]): CompiledExpression {
+    // non-optimized version would work like this:
+    //   const slots = [void 0, ...args.map(a => a.runtime)];
+    //   const f = head.runtime;
+    //   return RuntimeExpression(function (env) { slots[0] = env; return f(env).apply(null, slots); }, { id: ctx.id++ });
+    return Optimizer.apply(ctx, head, args);
 }
 
 function onlyStringLiteralsCanBeApplied() {
     throw new Error('Only string literals can be applied.');
 }
 
-function _compile(ctx: CompileContext, expr: Expression, isSymbol: boolean): RuntimeExpression {
+function _compile(ctx: CompileContext, expr: Expression, isSymbol: boolean): CompiledExpression {
     if (Expression.isLiteral(expr)) {
         if (isSymbol) {
             if (typeof expr !== 'string') onlyStringLiteralsCanBeApplied();
-            return symbol(ctx, getRuntime(expr as string));
+            return symbol(ctx, getRuntimeInfo(expr as string));
         }
         return value(ctx, expr);
     }
 
     const head = _compile(ctx, expr.symbol, true);
-    if (!expr.args || !expr.args.length) return wrap(ctx, head);
+    if (!expr.args || !expr.args.length) return head;
 
     const slots: any[] = [];
     if (expr.args) for (let i = 0; i < expr.args.length; i++) slots[i] = _compile(ctx, expr.args[i], false);
-    return wrap(ctx, apply(head, slots));
-}
-
-export default function compile(expr: Expression): RuntimeExpression {
-    return _compile({ id: 0 }, expr, false);
+    return apply(ctx, head, slots);
 }

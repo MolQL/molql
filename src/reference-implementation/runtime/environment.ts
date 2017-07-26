@@ -14,8 +14,8 @@ interface Environment {
     readonly slots: { [index: number]: Slot }
 }
 
-function Environment(queryCtx: {}): Environment {
-    return { queryCtx, element: Iterator(), atomSet: Iterator(), iterator: Slot(), slots: Object.create(null) };
+function Environment(queryCtx?: {}): Environment {
+    return { queryCtx: queryCtx as any, element: Iterator(), atomSet: Iterator(), iterator: Slot(), slots: Object.create(null) };
 }
 
 namespace Environment {

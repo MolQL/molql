@@ -36,6 +36,7 @@ function _format(e: Expression, lines: string[], prefix: string): string[] {
         symbol.forEach(l => lines.push(`${prefix}${l}`));
         return lines;
     }
+
     if (e.args.every(a => isValueLike(a))) {
         const args = e.args.map(a => formatValueLike(a, '')).join(' ');
         if (symbol.length === 1) {
@@ -53,10 +54,12 @@ function _format(e: Expression, lines: string[], prefix: string): string[] {
         lines.push(`${prefix}(`);
         symbol.forEach(l => lines.push(`${newPrefix}${l}`));
     }
-    let idx = 0;
+    let idx = 0, prevValueLike = false;
     for (const a of e.args) {
         idx++;
-        _format(a, lines, newPrefix);
+        if (isValueLike(a) && prevValueLike) lines[lines.length - 1] += formatValueLike(a, ' ');
+        else _format(a, lines, newPrefix);
+        prevValueLike = isValueLike(a);
         if (idx === e.args.length) lines[lines.length - 1] += ')';
     }
     return lines;

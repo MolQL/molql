@@ -415,7 +415,7 @@ Has reference implementation: *yes*
 
 ``structure.constructor.element-symbol :: (symbol: value) -> element-symbol``
 
-Has reference implementation: *yes*
+Has reference implementation: *no*
 
 -------------------
 
@@ -439,7 +439,7 @@ Has reference implementation: *no*
 
 ``structure.primitive.modify :: (seq: atom-set-seq, f: atom-set-seq) -> atom-set-seq``
 
-Has reference implementation: *yes*
+Has reference implementation: *no*
 
 -------------------
 
@@ -457,7 +457,7 @@ Has reference implementation: *no*
 
 *Executes the query inside a different context. This query cannot be used inside a generator or modifier sequence.*
 
-Has reference implementation: *yes*
+Has reference implementation: *no*
 
 -------------------
 
@@ -467,7 +467,7 @@ Has reference implementation: *yes*
 
 ``structure.generator.atom-groups :: (predicate: ?value, group-by: ?value) -> atom-set-seq``
 
-Has reference implementation: *yes*
+Has reference implementation: *no*
 
 -------------------
 
@@ -477,7 +477,7 @@ Has reference implementation: *yes*
 
 ``structure.modifier.filter :: (predicate: value) -> atom-set-seq``
 
-Has reference implementation: *yes*
+Has reference implementation: *no*
 
 -------------------
 
@@ -551,7 +551,7 @@ Has reference implementation: *no*
 
 *Returns an implementation specific unique identifier of the current atom.*
 
-Has reference implementation: *yes*
+Has reference implementation: *no*
 
 -------------------
 
@@ -583,7 +583,7 @@ Has reference implementation: *no*
 
 ``structure.property.atom.id :: value``
 
-Has reference implementation: *yes*
+Has reference implementation: *no*
 
 -------------------
 
@@ -591,7 +591,7 @@ Has reference implementation: *yes*
 
 ``structure.property.atom.label_atom_id :: value``
 
-Has reference implementation: *yes*
+Has reference implementation: *no*
 
 -------------------
 
@@ -599,7 +599,7 @@ Has reference implementation: *yes*
 
 ``structure.property.atom.type_symbol :: value``
 
-Has reference implementation: *yes*
+Has reference implementation: *no*
 
 -------------------
 
@@ -615,7 +615,7 @@ Has reference implementation: *no*
 
 ``structure.property.atom.B_iso_or_equiv :: value``
 
-Has reference implementation: *yes*
+Has reference implementation: *no*
 
 -------------------
 
@@ -637,7 +637,7 @@ Has reference implementation: *no*
 
 *Returns an implementation specific unique identifier of the current residue.*
 
-Has reference implementation: *yes*
+Has reference implementation: *no*
 
 -------------------
 
@@ -653,7 +653,7 @@ Has reference implementation: *no*
 
 ``structure.property.residue.label_seq_id :: value``
 
-Has reference implementation: *yes*
+Has reference implementation: *no*
 
 -------------------
 
@@ -661,7 +661,7 @@ Has reference implementation: *yes*
 
 ``structure.property.residue.label_comp_id :: value``
 
-Has reference implementation: *yes*
+Has reference implementation: *no*
 
 -------------------
 
@@ -689,7 +689,7 @@ Has reference implementation: *no*
 
 ``structure.property.chain.label_asym_id :: value``
 
-Has reference implementation: *yes*
+Has reference implementation: *no*
 
 -------------------
 
@@ -741,7 +741,7 @@ Has reference implementation: *no*
 
 ``structure.property.atom-set.atom-count :: value``
 
-Has reference implementation: *yes*
+Has reference implementation: *no*
 
 -------------------
 
@@ -749,7 +749,7 @@ Has reference implementation: *yes*
 
 ``structure.property.atom-set.reduce :: (f: value->value, initial: value) -> value``
 
-Has reference implementation: *yes*
+Has reference implementation: *no*
 
 -------------------
 
@@ -759,7 +759,7 @@ Has reference implementation: *yes*
 
 ``structure.property.atom-set-seq.length :: (seq: atom-set-seq) -> atom-set-seq``
 
-Has reference implementation: *yes*
+Has reference implementation: *no*
 
 -------------------
 
