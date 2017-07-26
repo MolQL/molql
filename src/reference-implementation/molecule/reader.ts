@@ -28,7 +28,8 @@ function createModel(data: Data, startRow: number, rowCount: number): Model {
     for (let i = startRow; i < rowCount; i++) {
         if (!pdbx_PDB_model_num.areValuesEqual(startRow, i)) break;
 
-        let newChain = !auth_asym_id.areValuesEqual(currentChainRow, i);
+        let newEntity = !label_entity_id.areValuesEqual(currentEntityRow, i);
+        let newChain = newEntity || !auth_asym_id.areValuesEqual(currentChainRow, i);
         let newResidue = newChain
             || !auth_seq_id.areValuesEqual(currentResidueRow, i)
             || !pdbx_PDB_ins_code.areValuesEqual(currentResidueRow, i);
@@ -37,7 +38,7 @@ function createModel(data: Data, startRow: number, rowCount: number): Model {
             atomStartIndex.push(residueStartAtom)
             atomEndIndex.push(atom + 1);
             chainIndex.push(chain)
-            residueStartAtom++;
+            residueStartAtom = atom + 1;
             residue++;
             currentResidueRow = i;
         }
@@ -45,8 +46,18 @@ function createModel(data: Data, startRow: number, rowCount: number): Model {
         if (newChain) {
             residueStartIndex.push(chainStartResidue);
             residueEndIndex.push(residue);
+            entityIndex.push(entity);
             currentChainRow = i;
+            chainStartResidue = residue;
             chain++;
+        }
+
+        if (newEntity) {
+            chainStartIndex.push(entityStartChain);
+            chainEndIndex.push(chain);
+            currentEntityRow = i;
+            entityStartChain = chain;
+            entity++;
         }
 
         dataIndex.push(i);
@@ -59,15 +70,23 @@ function createModel(data: Data, startRow: number, rowCount: number): Model {
     }
 
     if (atom > residueStartAtom) {
+        // finish residue
         atomStartIndex.push(residueStartAtom)
         atomEndIndex.push(atom);
+        chainIndex.push(chain);
+
+        // finish chain
         residueStartIndex.push(chainStartResidue);
         residueEndIndex.push(residue);
-        chainIndex.push(chain);
+        entityIndex.push(entity);
+
+        // finish entity
+        chainStartIndex.push(entityStartChain);
+        chainEndIndex.push(chain);
     }
 
-    const secondaryStructureType:number[] = new Uint8Array(residue) as any;
-    const secondaryStructureIndex:number[] = new Int32Array(residue) as any;
+    const secondaryStructureType: number[] = new Uint8Array(residue) as any;
+    const secondaryStructureIndex: number[] = new Int32Array(residue) as any;
 
     return {
         id: pdbx_PDB_model_num.getInteger(startRow),
