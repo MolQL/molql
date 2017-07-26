@@ -3,13 +3,13 @@
  */
 
 type Invariants = { [id: string]: any }
-type Iterator<T = any> = { value: T, isIterating: boolean, _parent?: Iterator, _invariants: Invariants }
+type Iterator<T = any> = { value: T, isIterating: boolean, '@parent'?: Iterator, '@invariants'?: Invariants }
 
-function Iterator(): Iterator { return { value: void 0, isIterating: false, _parent: void 0, _invariants: void 0 as any }; }
+function Iterator(): Iterator { return { value: void 0, isIterating: false, '@parent': void 0, '@invariants': void 0 }; }
 
 namespace Iterator {
     function noNestedIterators() {
-        throw new Error('Nested iterators are not supported.');
+        throw new Error('Nested iterators of the same type are not supported, son.');
     }
 
     export function begin<T>(iterator: Iterator, initialValue?: T, parent?: Iterator): Iterator<T> {
@@ -17,26 +17,28 @@ namespace Iterator {
 
         iterator.isIterating = true;
         iterator.value = initialValue;
-        iterator._invariants = Object.create(null);
-        iterator._parent = parent;
+        iterator['@invariants'] = Object.create(null);
+        iterator['@parent'] = parent;
         return iterator;
     }
 
     export function end(iterator: Iterator) {
         iterator.isIterating = false;
         iterator.value = void 0;
-        iterator._invariants = void 0 as any;
-        iterator._parent = void 0;
+        iterator['@invariants'] = void 0;
+        iterator['@parent'] = void 0;
     }
 
-    export function getInvariant<T = any>({ _invariants, _parent }: Iterator, id: number): T | undefined {
-        const inv = _invariants && _invariants[id];
+    export function getInvariant(iterator: Iterator, id: number): any {
+        const invariants = iterator['@invariants'];
+        const inv = invariants && invariants[id];
         if (inv) return inv;
-        return _parent && getInvariant(_parent, id);
+        const parent = iterator['@parent']
+        return parent && getInvariant(parent, id);
     }
 
-    export function setInvariant({ _invariants }: Iterator, id: number, value: any) {
-        _invariants[id] = value;
+    export function setInvariant(iterator: Iterator, id: number, value: any) {
+        iterator['@invariants']![id] = value;
     }
 }
 

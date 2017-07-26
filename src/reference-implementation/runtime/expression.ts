@@ -10,7 +10,7 @@ export type RuntimeExpression<T = any> = (env: Environment) => T
 
 export interface RuntimeInfo {
     id: number,
-    runtimeHint?: 'loop-invariant' | 'const'
+    hint?: 'loop-invariant' | 'const'
 }
 
 function evalInvariant(f: RuntimeExpression, id: number): RuntimeExpression {
@@ -36,7 +36,7 @@ function evalConst(v: any) {
 }
 
 export function RuntimeExpression(f: RuntimeExpression | SymbolRuntime | string | boolean | number | object, info: RuntimeInfo): RuntimeExpression {
-    switch (info.runtimeHint) {
+    switch (info.hint) {
         case 'const': return evalConst(f);
         case 'loop-invariant': return evalInvariant(f as RuntimeExpression, info.id);
         default: return evalBasic(f as RuntimeExpression);

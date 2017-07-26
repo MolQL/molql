@@ -14,10 +14,10 @@ import { lispFormat } from './reference-implementation/utils/expression'
 
 //function symb(s: { name: string }) { return Expression.symbol(s.name); }
 //console.log('symb', S.primitive.functional.partial.symbol);
-function apply(s: string | Expression.Symbol, args?: any[]) { return Expression.symbol(s, args) }
-//const expr = apply(apply(S.primitive.functional.partial.name, [apply(S.primitive.operator.arithmetic.add.name), 1, 2, 3, 4]), [5])
+function symb(s: string | Expression.Symbol, args?: any[]) { return Expression.symbol(s, args) }
+//const expr = symb(symb(S.primitive.functional.partial.name, [symb(S.primitive.operator.arithmetic.add.name), 1, 2, 3]), [4, 5])
 
-const expr = apply(S.primitive.operator.arithmetic.add.name, [1, 2, 3, 4, 5])
+const expr = symb(S.primitive.operator.arithmetic.mult.name, [1, 2, 3, 4, 5])
 
 //const expr = apply(S.primitive.operator.plus, 1, 2)
 console.log(lispFormat(expr));

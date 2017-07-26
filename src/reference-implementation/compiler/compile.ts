@@ -22,11 +22,11 @@ function wrap(ctx: CompileContext, f: RuntimeExpression) {
 }
 
 function value(ctx: CompileContext, v: any): RuntimeExpression {
-    return RuntimeExpression(v, { id: ctx.id++, runtimeHint: 'const' });
+    return RuntimeExpression(v, { id: ctx.id++, hint: 'const' });
 }
 
 function symbol(ctx: CompileContext, runtime: SymbolRuntime): RuntimeExpression {
-    return RuntimeExpression(runtime, { id: ctx.id++, runtimeHint: 'const' });
+    return RuntimeExpression(runtime, { id: ctx.id++, hint: 'const' });
 }
 
 function _apply(expression: RuntimeExpression, slots: any[]): RuntimeExpression {
