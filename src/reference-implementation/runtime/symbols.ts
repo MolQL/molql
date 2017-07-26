@@ -47,6 +47,11 @@ const symbols: ([SymbolInfo, RuntimeExpression] | [SymbolInfo, RuntimeExpression
         },
         staticAttribute
     ],
+    [
+        Symbols.primitive.constructor.regex,
+        (ctx, expr, flags) => new RegExp(expr(ctx), flags ? flags(ctx) : ''),
+        staticAttribute
+    ],
 
     // ============= FUNCTIONAL =============
     [
@@ -65,9 +70,9 @@ const symbols: ([SymbolInfo, RuntimeExpression] | [SymbolInfo, RuntimeExpression
     [Symbols.primitive.functional.slot, (ctx, index: RuntimeExpression<number>) => ctx.slots[index(ctx)].value],
 
     // ============= OPERATORS =============
-    [Symbols.primitive.operator.not, (ctx, x) => !x(ctx), staticAttribute],
+    [Symbols.primitive.operator.logic.not, (ctx, x) => !x(ctx), staticAttribute],
     [
-        Symbols.primitive.operator.and,
+        Symbols.primitive.operator.logic.and,
         function (ctx) {
             for (let i = 1; i < arguments.length; i++) if (!arguments[i](ctx)) return false;
             return true;
@@ -75,21 +80,28 @@ const symbols: ([SymbolInfo, RuntimeExpression] | [SymbolInfo, RuntimeExpression
         staticAttribute
     ],
     [
-        Symbols.primitive.operator.or,
+        Symbols.primitive.operator.logic.or,
         function (ctx) {
             for (let i = 1; i < arguments.length; i++) if (arguments[i](ctx)) return true;
             return false;
         },
         staticAttribute
     ],
-    [Symbols.primitive.operator.eq, (ctx, x, y) => x(ctx) === y(ctx), staticAttribute],
-    [Symbols.primitive.operator.neq, (ctx, x, y) => x(ctx) !== y(ctx), staticAttribute],
-    [Symbols.primitive.operator.lt, (ctx, x, y) => x(ctx) < y(ctx), staticAttribute],
-    [Symbols.primitive.operator.lte, (ctx, x, y) => x(ctx) <= y(ctx), staticAttribute],
-    [Symbols.primitive.operator.gr, (ctx, x, y) => x(ctx) > y(ctx), staticAttribute],
-    [Symbols.primitive.operator.gre, (ctx, x, y) => x(ctx) >= y(ctx), staticAttribute],
+
+    [Symbols.primitive.operator.relational.eq, (ctx, x, y) => x(ctx) === y(ctx), staticAttribute],
+    [Symbols.primitive.operator.relational.neq, (ctx, x, y) => x(ctx) !== y(ctx), staticAttribute],
+    [Symbols.primitive.operator.relational.lt, (ctx, x, y) => x(ctx) < y(ctx), staticAttribute],
+    [Symbols.primitive.operator.relational.lte, (ctx, x, y) => x(ctx) <= y(ctx), staticAttribute],
+    [Symbols.primitive.operator.relational.gr, (ctx, x, y) => x(ctx) > y(ctx), staticAttribute],
+    [Symbols.primitive.operator.relational.gre, (ctx, x, y) => x(ctx) >= y(ctx), staticAttribute],
     [
-        Symbols.primitive.operator.add,
+        Symbols.primitive.operator.relational.inRange,
+        (ctx, x, a, b) => { const v = x(ctx); return v >= a(ctx) && v <= b(ctx) },
+        staticAttribute
+    ],
+
+    [
+        Symbols.primitive.operator.arithmetic.add,
         function(ctx) {
             let ret = 0;
             for (let i = 1; i < arguments.length; i++) ret += arguments[i](ctx);
@@ -97,9 +109,9 @@ const symbols: ([SymbolInfo, RuntimeExpression] | [SymbolInfo, RuntimeExpression
         },
         staticAttribute
     ],
-    [Symbols.primitive.operator.sub, (ctx, x, y) => x(ctx) - y(ctx), staticAttribute],
+    [Symbols.primitive.operator.arithmetic.sub, (ctx, x, y) => x(ctx) - y(ctx), staticAttribute],
     [
-        Symbols.primitive.operator.mult,
+        Symbols.primitive.operator.arithmetic.mult,
         function(ctx) {
             let ret = 1;
             for (let i = 1; i < arguments.length; i++) ret *= arguments[i](ctx);
@@ -107,10 +119,10 @@ const symbols: ([SymbolInfo, RuntimeExpression] | [SymbolInfo, RuntimeExpression
         },
         staticAttribute
     ],
-    [Symbols.primitive.operator.div, (ctx, x, y) => x(ctx) / y(ctx), staticAttribute],
-    [Symbols.primitive.operator.pow, (ctx, x, y) => Math.pow(x(ctx), y(ctx)), staticAttribute],
+    [Symbols.primitive.operator.arithmetic.div, (ctx, x, y) => x(ctx) / y(ctx), staticAttribute],
+    [Symbols.primitive.operator.arithmetic.pow, (ctx, x, y) => Math.pow(x(ctx), y(ctx)), staticAttribute],
     [
-        Symbols.primitive.operator.min,
+        Symbols.primitive.operator.arithmetic.min,
         function(ctx) {
             let ret = 0;
             for (let i = 1; i < arguments.length; i++) ret = Math.min(arguments[i](ctx), ret);
@@ -119,7 +131,7 @@ const symbols: ([SymbolInfo, RuntimeExpression] | [SymbolInfo, RuntimeExpression
         staticAttribute
     ],
     [
-        Symbols.primitive.operator.max,
+        Symbols.primitive.operator.arithmetic.max,
         function(ctx) {
             let ret = 0;
             for (let i = 1; i < arguments.length; i++) ret = Math.max(arguments[i](ctx), ret);
@@ -128,7 +140,7 @@ const symbols: ([SymbolInfo, RuntimeExpression] | [SymbolInfo, RuntimeExpression
         staticAttribute
     ],
     [
-        Symbols.primitive.operator.stringJoin,
+        Symbols.primitive.operator.string.concat,
         function(ctx) {
             const ret: string[] = [];
             for (let i = 1; i < arguments.length; i++) ret.push('' + arguments[i](ctx));
@@ -136,18 +148,14 @@ const symbols: ([SymbolInfo, RuntimeExpression] | [SymbolInfo, RuntimeExpression
         },
         staticAttribute
     ],
+
     [
-        Symbols.primitive.operator.inRange,
-        (ctx, x, a, b) => { const v = x(ctx); return v >= a(ctx) && v <= b(ctx) },
-        staticAttribute
-    ],
-    [
-        Symbols.primitive.operator.inSet,
+        Symbols.primitive.operator.collections.inSet,
         (ctx, set: RuntimeExpression<FastSet<any>>, v) => set(ctx).has(v(ctx)),
         staticAttribute
     ],
     [
-        Symbols.primitive.operator.mapGet,
+        Symbols.primitive.operator.collections.mapGet,
         (ctx, map: RuntimeExpression<FastMap<any, any>>, key, def) => {
             const m = map(ctx), k = key(ctx);
             if (m.has(k)) return m.get(k);

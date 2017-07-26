@@ -7,18 +7,23 @@ Table of Contents
      * [Constructors](#constructors)
      * [Functional Operators](#functional-operators)
      * [Operators](#operators)
+       * [Logic](#logic)
+       * [Arithmetic](#arithmetic)
+       * [Relational](#relational)
+       * [Strings](#strings)
+       * [Collections](#collections)
    * [Molecular Structure Queries](#molecular-structure-queries)
      * [Constructors](#constructors)
+     * [Generators](#generators)
+     * [Atom Set Modifiers](#atom-set-modifiers)
+     * [Sequence Combinators](#sequence-combinators)
+     * [Context Updates](#context-updates)
      * [Properties](#properties)
        * [Atoms](#atoms)
        * [Residues](#residues)
        * [Chains](#chains)
        * [Atom Sets](#atom-sets)
        * [Atom Set Sequences](#atom-set-sequences)
-     * [Query Primitives](#query-primitives)
-     * [Atom Set Modifiers](#atom-set-modifiers)
-     * [Sequence Combinators](#sequence-combinators)
-     * [Context Updates](#context-updates)
 # Langauge Primitives
 
 ## Constructors
@@ -41,7 +46,17 @@ Has reference implementation: *yes*
 
 ### map
 
-``primitive.constructor.map :: (values: value*) -> map``
+``primitive.constructor.map :: (key-value-pairs: value*) -> map``
+
+Has reference implementation: *yes*
+
+-------------------
+
+### regex
+
+``primitive.constructor.regex :: (expression: value, flags: ?value) -> regex``
+
+*Creates a regular expression from a string using the ECMAscript syntax.*
 
 Has reference implementation: *yes*
 
@@ -49,9 +64,9 @@ Has reference implementation: *yes*
 
 ## Functional Operators
 
-### apply-partial
+### partial
 
-``primitive.functional.apply-partial :: (f: value*->value, args: value*) -> value``
+``primitive.functional.partial :: (f: value*->value, args: value*) -> value``
 
 Has reference implementation: *yes*
 
@@ -67,9 +82,11 @@ Has reference implementation: *yes*
 
 ## Operators
 
+### Logic
+
 ### not
 
-``primitive.operator.not :: (a: value) -> value``
+``primitive.operator.logic.not :: (a: value) -> value``
 
 Has reference implementation: *yes*
 
@@ -77,7 +94,7 @@ Has reference implementation: *yes*
 
 ### and
 
-``primitive.operator.and :: (args: value+) -> value``
+``primitive.operator.logic.and :: (args: value+) -> value``
 
 Has reference implementation: *yes*
 
@@ -85,15 +102,25 @@ Has reference implementation: *yes*
 
 ### or
 
-``primitive.operator.or :: (args: value+) -> value``
+``primitive.operator.logic.or :: (args: value+) -> value``
 
 Has reference implementation: *yes*
 
 -------------------
 
-### plus
+### Arithmetic
 
-``primitive.operator.plus :: (args: value+) -> value``
+### add
+
+``primitive.operator.arithmetic.add :: (args: value+) -> value``
+
+Has reference implementation: *yes*
+
+-------------------
+
+### sub
+
+``primitive.operator.arithmetic.sub :: (a: value, b: value) -> value``
 
 Has reference implementation: *yes*
 
@@ -101,55 +128,57 @@ Has reference implementation: *yes*
 
 ### minus
 
-``primitive.operator.minus :: (a: value, b: value) -> value``
+``primitive.operator.arithmetic.minus :: (a: value) -> value``
 
 Has reference implementation: *no*
 
 -------------------
 
-### times
+### mult
 
-``primitive.operator.times :: (args: value+) -> value``
-
-Has reference implementation: *no*
-
--------------------
-
-### div
-
-``primitive.operator.div :: (a: value, b: value) -> value``
+``primitive.operator.arithmetic.mult :: (args: value+) -> value``
 
 Has reference implementation: *yes*
 
 -------------------
 
-### power
+### div
 
-``primitive.operator.power :: (a: value, b: value) -> value``
+``primitive.operator.arithmetic.div :: (a: value, b: value) -> value``
 
-Has reference implementation: *no*
+Has reference implementation: *yes*
+
+-------------------
+
+### pow
+
+``primitive.operator.arithmetic.pow :: (a: value, b: value) -> value``
+
+Has reference implementation: *yes*
 
 -------------------
 
 ### min
 
-``primitive.operator.min :: (args: value+) -> value``
+``primitive.operator.arithmetic.min :: (args: value+) -> value``
 
-Has reference implementation: *no*
+Has reference implementation: *yes*
 
 -------------------
 
 ### max
 
-``primitive.operator.max :: (args: value+) -> value``
+``primitive.operator.arithmetic.max :: (args: value+) -> value``
 
-Has reference implementation: *no*
+Has reference implementation: *yes*
 
 -------------------
 
+### Relational
+
 ### eq
 
-``primitive.operator.eq :: (a: value, b: value) -> value``
+``primitive.operator.relational.eq :: (a: value, b: value) -> value``
 
 Has reference implementation: *yes*
 
@@ -157,7 +186,7 @@ Has reference implementation: *yes*
 
 ### neq
 
-``primitive.operator.neq :: (a: value, b: value) -> value``
+``primitive.operator.relational.neq :: (a: value, b: value) -> value``
 
 Has reference implementation: *yes*
 
@@ -165,7 +194,7 @@ Has reference implementation: *yes*
 
 ### lt
 
-``primitive.operator.lt :: (a: value, b: value) -> value``
+``primitive.operator.relational.lt :: (a: value, b: value) -> value``
 
 Has reference implementation: *yes*
 
@@ -173,7 +202,7 @@ Has reference implementation: *yes*
 
 ### lte
 
-``primitive.operator.lte :: (a: value, b: value) -> value``
+``primitive.operator.relational.lte :: (a: value, b: value) -> value``
 
 Has reference implementation: *yes*
 
@@ -181,7 +210,7 @@ Has reference implementation: *yes*
 
 ### gr
 
-``primitive.operator.gr :: (a: value, b: value) -> value``
+``primitive.operator.relational.gr :: (a: value, b: value) -> value``
 
 Has reference implementation: *yes*
 
@@ -189,7 +218,7 @@ Has reference implementation: *yes*
 
 ### gre
 
-``primitive.operator.gre :: (a: value, b: value) -> value``
+``primitive.operator.relational.gre :: (a: value, b: value) -> value``
 
 Has reference implementation: *yes*
 
@@ -197,15 +226,35 @@ Has reference implementation: *yes*
 
 ### in-range
 
-``primitive.operator.in-range :: (min: value, max: value, value: value) -> value``
+``primitive.operator.relational.in-range :: (min: value, max: value, value: value) -> value``
 
 Has reference implementation: *yes*
 
 -------------------
 
+### Strings
+
+### concat
+
+``primitive.operator.string.concat :: (args: value+) -> value``
+
+Has reference implementation: *yes*
+
+-------------------
+
+### match
+
+``primitive.operator.string.match :: (expression: regex, value: value) -> value``
+
+Has reference implementation: *no*
+
+-------------------
+
+### Collections
+
 ### in-set
 
-``primitive.operator.in-set :: (set: set, value: value) -> value``
+``primitive.operator.collections.in-set :: (set: set, value: value) -> value``
 
 Has reference implementation: *yes*
 
@@ -213,7 +262,7 @@ Has reference implementation: *yes*
 
 ### map-get
 
-``primitive.operator.map-get :: (map: map, key: value, default: value) -> value``
+``primitive.operator.collections.map-get :: (map: map, key: value, default: value) -> value``
 
 Has reference implementation: *yes*
 
@@ -231,9 +280,139 @@ Has reference implementation: *yes*
 
 -------------------
 
+### atom-set
+
+``structure.constructor.atom-set :: (atom-indices: value+) -> atom-set``
+
+Has reference implementation: *no*
+
+-------------------
+
+### atom-set-seq
+
+``structure.constructor.atom-set-seq :: (sets: atom-set*) -> atom-set-seq``
+
+Has reference implementation: *no*
+
+-------------------
+
+### modify
+
+``structure.primitive.modify :: (seq: atom-set-seq, f: atom-set-seq) -> atom-set-seq``
+
+Has reference implementation: *yes*
+
+-------------------
+
+### combine
+
+``structure.primitive.combine :: (combinator: atom-set-seq, seqs: atom-set-seq+) -> atom-set-seq``
+
+Has reference implementation: *no*
+
+-------------------
+
+### in-context
+
+``structure.primitive.in-context :: (context: value, query: atom-set-seq) -> atom-set-seq``
+
+*Executes the query inside a different context. This query cannot be used inside a generator or modifier sequence.*
+
+Has reference implementation: *yes*
+
+-------------------
+
+## Generators
+
+### atom-groups
+
+``structure.generator.atom-groups :: (predicate: ?value, group-by: ?value) -> atom-set-seq``
+
+Has reference implementation: *yes*
+
+-------------------
+
+## Atom Set Modifiers
+
+### filter
+
+``structure.modifier.filter :: (predicate: value) -> atom-set->atom-set-seq``
+
+Has reference implementation: *yes*
+
+-------------------
+
+### within
+
+``structure.modifier.within :: (radius: value, seq: atom-set-seq) -> atom-set->atom-set-seq``
+
+Has reference implementation: *no*
+
+-------------------
+
+### find
+
+``structure.modifier.find :: (query: atom-set-seq) -> atom-set->atom-set-seq``
+
+*Executes the specified query in the context induced by each of the atoms sets in the sequence.*
+
+Has reference implementation: *no*
+
+-------------------
+
+## Sequence Combinators
+
+### merge
+
+``structure.combinator.merge :: atom-set-seq+->atom-set-seq``
+
+Has reference implementation: *no*
+
+-------------------
+
+### union
+
+``structure.combinator.union :: atom-set-seq+->atom-set-seq``
+
+*Collects all atom sets in the sequence into a single atom set.*
+
+Has reference implementation: *no*
+
+-------------------
+
+### near
+
+``structure.combinator.near :: (max-distance: value) -> atom-set-seq+->atom-set-seq``
+
+*Merges all tuples of atom sets that are mutually no further than the specified threshold.*
+
+Has reference implementation: *no*
+
+-------------------
+
+## Context Updates
+
+### inside
+
+``structure.context.inside :: (query: atom-set-seq) -> value``
+
+*Create a context induced by the query.*
+
+Has reference implementation: *no*
+
+-------------------
+
 ## Properties
 
 ### Atoms
+
+### unique-id
+
+``structure.property.atom.unique-id :: value``
+
+Has reference implementation: *yes*
+
+-------------------
 
 ### id
 
@@ -271,7 +450,7 @@ Has reference implementation: *yes*
 
 ``structure.property.atom.operator-name :: value``
 
-> Returns the name of the symmetry operator applied to this atom.
+*Returns the name of the symmetry operator applied to this atom (e.g., 4_455). Atoms from the loaded asymmetric always return 1_555*
 
 Has reference implementation: *no*
 
@@ -338,132 +517,6 @@ Has reference implementation: *yes*
 ``structure.property.atom-set-seq.length :: (seq: atom-set-seq) -> atom-set-seq``
 
 Has reference implementation: *yes*
-
--------------------
-
-## Query Primitives
-
-### generate
-
-``structure.primitive.generate :: (predicate: ?value, group-by: ?value) -> atom-set-seq``
-
-Has reference implementation: *yes*
-
--------------------
-
-### modify
-
-``structure.primitive.modify :: (seq: atom-set-seq, f: atom-set-seq) -> atom-set-seq``
-
-Has reference implementation: *yes*
-
--------------------
-
-### combine
-
-``structure.primitive.combine :: (combinator: atom-set-seq, seqs: atom-set-seq+) -> atom-set-seq``
-
-Has reference implementation: *no*
-
--------------------
-
-### in-context
-
-``structure.primitive.in-context :: (context: value, query: atom-set-seq) -> atom-set-seq``
-
-> Executes the query inside a different context. This query cannot be used inside a generator or modifier sequence.
-
-Has reference implementation: *yes*
-
--------------------
-
-## Atom Set Modifiers
-
-### filter
-
-``structure.modifier.filter :: (predicate: value) -> atom-set-seq``
-
-Has reference implementation: *yes*
-
--------------------
-
-### within
-
-``structure.modifier.within :: (radius: value, seq: atom-set-seq) -> atom-set-seq``
-
-Has reference implementation: *no*
-
--------------------
-
-### find
-
-``structure.modifier.find :: (query: atom-set-seq) -> atom-set-seq``
-
-> Executes the specified query in the context induced by each of the atoms sets in the sequence.
-
-Has reference implementation: *no*
-
--------------------
-
-## Sequence Combinators
-
-### merge
-
-``structure.combinator.merge :: atom-set-seq``
-
-Has reference implementation: *no*
-
--------------------
-
-### union
-
-``structure.combinator.union :: atom-set-seq``
-
-> Collects all atom sets in the sequence into a single atom set.
-
-Has reference implementation: *no*
-
--------------------
-
-### near
-
-``structure.combinator.near :: (max-distance: value) -> atom-set-seq``
-
-> Merges all tuples of atom sets that are mutually no further than the specified threshold.
-
-Has reference implementation: *no*
-
--------------------
-
-## Context Updates
-
-### inside
-
-``structure.context.inside :: (query: atom-set-seq) -> value``
-
-> Create a context induced by the query.
-
-Has reference implementation: *no*
-
--------------------
-
-### assembly
-
-``structure.context.assembly :: (name: value) -> value``
-
-> Creates a context by applying assembly operators.
-
-Has reference implementation: *no*
-
--------------------
-
-### symmetry-mates
-
-``structure.context.symmetry-mates :: (radius: value) -> value``
-
-> Creates a context by adding symmetry mates that are within *radius* angstroms.
-
-Has reference implementation: *no*
 
 -------------------
 

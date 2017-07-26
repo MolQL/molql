@@ -2,8 +2,15 @@
  * Copyright (c) 2017 David Sehnal, licensed under MIT, See LICENSE file for more info.
  */
 
+
+/**
+ * The purpose of the type system is to provide annotations for symbol table to
+ * be able to more easily generate documentation.
+ */
+
 type Type =
     | Type.Value
+    | Type.Primitive.Regex
     | Type.Primitive.List
     | Type.Primitive.Map
     | Type.Primitive.Set
@@ -24,10 +31,12 @@ namespace Type {
     export const value: Value = { kind: 'value' };
 
     export namespace Primitive {
+        export interface Regex extends Base { kind: 'regex' }
         export interface List extends Base { kind: 'list' }
         export interface Set extends Base { kind: 'set' }
         export interface Map extends Base { kind: 'map' }
 
+        export const regex: Regex = { kind: 'regex' };
         export const list: List = { kind: 'list' };
         export const map: Map = { kind: 'map' };
         export const set: Set = { kind: 'set' };

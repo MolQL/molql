@@ -23,48 +23,21 @@ export interface SymbolInfo {
     args?: ArgSpec[]
 }
 
-export function isSymbolInfo(x: any): x is SymbolInfo {
-    return !!x.isSymbol;
-}
-
-function symbol(info: SymbolSpec): SymbolInfo {
-    return { isSymbol: true, name: '', shortName: info.name || '', type: info.type, description: info.description, args: info.args };
-}
-
-const valuesArg: ArgSpec = ['values', Type.zeroOrMore(Type.value), 'A list of values.'];
-function ctor(type: Type, args: ArgSpec[], description?: string) {
-    return symbol({ name: type.kind, type, args, description });
-}
-
-function value(description?: string) {
-    return symbol({ type: Type.value, description });
-}
-
-function binOp(description?: string) {
-    return symbol({
-        type: Type.value,
-        description,
-        args: [
-            ['args', Type.oneOrMore(Type.value)]
-        ]
-    });
-}
-
-function binRel(description?: string) {
-    return symbol({
-        type: Type.value,
-        description,
-        args: [['a', Type.value], ['b', Type.value]]
-    });
-}
-
 const primitive = {
     header: 'Langauge Primitives',
     constructor: {
         header: 'Constructors',
-        list: ctor(Type.Primitive.list, [valuesArg]),
-        set: ctor(Type.Primitive.set, [valuesArg]),
-        map: ctor(Type.Primitive.map, [valuesArg]),
+        list: ctor(Type.Primitive.list, [['values', Type.zeroOrMore(Type.value), 'A list of values.']]),
+        set: ctor(Type.Primitive.set, [['values', Type.zeroOrMore(Type.value), 'A list of values.']]),
+        map: ctor(Type.Primitive.map, [['key-value-pairs', Type.zeroOrMore(Type.value), 'A list of key value pairs, e.g. (map 1 "x" 2 "y").']]),
+        regex: symbol({
+            type: Type.Primitive.regex,
+            args: [
+                ['expression', Type.value],
+                ['flags', Type.optional(Type.value)]
+            ],
+            description: 'Creates a regular expression from a string using the ECMAscript syntax.'
+        })
     },
     functional: {
         header: 'Functional Operators',
@@ -82,90 +55,77 @@ const primitive = {
     },
     operator: {
         header: 'Operators',
-        not: symbol({ type: Type.value, args: [['a', Type.value]] }),
-        and: binOp(),
-        or: binOp(),
+        logic: {
+            header: 'Logic',
+            not: symbol({ type: Type.value, args: [['a', Type.value]] }),
+            and: binOp(),
+            or: binOp(),
+        },
 
-        add: binOp(),
-        sub: binRel(),
-        mult: binOp(),
-        div: binRel(),
-        pow: binRel(),
-        min: binOp(),
-        max: binOp(),
+        arithmetic: {
+            header: 'Arithmetic',
+            add: binOp(),
+            sub: binRel(),
+            minus: symbol({ type: Type.value, args: [['a', Type.value]] }),
+            mult: binOp(),
+            div: binRel(),
+            pow: binRel(),
+            min: binOp(),
+            max: binOp()
+        },
 
-        eq: binRel(),
-        neq: binRel(),
-        lt: binRel(),
-        lte: binRel(),
-        gr: binRel(),
-        gre: binRel(),
+        relational: {
+            header: 'Relational',
+            eq: binRel(),
+            neq: binRel(),
+            lt: binRel(),
+            lte: binRel(),
+            gr: binRel(),
+            gre: binRel(),
+            inRange: symbol({
+                type: Type.value,
+                args: [['min', Type.value], ['max', Type.value], ['value', Type.value]]
+            }),
+        },
 
-        stringJoin: binOp(),
+        string: {
+            header: 'Strings',
+            concat: binOp(),
+            match: symbol({
+                type: Type.value,
+                args: [
+                    ['expression', Type.Primitive.regex],
+                    ['value', Type.value]
+                ]
+            })
+        },
 
-        inRange: symbol({
-            type: Type.value,
-            args: [['min', Type.value], ['max', Type.value], ['value', Type.value]]
-        }),
-        inSet: symbol({
-            type: Type.value,
-            args: [['set', Type.Primitive.set], ['value', Type.value]]
-        }),
-        mapGet: symbol({
-            type: Type.value,
-            args: [['map', Type.Primitive.map], ['key', Type.value], ['default', Type.value]]
-        })
+        collections: {
+            header: 'Collections',
+            inSet: symbol({
+                type: Type.value,
+                args: [['set', Type.Primitive.set], ['value', Type.value]]
+            }),
+            mapGet: symbol({
+                type: Type.value,
+                args: [['map', Type.Primitive.map], ['key', Type.value], ['default', Type.value]]
+            })
+        }
     }
 }
+
+const modifierType = Type.fn(Type.Structure.atomSet, Type.Structure.atomSetSeq);
+const combinatorType = Type.fn(Type.oneOrMore(Type.Structure.atomSetSeq), Type.Structure.atomSetSeq);
 
 const structure = {
     header: 'Molecular Structure Queries',
     constructor: {
         header: 'Constructors',
         elementSymbol: ctor(Type.Structure.elementSymbol, [['symbol', Type.value]]),
-        //atomSet: ctor(Type.Structure.atomSet, [['atom-indices', Type.oneOrMore(Type.value)]]),
-        //atomSetSeq: ctor(Type.Structure.atomSetSeq, [['sets', Type.zeroOrMore(Type.Structure.atomSet)]])
+        atomSet: ctor(Type.Structure.atomSet, [['atom-indices', Type.oneOrMore(Type.value)]]),
+        atomSetSeq: ctor(Type.Structure.atomSetSeq, [['sets', Type.zeroOrMore(Type.Structure.atomSet)]])
     },
-    property: {
-        header: 'Properties',
-        atom: {
-            header: 'Atoms',
-            uniqueId: value(),
-            id: value(),
-            label_atom_id: value(),
-            type_symbol: value(),
-            B_iso_or_equiv: value(),
-            operatorName: value('Returns the name of the symmetry operator applied to this atom (e.g., 4_455). Atoms from the loaded asymmetric always return 1_555')
-        },
-        residue: {
-            header: 'Residues',
-            uniqueId: value(),
-            label_seq_id: value(),
-            label_comp_id: value()
-        },
-        chain: {
-            header: 'Chains',
-            label_asym_id: value()
-        },
-        atomSet: {
-            header: 'Atom Sets',
-            namespace: Type.Structure.atomSet.kind,
-            atomCount: value(),
-            reduce: symbol({
-                type: Type.value,
-                args: [['f', Type.fn(Type.value, Type.value)], ['initial', Type.value]]
-            })
-        },
-        atomSetSeq: {
-            header: 'Atom Set Sequences',
-            namespace: Type.Structure.atomSetSeq.kind,
-            length: symbol({
-                type: Type.Structure.atomSetSeq,
-                args: [ ['seq', Type.Structure.atomSetSeq] ]
-            })
-        }
-    },
-    primitive: {        
+    primitive: {
         modify: symbol({
             type: Type.Structure.atomSetSeq,
             args: [['seq', Type.Structure.atomSetSeq], ['f', Type.Structure.atomSetSeq]]
@@ -206,11 +166,11 @@ const structure = {
     combinator: {
         header: 'Sequence Combinators',
         merge: symbol({
-            type: Type.Structure.atomSetSeq
+            type: Type.Structure.atomSetSeq,
         }),
         union: symbol({
             description: 'Collects all atom sets in the sequence into a single atom set.',
-            type: Type.Structure.atomSetSeq
+            type: Type.Structure.atomSetSeq,
         }),
         near: symbol({
             description: 'Merges all tuples of atom sets that are mutually no further than the specified threshold.',
@@ -224,17 +184,46 @@ const structure = {
             type: Type.value,
             description: 'Create a context induced by the query.',
             args: [ ['query', Type.Structure.atomSetSeq] ]
-        }),
-        assembly: symbol({
-            type: Type.value,
-            description: 'Creates a context by applying assembly operators.',
-            args: [ ['name', Type.value] ]
-        }),
-        symmetryMates: symbol({
-            description: 'Creates a context by adding symmetry mates that are within *radius* angstroms.',
-            type: Type.value,
-            args: [ ['radius', Type.value] ]
         })
+    },
+    property: {
+        header: 'Properties',
+        atom: {
+            header: 'Atoms',
+            uniqueId: value(),
+            id: value(),
+            label_atom_id: value(),
+            type_symbol: value(),
+            B_iso_or_equiv: value(),
+            operatorName: value('Returns the name of the symmetry operator applied to this atom (e.g., 4_455). Atoms from the loaded asymmetric always return 1_555')
+        },
+        residue: {
+            header: 'Residues',
+            uniqueId: value(),
+            label_seq_id: value(),
+            label_comp_id: value()
+        },
+        chain: {
+            header: 'Chains',
+            label_asym_id: value()
+        },
+        atomSet: {
+            header: 'Atom Sets',
+            namespace: Type.Structure.atomSet.kind,
+            atomCount: value(),
+            reduce: symbol({
+                type: Type.value,
+                args: [['f', Type.fn(Type.value, Type.value)], ['initial', Type.value]]
+            })
+        },
+        atomSetSeq: {
+            header: 'Atom Set Sequences',
+            namespace: Type.Structure.atomSetSeq.kind,
+            length: symbol({
+                type: Type.Structure.atomSetSeq,
+                args: [ ['seq', Type.Structure.atomSetSeq] ]
+            })
+        }
     }
 }
 
@@ -242,6 +231,40 @@ const table = {
     primitive,
     structure
 };
+
+export function isSymbolInfo(x: any): x is SymbolInfo {
+    return !!x.isSymbol;
+}
+
+function symbol(info: SymbolSpec): SymbolInfo {
+    return { isSymbol: true, name: '', shortName: info.name || '', type: info.type, description: info.description, args: info.args };
+}
+
+function ctor(type: Type, args: ArgSpec[], description?: string) {
+    return symbol({ name: type.kind, type, args, description });
+}
+
+function value(description?: string) {
+    return symbol({ type: Type.value, description });
+}
+
+function binOp(description?: string) {
+    return symbol({
+        type: Type.value,
+        description,
+        args: [
+            ['args', Type.oneOrMore(Type.value)]
+        ]
+    });
+}
+
+function binRel(description?: string) {
+    return symbol({
+        type: Type.value,
+        description,
+        args: [['a', Type.value], ['b', Type.value]]
+    });
+}
 
 function formatKey(key: string) {
     return key.replace(/.[A-Z]/g, s => `${s[0]}-${s[1].toLocaleLowerCase()}`);

@@ -41,8 +41,8 @@ function applyRuntime(runtime: RuntimeExpression, slots: any[]): RuntimeExpressi
     }
 }
 
-function _compile(expr: Expression, isHead: boolean): RuntimeExpression {
-    if (isHead && typeof expr === 'string') {
+function _compile(expr: Expression, isSymbol: boolean): RuntimeExpression {
+    if (isSymbol && typeof expr === 'string') {
          return symbol(expr)
     }
 
