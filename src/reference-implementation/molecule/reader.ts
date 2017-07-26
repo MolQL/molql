@@ -95,7 +95,10 @@ function createModel(data: Data, startRow: number, rowCount: number): Model {
         chains: { residueStartIndex, residueEndIndex, entityIndex, count: chain },
         entities: { chainStartIndex, chainEndIndex, count: entity },
         positions: { x, y, z },
-        data
+        data,
+        get spatialLookup() {
+            return 0
+        }
     };
 }
 

@@ -38,10 +38,6 @@ export interface Entities {
     count: number
 }
 
-export interface SecondaryStructure {
-
-}
-
 export interface Model {
     id: number,
     data: {
@@ -53,7 +49,8 @@ export interface Model {
     atoms: Atoms,
     residues: Residues,
     chains: Chains,
-    entities: Entities
+    entities: Entities,
+    spatialLookup: any,
 }
 
 export interface Molecule {

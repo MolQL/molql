@@ -163,8 +163,14 @@ const structure = {
         header: 'Generators',
         atomGroups: symbol({
             type: Type.Structure.atomSetSeq,
-            args: [['predicate', Type.optional(Type.value)], ['group-by', Type.optional(Type.value)]]
-        }),
+            args: [
+                ['entity-predicate', Type.value],
+                ['chain-predicate', Type.value],
+                ['residue-predicate', Type.value],
+                ['atom-predicate', Type.value],
+                ['group-by', Type.optional(Type.value)]
+            ]
+        })
     },
     modifier: {
         header: 'Atom Set Modifiers',
