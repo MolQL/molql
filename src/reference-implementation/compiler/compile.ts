@@ -7,6 +7,7 @@ import RuntimeInfo, { SymbolRuntime } from '../runtime/symbols'
 import RuntimeExpression from '../runtime/expression'
 import Environment from '../runtime/environment'
 import * as Optimizer from './optimizer'
+import { isLiteral } from '../utils/expression'
 
 export default function compile(expr: Expression): RuntimeExpression {
     return _compile({ id: 0, staticEnv: Environment() }, expr, false).runtime;
@@ -45,7 +46,7 @@ export function symbol(ctx: CompileContext, info: SymbolRuntime.Info): CompiledE
 }
 
 function apply(ctx: CompileContext, head: CompiledExpression, args: CompiledExpression[]): CompiledExpression {
-    // non-optimized version would work like this:
+    // non-optimized version would work similar to this:
     //   const slots = [void 0, ...args.map(a => a.runtime)];
     //   const f = head.runtime;
     //   return RuntimeExpression(function (env) { slots[0] = env; return f(env).apply(null, slots); }, { id: ctx.id++ });
@@ -57,7 +58,7 @@ function onlyStringLiteralsCanBeApplied() {
 }
 
 function _compile(ctx: CompileContext, expr: Expression, isSymbol: boolean): CompiledExpression {
-    if (Expression.isLiteral(expr)) {
+    if (isLiteral(expr)) {
         if (isSymbol) {
             if (typeof expr !== 'string') onlyStringLiteralsCanBeApplied();
             return symbol(ctx, getRuntimeInfo(expr as string));

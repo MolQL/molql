@@ -385,7 +385,7 @@ Has reference implementation: *yes*
 
 ``primitive.operator.string.match :: (expression: regex, value: value) -> value``
 
-Has reference implementation: *no*
+Has reference implementation: *yes*
 
 -------------------
 

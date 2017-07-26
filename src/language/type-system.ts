@@ -4,7 +4,7 @@
 
 
 /**
- * The purpose of the type system is to provide annotations for symbol table to
+ * The main purpose of the type system is to provide annotations for symbol table to
  * be able to more easily generate documentation.
  */
 

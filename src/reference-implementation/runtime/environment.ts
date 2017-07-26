@@ -4,18 +4,19 @@
 
 import Iterator from './iterator'
 import Slot from './slot'
+import * as QueryData from '../query/data'
 
 interface Environment {
-    readonly queryCtx: {},
+    readonly queryCtx: QueryData.Context,
 
-    readonly element: Iterator<{}>,
-    readonly atomSet: Iterator<{}>,
+    readonly atom: Iterator<QueryData.AtomAddress>,
+    readonly atomSet: Iterator<QueryData.AtomSet>,
     readonly iterator: Slot<Iterator>,
     readonly slots: { [index: number]: Slot }
 }
 
 function Environment(queryCtx?: {}): Environment {
-    return { queryCtx: queryCtx as any, element: Iterator(), atomSet: Iterator(), iterator: Slot(), slots: Object.create(null) };
+    return { queryCtx: queryCtx as any, atom: Iterator(), atomSet: Iterator(), iterator: Slot(), slots: Object.create(null) };
 }
 
 namespace Environment {

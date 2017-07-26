@@ -18,9 +18,10 @@ import Env from './reference-implementation/runtime/environment'
 function symb(s: string | Expression.Symbol, args?: any[]) { return Expression.symbol(s, args) }
 //const expr = symb(symb(S.primitive.functional.partial.name, [symb(S.primitive.operator.arithmetic.add.name), 1, 2, 3]), [4, 5])
 
-const expr = symb(S.primitive.operator.collections.inSet.name, [symb(S.primitive.constructor.set.name, [1,2,3,4,5]), 4]);
+//const expr = symb(S.primitive.operator.collections.inSet.name, [symb(S.primitive.constructor.set.name, [1,2,3,4,5]), 4]);
+//const expr = symb(S.primitive.operator.string.match.name, [symb(S.primitive.constructor.regex.name, ['wh.', 'i']), 'wHy' ])
 
-//symb(S.primitive.operator.arithmetic.mult.name, [symb(S.primitive.operator.arithmetic.add.name, [3, 4, 5]), 2, 3, 4, 5])
+const expr = symb(S.primitive.operator.arithmetic.mult.name, [symb(S.primitive.operator.arithmetic.add.name, [3, 4, 5]), 2, 3, 4, 5])
 
 //const expr = apply(S.primitive.operator.plus, 1, 2)
 console.log(lispFormat(expr));
@@ -54,6 +55,9 @@ function bl() {
     return ret;
 }
 
+console.time('bb');
+bb();
+console.timeEnd('bb');
 console.time('bb');
 bb();
 console.timeEnd('bb');

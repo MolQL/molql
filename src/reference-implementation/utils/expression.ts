@@ -3,7 +3,9 @@
  */
 
 import Expression from '../../language/expression'
-const { isLiteral, isSymbol } = Expression
+
+export function isLiteral(e: Expression): e is Expression.Literal { return !(e as Expression.Symbol).symbol && !(e as Expression.Symbol).args; }
+export function isSymbol(e: Expression): e is Expression.Symbol { return !isLiteral(e); }
 
 export function lispFormat(e: Expression) {
     const lines: string[] = [];

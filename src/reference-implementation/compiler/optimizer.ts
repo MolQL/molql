@@ -8,7 +8,7 @@ import RuntimeExpression from '../runtime/expression'
 import Environment from '../runtime/environment'
 import * as Compiler from './compile'
 
-import CompiledExpression = Compiler.CompiledExpression
+type CompiledExpression = Compiler.CompiledExpression
 
 function _apply(head: RuntimeExpression, slots: any[]): RuntimeExpression {
     return function (env) { slots[0] = env; return head(env).apply(null, slots); };
@@ -39,11 +39,14 @@ function isLoopInvariant(expr: CompiledExpression) {
 export function apply(ctx: Compiler.CompileContext, head: CompiledExpression, args: CompiledExpression[]): CompiledExpression {
     const runtime = compileRuntime(head.runtime, args.map(a => a.runtime));
 
-    // collapse static nodes
+    // collapse static nodes into a single value
     if (isStatic(head) && args.every(a => isStatic(a))) {
         const value = runtime(ctx.staticEnv);
         return Compiler.value(ctx, value);
     }
 
-    return CompiledExpression.apply(RuntimeExpression(runtime, { id: ctx.id++, hint: isLoopInvariant(head) ? 'loop-invariant' : void 0 }), head, args);
+    return Compiler.CompiledExpression.apply(RuntimeExpression(runtime, {
+        id: ctx.id++,
+        hint: isLoopInvariant(head) ? 'loop-invariant' : void 0
+    }), head, args);
 }

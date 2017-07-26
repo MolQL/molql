@@ -23,9 +23,9 @@ export function sortAsc(array: number[]) {
 
 /**
  * An "object" based implementation of map that supports string and numeric keys
- * which should be ok for most use cases in LiteMol. 
- * 
- * The type limitation is on purpose to prevent using the type in places that are 
+ * which should be ok for most use cases in LiteMol.
+ *
+ * The type limitation is on purpose to prevent using the type in places that are
  * not appropriate.
  */
 export interface FastMap<K extends string | number, V> {
@@ -38,7 +38,7 @@ export interface FastMap<K extends string | number, V> {
     /**
      * Iterate over the collection.
      * Optional "context" object can be supplied that is passed to the callback.
-     * 
+     *
      * Enumerates only values that are not undefined.
      */
     forEach<Context>(f: (value: V, key: K, ctx?: Context) => void, ctx?: Context): void;
@@ -47,8 +47,8 @@ export interface FastMap<K extends string | number, V> {
 /**
  * An "object" based implementation of set that supports string and numeric values
  * which should be ok for most use cases in LiteMol.
- * 
- * The type limitation is on purpose to prevent using the type in places that are 
+ *
+ * The type limitation is on purpose to prevent using the type in places that are
  * not appropriate.
  */
 export interface FastSet<T extends string | number> {

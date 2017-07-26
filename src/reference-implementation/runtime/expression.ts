@@ -13,7 +13,7 @@ export interface RuntimeInfo {
     hint?: 'loop-invariant' | 'const'
 }
 
-function evalInvariant(f: RuntimeExpression, id: number): RuntimeExpression {
+function evalLoopInvariant(f: RuntimeExpression, id: number): RuntimeExpression {
     return function (env) {
         const iterator = env.iterator.value;
         if (!iterator) return f(env);
@@ -31,14 +31,16 @@ function evalBasic(f: RuntimeExpression): RuntimeExpression {
     return function(env) { return f(env); }
 }
 
-function evalConst(v: any) {
-    return function () { return v; };
+function evalConst(v: any): RuntimeExpression {
+    // Leaving out the "env" definition in the following code makes the runtime up to 20% slower.
+    // ...fun stuff :)
+    return function (env) { return v; };
 }
 
 export function RuntimeExpression(f: RuntimeExpression | SymbolRuntime | string | boolean | number | object, info: RuntimeInfo): RuntimeExpression {
     switch (info.hint) {
         case 'const': return evalConst(f);
-        case 'loop-invariant': return evalInvariant(f as RuntimeExpression, info.id);
+        case 'loop-invariant': return evalLoopInvariant(f as RuntimeExpression, info.id);
         default: return evalBasic(f as RuntimeExpression);
     }
 }
