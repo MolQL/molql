@@ -2,7 +2,8 @@
  * Copyright (c) 2017 David Sehnal, licensed under MIT, See LICENSE file for more info.
  */
 
-import { UniqueArrayBuilder, sortAsc, FastMap } from '../utils/collections'
+import { UniqueArrayBuilder, sortAsc, FastMap, FastSet } from '../utils/collections'
+import Mask from '../utils/mask'
 import Context from './context'
 import AtomSet from './atom-set'
 
@@ -21,6 +22,35 @@ namespace AtomSetSeq {
             }
         }
         return AtomSet(seq.context, sortAsc(atoms.array));
+    }
+
+    export function getMask(seq: AtomSetSeq) {
+        const count = seq.context.model.atoms.count;
+        if (!seq.atomSets.length) return Mask.never;
+        if (seq.atomSets.length === 1) return Mask.ofIndices(count, seq.atomSets[0].atomIndices);
+
+        let estSize = 0;
+        for (const atomSet of seq.atomSets) {
+            estSize += atomSet.atomIndices.length;
+        }
+
+        if ((estSize / count) > (1 / 12)) {
+            const mask = new Uint8Array(count);
+            for (const atomSet of seq.atomSets) {
+                for (const a of atomSet.atomIndices) {
+                    mask[a] = 1
+                }
+            }
+            return Mask.ofMask(mask as any as number[]);
+        } else {
+            const mask = FastSet.create<number>();
+            for (const atomSet of seq.atomSets) {
+                for (const a of atomSet.atomIndices) {
+                    mask.add(a);
+                }
+            }
+            return Mask.ofSet(mask);
+        }
     }
 
     export interface Builder { add(atomSet: AtomSet): Builder, getSeq(): AtomSetSeq }

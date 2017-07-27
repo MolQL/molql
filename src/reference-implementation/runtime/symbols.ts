@@ -6,8 +6,7 @@ import Symbols, { SymbolInfo } from '../../language/symbols'
 import { FastSet, FastMap } from '../utils/collections'
 import Environment from './environment'
 import RuntimeExpression from './expression'
-import { normalizeElementSymbol } from './helpers'
-import { Model } from '../molecule/data'
+import { Model, ElementSymbol } from '../molecule/data'
 import AtomSetSeq from '../query/atom-set-seq'
 import * as MolQueryRuntime from './molecule-query'
 
@@ -212,7 +211,7 @@ const symbols: CompileInfo[] = [
     // ============= CONSTRUCTORS =============
     [
         Symbols.structure.constructor.elementSymbol,
-        (env, s: RuntimeExpression<string>) => normalizeElementSymbol(s(env)),
+        (env, s: RuntimeExpression<string>) => ElementSymbol(s(env)),
         staticAttribute
     ],
 
@@ -224,7 +223,7 @@ const symbols: CompileInfo[] = [
     [Symbols.structure.property.atom.Cartn_z, env => env.positions.z[env.element.value.atom]],
 
     [Symbols.structure.property.atom.label_atom_id, env => env.atom_site.label_atom_id.getString(env.element.value.dataIndex)],
-    [Symbols.structure.property.atom.type_symbol, env => normalizeElementSymbol(env.atom_site.type_symbol.getString(env.element.value.dataIndex))],
+    [Symbols.structure.property.atom.type_symbol, env => ElementSymbol(env.atom_site.type_symbol.getString(env.element.value.dataIndex))],
     [Symbols.structure.property.atom.occupancy, env => env.atom_site.occupancy.getFloat(env.element.value.dataIndex)],
     [Symbols.structure.property.atom.B_iso_or_equiv, env => env.atom_site.B_iso_or_equiv.getFloat(env.element.value.dataIndex)],
 
@@ -270,7 +269,7 @@ const symbols: CompileInfo[] = [
         (env, seq: RuntimeExpression<AtomSetSeq>) => seq(env).atomSets.length
     ],
 
-    // // ============= PRIMITIVES =============    
+    // // ============= PRIMITIVES =============
     // [
     //     Symbols.structure.primitive.modify,
     //     (env, seq: RuntimeExpression<Query.AtomSetSeq>, f: RuntimeExpression<Query.AtomSetSeq>) => {

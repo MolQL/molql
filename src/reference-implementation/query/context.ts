@@ -25,17 +25,11 @@ namespace Context {
     }
 
     export function ofAtomSetSeq(model: MolData.Model, atomSetSeq: AtomSetSeq) {
-        const mask = new Set<number>();
-        for (const atomSet of atomSetSeq.atomSets) {
-            for (const a of atomSet.atomIndices) {
-                mask.add(a);
-            }
-        }
-        return Context(model, mask);
+        return Context(model, AtomSetSeq.getMask(atomSetSeq));
     }
 
     export function ofModel(model: MolData.Model) {
-        return Context(model, Mask.always(model.atoms.count));
+        return Context(model, Mask.always);
     }
 
     export namespace ElementAddress {
