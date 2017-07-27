@@ -2,31 +2,38 @@
  * Copyright (c) 2017 David Sehnal, licensed under MIT, See LICENSE file for more info.
  */
 
-import Symbols, { isSymbolInfo, ArgSpec, SymbolInfo } from './symbols'
-import Type from './type-system'
+import Symbols, { isSymbolInfo, ArgSpec, SymbolInfo } from '../../language/symbols'
+import Type from '../../language/type-system'
+import RuntimeSymbols from '../runtime/symbols'
 
 /**
  * Generates markdown documentation from the language spec.
  */
 
 const ToC: string[] = [`
-Table of Contents
-=================
+Language Reference
+==================
 
 `];
-const lines: string[] = []
+const implemented: string[] = []
+
+const notImplemented: string[] = [`
+Not yet implemented
+===================
+`
+]
 
 function formatArgs(args: ArgSpec[]) {
     return args.map(a => `${a[0]}: ${Type.format(a[1])}`).join(', ')
 }
 
-function formatSymbol(symbol: SymbolInfo) {
+function formatSymbol(symbol: SymbolInfo, lines: string[]) {
     const name = symbol.name;
     const header = symbol.args && symbol.args.length
-        ? `${name} :: (${formatArgs(symbol.args)}) -> ${Type.format(symbol.type)}`
+        ? `${name} :: (${formatArgs(symbol.args)}) => ${Type.format(symbol.type)}`
         : `${name} :: ${Type.format(symbol.type)}`;
-    lines.push(`### ${symbol.shortName}\n`);
-    lines.push(`\`\`${header}\`\`\n`);
+    lines.push(`### **${symbol.shortName}**&nbsp;&nbsp;&nbsp;\`\`${header}\`\`\n`);
+    //lines.push(`\`\`${header}\`\`\n`);
     if (symbol.description) {
         lines.push(`*${symbol.description}*\n`);
     }
@@ -35,11 +42,12 @@ function formatSymbol(symbol: SymbolInfo) {
 
 function format(depth: number, obj: any) {
     if (isSymbolInfo(obj)) {
-        formatSymbol(obj);
+        if (RuntimeSymbols[obj.name]) formatSymbol(obj, implemented);
+        else formatSymbol(obj, notImplemented);
         return;
     }
     if (obj['@header']) {
-        lines.push(`${new Array(depth + 1).join('#')} ${obj['@header']}\n`);
+        implemented.push(`${depth >= 2 ? '##' : '#'} ${obj['@header']}\n`);
         const tocLink = obj['@header'].toLowerCase().replace(/\s/g, '-');
         ToC.push(`${new Array(depth + 1).join('  ')} * [${obj['@header']}](#${tocLink})`);
     }
@@ -50,4 +58,5 @@ function format(depth: number, obj: any) {
 }
 format(0, Symbols);
 console.log(ToC.join('\n'));
-console.log(lines.join('\n'));
+console.log(implemented.join('\n'));
+console.log(notImplemented.join('\n'));

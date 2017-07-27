@@ -1,6 +1,6 @@
 
-Table of Contents
-=================
+Language Reference
+==================
 
 
    * [Langauge Primitives](#langauge-primitives)
@@ -30,45 +30,31 @@ Table of Contents
 
 ## Constructors
 
-### bool
-
-``primitive.constructor.bool :: (value: value) -> value``
+### **bool**&nbsp;&nbsp;&nbsp;``primitive.constructor.bool :: (value: any-value) => bool``
 
 -------------------
 
-### number
-
-``primitive.constructor.number :: (value: value) -> value``
+### **number**&nbsp;&nbsp;&nbsp;``primitive.constructor.number :: (value: any-value) => number``
 
 -------------------
 
-### str
-
-``primitive.constructor.str :: (value: value) -> value``
+### **str**&nbsp;&nbsp;&nbsp;``primitive.constructor.str :: (value: any-value) => string``
 
 -------------------
 
-### list
-
-``primitive.constructor.list :: (values: value*) -> list``
+### **list**&nbsp;&nbsp;&nbsp;``primitive.constructor.list :: (values: any-value*) => list``
 
 -------------------
 
-### set
-
-``primitive.constructor.set :: (values: value*) -> set``
+### **set**&nbsp;&nbsp;&nbsp;``primitive.constructor.set :: (values: any-value*) => set``
 
 -------------------
 
-### map
-
-``primitive.constructor.map :: (key-value-pairs: value*) -> map``
+### **map**&nbsp;&nbsp;&nbsp;``primitive.constructor.map :: (key-value-pairs: any-value*) => map``
 
 -------------------
 
-### regex
-
-``primitive.constructor.regex :: (expression: value, flags: ?value) -> regex``
+### **regex**&nbsp;&nbsp;&nbsp;``primitive.constructor.regex :: (expression: string, flags: ?string) => regex``
 
 *Creates a regular expression from a string using the ECMAscript syntax.*
 
@@ -76,261 +62,177 @@ Table of Contents
 
 ## Functional Operators
 
-### partial
+### **slot**&nbsp;&nbsp;&nbsp;``primitive.functional.slot :: (index: number) => any-value``
 
-``primitive.functional.partial :: (f: value*->value, args: value*) -> value``
-
--------------------
-
-### slot
-
-``primitive.functional.slot :: (index: value) -> value``
+*Evaluates into a value assigned to a slot with this index in the runtime environment. Useful for example for ``atomSet.reduce``.*
 
 -------------------
 
 ## Operators
 
-### Logic
+## Logic
 
-### not
-
-``primitive.operator.logic.not :: (args: value) -> value``
+### **not**&nbsp;&nbsp;&nbsp;``primitive.operator.logic.not :: (x: bool) => bool``
 
 -------------------
 
-### and
-
-``primitive.operator.logic.and :: (args: value+) -> value``
+### **and**&nbsp;&nbsp;&nbsp;``primitive.operator.logic.and :: (xs: bool+) => bool``
 
 -------------------
 
-### or
-
-``primitive.operator.logic.or :: (args: value+) -> value``
+### **or**&nbsp;&nbsp;&nbsp;``primitive.operator.logic.or :: (xs: bool+) => bool``
 
 -------------------
 
-### Arithmetic
+## Arithmetic
 
-### add
-
-``primitive.operator.arithmetic.add :: (args: value+) -> value``
+### **add**&nbsp;&nbsp;&nbsp;``primitive.operator.arithmetic.add :: (xs: number+) => number``
 
 -------------------
 
-### sub
-
-``primitive.operator.arithmetic.sub :: (a: value, b: value) -> value``
+### **sub**&nbsp;&nbsp;&nbsp;``primitive.operator.arithmetic.sub :: (x: number, y: number) => number``
 
 -------------------
 
-### minus
-
-``primitive.operator.arithmetic.minus :: (args: value) -> value``
+### **minus**&nbsp;&nbsp;&nbsp;``primitive.operator.arithmetic.minus :: (x: number) => number``
 
 -------------------
 
-### mult
-
-``primitive.operator.arithmetic.mult :: (args: value+) -> value``
+### **mult**&nbsp;&nbsp;&nbsp;``primitive.operator.arithmetic.mult :: (xs: number+) => number``
 
 -------------------
 
-### div
-
-``primitive.operator.arithmetic.div :: (a: value, b: value) -> value``
+### **div**&nbsp;&nbsp;&nbsp;``primitive.operator.arithmetic.div :: (x: number, y: number) => number``
 
 -------------------
 
-### pow
-
-``primitive.operator.arithmetic.pow :: (a: value, b: value) -> value``
+### **pow**&nbsp;&nbsp;&nbsp;``primitive.operator.arithmetic.pow :: (x: number, y: number) => number``
 
 -------------------
 
-### min
-
-``primitive.operator.arithmetic.min :: (args: value+) -> value``
+### **min**&nbsp;&nbsp;&nbsp;``primitive.operator.arithmetic.min :: (xs: number+) => number``
 
 -------------------
 
-### max
-
-``primitive.operator.arithmetic.max :: (args: value+) -> value``
+### **max**&nbsp;&nbsp;&nbsp;``primitive.operator.arithmetic.max :: (xs: number+) => number``
 
 -------------------
 
-### floor
-
-``primitive.operator.arithmetic.floor :: (args: value) -> value``
+### **floor**&nbsp;&nbsp;&nbsp;``primitive.operator.arithmetic.floor :: (x: number) => number``
 
 -------------------
 
-### ceil
-
-``primitive.operator.arithmetic.ceil :: (args: value) -> value``
+### **ceil**&nbsp;&nbsp;&nbsp;``primitive.operator.arithmetic.ceil :: (x: number) => number``
 
 -------------------
 
-### round-int
-
-``primitive.operator.arithmetic.round-int :: (args: value) -> value``
+### **round-int**&nbsp;&nbsp;&nbsp;``primitive.operator.arithmetic.round-int :: (x: number) => number``
 
 -------------------
 
-### abs
-
-``primitive.operator.arithmetic.abs :: (args: value) -> value``
+### **abs**&nbsp;&nbsp;&nbsp;``primitive.operator.arithmetic.abs :: (x: number) => number``
 
 -------------------
 
-### sin
-
-``primitive.operator.arithmetic.sin :: (args: value) -> value``
+### **sin**&nbsp;&nbsp;&nbsp;``primitive.operator.arithmetic.sin :: (x: number) => number``
 
 -------------------
 
-### cos
-
-``primitive.operator.arithmetic.cos :: (args: value) -> value``
+### **cos**&nbsp;&nbsp;&nbsp;``primitive.operator.arithmetic.cos :: (x: number) => number``
 
 -------------------
 
-### tan
-
-``primitive.operator.arithmetic.tan :: (args: value) -> value``
+### **tan**&nbsp;&nbsp;&nbsp;``primitive.operator.arithmetic.tan :: (x: number) => number``
 
 -------------------
 
-### asin
-
-``primitive.operator.arithmetic.asin :: (args: value) -> value``
+### **asin**&nbsp;&nbsp;&nbsp;``primitive.operator.arithmetic.asin :: (x: number) => number``
 
 -------------------
 
-### acos
-
-``primitive.operator.arithmetic.acos :: (args: value) -> value``
+### **acos**&nbsp;&nbsp;&nbsp;``primitive.operator.arithmetic.acos :: (x: number) => number``
 
 -------------------
 
-### atan
-
-``primitive.operator.arithmetic.atan :: (args: value) -> value``
+### **atan**&nbsp;&nbsp;&nbsp;``primitive.operator.arithmetic.atan :: (x: number) => number``
 
 -------------------
 
-### atan2
-
-``primitive.operator.arithmetic.atan2 :: (index: value) -> value``
+### **atan2**&nbsp;&nbsp;&nbsp;``primitive.operator.arithmetic.atan2 :: (x: number, y: number) => number``
 
 -------------------
 
-### sinh
-
-``primitive.operator.arithmetic.sinh :: (args: value) -> value``
+### **sinh**&nbsp;&nbsp;&nbsp;``primitive.operator.arithmetic.sinh :: (x: number) => number``
 
 -------------------
 
-### cosh
-
-``primitive.operator.arithmetic.cosh :: (args: value) -> value``
+### **cosh**&nbsp;&nbsp;&nbsp;``primitive.operator.arithmetic.cosh :: (x: number) => number``
 
 -------------------
 
-### tanh
-
-``primitive.operator.arithmetic.tanh :: (args: value) -> value``
+### **tanh**&nbsp;&nbsp;&nbsp;``primitive.operator.arithmetic.tanh :: (x: number) => number``
 
 -------------------
 
-### exp
-
-``primitive.operator.arithmetic.exp :: (args: value) -> value``
+### **exp**&nbsp;&nbsp;&nbsp;``primitive.operator.arithmetic.exp :: (x: number) => number``
 
 -------------------
 
-### log
-
-``primitive.operator.arithmetic.log :: (args: value) -> value``
+### **log**&nbsp;&nbsp;&nbsp;``primitive.operator.arithmetic.log :: (x: number) => number``
 
 -------------------
 
-### log10
-
-``primitive.operator.arithmetic.log10 :: (args: value) -> value``
+### **log10**&nbsp;&nbsp;&nbsp;``primitive.operator.arithmetic.log10 :: (x: number) => number``
 
 -------------------
 
-### Relational
+## Relational
 
-### eq
-
-``primitive.operator.relational.eq :: (a: value, b: value) -> value``
+### **eq**&nbsp;&nbsp;&nbsp;``primitive.operator.relational.eq :: (x: any-value, y: any-value) => bool``
 
 -------------------
 
-### neq
-
-``primitive.operator.relational.neq :: (a: value, b: value) -> value``
+### **neq**&nbsp;&nbsp;&nbsp;``primitive.operator.relational.neq :: (x: any-value, y: any-value) => bool``
 
 -------------------
 
-### lt
-
-``primitive.operator.relational.lt :: (a: value, b: value) -> value``
+### **lt**&nbsp;&nbsp;&nbsp;``primitive.operator.relational.lt :: (x: number, y: number) => bool``
 
 -------------------
 
-### lte
-
-``primitive.operator.relational.lte :: (a: value, b: value) -> value``
+### **lte**&nbsp;&nbsp;&nbsp;``primitive.operator.relational.lte :: (x: number, y: number) => bool``
 
 -------------------
 
-### gr
-
-``primitive.operator.relational.gr :: (a: value, b: value) -> value``
+### **gr**&nbsp;&nbsp;&nbsp;``primitive.operator.relational.gr :: (x: number, y: number) => bool``
 
 -------------------
 
-### gre
-
-``primitive.operator.relational.gre :: (a: value, b: value) -> value``
+### **gre**&nbsp;&nbsp;&nbsp;``primitive.operator.relational.gre :: (x: number, y: number) => bool``
 
 -------------------
 
-### in-range
-
-``primitive.operator.relational.in-range :: (min: value, max: value, value: value) -> value``
+### **in-range**&nbsp;&nbsp;&nbsp;``primitive.operator.relational.in-range :: (min: number, max: number, value: number) => number``
 
 -------------------
 
-### Strings
+## Strings
 
-### concat
-
-``primitive.operator.string.concat :: (args: value+) -> value``
+### **concat**&nbsp;&nbsp;&nbsp;``primitive.operator.string.concat :: (xs: string+) => string``
 
 -------------------
 
-### match
-
-``primitive.operator.string.match :: (expression: regex, value: value) -> value``
+### **match**&nbsp;&nbsp;&nbsp;``primitive.operator.string.match :: (regex: regex, value: string) => string``
 
 -------------------
 
-### Collections
+## Collections
 
-### in-set
-
-``primitive.operator.collections.in-set :: (set: set, value: value) -> value``
+### **in-set**&nbsp;&nbsp;&nbsp;``primitive.operator.collections.in-set :: (set: set, value: any-value) => bool``
 
 -------------------
 
-### map-get
-
-``primitive.operator.collections.map-get :: (map: map, key: value, default: value) -> value``
+### **map-get**&nbsp;&nbsp;&nbsp;``primitive.operator.collections.map-get :: (map: map, key: any-value, default: any-value) => any-value``
 
 -------------------
 
@@ -338,265 +240,227 @@ Table of Contents
 
 ## Constructors
 
-### element-symbol
-
-``structure.constructor.element-symbol :: (symbol: value) -> element-symbol``
-
--------------------
-
-### atom-set
-
-``structure.constructor.atom-set :: (atom-indices: value+) -> atom-set``
-
--------------------
-
-### atom-set-seq
-
-``structure.constructor.atom-set-seq :: (sets: atom-set*) -> atom-set-seq``
-
--------------------
-
-### modify
-
-``structure.primitive.modify :: (seq: atom-set-seq, f: atom-set-seq) -> atom-set-seq``
-
--------------------
-
-### combine
-
-``structure.primitive.combine :: (combinator: atom-set-seq, seqs: atom-set-seq+) -> atom-set-seq``
+### **element-symbol**&nbsp;&nbsp;&nbsp;``structure.constructor.element-symbol :: (symbol: string) => element-symbol``
 
 -------------------
 
 ## Generators
 
-### atom-groups
-
-``structure.generator.atom-groups :: (entity-predicate: value, chain-predicate: value, residue-predicate: value, atom-predicate: value, group-by: ?value) -> atom-set-seq``
+### **atom-groups**&nbsp;&nbsp;&nbsp;``structure.generator.atom-groups :: (entity-predicate: bool, chain-predicate: bool, residue-predicate: bool, atom-predicate: bool, group-by: ?any-value) => atom-set-seq``
 
 -------------------
 
 ## Atom Set Modifiers
 
-### filter
-
-``structure.modifier.filter :: (predicate: value) -> atom-set-seq``
-
--------------------
-
-### within
-
-``structure.modifier.within :: (radius: value, seq: atom-set-seq) -> atom-set-seq``
-
--------------------
-
-### find
-
-``structure.modifier.find :: (query: atom-set-seq) -> atom-set-seq``
-
-*Executes the specified query in the context induced by each of the atoms sets in the sequence.*
-
--------------------
-
 ## Sequence Combinators
-
-### intersect-with
-
-``structure.combinator.intersect-with :: atom-set-seq``
-
--------------------
-
-### merge
-
-``structure.combinator.merge :: atom-set-seq``
-
--------------------
-
-### union
-
-``structure.combinator.union :: atom-set-seq``
-
-*Collects all atom sets in the sequence into a single atom set.*
-
--------------------
-
-### near
-
-``structure.combinator.near :: (max-distance: value) -> atom-set-seq``
-
-*Merges all tuples of atom sets that are mutually no further than the specified threshold.*
-
--------------------
 
 ## Properties
 
-### Atoms
+## Atoms
 
-### unique-id
-
-``structure.property.atom.unique-id :: value``
+### **unique-id**&nbsp;&nbsp;&nbsp;``structure.property.atom.unique-id :: any-value``
 
 *Returns an implementation specific unique identifier of the current atom.*
 
 -------------------
 
-### id
-
-``structure.property.atom.id :: value``
+### **id**&nbsp;&nbsp;&nbsp;``structure.property.atom.id :: number``
 
 -------------------
 
-### Cartn_x
-
-``structure.property.atom.Cartn_x :: value``
+### **Cartn_x**&nbsp;&nbsp;&nbsp;``structure.property.atom.Cartn_x :: number``
 
 -------------------
 
-### Cartn_y
-
-``structure.property.atom.Cartn_y :: value``
+### **Cartn_y**&nbsp;&nbsp;&nbsp;``structure.property.atom.Cartn_y :: number``
 
 -------------------
 
-### Cartn_z
-
-``structure.property.atom.Cartn_z :: value``
+### **Cartn_z**&nbsp;&nbsp;&nbsp;``structure.property.atom.Cartn_z :: number``
 
 -------------------
 
-### label_atom_id
-
-``structure.property.atom.label_atom_id :: value``
+### **label_atom_id**&nbsp;&nbsp;&nbsp;``structure.property.atom.label_atom_id :: string``
 
 -------------------
 
-### type_symbol
-
-``structure.property.atom.type_symbol :: value``
+### **type_symbol**&nbsp;&nbsp;&nbsp;``structure.property.atom.type_symbol :: string``
 
 -------------------
 
-### occupancy
-
-``structure.property.atom.occupancy :: value``
+### **occupancy**&nbsp;&nbsp;&nbsp;``structure.property.atom.occupancy :: number``
 
 -------------------
 
-### B_iso_or_equiv
-
-``structure.property.atom.B_iso_or_equiv :: value``
+### **B_iso_or_equiv**&nbsp;&nbsp;&nbsp;``structure.property.atom.B_iso_or_equiv :: number``
 
 -------------------
 
-### Residues
+## Residues
 
-### unique-id
-
-``structure.property.residue.unique-id :: value``
+### **unique-id**&nbsp;&nbsp;&nbsp;``structure.property.residue.unique-id :: any-value``
 
 *Returns an implementation specific unique identifier of the current residue.*
 
 -------------------
 
-### group_-pD-b
-
-``structure.property.residue.group_-pD-b :: value``
+### **is-het**&nbsp;&nbsp;&nbsp;``structure.property.residue.is-het :: string``
 
 -------------------
 
-### label_seq_id
-
-``structure.property.residue.label_seq_id :: value``
+### **label_seq_id**&nbsp;&nbsp;&nbsp;``structure.property.residue.label_seq_id :: number``
 
 -------------------
 
-### label_comp_id
-
-``structure.property.residue.label_comp_id :: value``
+### **label_comp_id**&nbsp;&nbsp;&nbsp;``structure.property.residue.label_comp_id :: string``
 
 -------------------
 
-### pdbx_-pD-b_ins_code
-
-``structure.property.residue.pdbx_-pD-b_ins_code :: value``
+### **pdbx_PDB_ins_code**&nbsp;&nbsp;&nbsp;``structure.property.residue.pdbx_PDB_ins_code :: string``
 
 -------------------
 
-### Chains
+## Chains
 
-### unique-id
-
-``structure.property.chain.unique-id :: value``
+### **unique-id**&nbsp;&nbsp;&nbsp;``structure.property.chain.unique-id :: any-value``
 
 *Returns an implementation specific unique identifier of the current chain.*
 
 -------------------
 
-### label_asym_id
-
-``structure.property.chain.label_asym_id :: value``
+### **label_asym_id**&nbsp;&nbsp;&nbsp;``structure.property.chain.label_asym_id :: string``
 
 -------------------
 
-### Entities
+## Entities
 
-### unique-id
-
-``structure.property.entity.unique-id :: value``
+### **unique-id**&nbsp;&nbsp;&nbsp;``structure.property.entity.unique-id :: any-value``
 
 *Returns an implementation specific unique identifier of the current entity.*
 
 -------------------
 
-### id
-
-``structure.property.entity.id :: value``
+### **label_entity_id**&nbsp;&nbsp;&nbsp;``structure.property.entity.label_entity_id :: string``
 
 -------------------
 
-### Model
+## Model
 
-### pdbx_-pD-b_model_num
+## Secondary Structure
 
-``structure.property.model.pdbx_-pD-b_model_num :: value``
+## Atom Sets
+
+### **atom-count**&nbsp;&nbsp;&nbsp;``structure.property.atom-set.atom-count :: number``
 
 -------------------
 
-### Secondary Structure
+## Atom Set Sequences
 
-### unique-id
+### **length**&nbsp;&nbsp;&nbsp;``structure.property.atom-set-seq.length :: (seq: atom-set-seq) => atom-set-seq``
 
-``structure.property.secondaryStructure.unique-id :: value``
+-------------------
+
+
+Not yet implemented
+===================
+
+### **atom-set**&nbsp;&nbsp;&nbsp;``structure.constructor.atom-set :: (atom-indices: number+) => atom-set``
+
+-------------------
+
+### **atom-set-seq**&nbsp;&nbsp;&nbsp;``structure.constructor.atom-set-seq :: (sets: atom-set*) => atom-set-seq``
+
+-------------------
+
+### **modify**&nbsp;&nbsp;&nbsp;``structure.primitive.modify :: (seq: atom-set-seq, f: atom-set-seq) => atom-set-seq``
+
+-------------------
+
+### **combine**&nbsp;&nbsp;&nbsp;``structure.primitive.combine :: (combinator: atom-set-seq, seqs: atom-set-seq+) => atom-set-seq``
+
+-------------------
+
+### **connected-components**&nbsp;&nbsp;&nbsp;``structure.generator.connected-components :: atom-set-seq``
+
+*Returns all covalently connected components.*
+
+-------------------
+
+### **filter**&nbsp;&nbsp;&nbsp;``structure.modifier.filter :: (predicate: bool) => atom-set-seq``
+
+-------------------
+
+### **find**&nbsp;&nbsp;&nbsp;``structure.modifier.find :: (query: atom-set-seq) => atom-set-seq``
+
+*Executes the specified query in the context induced by each of the atoms sets in the sequence.*
+
+-------------------
+
+### **intersect-with**&nbsp;&nbsp;&nbsp;``structure.combinator.intersect-with :: atom-set-seq``
+
+-------------------
+
+### **merge**&nbsp;&nbsp;&nbsp;``structure.combinator.merge :: atom-set-seq``
+
+-------------------
+
+### **union**&nbsp;&nbsp;&nbsp;``structure.combinator.union :: atom-set-seq``
+
+*Collects all atom sets in the sequence into a single atom set.*
+
+-------------------
+
+### **near**&nbsp;&nbsp;&nbsp;``structure.combinator.near :: (max-distance: number) => atom-set-seq``
+
+*Merges all tuples of atom sets that are mutually no further than the specified threshold.*
+
+-------------------
+
+### **operator-name**&nbsp;&nbsp;&nbsp;``structure.property.atom.operator-name :: string``
+
+*Returns the name of the symmetry operator applied to this atom (e.g., 4_455). Atoms from the loaded asymmetric always return 1_555. Probably should have specific type constructor for this?*
+
+-------------------
+
+### **is-modified**&nbsp;&nbsp;&nbsp;``structure.property.residue.is-modified :: bool``
+
+-------------------
+
+### **pdbx_PDB_model_num**&nbsp;&nbsp;&nbsp;``structure.property.model.pdbx_PDB_model_num :: string``
+
+-------------------
+
+### **unique-id**&nbsp;&nbsp;&nbsp;``structure.property.secondaryStructure.unique-id :: any-value``
 
 *Returns an implementation specific unique identifier of the current secondary structure element.*
 
 -------------------
 
-### Atom Sets
+### **is-amino**&nbsp;&nbsp;&nbsp;``structure.property.atom-set.is-amino :: bool``
 
-### atom-count
-
-``structure.property.atom-set.atom-count :: value``
+*Is the current atom set formed solely from amino acid atoms?*
 
 -------------------
 
-### reduce
+### **is-nucleotide**&nbsp;&nbsp;&nbsp;``structure.property.atom-set.is-nucleotide :: bool``
 
-``structure.property.atom-set.reduce :: (f: value->value, initial: value) -> value``
-
--------------------
-
-### Atom Set Sequences
-
-### length
-
-``structure.property.atom-set-seq.length :: (seq: atom-set-seq) -> atom-set-seq``
+*Is the current atom set formed solely from nucleotide atoms?*
 
 -------------------
 
-### property-set
+### **is-ligand**&nbsp;&nbsp;&nbsp;``structure.property.atom-set.is-ligand :: bool``
 
-``structure.property.atom-set-seq.property-set :: (prop: value, seq: atom-set-seq) -> set``
+*Is the current atom set formed solely from ligand atoms?*
+
+-------------------
+
+### **reduce**&nbsp;&nbsp;&nbsp;``structure.property.atom-set.reduce :: (f: any-value->any-value, initial: any-value) => any-value``
+
+*Compute a property of an atom set based on it's properties. The current value is assigned to the 0-th slot [``(primitive.functional.slot 0)``].*
+
+-------------------
+
+### **property-set**&nbsp;&nbsp;&nbsp;``structure.property.atom-set-seq.property-set :: (prop: any-value, seq: atom-set-seq) => set``
 
 *Returns a set of unique properties from all atoms within the source sequence.*
 

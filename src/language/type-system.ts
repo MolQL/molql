@@ -9,7 +9,11 @@
  */
 
 type Type =
-    | Type.Value
+    | Type.AnyValue
+    | Type.AnyFunction
+    | Type.Primitive.Bool
+    | Type.Primitive.String
+    | Type.Primitive.Number
     | Type.Primitive.Regex
     | Type.Primitive.List
     | Type.Primitive.Map
@@ -27,14 +31,25 @@ type Type =
 namespace Type {
     interface Base { prefix?: string }
 
-    export interface Value extends Base { kind: 'value' }
-    export const value: Value = { kind: 'value' };
+    export interface AnyValue extends Base { kind: 'any-value' }
+    export const anyValue: AnyValue = { kind: 'any-value' };
+
+    export interface AnyFunction extends Base { kind: 'any-function' }
+    export const anyFunction: AnyFunction = { kind: 'any-function' };
 
     export namespace Primitive {
+        export interface Number extends Base { kind: 'number' }
+        export interface Bool extends Base { kind: 'bool' }
+        export interface String extends Base { kind: 'string' }
+
         export interface Regex extends Base { kind: 'regex' }
         export interface List extends Base { kind: 'list' }
         export interface Set extends Base { kind: 'set' }
         export interface Map extends Base { kind: 'map' }
+
+        export const num: Number = { kind: 'number' };
+        export const bool: Bool = { kind: 'bool' };
+        export const str: String = { kind: 'string' };
 
         export const regex: Regex = { kind: 'regex' };
         export const list: List = { kind: 'list' };
@@ -74,6 +89,7 @@ namespace Type {
             case 'list-of': return `list-of<${format(type.type)}>`;
             case 'tuple': return `(${type.types.map(t => format(t)).join(' ')})`;
             case 'function': return `${format(type.args)}->${format(type.result)}`;
+            case 'any-function': return `function`;
             default: return type.prefix ? `${type.prefix}.${type.kind}` : type.kind;
         }
     }

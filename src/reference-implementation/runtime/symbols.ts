@@ -8,6 +8,7 @@ import Environment from './environment'
 import RuntimeExpression from './expression'
 import { normalizeElementSymbol } from './helpers'
 import { Model } from '../molecule/data'
+import AtomSetSeq from '../query/atom-set-seq'
 import * as MolQueryRuntime from './molecule-query'
 
 namespace SymbolRuntime {
@@ -70,20 +71,20 @@ const symbols: CompileInfo[] = [
     ],
 
     // ============= FUNCTIONAL =============
-    [
-        Symbols.primitive.functional.partial,
-        function (env, f: RuntimeExpression<Function>) {
-            const func = f(env);
-            const first: any[] = [void 0];
-            for (let i = 2; i < arguments.length; i++) first[i - 1] = arguments[i];
-            return function (env: Environment) {
-                const second = [...first];
-                second[0] = env;
-                for (let i = 1; i < arguments.length; i++) second.push(arguments[i]);
-                return func.apply(null, second);
-            };
-        }
-    ],
+    // [
+    //     Symbols.primitive.functional.partial,
+    //     function (env, f: RuntimeExpression<Function>) {
+    //         const func = f(env);
+    //         const first: any[] = [void 0];
+    //         for (let i = 2; i < arguments.length; i++) first[i - 1] = arguments[i];
+    //         return function (env: Environment) {
+    //             const second = [...first];
+    //             second[0] = env;
+    //             for (let i = 1; i < arguments.length; i++) second.push(arguments[i]);
+    //             return func.apply(null, second);
+    //         };
+    //     }
+    // ],
     [Symbols.primitive.functional.slot, (env, index: RuntimeExpression<number>) => env.slots[index(env)].value],
 
     // ============= OPERATORS =============
@@ -229,7 +230,7 @@ const symbols: CompileInfo[] = [
 
     // ============= RESIDUE PROPERTIES =============
     [Symbols.structure.property.residue.uniqueId, env => env.element.value.residue],
-    [Symbols.structure.property.residue.group_PDB, env => env.atom_site.group_PDB.getString(env.element.value.dataIndex)],
+    [Symbols.structure.property.residue.isHet, env => !env.atom_site.group_PDB.stringEquals(env.element.value.dataIndex, 'ATOM')],
     [Symbols.structure.property.residue.label_seq_id, env => env.atom_site.label_seq_id.getInteger(env.element.value.dataIndex)],
     [Symbols.structure.property.residue.label_comp_id, env => env.atom_site.label_comp_id.getString(env.element.value.dataIndex)],
     [Symbols.structure.property.residue.pdbx_PDB_ins_code, env => env.atom_site.pdbx_PDB_ins_code.getString(env.element.value.dataIndex)],
@@ -242,11 +243,11 @@ const symbols: CompileInfo[] = [
     [Symbols.structure.property.entity.uniqueId, env => env.element.value.entity],
     [Symbols.structure.property.entity.label_entity_id, env => env.atom_site.label_entity_id.getString(env.element.value.dataIndex)],
 
-    // // ============= ATOM SET PROPERTIES =============
-    // [
-    //     Symbols.structure.property.atomSet.atomCount,
-    //     env => env.atomSet.value.atomIndices.length
-    // ],
+    // ============= ATOM SET PROPERTIES =============
+    [
+        Symbols.structure.property.atomSet.atomCount,
+        env => env.atomSet.value.atomIndices.length
+    ],
     // [
     //     Symbols.structure.property.atomSet.reduce,
     //     (env, f: RuntimeExpression<any>, initial: RuntimeExpression<any>) => {
@@ -263,11 +264,11 @@ const symbols: CompileInfo[] = [
     //     }
     // ],
 
-    // // ============= ATOM SEQ SEQ PROPERTIES =============
-    // [
-    //     Symbols.structure.property.atomSetSeq.length,
-    //     (env, seq: RuntimeExpression<Query.AtomSetSeq>) => seq(env).atomSets.length
-    // ],
+    // ============= ATOM SEQ SEQ PROPERTIES =============
+    [
+        Symbols.structure.property.atomSetSeq.length,
+        (env, seq: RuntimeExpression<AtomSetSeq>) => seq(env).atomSets.length
+    ],
 
     // // ============= PRIMITIVES =============    
     // [
