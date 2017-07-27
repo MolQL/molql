@@ -6,30 +6,36 @@ import Symbols, { SymbolInfo } from '../../language/symbols'
 import { FastSet, FastMap } from '../utils/collections'
 import Environment from './environment'
 import RuntimeExpression from './expression'
+import { normalizeElementSymbol } from './helpers'
+import { Model } from '../molecule/data'
+import * as MolQueryRuntime from './molecule-query'
 
-export type SymbolRuntime<T = any> = (env: Environment, ...args: RuntimeExpression[]) => T
+namespace SymbolRuntime {
+    export type Func<T = any> = (env: Environment, ...args: RuntimeExpression[]) => T
 
-export namespace SymbolRuntime {
     export type Attribute =
         | 'static-expr' // static expressions are independent from context if their children are also independent from context.
         | 'loop-invariant' // can be cached in loops becuase it will always yield the same answer
 
     export interface Info {
         symbol: SymbolInfo,
-        runtime: SymbolRuntime,
+        runtime: Func,
         attributes: Attribute[]
     }
 }
 
 
-export const staticAttribute: SymbolRuntime.Attribute[] = ['static-expr']
+const staticAttribute: SymbolRuntime.Attribute[] = ['static-expr']
 
-type CompileInfo = [SymbolInfo, SymbolRuntime] | [SymbolInfo, SymbolRuntime, SymbolRuntime.Attribute[]]
+type CompileInfo = [SymbolInfo, SymbolRuntime.Func] | [SymbolInfo, SymbolRuntime.Func, SymbolRuntime.Attribute[]]
 const symbols: CompileInfo[] = [
     ////////////////////////////////////
     // Primitives
 
     // ============= CONSTRUCTORS =============
+    [Symbols.primitive.constructor.bool, (env, v) => !!v(env), staticAttribute],
+    [Symbols.primitive.constructor.number, (env, v) => +v(env), staticAttribute],
+    [Symbols.primitive.constructor.str, (env, v) => '' + v(env), staticAttribute],
     [
         Symbols.primitive.constructor.list,
         function (env) {
@@ -202,54 +208,39 @@ const symbols: CompileInfo[] = [
     ////////////////////////////////////
     // Structure
 
-    // // ============= CONSTRUCTORS =============
-    // [
-    //     Symbols.structure.constructor.elementSymbol,
-    //     (env, s: RuntimeExpression<string>) => RuntimeHelpers.normalizeElementSymbol(s(env)),
-    //     staticAttribute
-    // ],
+    // ============= CONSTRUCTORS =============
+    [
+        Symbols.structure.constructor.elementSymbol,
+        (env, s: RuntimeExpression<string>) => normalizeElementSymbol(s(env)),
+        staticAttribute
+    ],
 
-    // // ============= ATOM PROPERTIES =============
-    // [
-    //     Symbols.structure.property.atom.uniqueId,
-    //     env => env.element.value.atom
-    // ],
-    // [
-    //     Symbols.structure.property.atom.id,
-    //     env => env.columns.id.getInteger(env.element.value.atom)
-    // ],
-    // [
-    //     Symbols.structure.property.atom.label_atom_id,
-    //     env => env.columns.label_asym_id.getString(env.element.value.atom)
-    // ],
-    // [
-    //     Symbols.structure.property.atom.type_symbol,
-    //     env => RuntimeHelpers.normalizeElementSymbol(env.columns.type_symbol.getString(env.element.value.atom))
-    // ],
-    // [
-    //     Symbols.structure.property.atom.B_iso_or_equiv,
-    //     env => env.columns.B_iso_or_equiv.getFloat(env.element.value.atom)
-    // ],
+    // ============= ATOM PROPERTIES =============
+    [Symbols.structure.property.atom.uniqueId, env => env.element.value.atom],
+    [Symbols.structure.property.atom.id, env => env.atom_site.id.getInteger(env.element.value.dataIndex)],
+    [Symbols.structure.property.atom.Cartn_x, env => env.positions.x[env.element.value.atom]],
+    [Symbols.structure.property.atom.Cartn_y, env => env.positions.y[env.element.value.atom]],
+    [Symbols.structure.property.atom.Cartn_z, env => env.positions.z[env.element.value.atom]],
 
-    // // ============= RESIDUE PROPERTIES =============
-    // [
-    //     Symbols.structure.property.residue.uniqueId,
-    //     env => env.element.value.residue
-    // ],
-    // [
-    //     Symbols.structure.property.residue.label_comp_id,
-    //     env => env.columns.label_comp_id.getString(env.element.value.atom)
-    // ],
-    // [
-    //     Symbols.structure.property.residue.label_seq_id,
-    //     env => env.columns.label_seq_id.getInteger(env.element.value.atom)
-    // ],
+    [Symbols.structure.property.atom.label_atom_id, env => env.atom_site.label_atom_id.getString(env.element.value.dataIndex)],
+    [Symbols.structure.property.atom.type_symbol, env => normalizeElementSymbol(env.atom_site.type_symbol.getString(env.element.value.dataIndex))],
+    [Symbols.structure.property.atom.occupancy, env => env.atom_site.occupancy.getFloat(env.element.value.dataIndex)],
+    [Symbols.structure.property.atom.B_iso_or_equiv, env => env.atom_site.B_iso_or_equiv.getFloat(env.element.value.dataIndex)],
 
-    // // ============= CHAIN PROPERTIES =============
-    // [
-    //     Symbols.structure.property.chain.label_asym_id,
-    //     env => env.columns.label_asym_id.getString(env.element.value.atom)
-    // ],
+    // ============= RESIDUE PROPERTIES =============
+    [Symbols.structure.property.residue.uniqueId, env => env.element.value.residue],
+    [Symbols.structure.property.residue.group_PDB, env => env.atom_site.group_PDB.getString(env.element.value.dataIndex)],
+    [Symbols.structure.property.residue.label_seq_id, env => env.atom_site.label_seq_id.getInteger(env.element.value.dataIndex)],
+    [Symbols.structure.property.residue.label_comp_id, env => env.atom_site.label_comp_id.getString(env.element.value.dataIndex)],
+    [Symbols.structure.property.residue.pdbx_PDB_ins_code, env => env.atom_site.pdbx_PDB_ins_code.getString(env.element.value.dataIndex)],
+
+    // ============= CHAIN PROPERTIES =============
+    [Symbols.structure.property.chain.uniqueId, env => env.element.value.chain],
+    [Symbols.structure.property.chain.label_asym_id, env => env.atom_site.label_asym_id.getString(env.element.value.dataIndex)],
+
+    // ============= ENTITY PROPERTIES =============
+    [Symbols.structure.property.entity.uniqueId, env => env.element.value.entity],
+    [Symbols.structure.property.entity.label_entity_id, env => env.atom_site.label_entity_id.getString(env.element.value.dataIndex)],
 
     // // ============= ATOM SET PROPERTIES =============
     // [
@@ -303,14 +294,13 @@ const symbols: CompileInfo[] = [
     //     }
     // ],
 
-    // // ============= GENERATORS =============
-    // [
-    //     Symbols.structure.generator.atomGroups,
-    //     (env, pred: RuntimeExpression, grouping?: RuntimeExpression) => {
-    //         if (grouping) return RuntimeHelpers.groupingGenerator(env, pred, grouping);
-    //         return RuntimeHelpers.nonGroupingGenerator(env, pred);
-    //     }
-    // ],
+    // ============= GENERATORS =============
+    [
+        Symbols.structure.generator.atomGroups,
+        (env, entityP, chainP, residueP, atomP, groupBy) => {
+            return MolQueryRuntime.atomGroupsGenerator(env, { entityP, chainP, residueP, atomP, groupBy });
+        }
+    ],
 
     // // ============= MODIFIERS =============
     // [
@@ -326,7 +316,11 @@ function unary(symbol: SymbolInfo, f: (v: any) => any): CompileInfo {
     return [symbol, (env, v) => f(v(env)), staticAttribute];
 }
 
-const table = (function () {
+function atomProp(symbol: SymbolInfo, getter: (atom_site: Model['data']['atom_site']) => (atomIndex: number) => any): CompileInfo {
+    return [symbol, (env) => getter(env.atom_site)(env.element.value.dataIndex)]
+}
+
+const SymbolRuntime = (function () {
     const table: { [name: string]: SymbolRuntime.Info } = Object.create(null);
     for (const s of symbols) {
         const name = s[0].name;
@@ -338,4 +332,5 @@ const table = (function () {
     return table;
 })();
 
-export default table;
+type SymbolRuntime = typeof SymbolRuntime
+export default SymbolRuntime

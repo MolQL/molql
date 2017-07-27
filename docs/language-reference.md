@@ -30,6 +30,24 @@ Table of Contents
 
 ## Constructors
 
+### bool
+
+``primitive.constructor.bool :: (value: value) -> value``
+
+-------------------
+
+### number
+
+``primitive.constructor.number :: (value: value) -> value``
+
+-------------------
+
+### str
+
+``primitive.constructor.str :: (value: value) -> value``
+
+-------------------
+
 ### list
 
 ``primitive.constructor.list :: (values: value*) -> list``
@@ -422,6 +440,12 @@ Table of Contents
 
 -------------------
 
+### id
+
+``structure.property.atom.id :: value``
+
+-------------------
+
 ### Cartn_x
 
 ``structure.property.atom.Cartn_x :: value``
@@ -437,12 +461,6 @@ Table of Contents
 ### Cartn_z
 
 ``structure.property.atom.Cartn_z :: value``
-
--------------------
-
-### id
-
-``structure.property.atom.id :: value``
 
 -------------------
 
@@ -467,14 +485,6 @@ Table of Contents
 ### B_iso_or_equiv
 
 ``structure.property.atom.B_iso_or_equiv :: value``
-
--------------------
-
-### operator-name
-
-``structure.property.atom.operator-name :: value``
-
-*Returns the name of the symmetry operator applied to this atom (e.g., 4_455). Atoms from the loaded asymmetric always return 1_555*
 
 -------------------
 

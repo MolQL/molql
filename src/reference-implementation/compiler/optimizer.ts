@@ -2,11 +2,9 @@
  * Copyright (c) 2017 David Sehnal, licensed under MIT, See LICENSE file for more info.
  */
 
-import Expression from '../../language/expression'
-import { SymbolRuntime } from '../runtime/symbols'
 import RuntimeExpression from '../runtime/expression'
 import Environment from '../runtime/environment'
-import * as Compiler from './compiler'
+import Compiler from './compiler'
 
 type CompiledExpression = Compiler.CompiledExpression
 
@@ -36,7 +34,7 @@ function isLoopInvariant(expr: CompiledExpression) {
     return expr.kind === 'value' || (expr.kind === 'symbol' && expr.info.attributes.indexOf('loop-invariant') >= 0);
 }
 
-export function apply(ctx: Compiler.CompileContext, head: CompiledExpression, args: CompiledExpression[]): CompiledExpression {
+function apply(ctx: Compiler.CompileContext, head: CompiledExpression, args: CompiledExpression[]): CompiledExpression {
     const runtime = compileRuntime(head.runtime, args.map(a => a.runtime));
 
     // collapse static nodes into a single value
@@ -50,3 +48,5 @@ export function apply(ctx: Compiler.CompileContext, head: CompiledExpression, ar
         hint: isLoopInvariant(head) ? 'loop-invariant' : void 0
     }), head, args);
 }
+
+export default apply

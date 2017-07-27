@@ -27,6 +27,9 @@ const primitive = {
     '@header': 'Langauge Primitives',
     constructor: {
         '@header': 'Constructors',
+        bool: symbol({ type: Type.value, args: [['value', Type.value]] }),
+        number: symbol({ type: Type.value, args: [['value', Type.value]] }),
+        str: symbol({ type: Type.value, args: [['value', Type.value]] }),
         list: ctor(Type.Primitive.list, [['values', Type.zeroOrMore(Type.value), 'A list of values.']]),
         set: ctor(Type.Primitive.set, [['values', Type.zeroOrMore(Type.value), 'A list of values.']]),
         map: ctor(Type.Primitive.map, [['key-value-pairs', Type.zeroOrMore(Type.value), 'A list of key value pairs, e.g. (map 1 "x" 2 "y").']]),
@@ -206,21 +209,19 @@ const structure = {
         atom: {
             '@header': 'Atoms',
             uniqueId: value('Returns an implementation specific unique identifier of the current atom.'),
-
+            id: value(),
             Cartn_x: value(),
             Cartn_y: value(),
             Cartn_z: value(),
-            id: value(),
             label_atom_id: value(),
             type_symbol: value(),
             occupancy: value(),
             B_iso_or_equiv: value(),
-            operatorName: value('Returns the name of the symmetry operator applied to this atom (e.g., 4_455). Atoms from the loaded asymmetric always return 1_555')
+            //operatorName: value('Returns the name of the symmetry operator applied to this atom (e.g., 4_455). Atoms from the loaded asymmetric always return 1_555')
         },
         residue: {
             '@header': 'Residues',
             uniqueId: value('Returns an implementation specific unique identifier of the current residue.'),
-
             group_PDB: value(),
             label_seq_id: value(),
             label_comp_id: value(),
@@ -229,14 +230,12 @@ const structure = {
         chain: {
             '@header': 'Chains',
             uniqueId: value('Returns an implementation specific unique identifier of the current chain.'),
-
             label_asym_id: value()
         },
         entity: {
             '@header': 'Entities',
             uniqueId: value('Returns an implementation specific unique identifier of the current entity.'),
-
-            id: value()
+            label_entity_id: value()
         },
         model: {
             '@header': 'Model',

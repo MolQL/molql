@@ -5,9 +5,9 @@
 import * as mmCIF from './mmcif'
 
 export const enum SecondaryStructureType {
-    StructConf = 0,
-    StructSheetRange = 1,
-    None = -1
+    None = 0,
+    StructConf = 1,
+    StructSheetRange = 2,
 }
 
 export interface Atoms {
@@ -43,7 +43,10 @@ export interface Model {
     data: {
         atom_site: mmCIF.Category<mmCIF.AtomSite>,
         entity: mmCIF.Category<mmCIF.Entity>,
-        secondaryStructure: [mmCIF.Category<mmCIF.StructConf>, mmCIF.Category<mmCIF.StructSheetRange>]
+        secondaryStructure: {
+            structConf: mmCIF.Category<mmCIF.StructConf>,
+            sheetRange: mmCIF.Category<mmCIF.StructSheetRange>
+        }
     },
     positions: { x: number[], y: number[], z: number[] },
     atoms: Atoms,

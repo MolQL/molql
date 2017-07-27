@@ -4,18 +4,17 @@
 
 import Expression from '../../language/expression'
 
-export function isLiteral(e: Expression): e is Expression.Literal { return !(e as Expression.Symbol).symbol && !(e as Expression.Symbol).args; }
-export function isSymbol(e: Expression): e is Expression.Symbol { return !isLiteral(e); }
+const { isLiteral, isSymbol, isApply } = Expression;
 
-export function lispFormat(e: Expression) {
+export default function lispFormat(e: Expression) {
     const lines: string[] = [];
     _format(e, lines, '');
     return lines.join('\n');
 }
 
-function isValueLike(e: Expression) {
-    if (isLiteral(e)) return true;
-    return typeof e.symbol === 'string' && (!e.args || !e.args.length);
+function isValueLike(e: Expression): e is Expression.Literal | Expression.Symbol {
+    if (isLiteral(e) || isSymbol(e)) return true;
+    return isSymbol(e.head) && (!e.args || !e.args.length);
 }
 
 function formatValueLike(e: Expression, prefix: string) {
@@ -24,37 +23,39 @@ function formatValueLike(e: Expression, prefix: string) {
             return prefix + (/\s/.test(e) ? `${prefix}\`${e}\`` : e);
         }
         return `${prefix}${e}`;
+    } else if (isSymbol(e)) {
+        return `${prefix}${e.symbol}`;
     }
-    return `${prefix}${e.symbol}`;
+    return `${prefix}(${(e.head as Expression.Symbol).symbol})`;
 }
 
 function _format(e: Expression, lines: string[], prefix: string): string[] {
-    if (isLiteral(e)) {
+    if (isValueLike(e)) {
         lines.push(formatValueLike(e, prefix));
         return lines;
     }
-    const symbol = _format(e.symbol, [], '');
+    const head = _format(e.head, [], '');
     if (!e.args || !e.args.length) {
-        symbol.forEach(l => lines.push(`${prefix}${l}`));
+        head.forEach(l => lines.push(`${prefix}${l}`));
         return lines;
     }
 
     if (e.args.every(a => isValueLike(a))) {
         const args = e.args.map(a => formatValueLike(a, '')).join(' ');
-        if (symbol.length === 1) {
-            lines.push(`${prefix}(${symbol[0]} ${args})`);
+        if (head.length === 1) {
+            lines.push(`${prefix}(${head[0]} ${args})`);
         } else {
-            symbol.forEach(l => lines.push(`${prefix}${l}`));
+            head.forEach(l => lines.push(`${prefix}${l}`));
             lines.push(args);
         }
         return lines;
     }
     const newPrefix = prefix + '  ';
-    if (symbol.length === 1) {
-        lines.push(`${prefix}(${symbol[0]}`);
+    if (head.length === 1) {
+        lines.push(`${prefix}(${head[0]}`);
     } else {
         lines.push(`${prefix}(`);
-        symbol.forEach(l => lines.push(`${newPrefix}${l}`));
+        head.forEach(l => lines.push(`${newPrefix}${l}`));
     }
     let idx = 0, prevValueLike = false;
     for (const a of e.args) {

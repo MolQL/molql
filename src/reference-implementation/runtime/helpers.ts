@@ -11,15 +11,15 @@
 //     return x(this);
 // }
 
-// const elementSymbolCache: { [value: string]: string } = Object.create(null);
+const elementSymbolCache: { [value: string]: string } = Object.create(null);
 
-// export function normalizeElementSymbol(symbol: any): string {
-//     let val = elementSymbolCache[symbol];
-//     if (val) return val;
-//     val = typeof symbol === 'string' ? symbol.toUpperCase() : `${symbol}`.toUpperCase();
-//     elementSymbolCache[symbol] = val;
-//     return val;
-// }
+export function normalizeElementSymbol(symbol: any): string {
+    let val = elementSymbolCache[symbol];
+    if (val) return val;
+    val = typeof symbol === 'string' ? symbol.toUpperCase() : `${symbol}`.toUpperCase();
+    elementSymbolCache[symbol] = val;
+    return val;
+}
 
 // export function nonGroupingGenerator(ctx: Query.Context, pred?: RuntimeExpression): Query.AtomSetSeq {
 //     const atoms: number[] = [];

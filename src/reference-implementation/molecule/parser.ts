@@ -5,7 +5,8 @@
 
 import CIF from 'ciftools.js'
 import * as mmCIF from './mmcif'
-import { Molecule, Model } from './data'
+import { Molecule, Model, SecondaryStructureType } from './data'
+import { FastMap } from '../utils/collections'
 
 type Data = Model['data']
 
@@ -69,21 +70,23 @@ function createModel(data: Data, startRow: number, rowCount: number): Model {
         atom++;
     }
 
-    if (atom > residueStartAtom) {
-        // finish residue
-        atomStartIndex.push(residueStartAtom)
-        atomEndIndex.push(atom);
-        chainIndex.push(chain);
+    // finish residue
+    atomStartIndex.push(residueStartAtom)
+    atomEndIndex.push(atom);
+    chainIndex.push(chain);
 
-        // finish chain
-        residueStartIndex.push(chainStartResidue);
-        residueEndIndex.push(residue);
-        entityIndex.push(entity);
+    // finish chain
+    residueStartIndex.push(chainStartResidue);
+    residueEndIndex.push(residue + 1);
+    entityIndex.push(entity);
 
-        // finish entity
-        chainStartIndex.push(entityStartChain);
-        chainEndIndex.push(chain);
-    }
+    // finish entity
+    chainStartIndex.push(entityStartChain);
+    chainEndIndex.push(chain + 1);
+
+    residue++;
+    chain++;
+    entity++;
 
     const secondaryStructureType: number[] = new Uint8Array(residue) as any;
     const secondaryStructureIndex: number[] = new Int32Array(residue) as any;
@@ -102,8 +105,94 @@ function createModel(data: Data, startRow: number, rowCount: number): Model {
     };
 }
 
-function assignSecondaryStructure(model: Model) {
+type SecondaryStructureEntry = {
+    startSeqNumber: number,
+    startInsCode: string | null,
+    endSeqNumber: number,
+    endInsCode: string | null,
+    type: SecondaryStructureType,
+    rowIndex: number
+}
+type SecondaryStructureMap = FastMap<string, FastMap<number, SecondaryStructureEntry>>
 
+function extendSecondaryStructureMap<T extends mmCIF.StructConf | mmCIF.StructSheetRange>(cat: mmCIF.Category<T>, type: SecondaryStructureType, map: SecondaryStructureMap) {
+    if (!cat.rowCount) return;
+
+    const { beg_label_asym_id, beg_label_seq_id, pdbx_beg_PDB_ins_code } = cat;
+    const { end_label_asym_id, end_label_seq_id, pdbx_end_PDB_ins_code } = cat;
+
+    for (let i = 0; i < cat.rowCount; i++) {
+        const entry: SecondaryStructureEntry = {
+            startSeqNumber: beg_label_seq_id.getInteger(i),
+            startInsCode: pdbx_beg_PDB_ins_code.getString(i),
+            endSeqNumber: end_label_seq_id.getInteger(i),
+            endInsCode: pdbx_end_PDB_ins_code.getString(i),
+            type,
+            rowIndex: i
+        };
+
+        const asymId = beg_label_asym_id.getString(i)!;
+        if (map.has(asymId)) {
+            map.get(asymId)!.set(entry.startSeqNumber, entry);
+        } else {
+            map.set(asymId, FastMap.ofArray([[entry.startSeqNumber, entry]]));
+        }
+    }
+
+    return map;
+}
+
+function assignSecondaryStructureEntry(model: Model, entry: SecondaryStructureEntry, resStart: number, resEnd: number) {
+    const { atomStartIndex, secondaryStructureIndex, secondaryStructureType } = model.residues;
+    const { dataIndex } = model.atoms;
+    const { label_seq_id, pdbx_PDB_ins_code } = model.data.atom_site;
+    const { endSeqNumber, endInsCode, rowIndex, type } = entry;
+
+    let rI = resStart;
+    while (rI < resEnd) {
+        const atomRowIndex = dataIndex[atomStartIndex[rI]];
+        const seqNumber = label_seq_id.getInteger(atomRowIndex);
+
+        if ((seqNumber > endSeqNumber) ||
+            (seqNumber === endSeqNumber && pdbx_PDB_ins_code.getString(atomRowIndex) === endInsCode)) {
+            break;
+        }
+
+        secondaryStructureIndex[rI] = rowIndex;
+        secondaryStructureType[rI] = type;
+        rI++;
+    }
+}
+
+function assignSecondaryStructure(model: Model) {
+    const map: SecondaryStructureMap = FastMap.create();
+    extendSecondaryStructureMap(model.data.secondaryStructure.structConf, SecondaryStructureType.StructConf, map);
+    extendSecondaryStructureMap(model.data.secondaryStructure.sheetRange, SecondaryStructureType.StructSheetRange, map);
+
+    const { residueStartIndex, residueEndIndex, count: chainCount } = model.chains;
+    const { atomStartIndex, secondaryStructureIndex, secondaryStructureType } = model.residues;
+    const { dataIndex } = model.atoms;
+    const { label_asym_id, label_seq_id, pdbx_PDB_ins_code } = model.data.atom_site;
+
+    for (let cI = 0; cI < chainCount; cI++) {
+        const resStart = residueStartIndex[cI], resEnd = residueEndIndex[cI];
+        const asymId = label_asym_id.getString(dataIndex[atomStartIndex[resStart]])!;
+
+        if (map.has(asymId)) {
+            const entries = map.get(asymId)!;
+
+            for (let rI = resStart; rI < resEnd; rI++) {
+                let atomRowIndex = dataIndex[atomStartIndex[rI]];
+                let seqNumber = label_seq_id.getInteger(atomRowIndex);
+                if (entries.has(seqNumber)) {
+                    const entry = entries.get(seqNumber)!;
+                    let insCode = pdbx_PDB_ins_code.getString(atomRowIndex);
+                    if (entry.startInsCode !== insCode) continue;
+                    assignSecondaryStructureEntry(model, entry, rI, resEnd);
+                }
+            }
+        }
+    }
 }
 
 export default function parseCIF(cifData: string): Molecule {
@@ -115,10 +204,10 @@ export default function parseCIF(cifData: string): Molecule {
     const data: Model['data'] = {
         atom_site: mmCIF.Category(dataBlock.getCategory('_atom_site'), mmCIF.AtomSite),
         entity: mmCIF.Category(dataBlock.getCategory('_entity'), mmCIF.Entity),
-        secondaryStructure: [
-            mmCIF.Category(dataBlock.getCategory('_struct_conf'), mmCIF.StructConf),
-            mmCIF.Category(dataBlock.getCategory('_struct_sheet_range'), mmCIF.StructSheetRange)
-        ]
+        secondaryStructure: {
+            structConf: mmCIF.Category(dataBlock.getCategory('_struct_conf'), mmCIF.StructConf),
+            sheetRange: mmCIF.Category(dataBlock.getCategory('_struct_sheet_range'), mmCIF.StructSheetRange)
+        }
     };
 
     const models: Model[] = [];

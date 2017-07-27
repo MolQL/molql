@@ -8,7 +8,11 @@ import Symbols, { SymbolInfo, isSymbolInfo } from '../../language/symbols'
 
 namespace Builder {
     function category<T>(symbols: T): (s: (cat: T) => SymbolInfo, ...args: Expression[]) => Expression {
-        return (s, ...args) => Expression.symbol(s(symbols).name, args.length ? args : void 0);
+        return (s, ...args) => Expression.apply(Expression.symbol(s(symbols).name), args.length ? args : void 0);
+    }
+
+    export function symbol(symb: (s: Symbols) => SymbolInfo) {
+        return Expression.symbol(symb(Symbols).name);
     }
 
     export const ctor = category(Symbols.primitive.constructor);
