@@ -33,7 +33,6 @@ namespace Compiler {
         staticEnv: Environment
     }
 
-
     function getRuntimeInfo(name: string): SymbolRuntime.Info {
         if (!SymbolRuntime[name]) throw new Error(`Could not find implementation of symbol '${name}'.`);
         return SymbolRuntime[name];
