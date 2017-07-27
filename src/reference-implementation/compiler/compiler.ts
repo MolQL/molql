@@ -11,25 +11,24 @@ import Optimizer from './optimizer'
 const { isLiteral, isSymbol } = Expression;
 
 function Compiler(expr: Expression): RuntimeExpression {
-    return Compiler.compile({ id: 0, staticEnv: Environment() }, expr).runtime;
+    return Compiler.compile({ staticEnv: Environment() }, expr).runtime;
 }
 
 namespace Compiler {
     export type CompiledExpression =
         | { kind: 'value', runtime: RuntimeExpression }
         | { kind: 'symbol', runtime: RuntimeExpression, info: SymbolRuntime.Info }
-        | { kind: 'apply', runtime: RuntimeExpression, head: CompiledExpression, args: CompiledExpression[] }
+        | { kind: 'apply', runtime: RuntimeExpression }
 
     export namespace CompiledExpression {
         export function value(runtime: RuntimeExpression): CompiledExpression { return { kind: 'value', runtime } }
         export function symbol(runtime: RuntimeExpression, info: SymbolRuntime.Info ): CompiledExpression { return { kind: 'symbol', runtime, info } }
-        export function apply(runtime: RuntimeExpression, head: CompiledExpression, args: CompiledExpression[]): CompiledExpression {
-            return { kind: 'apply', runtime, head, args };
+        export function apply(runtime: RuntimeExpression): CompiledExpression {
+            return { kind: 'apply', runtime };
         }
     }
 
     export interface CompileContext {
-        id: number,
         staticEnv: Environment
     }
 
@@ -39,11 +38,11 @@ namespace Compiler {
     }
 
     export function value(ctx: CompileContext, v: any): CompiledExpression {
-        return CompiledExpression.value(RuntimeExpression(v, { id: ctx.id++, hint: 'const' }));
+        return CompiledExpression.value(RuntimeExpression(v, { isConst: true }));
     }
 
     export function symbol(ctx: CompileContext, info: SymbolRuntime.Info): CompiledExpression {
-        return CompiledExpression.symbol(RuntimeExpression(info.runtime, { id: ctx.id++, hint: 'const' }), info);
+        return CompiledExpression.symbol(RuntimeExpression(info.runtime, { isConst: true }), info);
     }
 
     export function apply(ctx: CompileContext, head: CompiledExpression, args: CompiledExpression[]): CompiledExpression {
@@ -61,7 +60,9 @@ namespace Compiler {
     export function compile(ctx: CompileContext, expr: Expression): CompiledExpression {
         if (isLiteral(expr)) {
             return value(ctx, expr);
-        } else if (isSymbol(expr)) {
+        }
+
+        if (isSymbol(expr)) {
             return symbol(ctx, getRuntimeInfo(expr.symbol));
         }
 

@@ -6,6 +6,7 @@ import AtomSet from '../query/atom-set'
 import AtomSetSeq from '../query/atom-set-seq'
 import Context from '../query/context'
 import Environment from './environment'
+import Iterator from './iterator'
 import RuntimeExpression from './expression'
 import { FastMap } from '../utils/collections'
 
@@ -32,7 +33,7 @@ function atomGroupsIterator<BuildCtx>(env: Environment, { entityP, chainP, resid
     const { atomStartIndex, atomEndIndex } = model.residues;
     const { dataIndex } = model.atoms;
 
-    const iterator = Environment.beginIterator(env, env.element, Context.ElementAddress());
+    const iterator = Iterator.begin(env.element, Context.ElementAddress());
     const element = iterator.value;
     for (let eI = 0; eI < entityCount; eI++) {
         ElementAddress.setEntity(ctx, element, eI);
@@ -57,7 +58,7 @@ function atomGroupsIterator<BuildCtx>(env: Environment, { entityP, chainP, resid
             }
         }
     }
-    Environment.endIterator(env, iterator);
+    Iterator.end(iterator);
 }
 
 type FlatCtx = { atoms: number[] }

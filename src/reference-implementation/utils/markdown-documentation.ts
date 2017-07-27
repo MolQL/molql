@@ -33,7 +33,6 @@ function formatSymbol(symbol: SymbolInfo, lines: string[]) {
         ? `${name} :: (${formatArgs(symbol.args)}) => ${Type.format(symbol.type)}`
         : `${name} :: ${Type.format(symbol.type)}`;
     lines.push(`### **${symbol.shortName}**&nbsp;&nbsp;&nbsp;\`\`${header}\`\`\n`);
-    //lines.push(`\`\`${header}\`\`\n`);
     if (symbol.description) {
         lines.push(`*${symbol.description}*\n`);
     }

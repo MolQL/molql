@@ -30,10 +30,6 @@ function isStatic(expr: CompiledExpression) {
     return expr.kind === 'value' || (expr.kind === 'symbol' && expr.info.attributes.indexOf('static-expr') >= 0);
 }
 
-function isLoopInvariant(expr: CompiledExpression) {
-    return expr.kind === 'value' || (expr.kind === 'symbol' && expr.info.attributes.indexOf('loop-invariant') >= 0);
-}
-
 function apply(ctx: Compiler.CompileContext, head: CompiledExpression, args: CompiledExpression[]): CompiledExpression {
     const runtime = compileRuntime(head.runtime, args.map(a => a.runtime));
 
@@ -43,10 +39,7 @@ function apply(ctx: Compiler.CompileContext, head: CompiledExpression, args: Com
         return Compiler.value(ctx, value);
     }
 
-    return Compiler.CompiledExpression.apply(RuntimeExpression(runtime, {
-        id: ctx.id++,
-        hint: isLoopInvariant(head) ? 'loop-invariant' : void 0
-    }), head, args);
+    return Compiler.CompiledExpression.apply(RuntimeExpression(runtime, {}));
 }
 
 export default apply

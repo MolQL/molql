@@ -15,7 +15,6 @@ namespace SymbolRuntime {
 
     export type Attribute =
         | 'static-expr' // static expressions are independent from context if their children are also independent from context.
-        | 'loop-invariant' // can be cached in loops becuase it will always yield the same answer
 
     export interface Info {
         symbol: SymbolInfo,

@@ -18,7 +18,6 @@ interface Environment {
 
     readonly element: Iterator<Context.ElementAddress>,
     readonly atomSet: Iterator<AtomSet>,
-    readonly iterator: Slot<Iterator>,
     readonly slots: { [index: number]: Slot }
 }
 
@@ -33,7 +32,6 @@ function Environment(queryCtx?: Context): Environment {
 
         element: Iterator(),
         atomSet: Iterator(),
-        iterator: Slot(),
         slots: Object.create(null)
     };
 }
@@ -50,17 +48,6 @@ namespace Environment {
 
     export function endSlot({ slots }: Environment, i: number) {
         Slot.pop(slots[i]);
-    }
-
-    export function beginIterator<T>(env: Environment, iterator: Iterator<T>, initialValue?: T) {
-        Iterator.begin(iterator, initialValue, env.iterator.value);
-        Slot.push(env.iterator, iterator);
-        return iterator;
-    }
-
-    export function endIterator(env: Environment, iterator: Iterator) {
-        Iterator.end(iterator);
-        Slot.pop(env.iterator);
     }
 }
 
