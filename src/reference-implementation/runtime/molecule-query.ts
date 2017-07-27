@@ -26,14 +26,14 @@ function atomGroupsIterator<BuildCtx>(env: Environment, { entityP, chainP, resid
 
     const ctx = env.queryCtx;
     const { mask } = ctx;
-    const iterator = Environment.beginIterator(env, env.element, Context.ElementAddress());
-    const element = iterator.value;
     const { model } = env.queryCtx;
     const { chainStartIndex, chainEndIndex, count: entityCount } = model.entities;
     const { residueStartIndex, residueEndIndex } = model.chains;
     const { atomStartIndex, atomEndIndex } = model.residues;
     const { dataIndex } = model.atoms;
 
+    const iterator = Environment.beginIterator(env, env.element, Context.ElementAddress());
+    const element = iterator.value;
     for (let eI = 0; eI < entityCount; eI++) {
         ElementAddress.setEntity(ctx, element, eI);
         if (!entityP(env)) continue;
@@ -57,7 +57,6 @@ function atomGroupsIterator<BuildCtx>(env: Environment, { entityP, chainP, resid
             }
         }
     }
-
     Environment.endIterator(env, iterator);
 }
 
