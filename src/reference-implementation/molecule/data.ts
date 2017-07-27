@@ -3,6 +3,7 @@
  */
 
 import * as mmCIF from './mmcif'
+import SpatialLookup from '../utils/spatial-lookup'
 
 export const enum SecondaryStructureType {
     None = 0,
@@ -53,7 +54,7 @@ export interface Model {
     residues: Residues,
     chains: Chains,
     entities: Entities,
-    spatialLookup: any,
+    '@spatialLookup': SpatialLookup | undefined,
 }
 
 export interface Molecule {
@@ -70,4 +71,14 @@ export function ElementSymbol(symbol: any): string {
     val = typeof symbol === 'string' ? symbol.toUpperCase() : `${symbol}`.toUpperCase();
     elementSymbolCache[symbol] = val;
     return val;
+}
+
+export namespace Model {
+    export function spatialLookup(model: Model): SpatialLookup {
+        if (model['@spatialLookup']) return model['@spatialLookup']!;
+        const { positions } = model;
+        const lookup = SpatialLookup(model.positions);
+        model['@spatialLookup'] = lookup;
+        return lookup;
+    }
 }

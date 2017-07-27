@@ -99,10 +99,12 @@ function createModel(data: Data, startRow: number, rowCount: number): Model {
         entities: { chainStartIndex, chainEndIndex, count: entity },
         positions: { x, y, z },
         data,
-        get spatialLookup() {
-            return 0
-        }
+        '@spatialLookup': void 0
     };
+}
+
+function spatialLoopUp() {
+
 }
 
 type SecondaryStructureEntry = {

@@ -2,13 +2,13 @@
  * Copyright (c) 2017 David Sehnal, licensed under MIT, See LICENSE file for more info.
  */
 
-import AtomSet from '../query/atom-set'
-import AtomSetSeq from '../query/atom-set-seq'
-import Context from '../query/context'
-import Environment from './environment'
-import Iterator from './iterator'
-import RuntimeExpression from './expression'
-import { FastMap } from '../utils/collections'
+import AtomSet from '../../query/atom-set'
+import AtomSetSeq from '../../query/atom-set-seq'
+import Context from '../../query/context'
+import Environment from '../environment'
+import Iterator from '../iterator'
+import RuntimeExpression from '../expression'
+import { FastMap } from '../../utils/collections'
 
 import ElementAddress = Context.ElementAddress
 

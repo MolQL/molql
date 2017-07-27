@@ -8,7 +8,7 @@ import Environment from './environment'
 import RuntimeExpression from './expression'
 import { Model, ElementSymbol } from '../molecule/data'
 import AtomSetSeq from '../query/atom-set-seq'
-import * as MolQueryRuntime from './molecule-query'
+import { atomGroupsGenerator } from './molecule/generators'
 
 namespace SymbolRuntime {
     export type Func<T = any> = (env: Environment, ...args: RuntimeExpression[]) => T
@@ -297,7 +297,7 @@ const symbols: CompileInfo[] = [
     [
         Symbols.structure.generator.atomGroups,
         (env, entityP, chainP, residueP, atomP, groupBy) => {
-            return MolQueryRuntime.atomGroupsGenerator(env, { entityP, chainP, residueP, atomP, groupBy });
+            return atomGroupsGenerator(env, { entityP, chainP, residueP, atomP, groupBy });
         }
     ],
 
