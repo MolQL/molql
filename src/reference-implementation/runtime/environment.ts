@@ -4,13 +4,14 @@
 
 import Iterator from './iterator'
 import Slot from './slot'
-import * as QueryData from '../query/data'
+import Context from '../query/context'
+import AtomSet from '../query/atom-set'
 
 interface Environment {
-    readonly queryCtx: QueryData.Context,
+    readonly queryCtx: Context,
 
-    readonly atom: Iterator<QueryData.AtomAddress>,
-    readonly atomSet: Iterator<QueryData.AtomSet>,
+    readonly atom: Iterator<Context.ElementAddress>,
+    readonly atomSet: Iterator<AtomSet>,
     readonly iterator: Slot<Iterator>,
     readonly slots: { [index: number]: Slot }
 }

@@ -2,9 +2,12 @@
  * Copyright (c) 2017 David Sehnal, licensed under MIT, See LICENSE file for more info.
  */
 
-import Symbols, { isSymbolInfo, ArgSpec, SymbolInfo } from '../language/symbols'
-import Type from '../language/type-system'
-import Runtime from '../reference-implementation/runtime/symbols'
+import Symbols, { isSymbolInfo, ArgSpec, SymbolInfo } from './symbols'
+import Type from './type-system'
+
+/**
+ * Generates markdown documentation from the language spec.
+ */
 
 const ToC: string[] = [`
 Table of Contents
@@ -27,7 +30,6 @@ function formatSymbol(symbol: SymbolInfo) {
     if (symbol.description) {
         lines.push(`*${symbol.description}*\n`);
     }
-    lines.push(`Has reference implementation: *${Runtime[name] ? 'yes' : 'no'}*\n`);
     lines.push(`-------------------\n`);
 }
 
@@ -36,10 +38,10 @@ function format(depth: number, obj: any) {
         formatSymbol(obj);
         return;
     }
-    if (obj.header) {
-        lines.push(`${new Array(depth + 1).join('#')} ${obj.header}\n`);
-        const tocLink = obj.header.toLowerCase().replace(/\s/g, '-');
-        ToC.push(`${new Array(depth + 1).join('  ')} * [${obj.header}](#${tocLink})`);
+    if (obj['@header']) {
+        lines.push(`${new Array(depth + 1).join('#')} ${obj['@header']}\n`);
+        const tocLink = obj['@header'].toLowerCase().replace(/\s/g, '-');
+        ToC.push(`${new Array(depth + 1).join('  ')} * [${obj['@header']}](#${tocLink})`);
     }
     for (const childKey of Object.keys(obj)) {
         if (typeof obj[childKey] !== 'object') continue;

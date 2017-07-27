@@ -106,7 +106,7 @@ function assignSecondaryStructure(model: Model) {
 
 }
 
-export function parseCIF(cifData: string): Molecule {
+export default function parseCIF(cifData: string): Molecule {
     const file = CIF.Text.parse(cifData);
     if (file.isError) throw new Error(file.toString());
     const dataBlock = file.result.dataBlocks[0];

@@ -6,7 +6,7 @@ import Expression from '../../language/expression'
 import { SymbolRuntime } from '../runtime/symbols'
 import RuntimeExpression from '../runtime/expression'
 import Environment from '../runtime/environment'
-import * as Compiler from './compile'
+import * as Compiler from './compiler'
 
 type CompiledExpression = Compiler.CompiledExpression
 

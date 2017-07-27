@@ -2,64 +2,25 @@
  * Copyright (c) 2017 David Sehnal, licensed under MIT, See LICENSE file for more info.
  */
 
-import * as MolData from '../molecule/data'
-import Mask from '../utils/mask'
 import { UniqueArrayBuilder, sortAsc, FastMap } from '../utils/collections'
+import Context from './context'
 
-export interface AtomAddress { atom: number, residue: number, chain: number, entity: number }
-
-export interface AtomSet {
+interface AtomSet {
     readonly context: Context,
     readonly hashCode: number,
     readonly atomIndices: ReadonlyArray<number>,
     readonly residueIndices: ReadonlyArray<number>,
     readonly chainIndices: ReadonlyArray<number>,
     readonly entityIndices: ReadonlyArray<number>,
-    readonly center: [number, number, number],
-    readonly radius: number
+    readonly boundingSphere: { center: [number, number, number], radius: number }
 }
 
-export function AtomSet(ctx: Context, indices: number[]): AtomSet { return new AtomSetImpl(ctx, indices); }
-
-export type AtomSetSeq = { context: Context, atomSets: AtomSet[] }
-export function AtomSetSeq(context: Context, atomSets: AtomSet[]): AtomSetSeq { return { context, atomSets }; }
-
-export interface Context {
-    readonly model: MolData.Model,
-    readonly data: MolData.Model['data'],
-    readonly mask: Mask
-}
-
-export function Context(model: MolData.Model, mask: Mask): Context {
-    return { model, data: model.data, mask };
-}
-
-export namespace Context {
-    export function ofAtomSet(model: MolData.Model, atomSet: AtomSet) {
-        return Context(model, Mask.ofIndices(model.atoms.count, atomSet.atomIndices));
-    }
-
-    export function ofAtomSetSeq(model: MolData.Model, atomSetSeq: AtomSetSeq) {
-        const mask = new Set<number>();
-        for (const atomSet of atomSetSeq.atomSets) {
-            for (const a of atomSet.atomIndices) {
-                mask.add(a);
-            }
-        }
-        return Context(model, mask);
-    }
-
-    export function ofModel(model: MolData.Model) {
-        return Context(model, Mask.always(model.atoms.count));
-    }
-}
+function AtomSet(ctx: Context, indices: number[]): AtomSet { return new AtomSetImpl(ctx, indices); }
 
 class AtomSetImpl implements AtomSet {
     private _hashCode = 0;
     private _hashComputed = false;
-    /**
-     * The hash code of the fragment.
-     */
+
     get hashCode() {
         if (this._hashComputed) return this._hashCode;
 
@@ -115,29 +76,34 @@ class AtomSetImpl implements AtomSet {
         this._entityIndices = entityIndices.array;
     }
 
-    private _center: [number, number, number] = [0.1, 0.1, 0.1]
-    private _radius: number = -1;
-    private computeBoundary() {
-        if (this._radius >= 0) return;
+    private _boundingSphere: AtomSet['boundingSphere'] | undefined = void 0;
+    private computeBoundingSphere() {
+        if (this._boundingSphere) return this._boundingSphere;
 
         const { x, y, z } = this.context.model.positions;
+        const center: AtomSet['boundingSphere']['center'] = [0, 0, 0];
         for (const i of this.atomIndices) {
-            throw 'implement me properly'
+            center[0] += x[i];
+            center[1] += y[i];
+            center[2] += z[i];
         }
+        center[0] *= 1 / this.atomIndices.length;
+        center[1] *= 1 / this.atomIndices.length;
+        center[2] *= 1 / this.atomIndices.length;
+        let radius = 0;
+        for (const i of this.atomIndices) {
+            const dx = center[0] - x[i], dy = center[1] - y[i], dz = center[2] - z[i];
+            radius = Math.max(dx * dx + dy * dy + dz * dz, radius);
+        }
+        this._boundingSphere = { center, radius };
     }
 
-    get center() {
-        this.computeBoundary();
-        return this._center;
-    }
-
-    get radius() {
-        this.computeBoundary();
-        return this._radius;
+    get boundingSphere() {
+        return this.computeBoundingSphere()!;
     }
 }
 
-export namespace AtomSet {
+namespace AtomSet {
     export function areEqual(a: AtomSet, b: AtomSet) {
         const xs = a.atomIndices, ys = b.atomIndices;
         if (xs.length !== ys.length) return false;
@@ -172,17 +138,4 @@ export namespace AtomSet {
     }
 }
 
-export namespace AtomSetSeq {
-    export function flatten(seq: AtomSetSeq): AtomSet {
-        if (!seq.atomSets.length) return AtomSet(seq.context, []);
-        if (seq.atomSets.length === 1) return seq.atomSets[0];
-
-        const atoms = UniqueArrayBuilder<number>();
-        for (const set of seq.atomSets) {
-            for (const atom of set.atomIndices) {
-                UniqueArrayBuilder.add(atoms, atom, atom);
-            }
-        }
-        return AtomSet(seq.context, sortAsc(atoms.array));
-    }
-}
+export default AtomSet

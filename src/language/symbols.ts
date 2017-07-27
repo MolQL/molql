@@ -24,9 +24,9 @@ export interface SymbolInfo {
 }
 
 const primitive = {
-    header: 'Langauge Primitives',
+    '@header': 'Langauge Primitives',
     constructor: {
-        header: 'Constructors',
+        '@header': 'Constructors',
         list: ctor(Type.Primitive.list, [['values', Type.zeroOrMore(Type.value), 'A list of values.']]),
         set: ctor(Type.Primitive.set, [['values', Type.zeroOrMore(Type.value), 'A list of values.']]),
         map: ctor(Type.Primitive.map, [['key-value-pairs', Type.zeroOrMore(Type.value), 'A list of key value pairs, e.g. (map 1 "x" 2 "y").']]),
@@ -40,7 +40,7 @@ const primitive = {
         })
     },
     functional: {
-        header: 'Functional Operators',
+        '@header': 'Functional Operators',
         partial: symbol({
             type: Type.value,
             args: [
@@ -54,16 +54,16 @@ const primitive = {
         })
     },
     operator: {
-        header: 'Operators',
+        '@header': 'Operators',
         logic: {
-            header: 'Logic',
+            '@header': 'Logic',
             not: unaryOp(),
             and: binOp(),
             or: binOp(),
         },
 
         arithmetic: {
-            header: 'Arithmetic',
+            '@header': 'Arithmetic',
             add: binOp(),
             sub: binRel(),
             minus: unaryOp(),
@@ -94,7 +94,7 @@ const primitive = {
         },
 
         relational: {
-            header: 'Relational',
+            '@header': 'Relational',
             eq: binRel(),
             neq: binRel(),
             lt: binRel(),
@@ -108,7 +108,7 @@ const primitive = {
         },
 
         string: {
-            header: 'Strings',
+            '@header': 'Strings',
             concat: binOp(),
             match: symbol({
                 type: Type.value,
@@ -120,7 +120,7 @@ const primitive = {
         },
 
         collections: {
-            header: 'Collections',
+            '@header': 'Collections',
             inSet: symbol({
                 type: Type.value,
                 args: [['set', Type.Primitive.set], ['value', Type.value]]
@@ -137,9 +137,9 @@ const modifierType = Type.fn(Type.Structure.atomSet, Type.Structure.atomSetSeq);
 const combinatorType = Type.fn(Type.oneOrMore(Type.Structure.atomSetSeq), Type.Structure.atomSetSeq);
 
 const structure = {
-    header: 'Molecular Structure Queries',
+    '@header': 'Molecular Structure Queries',
     constructor: {
-        header: 'Constructors',
+        '@header': 'Constructors',
         elementSymbol: ctor(Type.Structure.elementSymbol, [['symbol', Type.value]]),
         atomSet: ctor(Type.Structure.atomSet, [['atom-indices', Type.oneOrMore(Type.value)]]),
         atomSetSeq: ctor(Type.Structure.atomSetSeq, [['sets', Type.zeroOrMore(Type.Structure.atomSet)]])
@@ -152,15 +152,10 @@ const structure = {
         combine: symbol({
             type: Type.Structure.atomSetSeq,
             args: [['combinator', Type.Structure.atomSetSeq], ['seqs', Type.oneOrMore(Type.Structure.atomSetSeq)]]
-        }),
-        inContext: symbol({
-            description: 'Executes the query inside a different context. This query cannot be used inside a generator or modifier sequence.',
-            type: Type.Structure.atomSetSeq,
-            args: [['context', Type.value], ['query', Type.Structure.atomSetSeq]]
         })
     },
     generator: {
-        header: 'Generators',
+        '@header': 'Generators',
         atomGroups: symbol({
             type: Type.Structure.atomSetSeq,
             args: [
@@ -173,7 +168,7 @@ const structure = {
         })
     },
     modifier: {
-        header: 'Atom Set Modifiers',
+        '@header': 'Atom Set Modifiers',
         filter: symbol({
             type: Type.Structure.atomSetSeq,
             args: [['predicate', Type.value]]
@@ -189,7 +184,10 @@ const structure = {
         }),
     },
     combinator: {
-        header: 'Sequence Combinators',
+        '@header': 'Sequence Combinators',
+        intersectWith: symbol({
+            type: Type.Structure.atomSetSeq,
+        }),
         merge: symbol({
             type: Type.Structure.atomSetSeq,
         }),
@@ -203,18 +201,10 @@ const structure = {
             args: [['max-distance', Type.value]]
         })
     },
-    context: {
-        header: 'Context Updates',
-        inside: symbol({
-            type: Type.value,
-            description: 'Create a context induced by the query.',
-            args: [ ['query', Type.Structure.atomSetSeq] ]
-        })
-    },
     property: {
-        header: 'Properties',
+        '@header': 'Properties',
         atom: {
-            header: 'Atoms',
+            '@header': 'Atoms',
             uniqueId: value('Returns an implementation specific unique identifier of the current atom.'),
 
             Cartn_x: value(),
@@ -228,7 +218,7 @@ const structure = {
             operatorName: value('Returns the name of the symmetry operator applied to this atom (e.g., 4_455). Atoms from the loaded asymmetric always return 1_555')
         },
         residue: {
-            header: 'Residues',
+            '@header': 'Residues',
             uniqueId: value('Returns an implementation specific unique identifier of the current residue.'),
 
             group_PDB: value(),
@@ -237,28 +227,28 @@ const structure = {
             pdbx_PDB_ins_code: value()
         },
         chain: {
-            header: 'Chains',
+            '@header': 'Chains',
             uniqueId: value('Returns an implementation specific unique identifier of the current chain.'),
 
             label_asym_id: value()
         },
         entity: {
-            header: 'Entities',
+            '@header': 'Entities',
             uniqueId: value('Returns an implementation specific unique identifier of the current entity.'),
 
             id: value()
         },
         model: {
-            header: 'Model',
+            '@header': 'Model',
             pdbx_PDB_model_num: value()
         },
         secondaryStructure: {
-            header: 'Secondary Structure',
+            '@header': 'Secondary Structure',
             uniqueId: value('Returns an implementation specific unique identifier of the current secondary structure element.'),
         },
         atomSet: {
-            header: 'Atom Sets',
-            namespace: Type.Structure.atomSet.kind,
+            '@header': 'Atom Sets',
+            '@namespace': Type.Structure.atomSet.kind,
             atomCount: value(),
             reduce: symbol({
                 type: Type.value,
@@ -266,8 +256,8 @@ const structure = {
             })
         },
         atomSetSeq: {
-            header: 'Atom Set Sequences',
-            namespace: Type.Structure.atomSetSeq.kind,
+            '@header': 'Atom Set Sequences',
+            '@namespace': Type.Structure.atomSetSeq.kind,
             length: symbol({
                 type: Type.Structure.atomSetSeq,
                 args: [ ['seq', Type.Structure.atomSetSeq] ]
@@ -342,7 +332,7 @@ function normalizeName(prefix: string, key: string, obj: any) {
 
         return;
     }
-    const namespace = `${obj['namespace'] || key}`;
+    const namespace = `${obj['@namespace'] || key}`;
     const newPrefix = prefix ? `${prefix}.${namespace}` : namespace;
     for (const childKey of Object.keys(obj)) {
         if (typeof obj[childKey] !== 'object') continue;
@@ -351,4 +341,5 @@ function normalizeName(prefix: string, key: string, obj: any) {
 }
 normalizeName('', '', table);
 
-export default table;
+type table = typeof table
+export default table

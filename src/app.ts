@@ -6,10 +6,11 @@ import * as fs from 'fs'
 
 import Expression from './language/expression'
 import S from './language/symbols'
-import * as Query from './reference-implementation/query/data-model'
-import compile from './reference-implementation/compiler/compile'
-import Q from './reference-implementation/query/builder'
-import * as Molecule from './reference-implementation/molecule/model'
+//import * as Query from './reference-implementation/query/data'
+import compile from './reference-implementation/compiler/compiler'
+import B from './reference-implementation/utils/expression-builder'
+import * as Molecule from './reference-implementation/molecule/data'
+import parseCIF from './reference-implementation/molecule/parser'
 import { lispFormat } from './reference-implementation/utils/expression'
 import Env from './reference-implementation/runtime/environment'
 
@@ -21,7 +22,8 @@ function symb(s: string | Expression.Symbol, args?: any[]) { return Expression.s
 //const expr = symb(S.primitive.operator.collections.inSet.name, [symb(S.primitive.constructor.set.name, [1,2,3,4,5]), 4]);
 //const expr = symb(S.primitive.operator.string.match.name, [symb(S.primitive.constructor.regex.name, ['wh.', 'i']), 'wHy' ])
 
-const expr = symb(S.primitive.operator.arithmetic.mult.name, [symb(S.primitive.operator.arithmetic.add.name, [3, 4, 5]), 2, 3, 4, 5])
+const expr = symb(S.primitive.operator.arithmetic.mult.name,
+    [1, symb(S.primitive.operator.arithmetic.add.name, [3, 4, 5]), 2, 3, 4, 5])
 
 //const expr = apply(S.primitive.operator.plus, 1, 2)
 console.log(lispFormat(expr));
@@ -113,7 +115,7 @@ fs.readFile('e:/test/quick/1tqn_updated.cif', 'utf-8', (err, data) => {
     }
 
     try {
-        const mol = Molecule.parseCIF(data);
+        const mol = parseCIF(data);
         //run(mol.models[0]);
     } catch (e) {
         console.error(e);

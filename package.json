@@ -6,7 +6,7 @@
   "scripts": {
     "build": "./node_modules/.bin/tsc",
     "watch": "./node_modules/.bin/tsc -watch",
-    "docs": "node ./build/utils/documentation.js > ./docs/language-reference.md",
+    "docs": "node ./build/language/documentation.js > ./docs/language-reference.md",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
