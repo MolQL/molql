@@ -27,31 +27,31 @@ const comp = compile(expr);
 console.log(comp(Environment()));
 
 
-function bb() {
-    const v = compile(expr);
-    let ret: any = [];
-    const env = Environment();
-    for (let i = 0; i < 1000000; i++) {
-        ret = v(env);
-    }
-    return ret;
-}
-function add(...args: number[]): number;
-function add() {
-    let ret = 0;
-    for (let i = 0; i < arguments.length; i++) ret += arguments[i];
-    return ret;
-}
-function fff(i: number) {
-    return i + 1;
-}
-function bl() {
-    let ret = 0;
-    for (let i = 0; i < 1000000; i++) {
-        ret += add.apply(null, [fff(i), fff(i), fff(i  -1 ), fff(i + 3), fff(i +9)]);
-    }
-    return ret;
-}
+// function bb() {
+//     const v = compile(expr);
+//     let ret: any = [];
+//     const env = Environment();
+//     for (let i = 0; i < 1000000; i++) {
+//         ret = v(env);
+//     }
+//     return ret;
+// }
+// function add(...args: number[]): number;
+// function add() {
+//     let ret = 0;
+//     for (let i = 0; i < arguments.length; i++) ret += arguments[i];
+//     return ret;
+// }
+// function fff(i: number) {
+//     return i + 1;
+// }
+// function bl() {
+//     let ret = 0;
+//     for (let i = 0; i < 1000000; i++) {
+//         ret += add.apply(null, [fff(i), fff(i), fff(i  -1 ), fff(i + 3), fff(i +9)]);
+//     }
+//     return ret;
+// }
 
 // console.time('bb');
 // bb();

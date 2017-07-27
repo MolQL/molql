@@ -3,7 +3,6 @@
  */
 
 import Environment from './environment'
-import Iterator from './iterator'
 import SymbolRuntime from './symbols'
 
 export type RuntimeExpression<T = any> = (env: Environment) => T

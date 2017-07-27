@@ -53,8 +53,8 @@ namespace Compiler {
         return Optimizer(ctx, head, args);
     }
 
-    function onlyStringLiteralsCanBeApplied() {
-        throw new Error('Only string literals can be applied.');
+    function literalsCannotBeApplied() {
+        throw new Error('Only symbols and apply expressions can be applied.');
     }
 
     export function compile(ctx: CompileContext, expr: Expression): CompiledExpression {
@@ -67,6 +67,8 @@ namespace Compiler {
         }
 
         const head = compile(ctx, expr.head);
+        if (head.kind === 'value') literalsCannotBeApplied();
+
         const slots: any[] = [];
         if (expr.args) for (let i = 0; i < expr.args.length; i++) slots[i] = compile(ctx, expr.args[i]);
         return apply(ctx, head, slots);

@@ -23,15 +23,12 @@ export type GeneratorParams = {
 }
 
 function atomGroupsIterator<BuildCtx>(env: Environment, { entityP, chainP, residueP, atomP }: GeneratorParams, onAtom: (ctx: BuildCtx, i: number) => void, builderCtx: BuildCtx) {
-    const atoms: number[] = [];
-
     const ctx = env.queryCtx;
     const { mask } = ctx;
     const { model } = env.queryCtx;
     const { chainStartIndex, chainEndIndex, count: entityCount } = model.entities;
     const { residueStartIndex, residueEndIndex } = model.chains;
     const { atomStartIndex, atomEndIndex } = model.residues;
-    const { dataIndex } = model.atoms;
 
     const iterator = Iterator.begin(env.element, Context.ElementAddress());
     const element = iterator.value;

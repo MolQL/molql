@@ -76,7 +76,6 @@ export function ElementSymbol(symbol: any): string {
 export namespace Model {
     export function spatialLookup(model: Model): SpatialLookup {
         if (model['@spatialLookup']) return model['@spatialLookup']!;
-        const { positions } = model;
         const lookup = SpatialLookup(model.positions);
         model['@spatialLookup'] = lookup;
         return lookup;

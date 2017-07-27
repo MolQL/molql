@@ -2,7 +2,7 @@
  * Copyright (c) 2017 David Sehnal, licensed under MIT, See LICENSE file for more info.
  */
 
-import { UniqueArrayBuilder, sortAsc, FastMap } from '../utils/collections'
+import { UniqueArrayBuilder, sortAsc } from '../utils/collections'
 import Context from './context'
 
 interface AtomSet {

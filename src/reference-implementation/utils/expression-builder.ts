@@ -3,8 +3,7 @@
  */
 
 import Expression from '../../language/expression'
-import Type from '../../language/type-system'
-import Symbols, { SymbolInfo, isSymbolInfo } from '../../language/symbols'
+import Symbols, { SymbolInfo } from '../../language/symbols'
 
 namespace Builder {
     function category<T>(symbols: T): (s: (cat: T) => SymbolInfo, ...args: Expression[]) => Expression {

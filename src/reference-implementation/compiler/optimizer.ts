@@ -3,7 +3,6 @@
  */
 
 import RuntimeExpression from '../runtime/expression'
-import Environment from '../runtime/environment'
 import Compiler from './compiler'
 
 type CompiledExpression = Compiler.CompiledExpression

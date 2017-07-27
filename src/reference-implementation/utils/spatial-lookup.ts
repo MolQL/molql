@@ -123,7 +123,7 @@ namespace QueryContext {
     }
 }
 
-function createInputData<T, Ctx>(positions: { x: number[], y: number[], z: number[] }): InputData {
+function createInputData(positions: { x: number[], y: number[], z: number[] }): InputData {
     const { x, y, z } = positions;
     const bounds = Box3D.createInfinite();
     const count = x.length;
@@ -265,7 +265,7 @@ function _build(state: State): SpatialHash {
     }
 }
 
-function build<T>({ positions, bounds, count }: InputData): SpatialHash {
+function build({ positions, bounds, count }: InputData): SpatialHash {
     const size = [
         ((bounds.max[0] - bounds.min[0]) >> Constants.Exp) + 1,
         ((bounds.max[1] - bounds.min[1]) >> Constants.Exp) + 1,

@@ -4,7 +4,7 @@
 
 import Expression from '../../language/expression'
 
-const { isLiteral, isSymbol, isApply } = Expression;
+const { isLiteral, isSymbol } = Expression;
 
 export default function lispFormat(e: Expression) {
     const lines: string[] = [];

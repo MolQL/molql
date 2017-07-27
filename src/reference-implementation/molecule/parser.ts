@@ -103,10 +103,6 @@ function createModel(data: Data, startRow: number, rowCount: number): Model {
     };
 }
 
-function spatialLoopUp() {
-
-}
-
 type SecondaryStructureEntry = {
     startSeqNumber: number,
     startInsCode: string | null,
@@ -121,7 +117,7 @@ function extendSecondaryStructureMap<T extends mmCIF.StructConf | mmCIF.StructSh
     if (!cat.rowCount) return;
 
     const { beg_label_asym_id, beg_label_seq_id, pdbx_beg_PDB_ins_code } = cat;
-    const { end_label_asym_id, end_label_seq_id, pdbx_end_PDB_ins_code } = cat;
+    const { end_label_seq_id, pdbx_end_PDB_ins_code } = cat;
 
     for (let i = 0; i < cat.rowCount; i++) {
         const entry: SecondaryStructureEntry = {
@@ -172,7 +168,7 @@ function assignSecondaryStructure(model: Model) {
     extendSecondaryStructureMap(model.data.secondaryStructure.sheetRange, SecondaryStructureType.StructSheetRange, map);
 
     const { residueStartIndex, residueEndIndex, count: chainCount } = model.chains;
-    const { atomStartIndex, secondaryStructureIndex, secondaryStructureType } = model.residues;
+    const { atomStartIndex } = model.residues;
     const { dataIndex } = model.atoms;
     const { label_asym_id, label_seq_id, pdbx_PDB_ins_code } = model.data.atom_site;
 

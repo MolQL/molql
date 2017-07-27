@@ -6,7 +6,7 @@ import Symbols, { SymbolInfo } from '../../language/symbols'
 import { FastSet, FastMap } from '../utils/collections'
 import Environment from './environment'
 import RuntimeExpression from './expression'
-import { Model, ElementSymbol } from '../molecule/data'
+import { ElementSymbol } from '../molecule/data'
 import AtomSetSeq from '../query/atom-set-seq'
 import { atomGroupsGenerator } from './molecule/generators'
 
@@ -313,10 +313,6 @@ const symbols: CompileInfo[] = [
 
 function unary(symbol: SymbolInfo, f: (v: any) => any): CompileInfo {
     return [symbol, (env, v) => f(v(env)), staticAttribute];
-}
-
-function atomProp(symbol: SymbolInfo, getter: (atom_site: Model['data']['atom_site']) => (atomIndex: number) => any): CompileInfo {
-    return [symbol, (env) => getter(env.atom_site)(env.element.value.dataIndex)]
 }
 
 const SymbolRuntime = (function () {

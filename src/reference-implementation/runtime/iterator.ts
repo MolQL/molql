@@ -2,7 +2,6 @@
  * Copyright (c) 2017 David Sehnal, licensed under MIT, See LICENSE file for more info.
  */
 
-type Invariants = { [id: string]: any }
 type Iterator<T = any> = { value: T, '@isIterating': boolean }
 
 function Iterator(): Iterator { return { value: void 0, '@isIterating': false }; }

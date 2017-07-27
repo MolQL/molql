@@ -3,7 +3,6 @@
  */
 
 import Type from './type-system'
-import Expression from './expression'
 
 export type ArgSpec = [string, Type, string] | [string, Type]
 
@@ -136,9 +135,6 @@ const primitive = {
         }
     }
 }
-
-const modifierType = Type.fn(Type.Structure.atomSet, Type.Structure.atomSetSeq);
-const combinatorType = Type.fn(Type.oneOrMore(Type.Structure.atomSetSeq), Type.Structure.atomSetSeq);
 
 const structure = {
     '@header': 'Molecular Structure Queries',
