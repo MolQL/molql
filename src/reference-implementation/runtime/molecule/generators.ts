@@ -65,8 +65,13 @@ type GroupCtx = { env: Environment, groupBy: RuntimeExpression, groups: FastMap<
 function onGroupAtom({ env, groupBy, groups, atomSetSeq }: GroupCtx, i: number) {
     const key = groupBy(env);
     let atomSet: number[];
-    if (groups.has(key)) atomSet = groups.get(key)!;
-    else { atomSet = []; groups.set(key, atomSet); atomSetSeq.push(atomSet); }
+    if (groups.has(key)) {
+        atomSet = groups.get(key)!;
+    } else {
+        atomSet = [];
+        groups.set(key, atomSet);
+        atomSetSeq.push(atomSet);
+    }
     atomSet.push(i);
 }
 
@@ -74,9 +79,9 @@ export function atomGroupsGenerator(env: Environment, params: GeneratorParams): 
     if (params.groupBy) {
         const ctx: GroupCtx = { env, groupBy: params.groupBy, groups: FastMap.create(), atomSetSeq: [] };
         atomGroupsIterator(env, params, onGroupAtom, ctx);
-        const result = AtomSetSeq.uniqueAtomSetSeqBuilder(env.queryCtx);
+        const result = AtomSetSeq.linearAtomSetSeqBuilder(env.queryCtx);
         for (const set of ctx.atomSetSeq) {
-            result.add(AtomSet.ofUnsortedIndices(env.queryCtx, set));
+            result.add(AtomSet(env.queryCtx, set));
         }
         return result.getSeq();
     } else {

@@ -49,7 +49,7 @@ namespace Compiler {
         // non-optimized version would work similar to this:
         //   const slots = [void 0, ...args.map(a => a.runtime)];
         //   const f = head.runtime;
-        //   return RuntimeExpression(function (env) { slots[0] = env; return f(env).apply(null, slots); }, { id: ctx.id++ });
+        //   return RuntimeExpression(function (env) { slots[0] = env; return f(env).apply(null, slots); }, { });
         return Optimizer(ctx, head, args);
     }
 
