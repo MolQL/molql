@@ -22,6 +22,19 @@ Model is a 4-layer tree structure with these layers:
 4. **Atoms**
     - Individual atoms within a single residue.
 
+## Atom attributes
+
+- Each layer has a corresponding "key" attibute assigned to an atom that uniquely identifies it. This is most useful in grouping atoms together.
+- Atoms have properties defined by the  "atom_site" columns in mmCIF format.
+
+## "Structure determination"
+
+- Secondary Structure: Same information as provided by mmCIF (helices, sheets, turns, what have you).
+- Main Sequence: Amino acid, nucleotide or "modified residue". Must be at least 10 AMK or 2 nucleotide long.
+- Water: anything that belongs to "water entity" or has residue name HOH or SOL or ?.
+- Ligand: not water or main sequence.
+
+
 Selections
 ==========
 

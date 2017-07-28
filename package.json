@@ -1,8 +1,8 @@
 {
   "name": "molql",
-  "version": "1.0.0",
-  "description": "",
-  "main": "app.js",
+  "version": "0.1.0",
+  "description": "A molecular query language.",
+  "main": "",
   "scripts": {
     "build": "./node_modules/.bin/tsc",
     "watch": "./node_modules/.bin/tsc -watch",

@@ -188,40 +188,17 @@ const symbolDefinitions: CompileInfo[] = [
 
     // ============= ATTRIBUTES =============
 
+    [Symbols.structure.attribute.atomKey, func(env => env.element.value.atom)],
+    [Symbols.structure.attribute.residueKey, func(env => env.model.residues.key[env.element.value.residue])],
+    [Symbols.structure.attribute.chainKey, func(env => env.model.residues.key[env.element.value.chain])],
+    [Symbols.structure.attribute.entityKey, func(env => env.model.residues.key[env.element.value.residue])],
     [Symbols.structure.attribute.staticAtomProperty, compiledFunc((ctx, name) => MolQueryAttributes.staticAtomProperty(getCompiledValue(name)))],
 
-    // // ============= ATOM PROPERTIES =============
-    // [Symbols.structure.property.atom.uniqueId, env => env.element.value.atom],
-    // [Symbols.structure.property.atom.id, env => env.atom_site.id.getInteger(env.element.value.dataIndex)],
-    // [Symbols.structure.property.atom.Cartn_x, env => env.positions.x[env.element.value.atom]],
-    // [Symbols.structure.property.atom.Cartn_y, env => env.positions.y[env.element.value.atom]],
-    // [Symbols.structure.property.atom.Cartn_z, env => env.positions.z[env.element.value.atom]],
-
-    // [Symbols.structure.property.atom.label_atom_id, env => env.atom_site.label_atom_id.getString(env.element.value.dataIndex)],
-    // [Symbols.structure.property.atom.type_symbol, env => ElementSymbol(env.atom_site.type_symbol.getString(env.element.value.dataIndex))],
-    // [Symbols.structure.property.atom.occupancy, env => env.atom_site.occupancy.getFloat(env.element.value.dataIndex)],
-    // [Symbols.structure.property.atom.B_iso_or_equiv, env => env.atom_site.B_iso_or_equiv.getFloat(env.element.value.dataIndex)],
-
-    // // ============= RESIDUE PROPERTIES =============
-    // [Symbols.structure.property.residue.uniqueId, env => env.element.value.residue],
-    // [Symbols.structure.property.residue.isHet, env => !env.atom_site.group_PDB.stringEquals(env.element.value.dataIndex, 'ATOM')],
-    // [Symbols.structure.property.residue.label_seq_id, env => env.atom_site.label_seq_id.getInteger(env.element.value.dataIndex)],
-    // [Symbols.structure.property.residue.label_comp_id, env => env.atom_site.label_comp_id.getString(env.element.value.dataIndex)],
-    // [Symbols.structure.property.residue.pdbx_PDB_ins_code, env => env.atom_site.pdbx_PDB_ins_code.getString(env.element.value.dataIndex)],
-
-    // // ============= CHAIN PROPERTIES =============
-    // [Symbols.structure.property.chain.uniqueId, env => env.element.value.chain],
-    // [Symbols.structure.property.chain.label_asym_id, env => env.atom_site.label_asym_id.getString(env.element.value.dataIndex)],
-
-    // // ============= ENTITY PROPERTIES =============
-    // [Symbols.structure.property.entity.uniqueId, env => env.element.value.entity],
-    // [Symbols.structure.property.entity.label_entity_id, env => env.atom_site.label_entity_id.getString(env.element.value.dataIndex)],
-
-    // // ============= ATOM SET PROPERTIES =============
-    // [Symbols.structure.property.atomSet.atomCount, env => env.atomSet.value.atomIndices.length],
-    // [Symbols.structure.property.atomSet.propertySet, (env, prop) => atomSetPropertySet(env, prop)],
-    // [Symbols.structure.property.atomSet.reduce.accumulator, accumulateAtomSet],
-    // [Symbols.structure.property.atomSet.reduce.value, (env) => env.atomSetReducer.value],
+    // ============= ATOM SET PROPERTIES =============
+    [Symbols.structure.property.atomSet.atomCount, func(env => env.atomSet.value.atomIndices.length)],
+    [Symbols.structure.property.atomSet.propertySet, func((env, prop) => MolQueryAttributes.atomSetPropertySet(env, prop))],
+    [Symbols.structure.property.atomSet.reduce.accumulator, func(MolQueryAttributes.accumulateAtomSet)],
+    [Symbols.structure.property.atomSet.reduce.value, func(env => env.atomSetReducer.value)],
 
     // // ============= ATOM SEQ SEQ PROPERTIES =============
     // [Symbols.structure.property.atomSelection.length, (env, seq: RuntimeExpression<AtomSelection>) => seq(env).atomSets.length],

@@ -11,7 +11,8 @@ import Slot from '../slot'
 import RuntimeExpression from '../expression'
 import { Set } from 'immutable'
 import Compiler from '../../compiler/compiler'
-import { ElementSymbol, AtomProperties } from '../../molecule/data'
+import { ElementSymbol } from '../../molecule/data'
+import { StaticAtomProperties } from '../../../language/properties'
 
 import ElementAddress = Context.ElementAddress
 
@@ -55,7 +56,7 @@ export function accumulateAtomSet(env: Environment, f: RuntimeExpression, initia
     return reduced;
 }
 
-export function staticAtomProperty(name: AtomProperties ): Compiler.CompiledExpression {
+export function staticAtomProperty(name: StaticAtomProperties): Compiler.CompiledExpression {
     switch (name) {
         case 'group_PDB': return Compiler.CompiledExpression.apply(env => env.atom_site.group_PDB.getString(env.element.value.dataIndex));
         case 'id': return Compiler.CompiledExpression.apply(env => env.atom_site.id.getInteger(env.element.value.dataIndex));

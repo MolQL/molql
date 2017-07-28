@@ -5,24 +5,20 @@ Language Reference
 
    * [Langauge Primitives](#langauge-primitives)
      * [Constructors](#constructors)
-     * [Functional Operators](#functional-operators)
      * [Operators](#operators)
        * [Logic](#logic)
        * [Arithmetic](#arithmetic)
        * [Relational](#relational)
        * [Strings](#strings)
-       * [Collections](#collections)
+       * [Sets](#sets)
+       * [Maps](#maps)
    * [Molecular Structure Queries](#molecular-structure-queries)
      * [Constructors](#constructors)
      * [Generators](#generators)
      * [Atom Set Modifiers](#atom-set-modifiers)
      * [Sequence Combinators](#sequence-combinators)
+     * [Attributes](#attributes)
      * [Properties](#properties)
-       * [Atoms](#atoms)
-       * [Residues](#residues)
-       * [Chains](#chains)
-       * [Entities](#entities)
-       * [Model](#model)
        * [Secondary Structure](#secondary-structure)
        * [Atom Sets](#atom-sets)
        * [Atom Set Sequences](#atom-set-sequences)
@@ -57,14 +53,6 @@ Language Reference
 ### **regex**&nbsp;&nbsp;&nbsp;``primitive.constructor.regex :: (expression: string, flags: ?string) => regex``
 
 *Creates a regular expression from a string using the ECMAscript syntax.*
-
--------------------
-
-## Functional Operators
-
-### **slot**&nbsp;&nbsp;&nbsp;``primitive.functional.slot :: (index: number) => any-value``
-
-*Evaluates into a value assigned to a slot with this index in the runtime environment. Useful for example for ``atomSet.reduce``.*
 
 -------------------
 
@@ -226,13 +214,23 @@ Language Reference
 
 -------------------
 
-## Collections
+## Sets
 
-### **in-set**&nbsp;&nbsp;&nbsp;``primitive.operator.collections.in-set :: (set: set, value: any-value) => bool``
+### **has**&nbsp;&nbsp;&nbsp;``primitive.operator.set.has :: (set: set, value: any-value) => bool``
 
 -------------------
 
-### **map-get**&nbsp;&nbsp;&nbsp;``primitive.operator.collections.map-get :: (map: map, key: any-value, default: any-value) => any-value``
+### **add**&nbsp;&nbsp;&nbsp;``primitive.operator.set.add :: (set: set, value: any-value) => set``
+
+-------------------
+
+## Maps
+
+### **get**&nbsp;&nbsp;&nbsp;``primitive.operator.map.get :: (map: map, key: any-value, default: any-value) => any-value``
+
+-------------------
+
+### **set**&nbsp;&nbsp;&nbsp;``primitive.operator.map.set :: (map: map, key: any-value, value: any-value) => map``
 
 -------------------
 
@@ -246,7 +244,7 @@ Language Reference
 
 ## Generators
 
-### **atom-groups**&nbsp;&nbsp;&nbsp;``structure.generator.atom-groups :: (entity-predicate: bool, chain-predicate: bool, residue-predicate: bool, atom-predicate: bool, group-by: ?any-value) => atom-set-seq``
+### **atom-groups**&nbsp;&nbsp;&nbsp;``structure.generator.atom-groups :: (entity-predicate: ()->bool, chain-predicate: ()->bool, residue-predicate: ()->bool, atom-predicate: ()->bool, group-by: ?()->any-value) => atom-selection``
 
 -------------------
 
@@ -254,111 +252,21 @@ Language Reference
 
 ## Sequence Combinators
 
+## Attributes
+
+### **static-atom-property**&nbsp;&nbsp;&nbsp;``structure.attribute.static-atom-property :: (name: string) => any-value``
+
+*Access a "statically defined" atom property. One of: ``group_PDB``, ``id``, ``type_symbol``, ``label_atom_id``, ``label_alt_id``, ``label_comp_id``, ``label_asym_id``, ``label_entity_id``, ``label_seq_id``, ``pdbx_PDB_ins_code``, ``pdbx_formal_charge``, ``Cartn_x``, ``Cartn_y``, ``Cartn_z``, ``occupancy``, ``B_iso_or_equiv``, ``auth_atom_id``, ``auth_comp_id``, ``auth_asym_id``, ``auth_seq_id``, ``pdbx_PDB_model_num``, ``is-het``, ``operator-name``.*
+
+-------------------
+
 ## Properties
-
-## Atoms
-
-### **unique-id**&nbsp;&nbsp;&nbsp;``structure.property.atom.unique-id :: any-value``
-
-*Returns an implementation specific unique identifier of the current atom.*
-
--------------------
-
-### **id**&nbsp;&nbsp;&nbsp;``structure.property.atom.id :: number``
-
--------------------
-
-### **Cartn_x**&nbsp;&nbsp;&nbsp;``structure.property.atom.Cartn_x :: number``
-
--------------------
-
-### **Cartn_y**&nbsp;&nbsp;&nbsp;``structure.property.atom.Cartn_y :: number``
-
--------------------
-
-### **Cartn_z**&nbsp;&nbsp;&nbsp;``structure.property.atom.Cartn_z :: number``
-
--------------------
-
-### **label_atom_id**&nbsp;&nbsp;&nbsp;``structure.property.atom.label_atom_id :: string``
-
--------------------
-
-### **type_symbol**&nbsp;&nbsp;&nbsp;``structure.property.atom.type_symbol :: string``
-
--------------------
-
-### **occupancy**&nbsp;&nbsp;&nbsp;``structure.property.atom.occupancy :: number``
-
--------------------
-
-### **B_iso_or_equiv**&nbsp;&nbsp;&nbsp;``structure.property.atom.B_iso_or_equiv :: number``
-
--------------------
-
-## Residues
-
-### **unique-id**&nbsp;&nbsp;&nbsp;``structure.property.residue.unique-id :: any-value``
-
-*Returns an implementation specific unique identifier of the current residue.*
-
--------------------
-
-### **is-het**&nbsp;&nbsp;&nbsp;``structure.property.residue.is-het :: string``
-
--------------------
-
-### **label_seq_id**&nbsp;&nbsp;&nbsp;``structure.property.residue.label_seq_id :: number``
-
--------------------
-
-### **label_comp_id**&nbsp;&nbsp;&nbsp;``structure.property.residue.label_comp_id :: string``
-
--------------------
-
-### **pdbx_PDB_ins_code**&nbsp;&nbsp;&nbsp;``structure.property.residue.pdbx_PDB_ins_code :: string``
-
--------------------
-
-## Chains
-
-### **unique-id**&nbsp;&nbsp;&nbsp;``structure.property.chain.unique-id :: any-value``
-
-*Returns an implementation specific unique identifier of the current chain.*
-
--------------------
-
-### **label_asym_id**&nbsp;&nbsp;&nbsp;``structure.property.chain.label_asym_id :: string``
-
--------------------
-
-## Entities
-
-### **unique-id**&nbsp;&nbsp;&nbsp;``structure.property.entity.unique-id :: any-value``
-
-*Returns an implementation specific unique identifier of the current entity.*
-
--------------------
-
-### **label_entity_id**&nbsp;&nbsp;&nbsp;``structure.property.entity.label_entity_id :: string``
-
--------------------
-
-## Model
 
 ## Secondary Structure
 
 ## Atom Sets
 
-### **atom-count**&nbsp;&nbsp;&nbsp;``structure.property.atom-set.atom-count :: number``
-
--------------------
-
 ## Atom Set Sequences
-
-### **length**&nbsp;&nbsp;&nbsp;``structure.property.atom-set-seq.length :: (seq: atom-set-seq) => atom-set-seq``
-
--------------------
 
 
 Not yet implemented
@@ -366,101 +274,107 @@ Not yet implemented
 
 ### **atom-set**&nbsp;&nbsp;&nbsp;``structure.constructor.atom-set :: (atom-indices: number+) => atom-set``
 
--------------------
-
-### **atom-set-seq**&nbsp;&nbsp;&nbsp;``structure.constructor.atom-set-seq :: (sets: atom-set*) => atom-set-seq``
+*A list of atom indices. This is a bit dodgy because the ordering can be de-facto orginary. Not 100% about including this into the language.*
 
 -------------------
 
-### **modify**&nbsp;&nbsp;&nbsp;``structure.primitive.modify :: (seq: atom-set-seq, f: atom-set-seq) => atom-set-seq``
+### **atom-selection**&nbsp;&nbsp;&nbsp;``structure.constructor.atom-selection :: (sets: atom-set*) => atom-selection``
 
 -------------------
 
-### **combine**&nbsp;&nbsp;&nbsp;``structure.primitive.combine :: (combinator: atom-set-seq, seqs: atom-set-seq+) => atom-set-seq``
+### **modify**&nbsp;&nbsp;&nbsp;``structure.primitive.modify :: (seq: atom-selection, f: atom-selection) => atom-selection``
 
 -------------------
 
-### **connected-components**&nbsp;&nbsp;&nbsp;``structure.generator.connected-components :: atom-set-seq``
+### **combine**&nbsp;&nbsp;&nbsp;``structure.primitive.combine :: (combinator: atom-selection, seqs: atom-selection+) => atom-selection``
+
+-------------------
+
+### **connected-components**&nbsp;&nbsp;&nbsp;``structure.generator.connected-components :: atom-selection``
 
 *Returns all covalently connected components.*
 
 -------------------
 
-### **filter**&nbsp;&nbsp;&nbsp;``structure.modifier.filter :: (predicate: bool) => atom-set-seq``
+### **filter**&nbsp;&nbsp;&nbsp;``structure.modifier.filter :: (seq: atom-selection, predicate: bool) => atom-selection``
 
 -------------------
 
-### **find**&nbsp;&nbsp;&nbsp;``structure.modifier.find :: (query: atom-set-seq) => atom-set-seq``
+### **find-in**&nbsp;&nbsp;&nbsp;``structure.modifier.find-in :: (seq: atom-selection, query: atom-selection) => atom-selection``
 
 *Executes the specified query in the context induced by each of the atoms sets in the sequence.*
 
 -------------------
 
-### **intersect-with**&nbsp;&nbsp;&nbsp;``structure.combinator.intersect-with :: atom-set-seq``
+### **intersect-with**&nbsp;&nbsp;&nbsp;``structure.combinator.intersect-with :: atom-selection``
 
 -------------------
 
-### **merge**&nbsp;&nbsp;&nbsp;``structure.combinator.merge :: atom-set-seq``
+### **merge**&nbsp;&nbsp;&nbsp;``structure.combinator.merge :: atom-selection``
 
 -------------------
 
-### **union**&nbsp;&nbsp;&nbsp;``structure.combinator.union :: atom-set-seq``
+### **union**&nbsp;&nbsp;&nbsp;``structure.combinator.union :: atom-selection``
 
 *Collects all atom sets in the sequence into a single atom set.*
 
 -------------------
 
-### **near**&nbsp;&nbsp;&nbsp;``structure.combinator.near :: (max-distance: number) => atom-set-seq``
+### **near**&nbsp;&nbsp;&nbsp;``structure.combinator.near :: (max-distance: number) => atom-selection``
 
 *Merges all tuples of atom sets that are mutually no further than the specified threshold.*
 
 -------------------
 
-### **operator-name**&nbsp;&nbsp;&nbsp;``structure.property.atom.operator-name :: string``
-
-*Returns the name of the symmetry operator applied to this atom (e.g., 4_455). Atoms from the loaded asymmetric always return 1_555. Probably should have specific type constructor for this?*
+### **atom-key**&nbsp;&nbsp;&nbsp;``structure.attribute.atom-key :: any-value``
 
 -------------------
 
-### **is-modified**&nbsp;&nbsp;&nbsp;``structure.property.residue.is-modified :: bool``
+### **residue-key**&nbsp;&nbsp;&nbsp;``structure.attribute.residue-key :: any-value``
 
 -------------------
 
-### **pdbx_PDB_model_num**&nbsp;&nbsp;&nbsp;``structure.property.model.pdbx_PDB_model_num :: string``
+### **chain-key**&nbsp;&nbsp;&nbsp;``structure.attribute.chain-key :: any-value``
 
 -------------------
 
-### **unique-id**&nbsp;&nbsp;&nbsp;``structure.property.secondaryStructure.unique-id :: any-value``
+### **entity-key**&nbsp;&nbsp;&nbsp;``structure.attribute.entity-key :: any-value``
+
+-------------------
+
+### **unique-id**&nbsp;&nbsp;&nbsp;``structure.property.secondary-structure.unique-id :: any-value``
 
 *Returns an implementation specific unique identifier of the current secondary structure element.*
 
 -------------------
 
-### **is-amino**&nbsp;&nbsp;&nbsp;``structure.property.atom-set.is-amino :: bool``
-
-*Is the current atom set formed solely from amino acid atoms?*
+### **atom-count**&nbsp;&nbsp;&nbsp;``structure.property.atom-set.atom-count :: number``
 
 -------------------
 
-### **is-nucleotide**&nbsp;&nbsp;&nbsp;``structure.property.atom-set.is-nucleotide :: bool``
-
-*Is the current atom set formed solely from nucleotide atoms?*
-
--------------------
-
-### **is-ligand**&nbsp;&nbsp;&nbsp;``structure.property.atom-set.is-ligand :: bool``
-
-*Is the current atom set formed solely from ligand atoms?*
-
--------------------
-
-### **reduce**&nbsp;&nbsp;&nbsp;``structure.property.atom-set.reduce :: (f: any-value->any-value, initial: any-value) => any-value``
+### **accumulator**&nbsp;&nbsp;&nbsp;``structure.property.atom-set.reduce.accumulator :: (value: any-value, initial: any-value) => any-value``
 
 *Compute a property of an atom set based on it's properties. The current value is assigned to the 0-th slot [``(primitive.functional.slot 0)``].*
 
 -------------------
 
-### **property-set**&nbsp;&nbsp;&nbsp;``structure.property.atom-set-seq.property-set :: (prop: any-value, seq: atom-set-seq) => set``
+### **value**&nbsp;&nbsp;&nbsp;``structure.property.atom-set.reduce.value :: any-value``
+
+*Current value of the accumulator.*
+
+-------------------
+
+### **property-set**&nbsp;&nbsp;&nbsp;``structure.property.atom-set.property-set :: (prop: any-value) => set``
+
+*Returns a set of unique properties from all atoms within the current atom set.*
+
+-------------------
+
+### **length**&nbsp;&nbsp;&nbsp;``structure.property.atom-selection.length :: (seq: atom-selection) => atom-selection``
+
+-------------------
+
+### **property-set**&nbsp;&nbsp;&nbsp;``structure.property.atom-selection.property-set :: (prop: any-value, seq: atom-selection) => set``
 
 *Returns a set of unique properties from all atoms within the source sequence.*
 

@@ -11,7 +11,6 @@ export const enum SecondaryStructureType {
     StructSheetRange = 2,
 }
 
-export type AtomProperties = mmCIF.AtomSite | 'is-het' | 'operator-name'
 export interface Atoms {
     dataIndex: number[],
     residueIndex: number[],

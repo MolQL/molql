@@ -82,8 +82,8 @@ function run(model: Model) {
         g => g.atomGroups,
         true, // entity
         true, // chain
-        true, //B.rel(e => e.eq, B.Struct.atomProperty('auth_comp_id'), 'HEM'), // residue
-        B.Struct.atomProperty('is-het'),  //B.set(e => e.has, B.ctor(c => c.set, es('C'), es('N')), B.Struct.atomProperty('type_symbol')), // atom
+        B.rel(e => e.eq, B.Struct.atomProperty('auth_comp_id'), 'HEM'), // residue
+        B.set(e => e.has, B.ctor(c => c.set, es('C'), es('N')), B.Struct.atomProperty('type_symbol')), // atom
         B.Struct.atomProperty('type_symbol') // group by
     );
 

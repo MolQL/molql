@@ -3,6 +3,7 @@
  */
 
 import Type from './type-system'
+import { StaticAtomProperties } from './properties'
 
 export type ArgSpec = [string, Type, string] | [string, Type]
 
@@ -137,10 +138,7 @@ const structure = {
     '@header': 'Molecular Structure Queries',
     constructor: {
         '@header': 'Constructors',
-        elementSymbol: ctor(Type.Structure.elementSymbol, [['symbol', Type.Primitive.str]]),
-        atomSet: ctor(Type.Structure.atomSet, [['atom-indices', Type.oneOrMore(Type.Primitive.num)]],
-            'A list of atom indices. This is a bit dodgy because the ordering can be de-facto orginary. Not 100% about including this into the language.'),
-        atomSelection: ctor(Type.Structure.atomSelection, [['sets', Type.zeroOrMore(Type.Structure.atomSet)]])
+        elementSymbol: ctor(Type.Structure.elementSymbol, [['symbol', Type.Primitive.str]])
     },
     primitive: {
         modify: symbol({
@@ -157,11 +155,11 @@ const structure = {
         atomGroups: symbol({
             type: Type.Structure.atomSelection,
             args: [
-                ['entity-predicate', Type.lazyValue(Type.Primitive.bool)],
-                ['chain-predicate', Type.lazyValue(Type.Primitive.bool)],
-                ['residue-predicate', Type.lazyValue(Type.Primitive.bool)],
-                ['atom-predicate', Type.lazyValue(Type.Primitive.bool)],
-                ['group-by', Type.optional(Type.lazyValue(Type.anyValue))]
+                ['entity-predicate', Type.Primitive.bool],
+                ['chain-predicate', Type.Primitive.bool],
+                ['residue-predicate', Type.Primitive.bool],
+                ['atom-predicate', Type.Primitive.bool],
+                ['group-by', Type.optional(Type.anyValue)]
             ]
         }),
         connectedComponents: symbol({
@@ -205,47 +203,15 @@ const structure = {
         residueKey: value(Type.anyValue),
         chainKey: value(Type.anyValue),
         entityKey: value(Type.anyValue),
-        staticAtomProperty: symbol({ type: Type.anyValue, args: [['name', Type.Primitive.str]] }),
+        staticAtomProperty: symbol({
+            type: Type.anyValue,
+            args: [['name', Type.Primitive.str]],
+            description: `Access a "statically defined" atom property. One of: ${Object.keys(StaticAtomProperties).map(k => '``' + k + '``').join(', ')}.`
+        }),
         //operatorName: value(Type.Primitive.str)
     },
     property: {
         '@header': 'Properties',
-        atom: {
-            '@header': 'Atoms',
-            uniqueId: value(Type.anyValue, 'Returns an implementation specific unique identifier of the current atom.'),
-            id: value(Type.Primitive.num),
-            Cartn_x: value(Type.Primitive.num),
-            Cartn_y: value(Type.Primitive.num),
-            Cartn_z: value(Type.Primitive.num),
-            label_atom_id: value(Type.Primitive.str),
-            type_symbol: value(Type.Primitive.str),
-            occupancy: value(Type.Primitive.num),
-            B_iso_or_equiv: value(Type.Primitive.num),
-            operatorName: value(Type.Primitive.str, 'Returns the name of the symmetry operator applied to this atom (e.g., 4_455). Atoms from the loaded asymmetric always return 1_555. Probably should have specific type constructor for this?')
-        },
-        residue: {
-            '@header': 'Residues',
-            uniqueId: value(Type.anyValue, 'Returns an implementation specific unique identifier of the current residue.'),
-            isHet: value(Type.Primitive.str),
-            label_seq_id: value(Type.Primitive.num),
-            label_comp_id: value(Type.Primitive.str),
-            pdbx_PDB_ins_code: value(Type.Primitive.str),
-            isModified: value(Type.Primitive.bool),
-        },
-        chain: {
-            '@header': 'Chains',
-            uniqueId: value(Type.anyValue, 'Returns an implementation specific unique identifier of the current chain.'),
-            label_asym_id: value(Type.Primitive.str)
-        },
-        entity: {
-            '@header': 'Entities',
-            uniqueId: value(Type.anyValue, 'Returns an implementation specific unique identifier of the current entity.'),
-            label_entity_id: value(Type.Primitive.str)
-        },
-        model: {
-            '@header': 'Model',
-            pdbx_PDB_model_num: value(Type.Primitive.str)
-        },
         secondaryStructure: {
             '@header': 'Secondary Structure',
             uniqueId: value(Type.anyValue, 'Returns an implementation specific unique identifier of the current secondary structure element.'),
