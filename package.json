@@ -12,10 +12,11 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
-    "@types/node": "^8.0.16",
+    "@types/node": "^8.0.17",
     "typescript": "^2.4.2"
   },
   "dependencies": {
-    "ciftools.js": "github:dsehnal/CIFTools.js.git#34cd913"
+    "ciftools.js": "github:dsehnal/CIFTools.js#34cd913",
+    "immutable": "^3.8.1"
   }
 }

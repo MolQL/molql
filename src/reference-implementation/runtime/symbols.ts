@@ -3,12 +3,13 @@
  */
 
 import Symbols, { SymbolInfo } from '../../language/symbols'
-import { FastSet, FastMap } from '../utils/collections'
+//import { FastSet, FastMap } from '../utils/collections'
 import Environment from './environment'
 import RuntimeExpression from './expression'
 import { ElementSymbol } from '../molecule/data'
 import AtomSelection from '../query/atom-selection'
 import { atomGroupsGenerator } from './molecule/generators'
+import { Set, Map } from 'immutable'
 
 namespace SymbolRuntime {
     export type Func<T = any> = (env: Environment, ...args: RuntimeExpression[]) => T
@@ -47,18 +48,18 @@ export const SymbolTable: CompileInfo[] = [
     [
         Symbols.primitive.constructor.set,
         function(env) {
-            const set = FastSet.create();
+            const set = Set().asMutable();
             for (let i = 1; i < arguments.length; i++) set.add(arguments[i](env));
-            return set;
+            return set.asImmutable();
         },
         staticAttribute
     ],
     [
         Symbols.primitive.constructor.map,
         function (env) {
-            const map = FastMap.create<any, any>();
+            const map = Map().asMutable();
             for (let i = 1; i < arguments.length; i += 2) map.set(arguments[i](env), arguments[i + 1](env));
-            return map;
+            return map.asImmutable();
         },
         staticAttribute
     ],
@@ -69,21 +70,7 @@ export const SymbolTable: CompileInfo[] = [
     ],
 
     // ============= FUNCTIONAL =============
-    // [
-    //     Symbols.primitive.functional.partial,
-    //     function (env, f: RuntimeExpression<Function>) {
-    //         const func = f(env);
-    //         const first: any[] = [void 0];
-    //         for (let i = 2; i < arguments.length; i++) first[i - 1] = arguments[i];
-    //         return function (env: Environment) {
-    //             const second = [...first];
-    //             second[0] = env;
-    //             for (let i = 1; i < arguments.length; i++) second.push(arguments[i]);
-    //             return func.apply(null, second);
-    //         };
-    //     }
-    // ],
-    [Symbols.primitive.functional.slot, (env, index: RuntimeExpression<number>) => env.slots[index(env)].value],
+    [Symbols.primitive.functional.lazy, (env, x) => x],
 
     // ============= OPERATORS =============
     [Symbols.primitive.operator.logic.not, (env, x) => !x(env), staticAttribute],
@@ -189,38 +176,19 @@ export const SymbolTable: CompileInfo[] = [
         staticAttribute
     ],
 
-    [
-        Symbols.primitive.operator.set.has,
-        (env, set: RuntimeExpression<FastSet<any>>, v) => set(env).has(v(env)),
-        staticAttribute
-    ],
-    [
-        Symbols.primitive.operator.set.add,
-        (env, set: RuntimeExpression<FastSet<any>>, v) => {
-            const _set = set(env);
-            _set.add(v(env));
-            return _set;
-        },
-        staticAttribute
-    ],
+    [Symbols.primitive.operator.set.has, (env, set: RuntimeExpression<Set<any>>, v) => set(env).has(v(env)), staticAttribute],
+    [Symbols.primitive.operator.set.add, (env, set: RuntimeExpression<Set<any>>, v) => set(env).add(v(env)), staticAttribute],
+
     [
         Symbols.primitive.operator.map.get,
-        (env, map: RuntimeExpression<FastMap<any, any>>, key, def) => {
+        (env, map: RuntimeExpression<Map<any, any>>, key, def) => {
             const m = map(env), k = key(env);
             if (m.has(k)) return m.get(k);
             return def(env);
         },
         staticAttribute
     ],
-    [
-        Symbols.primitive.operator.map.set,
-        (env, map: RuntimeExpression<FastMap<any, any>>, key, v) => {
-            const m = map(env);
-            m.set(key(env), v(env));
-            return m;
-        },
-        staticAttribute
-    ],
+    [Symbols.primitive.operator.map.set, (env, map: RuntimeExpression<Map<any, any>>, key, v) => map(env).set(key(env), v(env)), staticAttribute],
 
     ////////////////////////////////////
     // Structure
@@ -315,7 +283,13 @@ export const SymbolTable: CompileInfo[] = [
     [
         Symbols.structure.generator.atomGroups,
         (env, entityP, chainP, residueP, atomP, groupBy) => {
-            return atomGroupsGenerator(env, { entityP, chainP, residueP, atomP, groupBy });
+            return atomGroupsGenerator(env, {
+                entityP: entityP(env),
+                chainP: chainP(env),
+                residueP: residueP(env),
+                atomP: atomP(env),
+                groupBy: groupBy && groupBy(env)
+            });
         }
     ],
 

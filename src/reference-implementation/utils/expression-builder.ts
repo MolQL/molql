@@ -15,6 +15,7 @@ namespace Builder {
     }
 
     export const ctor = category(Symbols.primitive.constructor);
+    export const fn = category(Symbols.primitive.functional);
     export const logic = category(Symbols.primitive.operator.logic);
     export const rel = category(Symbols.primitive.operator.relational);
     export const math = category(Symbols.primitive.operator.arithmetic);

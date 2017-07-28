@@ -30,7 +30,7 @@ const primitive = {
         number: symbol({ type: Type.Primitive.num, args: [['value', Type.anyValue]] }),
         str: symbol({ type: Type.Primitive.str, args: [['value', Type.anyValue]] }),
         list: ctor(Type.Primitive.list, [['values', Type.zeroOrMore(Type.anyValue), 'A list of values.']]),
-        set: ctor(Type.Primitive.set, [['values', Type.zeroOrMore(Type.anyValue), 'A list of values.']]),
+        set: ctor(Type.Primitive.set, [['values', Type.zeroOrMore(Type.anyValue)]]),
         map: ctor(Type.Primitive.map, [['key-value-pairs', Type.zeroOrMore(Type.anyValue), 'A list of key value pairs, e.g. (map 1 "x" 2 "y").']]),
         regex: symbol({
             type: Type.Primitive.regex,
@@ -42,19 +42,12 @@ const primitive = {
         })
     },
     functional: {
-        '@header': 'Functional Operators',
-        // partial: symbol({
-        //     type: Type.anyFunction,
-        //     args: [
-        //         ['f', Type.anyFunction],
-        //         ['args', Type.zeroOrMore(Type.anyValue)]
-        //     ]
-        // }),
-        slot: symbol({
-            type: Type.anyValue,
-            args: [['index', Type.Primitive.num]],
-            description: 'Evaluates into a value assigned to a slot with this index in the runtime environment. Useful for example for ``atomSet.reduce``.'
-        })
+        '@header': 'Operators',
+        lazy: symbol({
+            type: Type.fn(Type.tuple(), Type.anyValue),
+            args: [['value', Type.anyValue]],
+            description: 'Holds a value without evaluating it.'
+        }),
     },
     operator: {
         '@header': 'Operators',
@@ -172,11 +165,11 @@ const structure = {
         atomGroups: symbol({
             type: Type.Structure.atomSelection,
             args: [
-                ['entity-predicate', Type.Primitive.bool],
-                ['chain-predicate', Type.Primitive.bool],
-                ['residue-predicate', Type.Primitive.bool],
-                ['atom-predicate', Type.Primitive.bool],
-                ['group-by', Type.optional(Type.anyValue)]
+                ['entity-predicate', Type.lazyValue(Type.Primitive.bool)],
+                ['chain-predicate', Type.lazyValue(Type.Primitive.bool)],
+                ['residue-predicate', Type.lazyValue(Type.Primitive.bool)],
+                ['atom-predicate', Type.lazyValue(Type.Primitive.bool)],
+                ['group-by', Type.optional(Type.lazyValue(Type.anyValue))]
             ]
         }),
         connectedComponents: symbol({
@@ -188,12 +181,12 @@ const structure = {
         '@header': 'Atom Set Modifiers',
         filter: symbol({
             type: Type.Structure.atomSelection,
-            args: [['predicate', Type.Primitive.bool]]
+            args: [['seq', Type.Structure.atomSelection], ['predicate', Type.Primitive.bool]]
         }),
-        find: symbol({
+        findIn: symbol({
             description: 'Executes the specified query in the context induced by each of the atoms sets in the sequence.',
             type: Type.Structure.atomSelection,
-            args: [['query', Type.Structure.atomSelection]]
+            args: [['seq', Type.Structure.atomSelection], ['query', Type.Structure.atomSelection]]
         }),
     },
     combinator: {

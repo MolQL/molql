@@ -81,6 +81,8 @@ namespace Type {
     export function tuple(...types: Type[]): Tuple { return { kind: 'tuple', types }; }
     export function listOf(type: Type): ListOf { return { kind: 'list-of', type }; }
 
+    export function lazyValue(type: Type) { return fn(tuple(), type); };
+
     export function format(type: Type): string {
         switch (type.kind) {
             case 'optional': return `?${format(type.type)}`;
