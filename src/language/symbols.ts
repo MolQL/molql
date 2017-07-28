@@ -122,15 +122,27 @@ const primitive = {
             })
         },
 
-        collections: {
-            '@header': 'Collections',
-            inSet: symbol({
+        set: {
+            '@header': 'Sets',
+            has: symbol({
                 type: Type.Primitive.bool,
                 args: [['set', Type.Primitive.set], ['value', Type.anyValue]]
             }),
-            mapGet: symbol({
+            add: symbol({
+                type: Type.Primitive.set,
+                args: [['set', Type.Primitive.set], ['value', Type.anyValue]]
+            }),
+        },
+
+        map: {
+            '@header': 'Maps',
+            get: symbol({
                 type: Type.anyValue,
                 args: [['map', Type.Primitive.map], ['key', Type.anyValue], ['default', Type.anyValue]]
+            }),
+            set: symbol({
+                type: Type.Primitive.map,
+                args: [['map', Type.Primitive.map], ['key', Type.anyValue], ['value', Type.anyValue]]
             })
         }
     }
@@ -250,11 +262,14 @@ const structure = {
             isAmino: value(Type.Primitive.bool, 'Is the current atom set formed solely from amino acid atoms?'),
             isNucleotide: value(Type.Primitive.bool, 'Is the current atom set formed solely from nucleotide atoms?'),
             isLigand: value(Type.Primitive.bool, 'Is the current atom set formed solely from ligand atoms?'),
-            reduce: symbol({
-                type: Type.anyValue,
-                args: [['f', Type.fn(Type.anyValue, Type.anyValue)], ['initial', Type.anyValue]],
-                description: 'Compute a property of an atom set based on it\'s properties. The current value is assigned to the 0-th slot [``(primitive.functional.slot 0)``].'
-            })
+            reduce: {
+                accumulator: symbol({
+                    type: Type.anyValue,
+                    args: [['value', Type.anyValue], ['initial', Type.anyValue]],
+                    description: 'Compute a property of an atom set based on it\'s properties. The current value is assigned to the 0-th slot [``(primitive.functional.slot 0)``].'
+                }),
+                value: symbol({ type: Type.anyValue, description: 'Current value of the accumulator.' })
+            }
         },
         atomSetSeq: {
             '@header': 'Atom Set Sequences',
@@ -333,7 +348,7 @@ function normalizeName(prefix: string, key: string, obj: any) {
 
         return;
     }
-    const namespace = `${obj['@namespace'] || key}`;
+    const namespace = `${obj['@namespace'] || formatKey(key)}`;
     const newPrefix = prefix ? `${prefix}.${namespace}` : namespace;
     for (const childKey of Object.keys(obj)) {
         if (typeof obj[childKey] !== 'object') continue;
@@ -341,6 +356,24 @@ function normalizeName(prefix: string, key: string, obj: any) {
     }
 }
 normalizeName('', '', table);
+
+function _symbolList(obj: any, list: SymbolInfo[]) {
+    if (isSymbolInfo(obj)) {
+        list.push(obj);
+        return;
+    }
+    for (const childKey of Object.keys(obj)) {
+        if (typeof obj[childKey] !== 'object') continue;
+        _symbolList(obj[childKey], list);
+    }
+}
+
+export function getSymbolsWithoutImplementation(implemented: SymbolInfo[]) {
+    const list: SymbolInfo[] = [];
+    _symbolList(table, list);
+    const names = new Set(implemented.map(s => s.name));
+    return list.filter(s => !names.has(s.name));
+}
 
 type table = typeof table
 export default table

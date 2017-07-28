@@ -27,7 +27,7 @@ namespace SymbolRuntime {
 const staticAttribute: SymbolRuntime.Attribute[] = ['static-expr']
 
 type CompileInfo = [SymbolInfo, SymbolRuntime.Func] | [SymbolInfo, SymbolRuntime.Func, SymbolRuntime.Attribute[]]
-const symbols: CompileInfo[] = [
+export const SymbolTable: CompileInfo[] = [
     ////////////////////////////////////
     // Primitives
 
@@ -190,16 +190,34 @@ const symbols: CompileInfo[] = [
     ],
 
     [
-        Symbols.primitive.operator.collections.inSet,
+        Symbols.primitive.operator.set.has,
         (env, set: RuntimeExpression<FastSet<any>>, v) => set(env).has(v(env)),
         staticAttribute
     ],
     [
-        Symbols.primitive.operator.collections.mapGet,
+        Symbols.primitive.operator.set.add,
+        (env, set: RuntimeExpression<FastSet<any>>, v) => {
+            const _set = set(env);
+            _set.add(v(env));
+            return _set;
+        },
+        staticAttribute
+    ],
+    [
+        Symbols.primitive.operator.map.get,
         (env, map: RuntimeExpression<FastMap<any, any>>, key, def) => {
             const m = map(env), k = key(env);
             if (m.has(k)) return m.get(k);
             return def(env);
+        },
+        staticAttribute
+    ],
+    [
+        Symbols.primitive.operator.map.set,
+        (env, map: RuntimeExpression<FastMap<any, any>>, key, v) => {
+            const m = map(env);
+            m.set(key(env), v(env));
+            return m;
         },
         staticAttribute
     ],
@@ -317,7 +335,7 @@ function unary(symbol: SymbolInfo, f: (v: any) => any): CompileInfo {
 
 const SymbolRuntime = (function () {
     const table: { [name: string]: SymbolRuntime.Info } = Object.create(null);
-    for (const s of symbols) {
+    for (const s of SymbolTable) {
         const name = s[0].name;
         if (table[name]) {
             throw new Error(`You've already implemented ${name}, dummy.`);

@@ -19,7 +19,8 @@ namespace Builder {
     export const rel = category(Symbols.primitive.operator.relational);
     export const math = category(Symbols.primitive.operator.arithmetic);
     export const str = category(Symbols.primitive.operator.string);
-    export const coll = category(Symbols.primitive.operator.collections);
+    export const set = category(Symbols.primitive.operator.set);
+    export const map = category(Symbols.primitive.operator.map);
 
     export namespace Struct {
         export const ctor = category(Symbols.structure.constructor);

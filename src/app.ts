@@ -13,8 +13,13 @@ import { Model } from './reference-implementation/molecule/data'
 import parseCIF from './reference-implementation/molecule/parser'
 import lispFormat from './reference-implementation/utils/expression-lisp-formatter'
 import Environment from './reference-implementation/runtime/environment'
+import { SymbolTable } from './reference-implementation/runtime/symbols'
 import Context from './reference-implementation/query/context'
 import AtomSetSeq from './reference-implementation/query/atom-set-seq'
+import { getSymbolsWithoutImplementation } from './language/symbols'
+
+const notImplemented = getSymbolsWithoutImplementation(SymbolTable.map(s => s[0]));
+console.log(notImplemented.map(s => s.name).join('\n'));
 
 const expr = B.math(s => s.mult, 1, 2, 3);
 
@@ -78,7 +83,7 @@ function run(model: Model) {
         true, // entity
         true, // chain
         B.rel(e => e.eq, B.Struct.prop(p => p.residue.label_comp_id), 'HEM'), // residue
-        B.coll(e => e.inSet, B.ctor(c => c.set, es('C'), es('N')), B.Struct.prop(p => p.atom.type_symbol)), // atom
+        B.set(e => e.has, B.ctor(c => c.set, es('C'), es('N')), B.Struct.prop(p => p.atom.type_symbol)), // atom
         B.Struct.prop(p => p.atom.type_symbol) // group by
     );
 
