@@ -80,11 +80,11 @@ function run(model: Model) {
 
     const q = B.Struct.gen(
         g => g.atomGroups,
-        B.fn(f => f.lazy, true), // entity
-        B.fn(f => f.lazy, true), // chain
-        B.fn(f => f.lazy, B.rel(e => e.eq, B.Struct.prop(p => p.residue.label_comp_id), 'HEM')), // residue
-        B.fn(f => f.lazy, B.set(e => e.has, B.ctor(c => c.set, es('C'), es('N')), B.Struct.prop(p => p.atom.type_symbol))), // atom
-        B.fn(f => f.lazy, B.Struct.prop(p => p.atom.type_symbol)) // group by
+        true, // entity
+        true, // chain
+        B.rel(e => e.eq, B.Struct.prop(p => p.residue.label_comp_id), 'HEM'), // residue
+        B.set(e => e.has, B.ctor(c => c.set, es('C'), es('N')), B.Struct.prop(p => p.atom.type_symbol)), // atom
+        B.Struct.prop(p => p.atom.type_symbol) // group by
     );
 
     console.log(lispFormat(q));

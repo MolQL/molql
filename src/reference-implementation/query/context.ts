@@ -33,6 +33,15 @@ namespace Context {
     }
 
     export namespace ElementAddress {
+        export function setAtomFull(ctx: Context, address: ElementAddress, atomIndex: number) {
+            const { atoms: { dataIndex, residueIndex }, residues: { chainIndex }, chains: { entityIndex }  } = ctx.model;
+            address.atom = atomIndex;
+            address.dataIndex = dataIndex[atomIndex];
+            address.residue = residueIndex[atomIndex];
+            address.chain = chainIndex[address.residue];
+            address.entity = entityIndex[address.chain];
+        }
+
         export function setAtom(ctx: Context, address: ElementAddress, atomIndex: number) {
             const { atoms: { dataIndex } } = ctx.model;
             address.atom = atomIndex;

@@ -18,7 +18,7 @@ interface Environment {
 
     readonly element: Iterator<Context.ElementAddress>,
     readonly atomSet: Iterator<AtomSet>,
-    readonly slots: { [index: number]: Slot }
+    readonly atomSetReducer: Slot
 }
 
 function Environment(queryCtx?: Context): Environment {
@@ -32,23 +32,8 @@ function Environment(queryCtx?: Context): Environment {
 
         element: Iterator(),
         atomSet: Iterator(),
-        slots: Object.create(null)
+        atomSetReducer: Slot()
     };
-}
-
-namespace Environment {
-    export function beginSlot({ slots }: Environment, i: number) {
-        let slot = slots[i];
-        if (!slot) {
-            slot = Slot();
-            slots[i] = slot;
-        }
-        return Slot.push(slot);
-    }
-
-    export function endSlot({ slots }: Environment, i: number) {
-        Slot.pop(slots[i]);
-    }
 }
 
 export default Environment;

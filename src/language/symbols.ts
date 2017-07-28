@@ -41,14 +41,6 @@ const primitive = {
             description: 'Creates a regular expression from a string using the ECMAscript syntax.'
         })
     },
-    functional: {
-        '@header': 'Operators',
-        lazy: symbol({
-            type: Type.fn(Type.tuple(), Type.anyValue),
-            args: [['value', Type.anyValue]],
-            description: 'Holds a value without evaluating it.'
-        }),
-    },
     operator: {
         '@header': 'Operators',
         logic: {
@@ -207,6 +199,15 @@ const structure = {
             args: [['max-distance', Type.Primitive.num]]
         })
     },
+    attrributes: {
+        '@header': 'Attributes',
+        atomKey: value(Type.anyValue),
+        residueKey: value(Type.anyValue),
+        chainKey: value(Type.anyValue),
+        entityKey: value(Type.anyValue),
+        atomProperty: symbol({ type: Type.anyValue, args:[['name', Type.Primitive.str]] }),
+        //operatorName: value(Type.Primitive.str)
+    },
     property: {
         '@header': 'Properties',
         atom: {
@@ -253,9 +254,6 @@ const structure = {
             '@header': 'Atom Sets',
             '@namespace': Type.Structure.atomSet.kind,
             atomCount: value(Type.Primitive.num),
-            isAmino: value(Type.Primitive.bool, 'Is the current atom set formed solely from amino acid atoms?'),
-            isNucleotide: value(Type.Primitive.bool, 'Is the current atom set formed solely from nucleotide atoms?'),
-            isLigand: value(Type.Primitive.bool, 'Is the current atom set formed solely from ligand atoms?'),
             reduce: {
                 accumulator: symbol({
                     type: Type.anyValue,
@@ -263,12 +261,12 @@ const structure = {
                     description: 'Compute a property of an atom set based on it\'s properties. The current value is assigned to the 0-th slot [``(primitive.functional.slot 0)``].'
                 }),
                 value: symbol({ type: Type.anyValue, description: 'Current value of the accumulator.' })
-            ,
+            },
             propertySet: symbol({
                 type: Type.Primitive.set,
                 args: [ ['prop', Type.anyValue] ],
                 description: 'Returns a set of unique properties from all atoms within the current atom set.'
-            }),}
+            })
         },
         atomSelection: {
             '@header': 'Atom Set Sequences',

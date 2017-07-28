@@ -3,13 +3,14 @@
  */
 
 import Symbols, { SymbolInfo } from '../../language/symbols'
-//import { FastSet, FastMap } from '../utils/collections'
 import Environment from './environment'
 import RuntimeExpression from './expression'
 import { ElementSymbol } from '../molecule/data'
 import AtomSelection from '../query/atom-selection'
 import { atomGroupsGenerator } from './molecule/generators'
+import { atomSetPropertySet, selectionPropertySet, accumulateAtomSet } from './molecule/attributes'
 import { Set, Map } from 'immutable'
+//import Compiler from '../compiler/compiler'
 
 namespace SymbolRuntime {
     export type Func<T = any> = (env: Environment, ...args: RuntimeExpression[]) => T
@@ -26,6 +27,12 @@ namespace SymbolRuntime {
 
 
 const staticAttribute: SymbolRuntime.Attribute[] = ['static-expr']
+
+// type SymbolRuntimeDefinition = {
+//     runtime: SymbolRuntime.Func,
+//     compile?: (...args: Compiler.CompiledExpression[]) => Compiler.CompiledExpression,
+//     attributes?: SymbolRuntime.Attribute | SymbolRuntime.Attribute[]
+// }
 
 type CompileInfo = [SymbolInfo, SymbolRuntime.Func] | [SymbolInfo, SymbolRuntime.Func, SymbolRuntime.Attribute[]]
 export const SymbolTable: CompileInfo[] = [
@@ -68,9 +75,6 @@ export const SymbolTable: CompileInfo[] = [
         (env, expr, flags) => new RegExp(expr(env), flags ? flags(env) : ''),
         staticAttribute
     ],
-
-    // ============= FUNCTIONAL =============
-    [Symbols.primitive.functional.lazy, (env, x) => x],
 
     // ============= OPERATORS =============
     [Symbols.primitive.operator.logic.not, (env, x) => !x(env), staticAttribute],
@@ -228,31 +232,14 @@ export const SymbolTable: CompileInfo[] = [
     [Symbols.structure.property.entity.label_entity_id, env => env.atom_site.label_entity_id.getString(env.element.value.dataIndex)],
 
     // ============= ATOM SET PROPERTIES =============
-    [
-        Symbols.structure.property.atomSet.atomCount,
-        env => env.atomSet.value.atomIndices.length
-    ],
-    // [
-    //     Symbols.structure.property.atomSet.reduce,
-    //     (env, f: RuntimeExpression<any>, initial: RuntimeExpression<any>) => {
-    //         const slot = Query.Iterator.beginSlot(env, 0, initial(env));
-    //         Query.Iterator.begin(env.element, Query.Iterator.Element());
-    //         for (const atom of env.atomSet.value.atomIndices) {
-    //             Query.Iterator.setAtomElement(env, atom);
-    //             slot.value = f(env);
-    //         }
-    //         const reduced = slot.value;
-    //         Query.Iterator.endSlot(env, 0);
-    //         Query.Iterator.end(env.element);
-    //         return reduced;
-    //     }
-    // ],
+    [Symbols.structure.property.atomSet.atomCount, env => env.atomSet.value.atomIndices.length],
+    [Symbols.structure.property.atomSet.propertySet, (env, prop) => atomSetPropertySet(env, prop)],
+    [Symbols.structure.property.atomSet.reduce.accumulator, accumulateAtomSet],
+    [Symbols.structure.property.atomSet.reduce.value, (env) => env.atomSetReducer.value],
 
     // ============= ATOM SEQ SEQ PROPERTIES =============
-    [
-        Symbols.structure.property.atomSelection.length,
-        (env, seq: RuntimeExpression<AtomSelection>) => seq(env).atomSets.length
-    ],
+    [Symbols.structure.property.atomSelection.length, (env, seq: RuntimeExpression<AtomSelection>) => seq(env).atomSets.length],
+    [Symbols.structure.property.atomSelection.propertySet, (env, prop, seq: RuntimeExpression<AtomSelection>) => selectionPropertySet(env, prop, seq(env))],
 
     // // ============= PRIMITIVES =============
     // [
@@ -283,13 +270,7 @@ export const SymbolTable: CompileInfo[] = [
     [
         Symbols.structure.generator.atomGroups,
         (env, entityP, chainP, residueP, atomP, groupBy) => {
-            return atomGroupsGenerator(env, {
-                entityP: entityP(env),
-                chainP: chainP(env),
-                residueP: residueP(env),
-                atomP: atomP(env),
-                groupBy: groupBy && groupBy(env)
-            });
+            return atomGroupsGenerator(env, { entityP, chainP, residueP, atomP,  groupBy });
         }
     ],
 
