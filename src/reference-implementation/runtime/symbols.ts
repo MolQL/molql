@@ -8,12 +8,13 @@ import RuntimeExpression from './expression'
 import { ElementSymbol } from '../molecule/data'
 import AtomSelection from '../query/atom-selection'
 import { atomGroupsGenerator } from './molecule/generators'
-import { atomSetPropertySet, selectionPropertySet, accumulateAtomSet } from './molecule/attributes'
+import * as MolQueryAttributes from './molecule/attributes'
 import { Set, Map } from 'immutable'
-//import Compiler from '../compiler/compiler'
+import Compiler from '../compiler/compiler'
 
 namespace SymbolRuntime {
-    export type Func<T = any> = (env: Environment, ...args: RuntimeExpression[]) => T
+    export type Func = (env: Environment, ...args: RuntimeExpression[]) => any
+    export type Compile = (ctx: Compiler.CompileContext, ...args: Compiler.CompiledExpression[]) => Compiler.CompiledExpression
 
     export type Attribute =
         | 'static-expr' // static expressions are independent from context if their children are also independent from context.
@@ -21,281 +22,284 @@ namespace SymbolRuntime {
     export interface Info {
         symbol: SymbolInfo,
         runtime: Func,
+        compile: Compile | undefined,
         attributes: Attribute[]
     }
 }
 
+type SymbolRuntimeDefinition = {
+    runtime: SymbolRuntime.Func,
+    compile?: SymbolRuntime.Compile,
+    attributes?: SymbolRuntime.Attribute[]
+}
 
-const staticAttribute: SymbolRuntime.Attribute[] = ['static-expr']
-
-// type SymbolRuntimeDefinition = {
-//     runtime: SymbolRuntime.Func,
-//     compile?: (...args: Compiler.CompiledExpression[]) => Compiler.CompiledExpression,
-//     attributes?: SymbolRuntime.Attribute | SymbolRuntime.Attribute[]
-// }
-
-type CompileInfo = [SymbolInfo, SymbolRuntime.Func] | [SymbolInfo, SymbolRuntime.Func, SymbolRuntime.Attribute[]]
-export const SymbolTable: CompileInfo[] = [
+type CompileInfo = [SymbolInfo, SymbolRuntimeDefinition]
+const symbolDefinitions: CompileInfo[] = [
     ////////////////////////////////////
     // Primitives
 
     // ============= CONSTRUCTORS =============
-    [Symbols.primitive.constructor.bool, (env, v) => !!v(env), staticAttribute],
-    [Symbols.primitive.constructor.number, (env, v) => +v(env), staticAttribute],
-    [Symbols.primitive.constructor.str, (env, v) => '' + v(env), staticAttribute],
+    [Symbols.primitive.constructor.bool, staticFunc((env, v) => !!v(env))],
+    [Symbols.primitive.constructor.number, staticFunc((env, v) => +v(env))],
+    [Symbols.primitive.constructor.str, staticFunc((env, v) => '' + v(env))],
     [
         Symbols.primitive.constructor.list,
-        function (env) {
+        staticFunc(function (env) {
             const list: any[] = [];
             for (let i = 1; i < arguments.length; i++) list[list.length] = arguments[i](env);
             return list;
-        },
-        staticAttribute
+        })
     ],
     [
         Symbols.primitive.constructor.set,
-        function(env) {
+        staticFunc(function(env) {
             const set = Set().asMutable();
             for (let i = 1; i < arguments.length; i++) set.add(arguments[i](env));
             return set.asImmutable();
-        },
-        staticAttribute
+        })
     ],
     [
         Symbols.primitive.constructor.map,
-        function (env) {
+        staticFunc(function (env) {
             const map = Map().asMutable();
             for (let i = 1; i < arguments.length; i += 2) map.set(arguments[i](env), arguments[i + 1](env));
             return map.asImmutable();
-        },
-        staticAttribute
+        })
     ],
-    [
-        Symbols.primitive.constructor.regex,
-        (env, expr, flags) => new RegExp(expr(env), flags ? flags(env) : ''),
-        staticAttribute
-    ],
+    [Symbols.primitive.constructor.regex, staticFunc((env, expr, flags) => new RegExp(expr(env), flags ? flags(env) : ''))],
 
     // ============= OPERATORS =============
-    [Symbols.primitive.operator.logic.not, (env, x) => !x(env), staticAttribute],
+
+    // ============= LOGIC ================
+    [Symbols.primitive.operator.logic.not, staticFunc((env, x) => !x(env))],
     [
         Symbols.primitive.operator.logic.and,
-        function (env) {
+        staticFunc(function (env) {
             for (let i = 1; i < arguments.length; i++) if (!arguments[i](env)) return false;
             return true;
-        },
-        staticAttribute
+        })
     ],
     [
         Symbols.primitive.operator.logic.or,
-        function (env) {
+        staticFunc(function (env) {
             for (let i = 1; i < arguments.length; i++) if (arguments[i](env)) return true;
             return false;
-        },
-        staticAttribute
+        })
     ],
 
-    [Symbols.primitive.operator.relational.eq, (env, x, y) => x(env) === y(env), staticAttribute],
-    [Symbols.primitive.operator.relational.neq, (env, x, y) => x(env) !== y(env), staticAttribute],
-    [Symbols.primitive.operator.relational.lt, (env, x, y) => x(env) < y(env), staticAttribute],
-    [Symbols.primitive.operator.relational.lte, (env, x, y) => x(env) <= y(env), staticAttribute],
-    [Symbols.primitive.operator.relational.gr, (env, x, y) => x(env) > y(env), staticAttribute],
-    [Symbols.primitive.operator.relational.gre, (env, x, y) => x(env) >= y(env), staticAttribute],
-    [
-        Symbols.primitive.operator.relational.inRange,
-        (env, x, a, b) => { const v = x(env); return v >= a(env) && v <= b(env) },
-        staticAttribute
-    ],
+    // ============= RELATIONAL ================
+    [Symbols.primitive.operator.relational.eq, staticFunc((env, x, y) => x(env) === y(env))],
+    [Symbols.primitive.operator.relational.neq, staticFunc((env, x, y) => x(env) !== y(env))],
+    [Symbols.primitive.operator.relational.lt, staticFunc((env, x, y) => x(env) < y(env))],
+    [Symbols.primitive.operator.relational.lte, staticFunc((env, x, y) => x(env) <= y(env))],
+    [Symbols.primitive.operator.relational.gr, staticFunc((env, x, y) => x(env) > y(env))],
+    [Symbols.primitive.operator.relational.gre, staticFunc((env, x, y) => x(env) >= y(env))],
+    [Symbols.primitive.operator.relational.inRange, staticFunc((env, x, a, b) => { const v = x(env); return v >= a(env) && v <= b(env) })],
 
+    // ============= ARITHMETIC ================
     [
         Symbols.primitive.operator.arithmetic.add,
-        function(env) {
+        staticFunc(function(env) {
             let ret = 0;
             for (let i = 1; i < arguments.length; i++) ret += arguments[i](env);
             return ret;
-        },
-        staticAttribute
+        })
     ],
-    [Symbols.primitive.operator.arithmetic.sub, (env, x, y) => x(env) - y(env), staticAttribute],
-    [Symbols.primitive.operator.arithmetic.minus, (env, x) => -x(env), staticAttribute],
+    [Symbols.primitive.operator.arithmetic.sub, staticFunc((env, x, y) => x(env) - y(env))],
+    [Symbols.primitive.operator.arithmetic.minus, staticFunc((env, x) => -x(env))],
     [
         Symbols.primitive.operator.arithmetic.mult,
-        function(env) {
+        staticFunc(function(env) {
             let ret = 1;
             for (let i = 1; i < arguments.length; i++) ret *= arguments[i](env);
             return ret;
-        },
-        staticAttribute
+        })
     ],
-    [Symbols.primitive.operator.arithmetic.div, (env, x, y) => x(env) / y(env), staticAttribute],
-    [Symbols.primitive.operator.arithmetic.pow, (env, x, y) => Math.pow(x(env), y(env)), staticAttribute],
+    [Symbols.primitive.operator.arithmetic.div, staticFunc((env, x, y) => x(env) / y(env))],
+    [Symbols.primitive.operator.arithmetic.pow, staticFunc((env, x, y) => Math.pow(x(env), y(env)))],
     [
         Symbols.primitive.operator.arithmetic.min,
-        function(env) {
+        staticFunc(function(env) {
             let ret = 0;
             for (let i = 1; i < arguments.length; i++) ret = Math.min(arguments[i](env), ret);
             return ret;
-        },
-        staticAttribute
+        })
     ],
     [
         Symbols.primitive.operator.arithmetic.max,
-        function(env) {
+        staticFunc(function(env) {
             let ret = 0;
             for (let i = 1; i < arguments.length; i++) ret = Math.max(arguments[i](env), ret);
             return ret;
-        },
-        staticAttribute
+        })
     ],
-    unary(Symbols.primitive.operator.arithmetic.floor, Math.floor),
-    unary(Symbols.primitive.operator.arithmetic.ceil, Math.ceil),
-    unary(Symbols.primitive.operator.arithmetic.roundInt, Math.round),
-    unary(Symbols.primitive.operator.arithmetic.abs, Math.abs),
-    unary(Symbols.primitive.operator.arithmetic.sin, Math.sin),
-    unary(Symbols.primitive.operator.arithmetic.cos, Math.cos),
-    unary(Symbols.primitive.operator.arithmetic.tan, Math.tan),
-    unary(Symbols.primitive.operator.arithmetic.asin, Math.asin),
-    unary(Symbols.primitive.operator.arithmetic.acos, Math.acos),
-    unary(Symbols.primitive.operator.arithmetic.atan, Math.atan),
-    [Symbols.primitive.operator.arithmetic.atan2, (env, x, y) => Math.atan2(x(env), y(env)), staticAttribute],
-    unary(Symbols.primitive.operator.arithmetic.sinh, Math.sinh),
-    unary(Symbols.primitive.operator.arithmetic.cosh, Math.cosh),
-    unary(Symbols.primitive.operator.arithmetic.tanh, Math.tanh),
-    unary(Symbols.primitive.operator.arithmetic.exp, Math.exp),
-    unary(Symbols.primitive.operator.arithmetic.log, Math.log),
-    unary(Symbols.primitive.operator.arithmetic.log10, Math.log10),
+    [Symbols.primitive.operator.arithmetic.floor, unaryFunc(Math.floor)],
+    [Symbols.primitive.operator.arithmetic.ceil, unaryFunc(Math.ceil)],
+    [Symbols.primitive.operator.arithmetic.roundInt, unaryFunc(Math.round)],
+    [Symbols.primitive.operator.arithmetic.abs, unaryFunc(Math.abs)],
+    [Symbols.primitive.operator.arithmetic.sin, unaryFunc(Math.sin)],
+    [Symbols.primitive.operator.arithmetic.cos, unaryFunc(Math.cos)],
+    [Symbols.primitive.operator.arithmetic.tan, unaryFunc(Math.tan)],
+    [Symbols.primitive.operator.arithmetic.asin, unaryFunc(Math.asin)],
+    [Symbols.primitive.operator.arithmetic.acos, unaryFunc(Math.acos)],
+    [Symbols.primitive.operator.arithmetic.atan, unaryFunc(Math.atan)],
+    [Symbols.primitive.operator.arithmetic.atan2, staticFunc((env, x, y) => Math.atan2(x(env), y(env)))],
+    [Symbols.primitive.operator.arithmetic.sinh, unaryFunc(Math.sinh)],
+    [Symbols.primitive.operator.arithmetic.cosh, unaryFunc(Math.cosh)],
+    [Symbols.primitive.operator.arithmetic.tanh, unaryFunc(Math.tanh)],
+    [Symbols.primitive.operator.arithmetic.exp, unaryFunc(Math.exp)],
+    [Symbols.primitive.operator.arithmetic.log, unaryFunc(Math.log)],
+    [Symbols.primitive.operator.arithmetic.log10, unaryFunc(Math.log10)],
 
+    // ============= STRING ================
     [
         Symbols.primitive.operator.string.concat,
-        function(env) {
+        staticFunc(function(env) {
             const ret: string[] = [];
             for (let i = 1; i < arguments.length; i++) ret.push('' + arguments[i](env));
             return ret.join('');
-        },
-        staticAttribute
+        })
     ],
     [
         Symbols.primitive.operator.string.match,
-        (env, regex: RuntimeExpression<RegExp>, str: RuntimeExpression<string>) => regex(env).test(str(env)),
-        staticAttribute
+        staticFunc((env, regex: RuntimeExpression<RegExp>, str: RuntimeExpression<string>) => regex(env).test(str(env)))
     ],
 
-    [Symbols.primitive.operator.set.has, (env, set: RuntimeExpression<Set<any>>, v) => set(env).has(v(env)), staticAttribute],
-    [Symbols.primitive.operator.set.add, (env, set: RuntimeExpression<Set<any>>, v) => set(env).add(v(env)), staticAttribute],
+    // ============= SET ================
+    [Symbols.primitive.operator.set.has, staticFunc((env, set: RuntimeExpression<Set<any>>, v) => set(env).has(v(env)))],
+    [Symbols.primitive.operator.set.add, staticFunc((env, set: RuntimeExpression<Set<any>>, v) => set(env).add(v(env)))],
 
+    // ============= MAP ================
     [
         Symbols.primitive.operator.map.get,
-        (env, map: RuntimeExpression<Map<any, any>>, key, def) => {
+        staticFunc((env, map: RuntimeExpression<Map<any, any>>, key, def) => {
             const m = map(env), k = key(env);
             if (m.has(k)) return m.get(k);
             return def(env);
-        },
-        staticAttribute
+        })
     ],
-    [Symbols.primitive.operator.map.set, (env, map: RuntimeExpression<Map<any, any>>, key, v) => map(env).set(key(env), v(env)), staticAttribute],
+    [Symbols.primitive.operator.map.set, staticFunc((env, map: RuntimeExpression<Map<any, any>>, key, v) => map(env).set(key(env), v(env)))],
 
     ////////////////////////////////////
     // Structure
 
     // ============= CONSTRUCTORS =============
-    [
-        Symbols.structure.constructor.elementSymbol,
-        (env, s: RuntimeExpression<string>) => ElementSymbol(s(env)),
-        staticAttribute
-    ],
+    [Symbols.structure.constructor.elementSymbol, staticFunc((env, s: RuntimeExpression<string>) => ElementSymbol(s(env)))],
 
-    // ============= ATOM PROPERTIES =============
-    [Symbols.structure.property.atom.uniqueId, env => env.element.value.atom],
-    [Symbols.structure.property.atom.id, env => env.atom_site.id.getInteger(env.element.value.dataIndex)],
-    [Symbols.structure.property.atom.Cartn_x, env => env.positions.x[env.element.value.atom]],
-    [Symbols.structure.property.atom.Cartn_y, env => env.positions.y[env.element.value.atom]],
-    [Symbols.structure.property.atom.Cartn_z, env => env.positions.z[env.element.value.atom]],
+    // ============= ATTRIBUTES =============
 
-    [Symbols.structure.property.atom.label_atom_id, env => env.atom_site.label_atom_id.getString(env.element.value.dataIndex)],
-    [Symbols.structure.property.atom.type_symbol, env => ElementSymbol(env.atom_site.type_symbol.getString(env.element.value.dataIndex))],
-    [Symbols.structure.property.atom.occupancy, env => env.atom_site.occupancy.getFloat(env.element.value.dataIndex)],
-    [Symbols.structure.property.atom.B_iso_or_equiv, env => env.atom_site.B_iso_or_equiv.getFloat(env.element.value.dataIndex)],
+    [Symbols.structure.attribute.staticAtomProperty, compiledFunc((ctx, name) => MolQueryAttributes.staticAtomProperty(getCompiledValue(name)))],
 
-    // ============= RESIDUE PROPERTIES =============
-    [Symbols.structure.property.residue.uniqueId, env => env.element.value.residue],
-    [Symbols.structure.property.residue.isHet, env => !env.atom_site.group_PDB.stringEquals(env.element.value.dataIndex, 'ATOM')],
-    [Symbols.structure.property.residue.label_seq_id, env => env.atom_site.label_seq_id.getInteger(env.element.value.dataIndex)],
-    [Symbols.structure.property.residue.label_comp_id, env => env.atom_site.label_comp_id.getString(env.element.value.dataIndex)],
-    [Symbols.structure.property.residue.pdbx_PDB_ins_code, env => env.atom_site.pdbx_PDB_ins_code.getString(env.element.value.dataIndex)],
+    // // ============= ATOM PROPERTIES =============
+    // [Symbols.structure.property.atom.uniqueId, env => env.element.value.atom],
+    // [Symbols.structure.property.atom.id, env => env.atom_site.id.getInteger(env.element.value.dataIndex)],
+    // [Symbols.structure.property.atom.Cartn_x, env => env.positions.x[env.element.value.atom]],
+    // [Symbols.structure.property.atom.Cartn_y, env => env.positions.y[env.element.value.atom]],
+    // [Symbols.structure.property.atom.Cartn_z, env => env.positions.z[env.element.value.atom]],
 
-    // ============= CHAIN PROPERTIES =============
-    [Symbols.structure.property.chain.uniqueId, env => env.element.value.chain],
-    [Symbols.structure.property.chain.label_asym_id, env => env.atom_site.label_asym_id.getString(env.element.value.dataIndex)],
+    // [Symbols.structure.property.atom.label_atom_id, env => env.atom_site.label_atom_id.getString(env.element.value.dataIndex)],
+    // [Symbols.structure.property.atom.type_symbol, env => ElementSymbol(env.atom_site.type_symbol.getString(env.element.value.dataIndex))],
+    // [Symbols.structure.property.atom.occupancy, env => env.atom_site.occupancy.getFloat(env.element.value.dataIndex)],
+    // [Symbols.structure.property.atom.B_iso_or_equiv, env => env.atom_site.B_iso_or_equiv.getFloat(env.element.value.dataIndex)],
 
-    // ============= ENTITY PROPERTIES =============
-    [Symbols.structure.property.entity.uniqueId, env => env.element.value.entity],
-    [Symbols.structure.property.entity.label_entity_id, env => env.atom_site.label_entity_id.getString(env.element.value.dataIndex)],
+    // // ============= RESIDUE PROPERTIES =============
+    // [Symbols.structure.property.residue.uniqueId, env => env.element.value.residue],
+    // [Symbols.structure.property.residue.isHet, env => !env.atom_site.group_PDB.stringEquals(env.element.value.dataIndex, 'ATOM')],
+    // [Symbols.structure.property.residue.label_seq_id, env => env.atom_site.label_seq_id.getInteger(env.element.value.dataIndex)],
+    // [Symbols.structure.property.residue.label_comp_id, env => env.atom_site.label_comp_id.getString(env.element.value.dataIndex)],
+    // [Symbols.structure.property.residue.pdbx_PDB_ins_code, env => env.atom_site.pdbx_PDB_ins_code.getString(env.element.value.dataIndex)],
 
-    // ============= ATOM SET PROPERTIES =============
-    [Symbols.structure.property.atomSet.atomCount, env => env.atomSet.value.atomIndices.length],
-    [Symbols.structure.property.atomSet.propertySet, (env, prop) => atomSetPropertySet(env, prop)],
-    [Symbols.structure.property.atomSet.reduce.accumulator, accumulateAtomSet],
-    [Symbols.structure.property.atomSet.reduce.value, (env) => env.atomSetReducer.value],
+    // // ============= CHAIN PROPERTIES =============
+    // [Symbols.structure.property.chain.uniqueId, env => env.element.value.chain],
+    // [Symbols.structure.property.chain.label_asym_id, env => env.atom_site.label_asym_id.getString(env.element.value.dataIndex)],
 
-    // ============= ATOM SEQ SEQ PROPERTIES =============
-    [Symbols.structure.property.atomSelection.length, (env, seq: RuntimeExpression<AtomSelection>) => seq(env).atomSets.length],
-    [Symbols.structure.property.atomSelection.propertySet, (env, prop, seq: RuntimeExpression<AtomSelection>) => selectionPropertySet(env, prop, seq(env))],
+    // // ============= ENTITY PROPERTIES =============
+    // [Symbols.structure.property.entity.uniqueId, env => env.element.value.entity],
+    // [Symbols.structure.property.entity.label_entity_id, env => env.atom_site.label_entity_id.getString(env.element.value.dataIndex)],
 
-    // // ============= PRIMITIVES =============
-    // [
-    //     Symbols.structure.primitive.modify,
-    //     (env, seq: RuntimeExpression<Query.AtomSetSeq>, f: RuntimeExpression<Query.AtomSetSeq>) => {
-    //         const result = new QueryHelpers.HashAtomSetSeqBuilder(env);
-    //         const iterator = env.atomSet;
-    //         Query.Iterator.begin(iterator, void 0);
-    //         for (const src of seq(env).atomSets) {
-    //             iterator.value = src;
-    //             for (const set of f(env).atomSets) {
-    //                 result.add(set);
-    //             }
-    //         }
-    //         Query.Iterator.end(iterator);
-    //         return result.getSeq();
-    //     }
-    // ],
-    // [
-    //     Symbols.structure.primitive.inContext,
-    //     (env, newenv: RuntimeExpression<Query.Context>, query: RuntimeExpression<Query.AtomSetSeq>) => {
-    //         if (env.element.value || env.atomSet.value) throw new Error('Context cannot be changed inside a generator or modifier query.');
-    //         return query(newenv(env));
-    //     }
-    // ],
+    // // ============= ATOM SET PROPERTIES =============
+    // [Symbols.structure.property.atomSet.atomCount, env => env.atomSet.value.atomIndices.length],
+    // [Symbols.structure.property.atomSet.propertySet, (env, prop) => atomSetPropertySet(env, prop)],
+    // [Symbols.structure.property.atomSet.reduce.accumulator, accumulateAtomSet],
+    // [Symbols.structure.property.atomSet.reduce.value, (env) => env.atomSetReducer.value],
+
+    // // ============= ATOM SEQ SEQ PROPERTIES =============
+    // [Symbols.structure.property.atomSelection.length, (env, seq: RuntimeExpression<AtomSelection>) => seq(env).atomSets.length],
+    // [Symbols.structure.property.atomSelection.propertySet, (env, prop, seq: RuntimeExpression<AtomSelection>) => selectionPropertySet(env, prop, seq(env))],
+
+    // // // ============= PRIMITIVES =============
+    // // [
+    // //     Symbols.structure.primitive.modify,
+    // //     (env, seq: RuntimeExpression<Query.AtomSetSeq>, f: RuntimeExpression<Query.AtomSetSeq>) => {
+    // //         const result = new QueryHelpers.HashAtomSetSeqBuilder(env);
+    // //         const iterator = env.atomSet;
+    // //         Query.Iterator.begin(iterator, void 0);
+    // //         for (const src of seq(env).atomSets) {
+    // //             iterator.value = src;
+    // //             for (const set of f(env).atomSets) {
+    // //                 result.add(set);
+    // //             }
+    // //         }
+    // //         Query.Iterator.end(iterator);
+    // //         return result.getSeq();
+    // //     }
+    // // ],
+    // // [
+    // //     Symbols.structure.primitive.inContext,
+    // //     (env, newenv: RuntimeExpression<Query.Context>, query: RuntimeExpression<Query.AtomSetSeq>) => {
+    // //         if (env.element.value || env.atomSet.value) throw new Error('Context cannot be changed inside a generator or modifier query.');
+    // //         return query(newenv(env));
+    // //     }
+    // // ],
 
     // ============= GENERATORS =============
     [
         Symbols.structure.generator.atomGroups,
-        (env, entityP, chainP, residueP, atomP, groupBy) => {
-            return atomGroupsGenerator(env, { entityP, chainP, residueP, atomP,  groupBy });
-        }
+        func((env, entityP, chainP, residueP, atomP, groupBy) => atomGroupsGenerator(env, { entityP, chainP, residueP, atomP,  groupBy }))
     ],
 
-    // // ============= MODIFIERS =============
-    // [
-    //     Symbols.structure.modifier.filter,
-    //     (env, pred: RuntimeExpression<boolean>) => {
-    //         if (pred(env)) return Query.AtomSetSeq(env, [env.atomSet.value]);
-    //         return Query.AtomSetSeq(env, []);
-    //     }
-    // ],
+    // // // ============= MODIFIERS =============
+    // // [
+    // //     Symbols.structure.modifier.filter,
+    // //     (env, pred: RuntimeExpression<boolean>) => {
+    // //         if (pred(env)) return Query.AtomSetSeq(env, [env.atomSet.value]);
+    // //         return Query.AtomSetSeq(env, []);
+    // //     }
+    // // ],
 ];
 
-function unary(symbol: SymbolInfo, f: (v: any) => any): CompileInfo {
-    return [symbol, (env, v) => f(v(env)), staticAttribute];
+function func(runtime: SymbolRuntime.Func): SymbolRuntimeDefinition {
+    return { runtime }
 }
 
+function staticFunc(runtime: SymbolRuntime.Func): SymbolRuntimeDefinition {
+    return { runtime, attributes: ['static-expr'] }
+}
+
+function compiledFunc(compile: SymbolRuntime.Compile): SymbolRuntimeDefinition {
+    return { runtime: (env) => { throw new Error('Cannot execute runtime of a compiled symbol.') }, compile, attributes: ['static-expr'] }
+}
+
+function getCompiledValue(e: Compiler.CompiledExpression) {
+    if (e.kind === 'value') return e.value;
+    throw new Error('Expected value.');
+}
+
+function unaryFunc(f: (v: any) => any): SymbolRuntimeDefinition {
+    return staticFunc((env, v) => f(v(env)));
+}
+
+export const SymbolTable: SymbolRuntime.Info[] = [];
 const SymbolRuntime = (function () {
     const table: { [name: string]: SymbolRuntime.Info } = Object.create(null);
-    for (const s of SymbolTable) {
+    for (const s of symbolDefinitions) {
         const name = s[0].name;
         if (table[name]) {
             throw new Error(`You've already implemented ${name}, dummy.`);
         }
-        table[name] = { symbol: s[0], runtime: s[1], attributes: s[2] as SymbolRuntime.Attribute[] || [] };
+        const info: SymbolRuntime.Info = { symbol: s[0], runtime: s[1].runtime, attributes: s[1].attributes || [], compile: s[1].compile };
+        table[name] = info;
+        SymbolTable.push(info);
     }
     return table;
 })();

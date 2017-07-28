@@ -30,12 +30,12 @@ function isStatic(expr: CompiledExpression) {
 }
 
 function apply(ctx: Compiler.CompileContext, head: CompiledExpression, args: CompiledExpression[]): CompiledExpression {
-    const runtime = compileRuntime(head.runtime, args.map(a => a.runtime));
+    const runtime = compileRuntime(head.runtime, args.map(a => a.runtime!));
 
     // collapse static nodes into a single value
     if (isStatic(head) && args.every(a => isStatic(a))) {
         const value = runtime(ctx.staticEnv);
-        return Compiler.value(ctx, value);
+        return Compiler.value(value);
     }
 
     return Compiler.CompiledExpression.apply(RuntimeExpression(runtime, {}));

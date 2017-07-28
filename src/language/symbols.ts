@@ -199,13 +199,13 @@ const structure = {
             args: [['max-distance', Type.Primitive.num]]
         })
     },
-    attrributes: {
+    attribute: {
         '@header': 'Attributes',
         atomKey: value(Type.anyValue),
         residueKey: value(Type.anyValue),
         chainKey: value(Type.anyValue),
         entityKey: value(Type.anyValue),
-        atomProperty: symbol({ type: Type.anyValue, args:[['name', Type.Primitive.str]] }),
+        staticAtomProperty: symbol({ type: Type.anyValue, args: [['name', Type.Primitive.str]] }),
         //operatorName: value(Type.Primitive.str)
     },
     property: {

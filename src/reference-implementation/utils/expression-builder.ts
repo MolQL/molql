@@ -4,6 +4,7 @@
 
 import Expression from '../../language/expression'
 import Symbols, { SymbolInfo } from '../../language/symbols'
+import { AtomProperties } from '../molecule/data'
 
 namespace Builder {
     function category<T>(symbols: T): (s: (cat: T) => SymbolInfo, ...args: Expression[]) => Expression {
@@ -24,8 +25,6 @@ namespace Builder {
 
     export namespace Struct {
         export const ctor = category(Symbols.structure.constructor);
-        export const prop = category(Symbols.structure.property);
-
         export const prim = category(Symbols.structure.primitive);
         export const gen = category(Symbols.structure.generator);
         export const mod = category(Symbols.structure.modifier);
@@ -34,6 +33,10 @@ namespace Builder {
         export function modify(what: Expression, modifier: Expression) { return prim(s => s.modify, what, modifier); }
         export function combine(combinator: (c: typeof comb) => Expression, ...seqs: Expression[]) {
             return prim(s => s.combine, combinator(comb), ...seqs);
+        }
+
+        export function atomProperty(name: AtomProperties) {
+            return Expression.apply(Expression.symbol(Symbols.structure.attribute.staticAtomProperty.name), [name]);
         }
 
         combine(c => c(t => t.filter, 0), )

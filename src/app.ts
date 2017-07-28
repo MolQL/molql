@@ -18,7 +18,7 @@ import Context from './reference-implementation/query/context'
 import AtomSelection from './reference-implementation/query/atom-selection'
 import { getSymbolsWithoutImplementation } from './language/symbols'
 
-const notImplemented = getSymbolsWithoutImplementation(SymbolTable.map(s => s[0]));
+const notImplemented = getSymbolsWithoutImplementation(SymbolTable.map(s => s.symbol));
 console.log(notImplemented.map(s => s.name).join('\n'));
 
 const expr = B.math(s => s.mult, 1, 2, 3);
@@ -82,9 +82,9 @@ function run(model: Model) {
         g => g.atomGroups,
         true, // entity
         true, // chain
-        B.rel(e => e.eq, B.Struct.prop(p => p.residue.label_comp_id), 'HEM'), // residue
-        B.set(e => e.has, B.ctor(c => c.set, es('C'), es('N')), B.Struct.prop(p => p.atom.type_symbol)), // atom
-        B.Struct.prop(p => p.atom.type_symbol) // group by
+        true, //B.rel(e => e.eq, B.Struct.atomProperty('auth_comp_id'), 'HEM'), // residue
+        B.Struct.atomProperty('is-het'),  //B.set(e => e.has, B.ctor(c => c.set, es('C'), es('N')), B.Struct.atomProperty('type_symbol')), // atom
+        B.Struct.atomProperty('type_symbol') // group by
     );
 
     console.log(lispFormat(q));
