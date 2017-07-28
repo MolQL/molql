@@ -10,7 +10,7 @@ import Optimizer from './optimizer'
 
 const { isLiteral, isSymbol } = Expression;
 
-function Compiler(expr: Expression): RuntimeExpression {
+function Compiler<T = any>(expr: Expression): RuntimeExpression<T> {
     return Compiler.compile({ staticEnv: Environment() }, expr).runtime;
 }
 

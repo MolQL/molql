@@ -3,7 +3,7 @@
  */
 
 import AtomSet from '../../query/atom-set'
-import AtomSetSeq from '../../query/atom-set-seq'
+import AtomSelection from '../../query/atom-selection'
 import Context from '../../query/context'
 import Environment from '../environment'
 import Iterator from '../iterator'
@@ -61,8 +61,8 @@ function atomGroupsIterator<BuildCtx>(env: Environment, { entityP, chainP, resid
 type FlatCtx = { atoms: number[] }
 function onFlatAtom(ctx: FlatCtx, i: number) { ctx.atoms.push(i); }
 
-type GroupCtx = { env: Environment, groupBy: RuntimeExpression, groups: FastMap<number, number[]>, atomSetSeq: number[][] }
-function onGroupAtom({ env, groupBy, groups, atomSetSeq }: GroupCtx, i: number) {
+type GroupCtx = { env: Environment, groupBy: RuntimeExpression, groups: FastMap<number, number[]>, selection: number[][] }
+function onGroupAtom({ env, groupBy, groups, selection }: GroupCtx, i: number) {
     const key = groupBy(env);
     let atomSet: number[];
     if (groups.has(key)) {
@@ -70,24 +70,24 @@ function onGroupAtom({ env, groupBy, groups, atomSetSeq }: GroupCtx, i: number) 
     } else {
         atomSet = [];
         groups.set(key, atomSet);
-        atomSetSeq.push(atomSet);
+        selection.push(atomSet);
     }
     atomSet.push(i);
 }
 
-export function atomGroupsGenerator(env: Environment, params: GeneratorParams): AtomSetSeq {
+export function atomGroupsGenerator(env: Environment, params: GeneratorParams): AtomSelection {
     if (params.groupBy) {
-        const ctx: GroupCtx = { env, groupBy: params.groupBy, groups: FastMap.create(), atomSetSeq: [] };
+        const ctx: GroupCtx = { env, groupBy: params.groupBy, groups: FastMap.create(), selection: [] };
         atomGroupsIterator(env, params, onGroupAtom, ctx);
-        const result = AtomSetSeq.linearAtomSetSeqBuilder(env.queryCtx);
-        for (const set of ctx.atomSetSeq) {
+        const result = AtomSelection.linearBuilder(env.queryCtx);
+        for (const set of ctx.selection) {
             result.add(AtomSet(env.queryCtx, set));
         }
         return result.getSeq();
     } else {
         const ctx: FlatCtx = { atoms: [] };
         atomGroupsIterator(env, params, onFlatAtom, ctx);
-        if (ctx.atoms.length) return AtomSetSeq(env.queryCtx, [AtomSet(env.queryCtx, ctx.atoms)]);
-        return AtomSetSeq(env.queryCtx, []);
+        if (ctx.atoms.length) return AtomSelection(env.queryCtx, [AtomSet(env.queryCtx, ctx.atoms)]);
+        return AtomSelection(env.queryCtx, []);
     }
 }

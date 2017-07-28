@@ -15,7 +15,7 @@ import lispFormat from './reference-implementation/utils/expression-lisp-formatt
 import Environment from './reference-implementation/runtime/environment'
 import { SymbolTable } from './reference-implementation/runtime/symbols'
 import Context from './reference-implementation/query/context'
-import AtomSetSeq from './reference-implementation/query/atom-set-seq'
+import AtomSelection from './reference-implementation/query/atom-selection'
 import { getSymbolsWithoutImplementation } from './language/symbols'
 
 const notImplemented = getSymbolsWithoutImplementation(SymbolTable.map(s => s[0]));
@@ -91,8 +91,8 @@ function run(model: Model) {
 
     const ctx = Context.ofModel(model);
     const env = Environment(ctx);
-    const r = compile(q);
-    const res = r(env) as AtomSetSeq;
+    const r = compile<AtomSelection>(q);
+    const res = r(env);
 
     console.log(res.atomSets.map(s => s.atomIndices));
 

@@ -7,7 +7,7 @@ import { FastSet, FastMap } from '../utils/collections'
 import Environment from './environment'
 import RuntimeExpression from './expression'
 import { ElementSymbol } from '../molecule/data'
-import AtomSetSeq from '../query/atom-set-seq'
+import AtomSelection from '../query/atom-selection'
 import { atomGroupsGenerator } from './molecule/generators'
 
 namespace SymbolRuntime {
@@ -282,8 +282,8 @@ export const SymbolTable: CompileInfo[] = [
 
     // ============= ATOM SEQ SEQ PROPERTIES =============
     [
-        Symbols.structure.property.atomSetSeq.length,
-        (env, seq: RuntimeExpression<AtomSetSeq>) => seq(env).atomSets.length
+        Symbols.structure.property.atomSelection.length,
+        (env, seq: RuntimeExpression<AtomSelection>) => seq(env).atomSets.length
     ],
 
     // // ============= PRIMITIVES =============

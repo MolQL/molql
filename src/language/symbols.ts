@@ -153,23 +153,24 @@ const structure = {
     constructor: {
         '@header': 'Constructors',
         elementSymbol: ctor(Type.Structure.elementSymbol, [['symbol', Type.Primitive.str]]),
-        atomSet: ctor(Type.Structure.atomSet, [['atom-indices', Type.oneOrMore(Type.Primitive.num)]]),
-        atomSetSeq: ctor(Type.Structure.atomSetSeq, [['sets', Type.zeroOrMore(Type.Structure.atomSet)]])
+        atomSet: ctor(Type.Structure.atomSet, [['atom-indices', Type.oneOrMore(Type.Primitive.num)]],
+            'A list of atom indices. This is a bit dodgy because the ordering can be de-facto orginary. Not 100% about including this into the language.'),
+        atomSelection: ctor(Type.Structure.atomSelection, [['sets', Type.zeroOrMore(Type.Structure.atomSet)]])
     },
     primitive: {
         modify: symbol({
-            type: Type.Structure.atomSetSeq,
-            args: [['seq', Type.Structure.atomSetSeq], ['f', Type.Structure.atomSetSeq]]
+            type: Type.Structure.atomSelection,
+            args: [['seq', Type.Structure.atomSelection], ['f', Type.Structure.atomSelection]]
         }),
         combine: symbol({
-            type: Type.Structure.atomSetSeq,
-            args: [['combinator', Type.Structure.atomSetSeq], ['seqs', Type.oneOrMore(Type.Structure.atomSetSeq)]]
+            type: Type.Structure.atomSelection,
+            args: [['combinator', Type.Structure.atomSelection], ['seqs', Type.oneOrMore(Type.Structure.atomSelection)]]
         })
     },
     generator: {
         '@header': 'Generators',
         atomGroups: symbol({
-            type: Type.Structure.atomSetSeq,
+            type: Type.Structure.atomSelection,
             args: [
                 ['entity-predicate', Type.Primitive.bool],
                 ['chain-predicate', Type.Primitive.bool],
@@ -179,37 +180,37 @@ const structure = {
             ]
         }),
         connectedComponents: symbol({
-            type: Type.Structure.atomSetSeq,
+            type: Type.Structure.atomSelection,
             description: 'Returns all covalently connected components.'
         })
     },
     modifier: {
         '@header': 'Atom Set Modifiers',
         filter: symbol({
-            type: Type.Structure.atomSetSeq,
+            type: Type.Structure.atomSelection,
             args: [['predicate', Type.Primitive.bool]]
         }),
         find: symbol({
             description: 'Executes the specified query in the context induced by each of the atoms sets in the sequence.',
-            type: Type.Structure.atomSetSeq,
-            args: [['query', Type.Structure.atomSetSeq]]
+            type: Type.Structure.atomSelection,
+            args: [['query', Type.Structure.atomSelection]]
         }),
     },
     combinator: {
         '@header': 'Sequence Combinators',
         intersectWith: symbol({
-            type: Type.Structure.atomSetSeq,
+            type: Type.Structure.atomSelection,
         }),
         merge: symbol({
-            type: Type.Structure.atomSetSeq,
+            type: Type.Structure.atomSelection,
         }),
         union: symbol({
             description: 'Collects all atom sets in the sequence into a single atom set.',
-            type: Type.Structure.atomSetSeq,
+            type: Type.Structure.atomSelection,
         }),
         near: symbol({
             description: 'Merges all tuples of atom sets that are mutually no further than the specified threshold.',
-            type: Type.Structure.atomSetSeq,
+            type: Type.Structure.atomSelection,
             args: [['max-distance', Type.Primitive.num]]
         })
     },
@@ -269,18 +270,23 @@ const structure = {
                     description: 'Compute a property of an atom set based on it\'s properties. The current value is assigned to the 0-th slot [``(primitive.functional.slot 0)``].'
                 }),
                 value: symbol({ type: Type.anyValue, description: 'Current value of the accumulator.' })
-            }
+            ,
+            propertySet: symbol({
+                type: Type.Primitive.set,
+                args: [ ['prop', Type.anyValue] ],
+                description: 'Returns a set of unique properties from all atoms within the current atom set.'
+            }),}
         },
-        atomSetSeq: {
+        atomSelection: {
             '@header': 'Atom Set Sequences',
-            '@namespace': Type.Structure.atomSetSeq.kind,
+            '@namespace': Type.Structure.atomSelection.kind,
             length: symbol({
-                type: Type.Structure.atomSetSeq,
-                args: [ ['seq', Type.Structure.atomSetSeq] ]
+                type: Type.Structure.atomSelection,
+                args: [ ['seq', Type.Structure.atomSelection] ]
             }),
             propertySet: symbol({
                 type: Type.Primitive.set,
-                args: [ ['prop', Type.anyValue], ['seq', Type.Structure.atomSetSeq] ],
+                args: [ ['prop', Type.anyValue], ['seq', Type.Structure.atomSelection] ],
                 description: 'Returns a set of unique properties from all atoms within the source sequence.'
             }),
         }

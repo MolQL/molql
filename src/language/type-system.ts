@@ -20,7 +20,7 @@ type Type =
     | Type.Primitive.Set
     | Type.Structure.ElementSymbol
     | Type.Structure.AtomSet
-    | Type.Structure.AtomSetSeq
+    | Type.Structure.AtomSelection
     | Type.Function
     | Type.Tuple
     | Type.ZeroOrMore
@@ -60,11 +60,11 @@ namespace Type {
     export namespace Structure {
         export interface ElementSymbol extends Base { kind: 'element-symbol' }
         export interface AtomSet extends Base { kind: 'atom-set' }
-        export interface AtomSetSeq extends Base { kind: 'atom-set-seq' }
+        export interface AtomSelection extends Base { kind: 'atom-selection' }
 
         export const elementSymbol: ElementSymbol = { kind: 'element-symbol' };
         export const atomSet: AtomSet = { kind: 'atom-set' };
-        export const atomSetSeq: AtomSetSeq = { kind: 'atom-set-seq' };
+        export const atomSelection: AtomSelection = { kind: 'atom-selection' };
     }
 
     export interface Function { kind: 'function', args: Type, result: Type }

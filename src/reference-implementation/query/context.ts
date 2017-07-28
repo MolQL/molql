@@ -5,7 +5,7 @@
 import * as MolData from '../molecule/data'
 import Mask from '../utils/mask'
 import AtomSet from './atom-set'
-import AtomSetSeq from './atom-set-seq'
+import AtomSelection from './atom-selection'
 
 interface Context {
     readonly model: MolData.Model,
@@ -24,8 +24,8 @@ namespace Context {
         return Context(model, Mask.ofIndices(model.atoms.count, atomSet.atomIndices));
     }
 
-    export function ofAtomSetSeq(model: MolData.Model, atomSetSeq: AtomSetSeq) {
-        return Context(model, AtomSetSeq.getMask(atomSetSeq));
+    export function ofAtomSelection(model: MolData.Model, atomSelection: AtomSelection) {
+        return Context(model, AtomSelection.getMask(atomSelection));
     }
 
     export function ofModel(model: MolData.Model) {

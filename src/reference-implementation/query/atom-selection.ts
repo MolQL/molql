@@ -7,11 +7,11 @@ import Mask from '../utils/mask'
 import Context from './context'
 import AtomSet from './atom-set'
 
-type AtomSetSeq = { context: Context, atomSets: AtomSet[] }
-function AtomSetSeq(context: Context, atomSets: AtomSet[]): AtomSetSeq { return { context, atomSets }; }
+type AtomSelection = { context: Context, atomSets: AtomSet[] }
+function AtomSelection(context: Context, atomSets: AtomSet[]): AtomSelection { return { context, atomSets }; }
 
-namespace AtomSetSeq {
-    export function flatten(seq: AtomSetSeq): AtomSet {
+namespace AtomSelection {
+    export function flatten(seq: AtomSelection): AtomSet {
         if (!seq.atomSets.length) return AtomSet(seq.context, []);
         if (seq.atomSets.length === 1) return seq.atomSets[0];
 
@@ -24,7 +24,7 @@ namespace AtomSetSeq {
         return AtomSet(seq.context, sortAsc(atoms.array));
     }
 
-    export function getMask(seq: AtomSetSeq) {
+    export function getMask(seq: AtomSelection) {
         const count = seq.context.model.atoms.count;
         if (!seq.atomSets.length) return Mask.never;
         if (seq.atomSets.length === 1) return Mask.ofIndices(count, seq.atomSets[0].atomIndices);
@@ -53,9 +53,9 @@ namespace AtomSetSeq {
         }
     }
 
-    export interface Builder { add(atomSet: AtomSet): Builder, getSeq(): AtomSetSeq }
+    export interface Builder { add(atomSet: AtomSet): Builder, getSeq(): AtomSelection }
 
-    class AtomSetSeqBuilder implements Builder {
+    class LinearSelectionBuilder implements Builder {
         private atomSets: AtomSet[] = [];
 
         add(atomSet: AtomSet) {
@@ -64,13 +64,13 @@ namespace AtomSetSeq {
         }
 
         getSeq() {
-            return AtomSetSeq(this.ctx, this.atomSets);
+            return AtomSelection(this.ctx, this.atomSets);
         }
 
         constructor(private ctx: Context) { }
     }
 
-    class HashAtomSetSeqBuilder implements Builder {
+    class HashSelectionBuilder implements Builder {
         private atomSets: AtomSet[] = [];
         private byHash = FastMap.create<number, AtomSet[]>();
 
@@ -95,19 +95,19 @@ namespace AtomSetSeq {
         }
 
         getSeq() {
-            return AtomSetSeq(this.ctx, this.atomSets);
+            return AtomSelection(this.ctx, this.atomSets);
         }
 
         constructor(private ctx: Context) { }
     }
 
-    export function uniqueAtomSetSeqBuilder(ctx: Context): Builder {
-        return new HashAtomSetSeqBuilder(ctx);
+    export function uniqueBuilder(ctx: Context): Builder {
+        return new HashSelectionBuilder(ctx);
     }
 
-    export function linearAtomSetSeqBuilder(ctx: Context): Builder {
-        return new AtomSetSeqBuilder(ctx);
+    export function linearBuilder(ctx: Context): Builder {
+        return new LinearSelectionBuilder(ctx);
     }
 }
 
-export default AtomSetSeq
+export default AtomSelection
