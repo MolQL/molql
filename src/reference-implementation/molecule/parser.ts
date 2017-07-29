@@ -105,9 +105,9 @@ function createModel(data: Data, startRow: number, rowCount: number): Model {
     };
 }
 
-function getElementKey(map: FastMap<string | number, number>, key: string | number) {
+function getElementKey(map: FastMap<string | number, number>, key: string | number, counter: { index: number }) {
     if (map.has(key)) return map.get(key)!;
-    const ret = map.size;
+    const ret = counter.index++;
     map.set(key, ret);
     return ret;
 }
@@ -120,9 +120,9 @@ function getElementSubstructureKeyMap(map: FastMap<number, FastMap<string, numbe
 }
 
 function assignKeys(model: Model) {
-    const entityMap = FastMap.create<string, number>();
-    const chainMaps = FastMap.create<number, FastMap<string, number>>();
-    const residueMaps = FastMap.create<number, FastMap<string, number>>();
+    const entityMap = FastMap.create<string, number>(), entityCounter = { index: 0 };
+    const chainMaps = FastMap.create<number, FastMap<string, number>>(), chainCounter = { index: 0 };;
+    const residueMaps = FastMap.create<number, FastMap<string, number>>(), residueCounter = { index: 0 };;
 
     const { dataIndex } = model.atoms;
     const { key: residueKey, atomStartIndex } = model.residues;
@@ -135,21 +135,21 @@ function assignKeys(model: Model) {
         const chainStart = chainStartIndex[eI], chainEnd = chainEndIndex[eI];
         let dataRow = dataIndex[atomStartIndex[residueStartIndex[chainStart]]];
 
-        const eKey = getElementKey(entityMap, label_entity_id.getString(dataRow)!);
+        const eKey = getElementKey(entityMap, label_entity_id.getString(dataRow)!, entityCounter);
         entityKey[eI] = eKey;
         const chainMap = getElementSubstructureKeyMap(chainMaps, eKey);
         for (let cI = chainStart; cI < chainEnd; cI++) {
             const residueStart = residueStartIndex[cI], residueEnd = residueEndIndex[cI];
             dataRow = dataIndex[atomStartIndex[residueStart]];
 
-            const cKey = getElementKey(chainMap, auth_asym_id.getString(dataRow)!);
+            const cKey = getElementKey(chainMap, auth_asym_id.getString(dataRow)!, chainCounter);
             chainKey[cI] = cKey;
             const residueMap = getElementSubstructureKeyMap(residueMaps, cKey);
             for (let rI = residueStart; rI < residueEnd; rI++) {
                 dataRow = dataIndex[atomStartIndex[rI]];
                 residueKey[rI] = getElementKey(residueMap, pdbx_PDB_ins_code.getValuePresence(dataRow) !== CIF.ValuePresence.Present
                     ? auth_seq_id.getInteger(dataRow)
-                    : `${auth_seq_id.getInteger(dataRow)} ${pdbx_PDB_ins_code.getString(dataRow)}`);
+                    : `${auth_seq_id.getInteger(dataRow)} ${pdbx_PDB_ins_code.getString(dataRow)}`, residueCounter);
             }
         }
     }
