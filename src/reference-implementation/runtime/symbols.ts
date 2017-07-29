@@ -197,7 +197,7 @@ const symbolDefinitions: CompileInfo[] = [
     [Symbols.structure.attribute.staticAtomProperty, compiledFunc((ctx, name) => MolQueryAttributes.staticAtomProperty(ctx, getCompiledValue(name)))],
 
     // ============= ATOM SETS =============
-    [Symbols.structure.atomSet.atomCount, func(env => AtomSet.atomIndices(env.atomSet.value).length)],
+    [Symbols.structure.atomSet.atomCount, func(env => AtomSet.count(env.atomSet.value))],
     [Symbols.structure.atomSet.propertySet, func((env, prop) => MolQueryAttributes.atomSetPropertySet(env, prop))],
     [Symbols.structure.atomSet.reduce.accumulator, func(MolQueryAttributes.accumulateAtomSet)],
     [Symbols.structure.atomSet.reduce.value, func(env => env.atomSetReducer.value)],

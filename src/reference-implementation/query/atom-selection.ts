@@ -22,7 +22,7 @@ namespace AtomSelection {
 
     export function atomSets(selection: AtomSelection) { return (selection as AtomSelectionImpl).atomSets; }
 
-    export function flatten(seq: AtomSelection): AtomSet {
+    export function toAtomSet(seq: AtomSelection): AtomSet {
         const sets = atomSets(seq);
         const length = sets.length;
         if (!length) return AtomSet.empty;
@@ -37,19 +37,18 @@ namespace AtomSelection {
     export function getMask(seq: AtomSelection) {
         const sets = atomSets(seq);
         if (!sets.length) return Mask.never;
-        if (sets.length === 1) return Mask.ofUniqueIndices(AtomSet.atomIndices(sets[0]));
+        if (sets.length === 1) return AtomSet.getMask(sets[0]);
 
         let estSize = 0, max = 0;
         for (const atomSet of sets) {
-            const indices = AtomSet.atomIndices(atomSet);
-            estSize += indices.length;
-            for (const i of indices) {
+            estSize += AtomSet.count(atomSet);
+            for (const i of AtomSet.atomIndices(atomSet)) {
                 if (i > max) max = i;
             }
         }
 
         if ((estSize / max) > (1 / 12)) {
-            const mask = new Uint8Array(max);
+            const mask = new Uint8Array(max + 1);
             let size = 0;
             for (const atomSet of sets) {
                 for (const a of AtomSet.atomIndices(atomSet)) {

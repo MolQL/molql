@@ -103,8 +103,6 @@ namespace Mask {
         }
         if (len === max) return new AllMask(len);
 
-
-
         const f = len / max;
         if (f < 1 / 12) {
             const set = FastSet.create<number>();
@@ -112,7 +110,7 @@ namespace Mask {
             return new SetMask(set);
         }
 
-        const mask = new Int8Array(max);
+        const mask = new Int8Array(max + 1);
         let size = 0;
         for (const i of (indices as number[])) {
             mask[i] = 1;

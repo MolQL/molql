@@ -18,21 +18,33 @@ interface AtomSetImpl extends AtomSet {
     boundingSphere: { center: [number, number, number], radius: number } | undefined
 }
 
-function AtomSetImpl(indices: ArrayLike<number>): AtomSetImpl { return { atomIndices: indices as ReadonlyArray<number>, hashCode: 0, hashCodeComputed: false, hierarchy: void 0, boundingSphere: void 0 } }
+function AtomSetImpl(indices: ArrayLike<number>): AtomSetImpl {
+    return { 
+        atomIndices: indices as ReadonlyArray<number>,
+        hashCode: 0,
+        hashCodeComputed: false,
+        hierarchy: void 0,
+        boundingSphere: void 0
+    };
+}
 
 namespace AtomSet {
     export const empty = AtomSet([]);
 
-    export function atomIndices(a: AtomSet): ReadonlyArray<number> {
+    export function count(a: AtomSet) {
+        return (a as AtomSetImpl).atomIndices.length;
+    }
+
+    export function atomIndices(a: AtomSet) {
         return (a as AtomSetImpl).atomIndices;
     }
 
     export function getMask(a: AtomSet) {
-        return Mask.ofUniqueIndices(atomIndices(a));
+        return Mask.ofUniqueIndices((a as AtomSetImpl).atomIndices);
     }
 
     export function areEqual(a: AtomSet, b: AtomSet) {
-        const xs = atomIndices(a), ys = atomIndices(b);
+        const xs = (a as AtomSetImpl).atomIndices, ys = (b as AtomSetImpl).atomIndices;
         if (xs.length !== ys.length) return false;
         for (let i = 0, _i = xs.length; i < _i; i++) {
             if (xs[i] !== ys[i]) return false;
@@ -104,25 +116,28 @@ namespace AtomSet {
     }
 
     export function distance(ctx: Context, a: AtomSet, b: AtomSet) {
+        if (a === b) return 0;
         let distSq = Number.POSITIVE_INFINITY;
         const { x, y, z } = ctx.model.positions;
-        const xs = atomIndices(a), ys = atomIndices(b);
+        const xs = (a as AtomSetImpl).atomIndices, ys = (b as AtomSetImpl).atomIndices;
         for (const i of xs) {
             for (const j of ys) {
                 const d = atomDistanceSq(x, y, z, i, j);
                 if (d < distSq) distSq = d;
             }
         }
-        return Math.sqrt(distSq);;
+        return Math.sqrt(distSq);
     }
 
     export function areWithin(ctx: Context, a: AtomSet, b: AtomSet, maxDistance: number) {
+        if (a === b) return true;
         const dSq = maxDistance * maxDistance;
         const { x, y, z } = ctx.model.positions;
-        const xs = atomIndices(a), ys = atomIndices(b);
+
+        const xs = (a as AtomSetImpl).atomIndices, ys = (b as AtomSetImpl).atomIndices;
         for (const i of xs) {
             for (const j of ys) {
-                if (atomDistanceSq(x, y, z, i, j) < dSq) return true;
+                if (atomDistanceSq(x, y, z, i, j) <= dSq) return true;
             }
         }
         return false;

@@ -32,7 +32,6 @@ console.log(lispFormat(expr));
 const comp = compile(expr);
 console.log(comp(Environment()));
 
-
 // function bb() {
 //     const v = compile(expr);
 //     let ret: any = [];
@@ -94,8 +93,9 @@ function run(model: Model) {
     const env = Environment(ctx);
     const r = compile<AtomSelection>(q);
     const res = r(env);
-
+  
     console.log(AtomSelection.atomSets(res).map(s => AtomSet.atomIndices(s)));
+    console.log(AtomSet.atomIndices(AtomSelection.toAtomSet(res)));
 
     //console.log(model.entities);
     //console.log(model.chains);
