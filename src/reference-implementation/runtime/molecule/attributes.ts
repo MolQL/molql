@@ -19,7 +19,7 @@ import ElementAddress = Context.ElementAddress
 function _atomSetPropertySet(env: Environment, atomSet: AtomSet, prop: RuntimeExpression, set: Set<any>) {
     const ctx = env.queryCtx;
     const element = Environment.beginIterateElemement(env);
-    for (const a of atomSet.atomIndices) {
+    for (const a of AtomSet.atomIndices(atomSet)) {
         ElementAddress.setAtom(ctx, element, a);
         set.add(prop(env));
     }
@@ -34,7 +34,7 @@ export function atomSetPropertySet(env: Environment, prop: RuntimeExpression) {
 
 export function selectionPropertySet(env: Environment, prop: RuntimeExpression, selection: AtomSelection) {
     const set = Set().asMutable();
-    for (const atomSet of selection.atomSets) {
+    for (const atomSet of AtomSelection.atomSets(selection)) {
         _atomSetPropertySet(env, atomSet, prop, set);
     }
     return set.asImmutable();
@@ -44,7 +44,7 @@ export function accumulateAtomSet(env: Environment, f: RuntimeExpression, initia
     const ctx = env.queryCtx;
     const slot = Slot.push(env.atomSetReducer, initial(env));
     const element = Environment.beginIterateElemement(env);
-    for (const a of env.atomSet.value.atomIndices) {
+    for (const a of AtomSet.atomIndices(env.atomSet.value)) {
         ElementAddress.setAtom(ctx, element, a);
         slot.value = f(env);
     }
@@ -52,7 +52,7 @@ export function accumulateAtomSet(env: Environment, f: RuntimeExpression, initia
     return Slot.pop(slot);
 }
 
-export function staticAtomProperty(name: StaticAtomProperties): Compiler.CompiledExpression {
+export function staticAtomProperty(compilerCtx: Compiler.CompileContext, name: StaticAtomProperties): Compiler.CompiledExpression {
     switch (name) {
         case 'group_PDB': return Compiler.CompiledExpression.apply(env => env.atom_site.group_PDB.getString(env.element.value.dataIndex));
         case 'id': return Compiler.CompiledExpression.apply(env => env.atom_site.id.getInteger(env.element.value.dataIndex));
@@ -79,6 +79,9 @@ export function staticAtomProperty(name: StaticAtomProperties): Compiler.Compile
         case 'is-het': return Compiler.CompiledExpression.apply(env => !env.atom_site.group_PDB.stringEquals(env.element.value.dataIndex, 'ATOM'));
         case 'operator-name': return Compiler.CompiledExpression.apply(env => '1_555');
 
-        default: throw new Error('Unknown static atom property name.');
+        default: {
+            compilerCtx.warnings.push(`Compiling undefined property '${name}'.`);
+            return Compiler.CompiledExpression.apply(env => void 0);
+        }
     }
 }

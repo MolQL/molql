@@ -20,8 +20,8 @@ namespace Context {
     export interface ElementAddress { dataIndex: number, atom: number, residue: number, chain: number, entity: number }
     export function ElementAddress(): ElementAddress { return { dataIndex: 0, atom: 0, residue: 0, chain: 0, entity: 0 }; }
 
-    export function ofAtomSet(model: MolData.Model, atomSet: AtomSet) {
-        return Context(model, Mask.ofUniqueIndices(model.atoms.count, atomSet.atomIndices));
+    export function ofAtomSet({ model }: Context, atomSet: AtomSet) {
+        return Context(model, AtomSet.getMask(atomSet));
     }
 
     export function ofAtomSelection(model: MolData.Model, atomSelection: AtomSelection) {

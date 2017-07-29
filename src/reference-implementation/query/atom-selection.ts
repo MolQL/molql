@@ -7,38 +7,52 @@ import Mask from '../utils/mask'
 import Context from './context'
 import AtomSet from './atom-set'
 
-type AtomSelection = { context: Context, atomSets: AtomSet[] }
-function AtomSelection(context: Context, atomSets: AtomSet[]): AtomSelection { return { context, atomSets }; }
+interface AtomSelection { '@type'?: 'atom-selection' }
+
+function AtomSelection(atomSets: AtomSet[]): AtomSelection { return AtomSelectionImpl(atomSets); }
+
+interface AtomSelectionImpl extends AtomSelection {
+    atomSets: AtomSet[]
+}
+
+function AtomSelectionImpl(atomSets: AtomSet[]): AtomSelectionImpl { return { atomSets }; }
 
 namespace AtomSelection {
+    export const empty = AtomSelection([]);
+
+    export function atomSets(selection: AtomSelection) { return (selection as AtomSelectionImpl).atomSets; }
+
     export function flatten(seq: AtomSelection): AtomSet {
-        if (!seq.atomSets.length) return AtomSet(seq.context, []);
-        if (seq.atomSets.length === 1) return seq.atomSets[0];
+        const sets = atomSets(seq);
+        const length = sets.length;
+        if (!length) return AtomSet.empty;
+        if (length === 1) return sets[0];
 
         const mask = getMask(seq);
-        const atoms = new Int32Array(mask.size) ;
-        let offset = 0;
-        for (let i = 0, _i = seq.context.model.atoms.count; i < _i ; i++) {
-            if (mask.has(i)) atoms[offset++] = i;
-        }
-        return AtomSet(seq.context, sortAsc(atoms));
+        const atoms = new Int32Array(mask.size);
+        mask.forEach((i, ctx) => ctx!.atoms[ctx!.offset++] = i, { atoms, offset: 0 });
+        return AtomSet(sortAsc(atoms));
     }
 
     export function getMask(seq: AtomSelection) {
-        const count = seq.context.model.atoms.count;
-        if (!seq.atomSets.length) return Mask.never;
-        if (seq.atomSets.length === 1) return Mask.ofUniqueIndices(count, seq.atomSets[0].atomIndices);
+        const sets = atomSets(seq);
+        if (!sets.length) return Mask.never;
+        if (sets.length === 1) return Mask.ofUniqueIndices(AtomSet.atomIndices(sets[0]));
 
-        let estSize = 0;
-        for (const atomSet of seq.atomSets) {
-            estSize += atomSet.atomIndices.length;
+        let estSize = 0, max = 0;
+        for (const atomSet of sets) {
+            const indices = AtomSet.atomIndices(atomSet);
+            estSize += indices.length;
+            for (const i of indices) {
+                if (i > max) max = i;
+            }
         }
 
-        if ((estSize / count) > (1 / 12)) {
-            const mask = new Uint8Array(count);
+        if ((estSize / max) > (1 / 12)) {
+            const mask = new Uint8Array(max);
             let size = 0;
-            for (const atomSet of seq.atomSets) {
-                for (const a of atomSet.atomIndices) {
+            for (const atomSet of sets) {
+                for (const a of AtomSet.atomIndices(atomSet)) {
                     if (mask[a]) continue;
                     mask[a] = 1;
                     size++;
@@ -47,8 +61,8 @@ namespace AtomSelection {
             return Mask.ofMask(mask as any as number[], size);
         } else {
             const mask = FastSet.create<number>();
-            for (const atomSet of seq.atomSets) {
-                for (const a of atomSet.atomIndices) {
+            for (const atomSet of sets) {
+                for (const a of AtomSet.atomIndices(atomSet)) {
                     mask.add(a);
                 }
             }
@@ -67,10 +81,10 @@ namespace AtomSelection {
         }
 
         getSeq() {
-            return AtomSelection(this.ctx, this.atomSets);
+            return AtomSelection(this.atomSets);
         }
 
-        constructor(private ctx: Context) { }
+        constructor() { }
     }
 
     class HashSelectionBuilder implements Builder {
@@ -78,7 +92,7 @@ namespace AtomSelection {
         private byHash = FastMap.create<number, AtomSet[]>();
 
         add(atomSet: AtomSet) {
-            const hash = atomSet.hashCode;
+            const hash = AtomSet.hashCode(atomSet);
 
             if (this.byHash.has(hash)) {
                 const sets = this.byHash.get(hash)!;
@@ -98,18 +112,18 @@ namespace AtomSelection {
         }
 
         getSeq() {
-            return AtomSelection(this.ctx, this.atomSets);
+            return AtomSelection(this.atomSets);
         }
 
-        constructor(private ctx: Context) { }
+        constructor() { }
     }
 
-    export function uniqueBuilder(ctx: Context): Builder {
-        return new HashSelectionBuilder(ctx);
+    export function uniqueBuilder(): Builder {
+        return new HashSelectionBuilder();
     }
 
-    export function linearBuilder(ctx: Context): Builder {
-        return new LinearSelectionBuilder(ctx);
+    export function linearBuilder(): Builder {
+        return new LinearSelectionBuilder();
     }
 }
 

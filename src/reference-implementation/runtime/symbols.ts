@@ -4,8 +4,10 @@
 
 import Symbols, { SymbolInfo } from '../../language/symbols'
 import Environment from './environment'
+import Context from '../query/context'
 import RuntimeExpression from './expression'
 import { ElementSymbol } from '../molecule/data'
+import AtomSet from '../query/atom-set'
 import AtomSelection from '../query/atom-selection'
 import { atomGroupsGenerator } from './molecule/generators'
 import * as MolQueryAttributes from './molecule/attributes'
@@ -192,13 +194,14 @@ const symbolDefinitions: CompileInfo[] = [
     [Symbols.structure.attribute.residueKey, func(env => env.model.residues.key[env.element.value.residue])],
     [Symbols.structure.attribute.chainKey, func(env => env.model.residues.key[env.element.value.chain])],
     [Symbols.structure.attribute.entityKey, func(env => env.model.residues.key[env.element.value.residue])],
-    [Symbols.structure.attribute.staticAtomProperty, compiledFunc((ctx, name) => MolQueryAttributes.staticAtomProperty(getCompiledValue(name)))],
+    [Symbols.structure.attribute.staticAtomProperty, compiledFunc((ctx, name) => MolQueryAttributes.staticAtomProperty(ctx, getCompiledValue(name)))],
 
-    // ============= ATOM SET PROPERTIES =============
-    [Symbols.structure.property.atomSet.atomCount, func(env => env.atomSet.value.atomIndices.length)],
-    [Symbols.structure.property.atomSet.propertySet, func((env, prop) => MolQueryAttributes.atomSetPropertySet(env, prop))],
-    [Symbols.structure.property.atomSet.reduce.accumulator, func(MolQueryAttributes.accumulateAtomSet)],
-    [Symbols.structure.property.atomSet.reduce.value, func(env => env.atomSetReducer.value)],
+    // ============= ATOM SETS =============
+    [Symbols.structure.atomSet.atomCount, func(env => AtomSet.atomIndices(env.atomSet.value).length)],
+    [Symbols.structure.atomSet.propertySet, func((env, prop) => MolQueryAttributes.atomSetPropertySet(env, prop))],
+    [Symbols.structure.atomSet.reduce.accumulator, func(MolQueryAttributes.accumulateAtomSet)],
+    [Symbols.structure.atomSet.reduce.value, func(env => env.atomSetReducer.value)],
+    [Symbols.structure.atomSet.find, func((env, query) => query(Environment(Context.ofAtomSet(env.queryCtx, env.atomSet.value))))],
 
     // // ============= ATOM SEQ SEQ PROPERTIES =============
     // [Symbols.structure.property.atomSelection.length, (env, seq: RuntimeExpression<AtomSelection>) => seq(env).atomSets.length],

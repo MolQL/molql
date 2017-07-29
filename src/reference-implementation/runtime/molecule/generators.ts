@@ -78,15 +78,15 @@ export function atomGroupsGenerator(env: Environment, params: GeneratorParams): 
     if (params.groupBy) {
         const ctx: GroupCtx = { env, groupBy: params.groupBy, groups: FastMap.create(), selection: [] };
         atomGroupsIterator(env, params, onGroupAtom, ctx);
-        const result = AtomSelection.linearBuilder(env.queryCtx);
+        const result = AtomSelection.linearBuilder();
         for (const set of ctx.selection) {
-            result.add(AtomSet(env.queryCtx, set));
+            result.add(AtomSet(set));
         }
         return result.getSeq();
     } else {
         const ctx: FlatCtx = { atoms: [] };
         atomGroupsIterator(env, params, onFlatAtom, ctx);
-        if (ctx.atoms.length) return AtomSelection(env.queryCtx, [AtomSet(env.queryCtx, ctx.atoms)]);
-        return AtomSelection(env.queryCtx, []);
+        if (ctx.atoms.length) return AtomSelection([AtomSet(ctx.atoms)]);
+        return AtomSelection([]);
     }
 }

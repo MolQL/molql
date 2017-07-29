@@ -173,11 +173,6 @@ const structure = {
             type: Type.Structure.atomSelection,
             args: [['seq', Type.Structure.atomSelection], ['predicate', Type.Primitive.bool]]
         }),
-        findIn: symbol({
-            description: 'Executes the specified query in the context induced by each of the atoms sets in the sequence.',
-            type: Type.Structure.atomSelection,
-            args: [['seq', Type.Structure.atomSelection], ['query', Type.Structure.atomSelection]]
-        }),
     },
     combinator: {
         '@header': 'Sequence Combinators',
@@ -207,32 +202,36 @@ const structure = {
             type: Type.anyValue,
             args: [['name', Type.Primitive.str]],
             description: `Access a "statically defined" atom property. One of: ${Object.keys(StaticAtomProperties).map(k => '``' + k + '``').join(', ')}.`
+        })
+    },
+    atomSet: {
+        '@header': 'Atom Sets',
+        '@namespace': Type.Structure.atomSet.kind,
+        atomCount: value(Type.Primitive.num),
+        reduce: {
+            accumulator: symbol({
+                type: Type.anyValue,
+                args: [['value', Type.anyValue], ['initial', Type.anyValue]],
+                description: 'Compute a property of an atom set based on it\'s properties. The current value is assigned to the 0-th slot [``(primitive.functional.slot 0)``].'
+            }),
+            value: symbol({ type: Type.anyValue, description: 'Current value of the accumulator.' })
+        },
+        propertySet: symbol({
+            type: Type.Primitive.set,
+            args: [ ['prop', Type.anyValue] ],
+            description: 'Returns a set of unique properties from all atoms within the current atom set.'
         }),
-        //operatorName: value(Type.Primitive.str)
+        find: symbol({
+            description: 'Executes the specified query in the context induced the current atom set.',
+            type: Type.Structure.atomSelection,
+            args: [['query', Type.Structure.atomSelection]]
+        }),
     },
     property: {
         '@header': 'Properties',
         secondaryStructure: {
             '@header': 'Secondary Structure',
             uniqueId: value(Type.anyValue, 'Returns an implementation specific unique identifier of the current secondary structure element.'),
-        },
-        atomSet: {
-            '@header': 'Atom Sets',
-            '@namespace': Type.Structure.atomSet.kind,
-            atomCount: value(Type.Primitive.num),
-            reduce: {
-                accumulator: symbol({
-                    type: Type.anyValue,
-                    args: [['value', Type.anyValue], ['initial', Type.anyValue]],
-                    description: 'Compute a property of an atom set based on it\'s properties. The current value is assigned to the 0-th slot [``(primitive.functional.slot 0)``].'
-                }),
-                value: symbol({ type: Type.anyValue, description: 'Current value of the accumulator.' })
-            },
-            propertySet: symbol({
-                type: Type.Primitive.set,
-                args: [ ['prop', Type.anyValue] ],
-                description: 'Returns a set of unique properties from all atoms within the current atom set.'
-            })
         },
         atomSelection: {
             '@header': 'Atom Set Sequences',

@@ -17,6 +17,7 @@ import { SymbolTable } from './reference-implementation/runtime/symbols'
 import Context from './reference-implementation/query/context'
 import AtomSelection from './reference-implementation/query/atom-selection'
 import { getSymbolsWithoutImplementation } from './language/symbols'
+import AtomSet from './reference-implementation/query/atom-set'
 
 const notImplemented = getSymbolsWithoutImplementation(SymbolTable.map(s => s.symbol));
 console.log(notImplemented.map(s => s.name).join('\n'));
@@ -94,7 +95,7 @@ function run(model: Model) {
     const r = compile<AtomSelection>(q);
     const res = r(env);
 
-    console.log(res.atomSets.map(s => s.atomIndices));
+    console.log(AtomSelection.atomSets(res).map(s => AtomSet.atomIndices(s)));
 
     //console.log(model.entities);
     //console.log(model.chains);

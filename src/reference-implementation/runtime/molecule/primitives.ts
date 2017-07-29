@@ -16,7 +16,15 @@ import { StaticAtomProperties } from '../../../language/properties'
 
 import ElementAddress = Context.ElementAddress
 
-export function findInAtomSet(env: Environment, query: RuntimeExpression) {
-    const newEnv = Environment(Context.ofAtomSet(env.queryCtx, env.atomSet.value));
-    return query(Environment(Context.ofAtomSet(env.queryCtx, env.atomSet.value)));
+export function flatMap(env: Environment, selection: RuntimeExpression<AtomSelection>, map: RuntimeExpression<AtomSelection>) {
+    const builder = AtomSelection.uniqueBuilder();
+    const iterator = Iterator.begin(env.atomSet);
+    for (const atomSet of AtomSelection.atomSets(selection(env))){
+        iterator.value = atomSet;
+        for (const mappedAtomSet of AtomSelection.atomSets(map(env))) {
+            builder.add(mappedAtomSet);
+        }
+    }
+    Iterator.end(iterator);
+    return builder.getSeq();
 }

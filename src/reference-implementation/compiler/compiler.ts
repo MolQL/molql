@@ -11,7 +11,7 @@ import Optimizer from './optimizer'
 const { isLiteral, isSymbol } = Expression;
 
 function Compiler<T = any>(expr: Expression): RuntimeExpression<T> {
-    return Compiler.compile({ staticEnv: Environment() }, expr).runtime;
+    return Compiler.compile(Compiler.CompilerContext(), expr).runtime;
 }
 
 namespace Compiler {
@@ -27,7 +27,12 @@ namespace Compiler {
     }
 
     export interface CompileContext {
-        staticEnv: Environment
+        staticEnv: Environment,
+        warnings: string[]
+    }
+
+    export function CompilerContext(): CompileContext {
+        return { staticEnv: Environment(), warnings: [] };
     }
 
     function getRuntimeInfo(name: string): SymbolRuntime.Info {
