@@ -18,13 +18,12 @@ import ElementAddress = Context.ElementAddress
 
 function _atomSetPropertySet(env: Environment, atomSet: AtomSet, prop: RuntimeExpression, set: Set<any>) {
     const ctx = env.queryCtx;
-    const iterator = Iterator.begin(env.element, ElementAddress());
-    const element = iterator.value;
+    const element = Environment.beginIterateElemement(env);
     for (const a of atomSet.atomIndices) {
-        ElementAddress.setAtomFull(ctx, element, a);
+        ElementAddress.setAtom(ctx, element, a);
         set.add(prop(env));
     }
-    Iterator.end(iterator);
+    Environment.endIterateElement(env);
 
     return set;
 }
@@ -44,16 +43,13 @@ export function selectionPropertySet(env: Environment, prop: RuntimeExpression, 
 export function accumulateAtomSet(env: Environment, f: RuntimeExpression, initial: RuntimeExpression) {
     const ctx = env.queryCtx;
     const slot = Slot.push(env.atomSetReducer, initial(env));
-    const iterator = Iterator.begin(env.element, ElementAddress());
-    const element = iterator.value;
+    const element = Environment.beginIterateElemement(env);
     for (const a of env.atomSet.value.atomIndices) {
-        ElementAddress.setAtomFull(ctx, element, a);
+        ElementAddress.setAtom(ctx, element, a);
         slot.value = f(env);
     }
-    const reduced = slot.value;
-    Slot.pop(slot);
-    Iterator.end(iterator);
-    return reduced;
+    Environment.endIterateElement(env);
+    return Slot.pop(slot);
 }
 
 export function staticAtomProperty(name: StaticAtomProperties): Compiler.CompiledExpression {

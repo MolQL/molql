@@ -30,24 +30,23 @@ function atomGroupsIterator<BuildCtx>(env: Environment, { entityP, chainP, resid
     const { residueStartIndex, residueEndIndex } = model.chains;
     const { atomStartIndex, atomEndIndex } = model.residues;
 
-    const iterator = Iterator.begin(env.element, Context.ElementAddress());
-    const element = iterator.value;
+    const element = Environment.beginIterateElemement(env);
     for (let eI = 0; eI < entityCount; eI++) {
-        ElementAddress.setEntity(ctx, element, eI);
+        ElementAddress.setEntityLayer(ctx, element, eI);
         if (!entityP(env)) continue;
 
         for (let cI = chainStartIndex[eI], _cI = chainEndIndex[eI]; cI < _cI; cI++) {
-            ElementAddress.setChain(ctx, element, cI);
+            ElementAddress.setChainLayer(ctx, element, cI);
             if (!chainP(env)) continue;
 
             for (let rI = residueStartIndex[cI], _rI = residueEndIndex[cI]; rI < _rI; rI++) {
-                ElementAddress.setResidue(ctx, element, rI);
+                ElementAddress.setResidueLayer(ctx, element, rI);
                 if (!residueP(env)) continue;
 
                 for (let aI = atomStartIndex[rI], _aI = atomEndIndex[rI]; aI < _aI; aI++) {
                     if (!mask.has(aI)) continue;
 
-                    ElementAddress.setAtom(ctx, element, aI);
+                    ElementAddress.setAtomLayer(ctx, element, aI);
                     if (!atomP(env)) continue;
 
                     onAtom(builderCtx, aI);
@@ -55,7 +54,7 @@ function atomGroupsIterator<BuildCtx>(env: Environment, { entityP, chainP, resid
             }
         }
     }
-    Iterator.end(iterator);
+    Environment.endIterateElement(env);
 }
 
 type FlatCtx = { atoms: number[] }

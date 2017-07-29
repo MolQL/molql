@@ -36,4 +36,15 @@ function Environment(queryCtx?: Context): Environment {
     };
 }
 
+namespace Environment {
+    export function beginIterateElemement(env: Environment) {
+        Iterator.begin(env.element, Context.ElementAddress());
+        return env.element.value;
+    }
+
+    export function endIterateElement(env: Environment) {
+        Iterator.end(env.element);
+    }
+}
+
 export default Environment;

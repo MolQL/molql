@@ -33,7 +33,7 @@ namespace Context {
     }
 
     export namespace ElementAddress {
-        export function setAtomFull(ctx: Context, address: ElementAddress, atomIndex: number) {
+        export function setAtom(ctx: Context, address: ElementAddress, atomIndex: number) {
             const { atoms: { dataIndex, residueIndex }, residues: { chainIndex }, chains: { entityIndex }  } = ctx.model;
             address.atom = atomIndex;
             address.dataIndex = dataIndex[atomIndex];
@@ -42,20 +42,20 @@ namespace Context {
             address.entity = entityIndex[address.chain];
         }
 
-        export function setAtom(ctx: Context, address: ElementAddress, atomIndex: number) {
+        export function setAtomLayer(ctx: Context, address: ElementAddress, atomIndex: number) {
             const { atoms: { dataIndex } } = ctx.model;
             address.atom = atomIndex;
             address.dataIndex = dataIndex[atomIndex];
         }
 
-        export function setResidue(ctx: Context, address: ElementAddress, residueIndex: number) {
+        export function setResidueLayer(ctx: Context, address: ElementAddress, residueIndex: number) {
             const { residues: { atomStartIndex }, atoms: { dataIndex } } = ctx.model;
             address.atom = atomStartIndex[residueIndex];
             address.dataIndex = dataIndex[address.atom];
             address.residue = residueIndex;
         }
 
-        export function setChain(ctx: Context, address: ElementAddress, chainIndex: number) {
+        export function setChainLayer(ctx: Context, address: ElementAddress, chainIndex: number) {
             const { residues: { atomStartIndex }, chains: { residueStartIndex }, atoms: { dataIndex } } = ctx.model;
             address.chain = chainIndex;
             address.residue = residueStartIndex[chainIndex];
@@ -63,7 +63,7 @@ namespace Context {
             address.dataIndex = dataIndex[address.atom];
         }
 
-        export function setEntity(ctx: Context, address: ElementAddress, entityIndex: number) {
+        export function setEntityLayer(ctx: Context, address: ElementAddress, entityIndex: number) {
             const { residues: { atomStartIndex }, chains: { residueStartIndex }, entities: { chainStartIndex }, atoms: { dataIndex } } = ctx.model;
             address.entity = entityIndex;
             address.chain = chainStartIndex[entityIndex];
