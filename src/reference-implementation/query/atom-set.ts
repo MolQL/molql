@@ -15,7 +15,7 @@ interface AtomSet {
     readonly boundingSphere: { center: [number, number, number], radius: number }
 }
 
-function AtomSet(ctx: Context, indices: number[]): AtomSet { return new AtomSetImpl(ctx, indices); }
+function AtomSet(ctx: Context, indices: ArrayLike<number>): AtomSet { return new AtomSetImpl(ctx, indices as ReadonlyArray<number>); }
 
 class AtomSetImpl implements AtomSet {
     private _hashCode = 0;
@@ -25,7 +25,7 @@ class AtomSetImpl implements AtomSet {
         if (this._hashComputed) return this._hashCode;
 
         let code = 23;
-        for (let i of this.atomIndices) {
+        for (const i of this.atomIndices) {
             code = (31 * code + i) | 0;
         }
 
@@ -117,14 +117,23 @@ namespace AtomSet {
         return AtomSet(ctx, sortAsc(indices));
     }
 
-    export function distance(a: AtomSet, b: AtomSet) {
-        return 0;
-    }
-
     function atomDistanceSq(x: number[], y: number[], z: number[], i: number, j: number) {
         const dx = x[i] - x[j], dy = y[i] - y[j], dz = z[i] - z[j];
         return dx * dx + dy * dy + dz * dz;
     }
+
+    export function distance(a: AtomSet, b: AtomSet) {
+        let distSq = Number.POSITIVE_INFINITY;
+        const { x, y, z } = a.context.model.positions;
+        for (const i of a.atomIndices) {
+            for (const j of b.atomIndices) {
+                const d = atomDistanceSq(x, y, z, i, j);
+                if (d < distSq) distSq = d;
+            }
+        }
+        return Math.sqrt(distSq);;
+    }
+
 
     export function areWithin(a: AtomSet, b: AtomSet, maxDistance: number) {
         const dSq = maxDistance * maxDistance;

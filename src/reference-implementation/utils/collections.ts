@@ -17,8 +17,9 @@ function _ascSort(a: number, b: number) {
     return a - b;
 }
 
-export function sortAsc(array: number[]) {
-    return Array.prototype.sort.call(array, _ascSort);
+export function sortAsc<T extends ArrayLike<number>>(array: T): T {
+    Array.prototype.sort.call(array, _ascSort);
+    return array;
 }
 
 /**

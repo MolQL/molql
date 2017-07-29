@@ -5,16 +5,19 @@
 import { FastSet } from './collections'
 
 interface Mask {
+    size: number;
     has(i: number): boolean;
 }
 
 namespace Mask {
     class EmptyMask implements Mask {
+        size = 0;
         has(i: number) { return false; }
         constructor() { }
     }
 
     class SingletonMask implements Mask {
+        size = 1;
         has(i: number) { return i === this.idx; }
         constructor(private idx: number) { }
     }
@@ -22,25 +25,27 @@ namespace Mask {
     class BitMask implements Mask {
         private length: number;
         has(i: number) { return i < this.length && !!this.mask[i] as any; }
-        constructor(private mask: number[]) { this.length = mask.length;  }
+        constructor(private mask: number[], public size: number) { this.length = mask.length;  }
     }
 
     class AllMask implements Mask {
         has(i: number) { return true; }
-        constructor() { }
+        constructor(public size: number) { }
     }
 
-    export const always = new AllMask();
+    export function always(size: number) { return new AllMask(size); }
     export const never = new EmptyMask();
 
     export function ofSet(set: FastSet<number>): Mask {
         return set;
     }
 
-    export function ofIndices(totalCount: number, indices: ArrayLike<number>): Mask {
+    export function ofUniqueIndices(totalCount: number, indices: ArrayLike<number>): Mask {
         const len = indices.length;
         if (len === 0) return new EmptyMask();
         if (len === 1) return new SingletonMask(indices[0]);
+        if (len === totalCount) return new AllMask(len);
+
         const f = len / totalCount;
         if (f < 1 / 12) {
             const set = FastSet.create();
@@ -49,14 +54,15 @@ namespace Mask {
         }
 
         const mask = new Int8Array(totalCount);
+        let size = 0;
         for (const i of (indices as number[])) {
             mask[i] = 1;
         }
-        return new BitMask(mask as any);
+        return new BitMask(mask as any, indices.length);
     }
 
-    export function ofMask(mask: number[]): Mask {
-        return new BitMask(mask);
+    export function ofMask(mask: number[], size: number): Mask {
+        return new BitMask(mask, size);
     }
 
     export function hasAny(mask: Mask, xs: number[]) {

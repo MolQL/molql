@@ -82,9 +82,9 @@ function run(model: Model) {
         g => g.atomGroups,
         true, // entity
         true, // chain
-        B.rel(e => e.eq, B.Struct.atomProperty('auth_comp_id'), 'HEM'), // residue
+        B.rel(e => e.inRange, B.Struct.atomProperty('auth_seq_id'), 35, 45), // residue
         B.set(e => e.has, B.ctor(c => c.set, es('C'), es('N')), B.Struct.atomProperty('type_symbol')), // atom
-        B.Struct.atomProperty('type_symbol') // group by
+        B.Struct.attr(a => a.residueKey) // group by
     );
 
     console.log(lispFormat(q));

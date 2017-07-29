@@ -21,7 +21,7 @@ namespace Context {
     export function ElementAddress(): ElementAddress { return { dataIndex: 0, atom: 0, residue: 0, chain: 0, entity: 0 }; }
 
     export function ofAtomSet(model: MolData.Model, atomSet: AtomSet) {
-        return Context(model, Mask.ofIndices(model.atoms.count, atomSet.atomIndices));
+        return Context(model, Mask.ofUniqueIndices(model.atoms.count, atomSet.atomIndices));
     }
 
     export function ofAtomSelection(model: MolData.Model, atomSelection: AtomSelection) {
@@ -29,7 +29,7 @@ namespace Context {
     }
 
     export function ofModel(model: MolData.Model) {
-        return Context(model, Mask.always);
+        return Context(model, Mask.always(model.atoms.count));
     }
 
     export namespace ElementAddress {

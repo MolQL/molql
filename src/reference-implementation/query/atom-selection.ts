@@ -15,19 +15,19 @@ namespace AtomSelection {
         if (!seq.atomSets.length) return AtomSet(seq.context, []);
         if (seq.atomSets.length === 1) return seq.atomSets[0];
 
-        const atoms = UniqueArrayBuilder<number>();
-        for (const set of seq.atomSets) {
-            for (const atom of set.atomIndices) {
-                UniqueArrayBuilder.add(atoms, atom, atom);
-            }
+        const mask = getMask(seq);
+        const atoms = new Int32Array(mask.size) ;
+        let offset = 0;
+        for (let i = 0, _i = seq.context.model.atoms.count; i < _i ; i++) {
+            if (mask.has(i)) atoms[offset++] = i;
         }
-        return AtomSet(seq.context, sortAsc(atoms.array));
+        return AtomSet(seq.context, sortAsc(atoms));
     }
 
     export function getMask(seq: AtomSelection) {
         const count = seq.context.model.atoms.count;
         if (!seq.atomSets.length) return Mask.never;
-        if (seq.atomSets.length === 1) return Mask.ofIndices(count, seq.atomSets[0].atomIndices);
+        if (seq.atomSets.length === 1) return Mask.ofUniqueIndices(count, seq.atomSets[0].atomIndices);
 
         let estSize = 0;
         for (const atomSet of seq.atomSets) {
@@ -36,12 +36,15 @@ namespace AtomSelection {
 
         if ((estSize / count) > (1 / 12)) {
             const mask = new Uint8Array(count);
+            let size = 0;
             for (const atomSet of seq.atomSets) {
                 for (const a of atomSet.atomIndices) {
-                    mask[a] = 1
+                    if (mask[a]) continue;
+                    mask[a] = 1;
+                    size++;
                 }
             }
-            return Mask.ofMask(mask as any as number[]);
+            return Mask.ofMask(mask as any as number[], size);
         } else {
             const mask = FastSet.create<number>();
             for (const atomSet of seq.atomSets) {

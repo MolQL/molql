@@ -29,6 +29,7 @@ namespace Builder {
         export const gen = category(Symbols.structure.generator);
         export const mod = category(Symbols.structure.modifier);
         export const comb = category(Symbols.structure.modifier);
+        export const attr = category(Symbols.structure.attribute);
 
         export function modify(what: Expression, modifier: Expression) { return prim(s => s.modify, what, modifier); }
         export function combine(combinator: (c: typeof comb) => Expression, ...seqs: Expression[]) {
