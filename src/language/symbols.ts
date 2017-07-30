@@ -178,7 +178,7 @@ const structure = {
     },
     filter: {
         '@header': 'Selection Filters',
-        withProperties: symbol({
+        withSameProperties: symbol({
             type: Type.Structure.atomSelection,
             args: [['selection', Type.Structure.atomSelection], ['source', Type.Structure.atomSelection], ['property', Type.anyValue]]
         }),
@@ -231,23 +231,10 @@ const structure = {
             }),
             value: symbol({ type: Type.anyValue, description: 'Current value of the accumulator.' })
         },
-        propertySet: symbol({
-            type: Type.Primitive.set,
-            args: [ ['prop', Type.anyValue] ],
-            description: 'Returns a set of unique properties from all atoms within the current atom set.'
-        }),
         count: symbol({
             description: 'Counts the number of occurences of a specific query inside the current atom set.',
             type: Type.Structure.atomSelection,
             args: [['query', Type.Structure.atomSelection]]
-        }),
-    },
-    selection: {
-        '@header': 'Selection',
-        propertySet: symbol({
-            type: Type.Primitive.set,
-            args: [ ['prop', Type.anyValue], ['seq', Type.Structure.atomSelection] ],
-            description: 'Returns a set of unique properties from all atoms within the source sequence.'
         })
     }
 }

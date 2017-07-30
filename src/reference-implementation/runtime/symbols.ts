@@ -200,7 +200,7 @@ const symbolDefinitions: CompileInfo[] = [
     // ============= FILTERS =============
     [Symbols.structure.filter.pick, func(MolQueryFilters.pick)],
     [Symbols.structure.filter.within, func(MolQueryFilters.within)],
-    [Symbols.structure.filter.withProperties, func(MolQueryFilters.withProperties)],
+    [Symbols.structure.filter.withSameProperties, func(MolQueryFilters.withProperties)],
 
     // ============= MODIFIERS =============
     [Symbols.structure.modifier.queryEach, func(MolQueryModifiers.queryEach)],
@@ -208,7 +208,6 @@ const symbolDefinitions: CompileInfo[] = [
 
     // ============= ATOM SETS =============
     [Symbols.structure.atomSet.atomCount, func(env => AtomSet.count(env.atomSet.value))],
-    [Symbols.structure.atomSet.propertySet, func((env, prop) => MolQueryProperties.atomSetPropertySet(env, prop, env.atomSet.value))],
     [Symbols.structure.atomSet.reduce.accumulator, func(MolQueryProperties.accumulateAtomSet)],
     [Symbols.structure.atomSet.reduce.value, func(env => env.atomSetReducer.value)],
 ];
