@@ -10,7 +10,7 @@ import { FastMap } from '../utils/collections'
 
 type Data = Model['data']
 
-function createModel(data: Data, startRow: number, rowCount: number): Model {
+function createModel(moleculeId: string, data: Data, startRow: number, rowCount: number): Model {
     const dataIndex: number[] = [], residueIndex: number[] = [];
     const atomStartIndex: number[] = [], atomEndIndex: number[] = [], chainIndex: number[] = [];
     const x: number[] = [], y: number[] = [], z: number[] = [];
@@ -94,6 +94,7 @@ function createModel(data: Data, startRow: number, rowCount: number): Model {
     const secondaryStructureIndex: number[] = new Int32Array(residue) as any;
 
     return {
+        moleculeId,
         id: pdbx_PDB_model_num.getInteger(startRow),
         atoms: { dataIndex, residueIndex, count: atom },
         residues: { atomStartIndex, atomEndIndex, secondaryStructureType, secondaryStructureIndex, chainIndex, count: residue, key: new Int32Array(residue) as any },
@@ -263,7 +264,7 @@ export default function parseCIF(cifData: string): Molecule {
     const models: Model[] = [];
     let modelStartIndex = 0;
     while (modelStartIndex < data.atom_site.rowCount) {
-        const model = createModel(data, modelStartIndex, data.atom_site.rowCount);
+        const model = createModel(dataBlock.header, data, modelStartIndex, data.atom_site.rowCount);
         assignKeys(model);
         assignSecondaryStructure(model);
         models.push(model);

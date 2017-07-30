@@ -87,7 +87,7 @@ export function staticAtomProperty(compilerCtx: Compiler.CompileContext, name: S
         case 'entity-key': return prop(env => env.element.value.entity);
 
         case 'is-het': return prop(env => !env.atom_site.group_PDB.stringEquals(env.element.value.dataIndex, 'ATOM'));
-        case 'operator-name': return prop(env => '1_555');
+        //case 'operator-name': return prop(env => '1_555');
 
         default: {
             compilerCtx.warnings.push(`Compiling undefined property '${name}'.`);

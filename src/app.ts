@@ -18,6 +18,7 @@ import Context from './reference-implementation/query/context'
 import AtomSelection from './reference-implementation/query/atom-selection'
 import { getSymbolsWithoutImplementation } from './language/symbols'
 import AtomSet from './reference-implementation/query/atom-set'
+import mmCIFwriter from './reference-implementation/molecule/writer'
 
 const notImplemented = getSymbolsWithoutImplementation(SymbolTable.map(s => s.symbol));
 console.log(notImplemented.map(s => s.name).join('\n'));
@@ -96,6 +97,15 @@ function run(model: Model) {
         B.Struct.atomProperty('residue-key') // group by
     );
 
+    const hem = B.Struct.gen(
+        g => g.atomGroups,
+        true, // entity
+        true, // chain
+        B.rel(r => r.eq, B.Struct.atomProperty('auth_comp_id'), 'HEM'), // residue
+        true, // atom
+        B.Struct.atomProperty('residue-key') // group by
+    );
+
     const cn = B.Struct.gen(
         g => g.atomGroups,
         true, // entity
@@ -107,7 +117,7 @@ function run(model: Model) {
     );
 
     const bfactor = B.Struct.atomSet(s => s.reduce.accumulator, 0, B.math(m => m.max, B.Struct.atomProperty('B_iso_or_equiv'), B.Struct.atomSet(s => s.reduce.value)));
-    const q = B.Struct.modifier(m => m.includeSurroundings, cn, 5, true);
+    const q = B.Struct.modifier(m => m.includeSurroundings, fe, 5, true);
     //B.Struct.filter(f => f.pick, cn, B.rel(r => r.gr, bfactor, 80));
 
     console.log(lispFormat(q));
@@ -125,12 +135,15 @@ function run(model: Model) {
 
     //console.log(AtomSelection.atomSets(res).map(s => AtomSet.atomIndices(s)));
     console.log(AtomSelection.atomSets(res).length);
+
+    const cif = mmCIFwriter(model, AtomSet.atomIndices(AtomSelection.toAtomSet(res)));
+    console.log(cif);
     //console.log(AtomSet.atomIndices(AtomSelection.toAtomSet(res)));
     //console.log(model.entities);
     //console.log(model.chains);
 }
 
-fs.readFile('e:/test/quick/1jj2_updated.cif', 'utf-8', (err, data) => {
+fs.readFile('e:/test/quick/1tqn_updated.cif', 'utf-8', (err, data) => {
     if (err) {
         console.error(err);
         return;

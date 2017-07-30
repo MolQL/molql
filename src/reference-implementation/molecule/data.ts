@@ -43,6 +43,7 @@ export interface Entities {
 }
 
 export interface Model {
+    moleculeId: string,
     id: number,
     data: {
         atom_site: mmCIF.Category<mmCIF.AtomSite>,
