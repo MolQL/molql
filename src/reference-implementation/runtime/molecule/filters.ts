@@ -26,7 +26,7 @@ export function pick(env: Environment, selection: RuntimeExpression<AtomSelectio
         if (pred(env)) ret.add(atomSet);
     }
     Iterator.end(iterarator);
-    return ret.getSeq();
+    return ret.getSelection();
 }
 
 export function withProperties(env: Environment, selection: RuntimeExpression<AtomSelection>, source: RuntimeExpression<AtomSelection>, prop: RuntimeExpression<any>) {
@@ -37,7 +37,7 @@ export function withProperties(env: Environment, selection: RuntimeExpression<At
         const props = MolQueryProperties.atomSetPropertySet(env, prop, atomSet);
         if (props.isSubset(propSet)) ret.add(atomSet);
     }
-    return ret.getSeq();
+    return ret.getSelection();
 }
 
 export function within(env: Environment, selection: RuntimeExpression<AtomSelection>, target: RuntimeExpression<AtomSelection>, radius: RuntimeExpression<number>) {
@@ -56,7 +56,7 @@ export function within(env: Environment, selection: RuntimeExpression<AtomSelect
             }
         }
     }
-    return ret.getSeq();
+    return ret.getSelection();
 }
 
 export function findInAtomSet(env: Environment, query: RuntimeExpression) {

@@ -57,9 +57,6 @@ function atomGroupsIterator<BuildCtx>(env: Environment, { entityP, chainP, resid
     Environment.endIterateElement(env);
 }
 
-type FlatCtx = { atoms: number[] }
-function onFlatAtom(ctx: FlatCtx, i: number) { ctx.atoms.push(i); }
-
 type GroupCtx = { env: Environment, groupBy: RuntimeExpression, groups: FastMap<number, number[]>, selection: number[][] }
 function onGroupAtom({ env, groupBy, groups, selection }: GroupCtx, i: number) {
     const key = groupBy(env);
@@ -85,12 +82,5 @@ export function atomGroupsGenerator(env: Environment, params: GeneratorParams): 
     for (const set of ctx.selection) {
         result.add(AtomSet(set));
     }
-    return result.getSeq();
-    
-    // else {
-    //     const ctx: FlatCtx = { atoms: [] };
-    //     atomGroupsIterator(env, params, onFlatAtom, ctx);
-    //     if (ctx.atoms.length) return AtomSelection([AtomSet(ctx.atoms)]);
-    //     return AtomSelection([]);
-    // }
+    return result.getSelection();
 }

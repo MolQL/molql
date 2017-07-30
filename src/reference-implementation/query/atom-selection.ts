@@ -69,7 +69,7 @@ namespace AtomSelection {
         }
     }
 
-    export interface Builder { add(atomSet: AtomSet): Builder, getSeq(): AtomSelection }
+    export interface Builder { add(atomSet: AtomSet): Builder, getSelection(): AtomSelection }
 
     class LinearSelectionBuilder implements Builder {
         private atomSets: AtomSet[] = [];
@@ -79,7 +79,7 @@ namespace AtomSelection {
             return this;
         }
 
-        getSeq() {
+        getSelection() {
             return AtomSelection(this.atomSets);
         }
 
@@ -110,7 +110,7 @@ namespace AtomSelection {
             return this;
         }
 
-        getSeq() {
+        getSelection() {
             return AtomSelection(this.atomSets);
         }
 
