@@ -7,8 +7,8 @@ export function UniqueArrayBuilder<T>(): UniqueArrayBuilder<T> { return { _keys:
 
 export namespace UniqueArrayBuilder {
     export function add<T>(builder: UniqueArrayBuilder<T>, key: string | number, value: any) {
-        if (builder._keys[key] === void 0) return;
-        builder._keys[key] = 0;
+        if (builder._keys[key] === 1) return;
+        builder._keys[key] = 1;
         builder.array.push(value)
     }
 }

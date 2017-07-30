@@ -10,7 +10,9 @@ import { ElementSymbol } from '../molecule/data'
 import AtomSet from '../query/atom-set'
 import AtomSelection from '../query/atom-selection'
 import { atomGroupsGenerator } from './molecule/generators'
-import * as MolQueryAttributes from './molecule/attributes'
+import * as MolQueryProperties from './molecule/properties'
+import * as MolQueryFilters from './molecule/filters'
+import * as MolQueryModifiers from './molecule/modifiers'
 import { Set, Map } from 'immutable'
 import Compiler from '../compiler/compiler'
 
@@ -189,48 +191,7 @@ const symbolDefinitions: CompileInfo[] = [
     [Symbols.structure.constructor.elementSymbol, staticFunc((env, s: RuntimeExpression<string>) => ElementSymbol(s(env)))],
 
     // ============= ATTRIBUTES =============
-
-    [Symbols.structure.attribute.atomKey, func(env => env.element.value.atom)],
-    [Symbols.structure.attribute.residueKey, func(env => env.model.residues.key[env.element.value.residue])],
-    [Symbols.structure.attribute.chainKey, func(env => env.model.residues.key[env.element.value.chain])],
-    [Symbols.structure.attribute.entityKey, func(env => env.model.residues.key[env.element.value.residue])],
-    [Symbols.structure.attribute.staticAtomProperty, compiledFunc((ctx, name) => MolQueryAttributes.staticAtomProperty(ctx, getCompiledValue(name)))],
-
-    // ============= ATOM SETS =============
-    [Symbols.structure.atomSet.atomCount, func(env => AtomSet.count(env.atomSet.value))],
-    [Symbols.structure.atomSet.propertySet, func((env, prop) => MolQueryAttributes.atomSetPropertySet(env, prop))],
-    [Symbols.structure.atomSet.reduce.accumulator, func(MolQueryAttributes.accumulateAtomSet)],
-    [Symbols.structure.atomSet.reduce.value, func(env => env.atomSetReducer.value)],
-    [Symbols.structure.atomSet.find, func((env, query) => query(Environment(Context.ofAtomSet(env.queryCtx, env.atomSet.value))))],
-
-    // // ============= ATOM SEQ SEQ PROPERTIES =============
-    // [Symbols.structure.property.atomSelection.length, (env, seq: RuntimeExpression<AtomSelection>) => seq(env).atomSets.length],
-    // [Symbols.structure.property.atomSelection.propertySet, (env, prop, seq: RuntimeExpression<AtomSelection>) => selectionPropertySet(env, prop, seq(env))],
-
-    // // // ============= PRIMITIVES =============
-    // // [
-    // //     Symbols.structure.primitive.modify,
-    // //     (env, seq: RuntimeExpression<Query.AtomSetSeq>, f: RuntimeExpression<Query.AtomSetSeq>) => {
-    // //         const result = new QueryHelpers.HashAtomSetSeqBuilder(env);
-    // //         const iterator = env.atomSet;
-    // //         Query.Iterator.begin(iterator, void 0);
-    // //         for (const src of seq(env).atomSets) {
-    // //             iterator.value = src;
-    // //             for (const set of f(env).atomSets) {
-    // //                 result.add(set);
-    // //             }
-    // //         }
-    // //         Query.Iterator.end(iterator);
-    // //         return result.getSeq();
-    // //     }
-    // // ],
-    // // [
-    // //     Symbols.structure.primitive.inContext,
-    // //     (env, newenv: RuntimeExpression<Query.Context>, query: RuntimeExpression<Query.AtomSetSeq>) => {
-    // //         if (env.element.value || env.atomSet.value) throw new Error('Context cannot be changed inside a generator or modifier query.');
-    // //         return query(newenv(env));
-    // //     }
-    // // ],
+    [Symbols.structure.property.atomStatic, compiledFunc((ctx, name) => MolQueryProperties.staticAtomProperty(ctx, getCompiledValue(name)))],
 
     // ============= GENERATORS =============
     [
@@ -238,14 +199,20 @@ const symbolDefinitions: CompileInfo[] = [
         func((env, entityP, chainP, residueP, atomP, groupBy) => atomGroupsGenerator(env, { entityP, chainP, residueP, atomP,  groupBy }))
     ],
 
-    // // // ============= MODIFIERS =============
-    // // [
-    // //     Symbols.structure.modifier.filter,
-    // //     (env, pred: RuntimeExpression<boolean>) => {
-    // //         if (pred(env)) return Query.AtomSetSeq(env, [env.atomSet.value]);
-    // //         return Query.AtomSetSeq(env, []);
-    // //     }
-    // // ],
+    // ============= FILTERS =============
+    [Symbols.structure.filter.pick, func(MolQueryFilters.pick)],
+    [Symbols.structure.filter.within, func(MolQueryFilters.within)],
+    [Symbols.structure.filter.withProperties, func(MolQueryFilters.withProperties)],
+
+    // ============= MODIFIERS =============
+    [Symbols.structure.modifier.queryEach, func(MolQueryModifiers.queryEach)],
+    [Symbols.structure.modifier.includeSurroundings, func(MolQueryModifiers.includeSurroundings)],
+
+    // ============= ATOM SETS =============
+    [Symbols.structure.atomSet.atomCount, func(env => AtomSet.count(env.atomSet.value))],
+    [Symbols.structure.atomSet.propertySet, func((env, prop) => MolQueryProperties.atomSetPropertySet(env, prop, env.atomSet.value))],
+    [Symbols.structure.atomSet.reduce.accumulator, func(MolQueryProperties.accumulateAtomSet)],
+    [Symbols.structure.atomSet.reduce.value, func(env => env.atomSetReducer.value)],
 ];
 
 function func(runtime: SymbolRuntime.Func): SymbolRuntimeDefinition {

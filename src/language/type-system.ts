@@ -19,7 +19,9 @@ type Type =
     | Type.Primitive.Map
     | Type.Primitive.Set
     | Type.Structure.ElementSymbol
+    | Type.Structure.SecondaryStructureType
     | Type.Structure.AtomSet
+    | Type.Structure.AtomProperty
     | Type.Structure.AtomSelection
     | Type.Function
     | Type.Tuple
@@ -59,11 +61,15 @@ namespace Type {
 
     export namespace Structure {
         export interface ElementSymbol extends Base { kind: 'element-symbol' }
+        export interface SecondaryStructureType extends Base { kind: 'secondary-structure-type' }
         export interface AtomSet extends Base { kind: 'atom-set' }
+        export interface AtomProperty extends Base { kind: 'atom-property' }
         export interface AtomSelection extends Base { kind: 'atom-selection' }
 
         export const elementSymbol: ElementSymbol = { kind: 'element-symbol' };
+        export const secondaryStructureType: SecondaryStructureType = { kind: 'secondary-structure-type' };
         export const atomSet: AtomSet = { kind: 'atom-set' };
+        export const atomProperty: AtomProperty = { kind: 'atom-property' };
         export const atomSelection: AtomSelection = { kind: 'atom-selection' };
     }
 

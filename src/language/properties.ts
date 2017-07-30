@@ -27,5 +27,21 @@ export const StaticAtomProperties = {
     'pdbx_PDB_model_num': '',
 
     'is-het': '',
-    'operator-name': ''
+    'operator-name': '',
+    'secondary-structure-type': '',
+
+    'atom-key': '',
+    'residue-key': '',
+    'chain-key': '',
+    'entity-key': '',
+
+    'is-ligand': '',
+    'ligand-key': ''
 }
+
+export const SecondaryStructureTypes = {
+    'sheet': '',
+    'helix': '',
+    'turn': '',
+    'none': ''
+};

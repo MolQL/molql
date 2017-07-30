@@ -63,6 +63,7 @@ function onFlatAtom(ctx: FlatCtx, i: number) { ctx.atoms.push(i); }
 type GroupCtx = { env: Environment, groupBy: RuntimeExpression, groups: FastMap<number, number[]>, selection: number[][] }
 function onGroupAtom({ env, groupBy, groups, selection }: GroupCtx, i: number) {
     const key = groupBy(env);
+    if (key === void 0) return;
     let atomSet: number[];
     if (groups.has(key)) {
         atomSet = groups.get(key)!;
@@ -74,19 +75,22 @@ function onGroupAtom({ env, groupBy, groups, selection }: GroupCtx, i: number) {
     atomSet.push(i);
 }
 
+function groupByAtom(env: Environment) { return env.element.value.atom; }
+
 export function atomGroupsGenerator(env: Environment, params: GeneratorParams): AtomSelection {
-    if (params.groupBy) {
-        const ctx: GroupCtx = { env, groupBy: params.groupBy, groups: FastMap.create(), selection: [] };
-        atomGroupsIterator(env, params, onGroupAtom, ctx);
-        const result = AtomSelection.linearBuilder();
-        for (const set of ctx.selection) {
-            result.add(AtomSet(set));
-        }
-        return result.getSeq();
-    } else {
-        const ctx: FlatCtx = { atoms: [] };
-        atomGroupsIterator(env, params, onFlatAtom, ctx);
-        if (ctx.atoms.length) return AtomSelection([AtomSet(ctx.atoms)]);
-        return AtomSelection([]);
+    const groupBy = params.groupBy || groupByAtom;
+    const ctx: GroupCtx = { env, groupBy, groups: FastMap.create(), selection: [] };
+    atomGroupsIterator(env, params, onGroupAtom, ctx);
+    const result = AtomSelection.linearBuilder();
+    for (const set of ctx.selection) {
+        result.add(AtomSet(set));
     }
+    return result.getSeq();
+    
+    // else {
+    //     const ctx: FlatCtx = { atoms: [] };
+    //     atomGroupsIterator(env, params, onFlatAtom, ctx);
+    //     if (ctx.atoms.length) return AtomSelection([AtomSet(ctx.atoms)]);
+    //     return AtomSelection([]);
+    // }
 }

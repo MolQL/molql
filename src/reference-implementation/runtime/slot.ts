@@ -14,8 +14,9 @@ namespace Slot {
     }
     export function pop(slot: Slot) {
         const stack = slot['@stack'];
+        const ret = slot.value;
         slot.value = stack.length ? stack.pop() : void 0;
-        return slot.value;
+        return ret;
     }
 }
 

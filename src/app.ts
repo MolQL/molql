@@ -78,30 +78,59 @@ function run(model: Model) {
 
     const es = (s: string) => B.Struct.ctor(c => c.elementSymbol, s)
 
-    const q = B.Struct.gen(
+    // const q = B.Struct.gen(
+    //     g => g.atomGroups,
+    //     true, // entity
+    //     true, // chain
+    //     B.rel(e => e.inRange, B.Struct.atomProperty('auth_seq_id'), 35, 45), // residue
+    //     B.set(e => e.has, B.ctor(c => c.set, es('C'), es('N')), B.Struct.atomProperty('type_symbol')), // atom
+    //     B.Struct.atomProperty('residue-key') // group by
+    // );
+
+    const fe = B.Struct.gen(
         g => g.atomGroups,
         true, // entity
         true, // chain
-        B.rel(e => e.inRange, B.Struct.atomProperty('auth_seq_id'), 35, 45), // residue
-        B.set(e => e.has, B.ctor(c => c.set, es('C'), es('N')), B.Struct.atomProperty('type_symbol')), // atom
-        B.Struct.attr(a => a.residueKey) // group by
+        true, // residue
+        B.set(e => e.has, B.ctor(c => c.set, es('FE')), B.Struct.atomProperty('type_symbol')), // atom
+        B.Struct.atomProperty('residue-key') // group by
     );
+
+    const cn = B.Struct.gen(
+        g => g.atomGroups,
+        true, // entity
+        true, // chain
+        B.rel(r => r.eq, B.Struct.atomProperty('auth_comp_id'), 'ALA'),
+        //B.rel(e => e.inRange, B.Struct.atomProperty('auth_seq_id'), 35, 45), // residue
+        B.set(e => e.has, B.ctor(c => c.set, es('C'), es('N')), B.Struct.atomProperty('type_symbol')), // atom
+        B.Struct.atomProperty('residue-key') // group by
+    );
+
+    const bfactor = B.Struct.atomSet(s => s.reduce.accumulator, 0, B.math(m => m.max, B.Struct.atomProperty('B_iso_or_equiv'), B.Struct.atomSet(s => s.reduce.value)));
+    const q = B.Struct.modifier(m => m.includeSurroundings, cn, 5, true);
+    //B.Struct.filter(f => f.pick, cn, B.rel(r => r.gr, bfactor, 80));
 
     console.log(lispFormat(q));
 
     const ctx = Context.ofModel(model);
     const env = Environment(ctx);
     const r = compile<AtomSelection>(q);
+    console.time('query');
     const res = r(env);
-  
-    console.log(AtomSelection.atomSets(res).map(s => AtomSet.atomIndices(s)));
-    console.log(AtomSet.atomIndices(AtomSelection.toAtomSet(res)));
+    console.timeEnd('query');
 
+    // console.time('query');
+    // const res1 = r(env);
+    // console.timeEnd('query');
+
+    //console.log(AtomSelection.atomSets(res).map(s => AtomSet.atomIndices(s)));
+    console.log(AtomSelection.atomSets(res).length);
+    //console.log(AtomSet.atomIndices(AtomSelection.toAtomSet(res)));
     //console.log(model.entities);
     //console.log(model.chains);
 }
 
-fs.readFile('e:/test/quick/1tqn_updated.cif', 'utf-8', (err, data) => {
+fs.readFile('e:/test/quick/1jj2_updated.cif', 'utf-8', (err, data) => {
     if (err) {
         console.error(err);
         return;

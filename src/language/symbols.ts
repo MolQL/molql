@@ -138,17 +138,8 @@ const structure = {
     '@header': 'Molecular Structure Queries',
     constructor: {
         '@header': 'Constructors',
-        elementSymbol: ctor(Type.Structure.elementSymbol, [['symbol', Type.Primitive.str]])
-    },
-    primitive: {
-        modify: symbol({
-            type: Type.Structure.atomSelection,
-            args: [['seq', Type.Structure.atomSelection], ['f', Type.Structure.atomSelection]]
-        }),
-        combine: symbol({
-            type: Type.Structure.atomSelection,
-            args: [['combinator', Type.Structure.atomSelection], ['seqs', Type.oneOrMore(Type.Structure.atomSelection)]]
-        })
+        elementSymbol: ctor(Type.Structure.elementSymbol, [['symbol', Type.Primitive.str]]),
+        secondaryStructureType: ctor(Type.Structure.secondaryStructureType, [['symbol', Type.Primitive.str]]),
     },
     generator: {
         '@header': 'Generators',
@@ -161,25 +152,61 @@ const structure = {
                 ['atom-predicate', Type.Primitive.bool],
                 ['group-by', Type.optional(Type.anyValue)]
             ]
-        }),
-        connectedComponents: symbol({
-            type: Type.Structure.atomSelection,
-            description: 'Returns all covalently connected components.'
         })
+        // connectedComponents: symbol({
+        //     type: Type.Structure.atomSelection,
+        //     description: 'Returns all covalently connected components.'
+        // })
     },
     modifier: {
-        '@header': 'Atom Set Modifiers',
-        filter: symbol({
+        '@header': 'Selection Modifications',
+        includeSurroundings: symbol({
             type: Type.Structure.atomSelection,
-            args: [['seq', Type.Structure.atomSelection], ['predicate', Type.Primitive.bool]]
+            args: [['selection', Type.Structure.atomSelection], ['radius', Type.Primitive.num], ['wholeResidues', Type.optional(Type.Primitive.bool)]]
+        }),
+        queryEach: symbol({
+            type: Type.Structure.atomSelection,
+            args: [['selection', Type.Structure.atomSelection], ['query', Type.Structure.atomSelection]]
+        }),
+        intersectBy: symbol({
+            description: 'Intersect each atom set from the first sequence from atoms in the second one.',
+            type: Type.Structure.atomSelection,
+            args: [['selection', Type.Structure.atomSelection], ['by', Type.Structure.atomSelection]]
+        }),
+        unionBy: symbol({
+            description: 'For each atom set A in the orginal sequence, combine all atoms sets in the target selection that intersect with A.',
+            type: Type.Structure.atomSelection,
+            args: [['selection', Type.Structure.atomSelection], ['by', Type.Structure.atomSelection]]
+        }),
+        complement: symbol({
+            description: 'Complement each atom set in the selection (with respect to the current context).',
+            type: Type.Structure.atomSelection,
+            args: [['selection', Type.Structure.atomSelection]]
+        }),
+    },
+    filter: {
+        '@header': 'Selection Filters',
+        withProperties: symbol({
+            type: Type.Structure.atomSelection,
+            args: [['selection', Type.Structure.atomSelection], ['source', Type.Structure.atomSelection], ['property', Type.anyValue]]
+        }),
+        within: symbol({
+            type: Type.Structure.atomSelection,
+            args: [['selection', Type.Structure.atomSelection], ['other-selection', Type.Structure.atomSelection]]
+        }),
+        pick: symbol({
+            type: Type.Structure.atomSelection,
+            args: [['selection', Type.Structure.atomSelection], ['predicate', Type.Primitive.bool]]
         }),
     },
     combinator: {
         '@header': 'Sequence Combinators',
-        intersectWith: symbol({
+        intersect: symbol({
+            description: 'Return all unique atom sets that appear in all of the source selections.',
             type: Type.Structure.atomSelection,
         }),
         merge: symbol({
+            description: 'Merges multiple selections into a single one.',
             type: Type.Structure.atomSelection,
         }),
         union: symbol({
@@ -192,15 +219,11 @@ const structure = {
             args: [['max-distance', Type.Primitive.num]]
         })
     },
-    attribute: {
-        '@header': 'Attributes',
-        atomKey: value(Type.anyValue),
-        residueKey: value(Type.anyValue),
-        chainKey: value(Type.anyValue),
-        entityKey: value(Type.anyValue),
-        staticAtomProperty: symbol({
+    property: {
+        '@header': 'Properties',
+        atomStatic: symbol({
             type: Type.anyValue,
-            args: [['name', Type.Primitive.str]],
+            args: [['name', Type.Structure.atomProperty]],
             description: `Access a "statically defined" atom property. One of: ${Object.keys(StaticAtomProperties).map(k => '``' + k + '``').join(', ')}.`
         })
     },
@@ -221,31 +244,19 @@ const structure = {
             args: [ ['prop', Type.anyValue] ],
             description: 'Returns a set of unique properties from all atoms within the current atom set.'
         }),
-        find: symbol({
-            description: 'Executes the specified query in the context induced the current atom set.',
+        count: symbol({
+            description: 'Counts the number of occurences of a specific query inside the current atom set.',
             type: Type.Structure.atomSelection,
             args: [['query', Type.Structure.atomSelection]]
         }),
     },
-    property: {
-        '@header': 'Properties',
-        secondaryStructure: {
-            '@header': 'Secondary Structure',
-            uniqueId: value(Type.anyValue, 'Returns an implementation specific unique identifier of the current secondary structure element.'),
-        },
-        atomSelection: {
-            '@header': 'Atom Set Sequences',
-            '@namespace': Type.Structure.atomSelection.kind,
-            length: symbol({
-                type: Type.Structure.atomSelection,
-                args: [ ['seq', Type.Structure.atomSelection] ]
-            }),
-            propertySet: symbol({
-                type: Type.Primitive.set,
-                args: [ ['prop', Type.anyValue], ['seq', Type.Structure.atomSelection] ],
-                description: 'Returns a set of unique properties from all atoms within the source sequence.'
-            }),
-        }
+    selection: {
+        '@header': 'Selection',
+        propertySet: symbol({
+            type: Type.Primitive.set,
+            args: [ ['prop', Type.anyValue], ['seq', Type.Structure.atomSelection] ],
+            description: 'Returns a set of unique properties from all atoms within the source sequence.'
+        })
     }
 }
 

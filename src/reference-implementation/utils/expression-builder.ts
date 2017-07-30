@@ -25,22 +25,22 @@ namespace Builder {
 
     export namespace Struct {
         export const ctor = category(Symbols.structure.constructor);
-        export const prim = category(Symbols.structure.primitive);
+        export const filter = category(Symbols.structure.filter);
+        export const modifier = category(Symbols.structure.modifier);
         export const gen = category(Symbols.structure.generator);
-        export const mod = category(Symbols.structure.modifier);
-        export const comb = category(Symbols.structure.modifier);
-        export const attr = category(Symbols.structure.attribute);
+        export const atomSet = category(Symbols.structure.atomSet);
+        //export const mod = category(Symbols.structure.modifier);
+        //export const comb = category(Symbols.structure.modifier);
+        export const attr = category(Symbols.structure.property);
 
-        export function modify(what: Expression, modifier: Expression) { return prim(s => s.modify, what, modifier); }
-        export function combine(combinator: (c: typeof comb) => Expression, ...seqs: Expression[]) {
-            return prim(s => s.combine, combinator(comb), ...seqs);
-        }
+        // export function modify(what: Expression, modifier: Expression) { return prim(s => s.modify, what, modifier); }
+        // export function combine(combinator: (c: typeof comb) => Expression, ...seqs: Expression[]) {
+        //     return prim(s => s.combine, combinator(comb), ...seqs);
+        // }
 
         export function atomProperty(name: StaticAtomProperties) {
-            return Expression.apply(Expression.symbol(Symbols.structure.attribute.staticAtomProperty.name), [name]);
+            return Expression.apply(Expression.symbol(Symbols.structure.property.atomStatic.name), [name]);
         }
-
-        combine(c => c(t => t.filter, 0), )
     }
 }
 
