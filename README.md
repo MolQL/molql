@@ -31,19 +31,25 @@ TODO.
 Building & Running
 ========
 
-Build:
+### Build:
 
     npm install
     npm run build
 
-Interactive builds on file save:
+### Interactive builds on file save:
 
     npm run watch
 
-Building docs:
+### Building docs:
  
     npm run docs
 
-To run the test app:
+### To run the test app:
 
     node build/app
+
+### "Building" test app
+
+    node_modules/.bin/webpack build/test-app/index.js test-app/index.js
+
+Then just open ``test-app/index.html``.
