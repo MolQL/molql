@@ -48,8 +48,8 @@ Building & Running
 
     node build/app
 
-### "Building" test app
+### Building "HTML" test app
 
-    node_modules/.bin/webpack build/test-app/index.js test-app/index.js
+    npm run testapp
 
 Then just open ``test-app/index.html``.

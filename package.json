@@ -7,7 +7,8 @@
     "build": "./node_modules/.bin/tsc",
     "watch": "./node_modules/.bin/tsc -watch",
     "docs": "node ./build/reference-implementation/utils/markdown-documentation.js > ./docs/language-reference.md",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "testapp": "node_modules/.bin/webpack build/test-app/index.js test-app/index.js"
   },
   "author": "",
   "license": "MIT",
