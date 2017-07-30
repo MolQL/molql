@@ -13,7 +13,7 @@ import { atomGroupsGenerator } from './molecule/generators'
 import * as MolQueryProperties from './molecule/properties'
 import * as MolQueryFilters from './molecule/filters'
 import * as MolQueryModifiers from './molecule/modifiers'
-import { Set, Map } from 'immutable'
+import { FastSet, FastMap } from '../utils/collections'
 import Compiler from '../compiler/compiler'
 
 namespace SymbolRuntime {
@@ -57,17 +57,17 @@ const symbolDefinitions: CompileInfo[] = [
     [
         Symbols.primitive.constructor.set,
         staticFunc(function(env) {
-            const set = Set().asMutable();
+            const set = FastSet.create<any>();
             for (let i = 1; i < arguments.length; i++) set.add(arguments[i](env));
-            return set.asImmutable();
+            return set;
         })
     ],
     [
         Symbols.primitive.constructor.map,
         staticFunc(function (env) {
-            const map = Map().asMutable();
+            const map = FastMap.create<any, any>();
             for (let i = 1; i < arguments.length; i += 2) map.set(arguments[i](env), arguments[i + 1](env));
-            return map.asImmutable();
+            return map;
         })
     ],
     [Symbols.primitive.constructor.regex, staticFunc((env, expr, flags) => new RegExp(expr(env), flags ? flags(env) : ''))],
@@ -171,7 +171,6 @@ const symbolDefinitions: CompileInfo[] = [
 
     // ============= SET ================
     [Symbols.primitive.operator.set.has, staticFunc((env, set: RuntimeExpression<Set<any>>, v) => set(env).has(v(env)))],
-    [Symbols.primitive.operator.set.add, staticFunc((env, set: RuntimeExpression<Set<any>>, v) => set(env).add(v(env)))],
 
     // ============= MAP ================
     [
@@ -182,7 +181,6 @@ const symbolDefinitions: CompileInfo[] = [
             return def(env);
         })
     ],
-    [Symbols.primitive.operator.map.set, staticFunc((env, map: RuntimeExpression<Map<any, any>>, key, v) => map(env).set(key(env), v(env)))],
 
     ////////////////////////////////////
     // Structure

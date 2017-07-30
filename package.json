@@ -19,7 +19,6 @@
   },
   "dependencies": {
     "ciftools.js": "github:dsehnal/CIFTools.js#34cd913",
-    "immutable": "^3.8.1",
     "litemol": "github:dsehnal/LiteMol#12d6a12"
   }
 }

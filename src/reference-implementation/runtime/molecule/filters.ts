@@ -9,11 +9,11 @@ import Environment from '../environment'
 import Iterator from '../iterator'
 import Slot from '../slot'
 import RuntimeExpression from '../expression'
-import { Set } from 'immutable'
 import Compiler from '../../compiler/compiler'
 import { ElementSymbol, Model } from '../../molecule/data'
 import { StaticAtomProperties } from '../../../language/properties'
 import * as MolQueryProperties from './properties'
+import { FastSet } from '../../utils/collections'
 
 import ElementAddress = Context.ElementAddress
 
@@ -29,13 +29,22 @@ export function pick(env: Environment, selection: RuntimeExpression<AtomSelectio
     return ret.getSelection();
 }
 
+function isSubset(a: FastSet<any>, b: FastSet<any>) {
+    const _ctx = { b, count: 0 };
+    a.forEach((e, ctx) => {
+        if (!ctx!.b.has(e)) return false;
+        ctx!.count++;
+    }, _ctx);
+    return _ctx.count === a.size;
+}
+
 export function withProperties(env: Environment, selection: RuntimeExpression<AtomSelection>, source: RuntimeExpression<AtomSelection>, prop: RuntimeExpression<any>) {
     const sel = selection(env);
     const propSet = MolQueryProperties.selectionPropertySet(env, prop, source(env));
     const ret = AtomSelection.linearBuilder();
     for (const atomSet of AtomSelection.atomSets(sel)) {
         const props = MolQueryProperties.atomSetPropertySet(env, prop, atomSet);
-        if (props.isSubset(propSet)) ret.add(atomSet);
+        if (isSubset(props, propSet)) ret.add(atomSet);
     }
     return ret.getSelection();
 }

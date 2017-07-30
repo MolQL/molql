@@ -62,7 +62,7 @@ export interface FastSet<T extends string | number> {
      * Iterate over the collection.
      * Optional "context" object can be supplied that is passed to the callback.
      */
-    forEach<Context>(f: (key: T, ctx?: Context) => void, ctx?: Context): void;
+    forEach<Context>(f: (key: T, ctx?: Context) => boolean | any, ctx?: Context): void;
 }
 
 function createMapObject() {
@@ -147,10 +147,10 @@ export namespace FastMap {
 }
 
 export namespace FastSet {
-    function forEach(data: any, f: (k: string | number, ctx: any) => void, ctx: any) {
+    function forEach(data: any, f: (k: string | number, ctx: any) => boolean | void, ctx: any) {
         for (const p of Object.keys(data)) {
             if (data[p] !== null) continue;
-            f(p, ctx);
+            if (f(p, ctx) === false) break;
         }
     }
 

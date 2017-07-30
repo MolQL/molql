@@ -9,14 +9,14 @@ import Environment from '../environment'
 import Iterator from '../iterator'
 import Slot from '../slot'
 import RuntimeExpression from '../expression'
-import { Set } from 'immutable'
 import Compiler from '../../compiler/compiler'
 import { ElementSymbol } from '../../molecule/data'
 import { StaticAtomProperties } from '../../../language/properties'
+import { FastSet } from '../../utils/collections'
 
 import ElementAddress = Context.ElementAddress
 
-function _atomSetPropertySet(env: Environment, atomSet: AtomSet, prop: RuntimeExpression, set: Set<any>) {
+function _atomSetPropertySet(env: Environment, atomSet: AtomSet, prop: RuntimeExpression, set: FastSet<any>) {
     const ctx = env.queryCtx;
     const element = Environment.beginIterateElemement(env);
     for (const a of AtomSet.atomIndices(atomSet)) {
@@ -30,15 +30,15 @@ function _atomSetPropertySet(env: Environment, atomSet: AtomSet, prop: RuntimeEx
 }
 
 export function atomSetPropertySet(env: Environment, prop: RuntimeExpression, set: AtomSet) {
-    return _atomSetPropertySet(env, set, prop, Set().asMutable()).asImmutable();
+    return _atomSetPropertySet(env, set, prop, FastSet.create());
 }
 
 export function selectionPropertySet(env: Environment, prop: RuntimeExpression, selection: AtomSelection) {
-    const set = Set().asMutable();
+    const set = FastSet.create<any>();
     for (const atomSet of AtomSelection.atomSets(selection)) {
         _atomSetPropertySet(env, atomSet, prop, set);
     }
-    return set.asImmutable();
+    return set;
 }
 
 export function accumulateAtomSet(env: Environment, initial: RuntimeExpression, f: RuntimeExpression) {

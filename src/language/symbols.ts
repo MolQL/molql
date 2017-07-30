@@ -113,11 +113,7 @@ const primitive = {
             has: symbol({
                 type: Type.Primitive.bool,
                 args: [['set', Type.Primitive.set], ['value', Type.anyValue]]
-            }),
-            add: symbol({
-                type: Type.Primitive.set,
-                args: [['set', Type.Primitive.set], ['value', Type.anyValue]]
-            }),
+            })
         },
 
         map: {
@@ -125,10 +121,6 @@ const primitive = {
             get: symbol({
                 type: Type.anyValue,
                 args: [['map', Type.Primitive.map], ['key', Type.anyValue], ['default', Type.anyValue]]
-            }),
-            set: symbol({
-                type: Type.Primitive.map,
-                args: [['map', Type.Primitive.map], ['key', Type.anyValue], ['value', Type.anyValue]]
             })
         }
     }
