@@ -9,7 +9,11 @@
         //"noUnusedLocals": true,
         "strictNullChecks": true,
         //"downlevelIteration": true,
+        "jsx": "react",
         "lib": [ "es6", "dom" ],
         "outDir": "build"
-    }
+    },
+    "include": [
+        "src/**/*"
+    ]
 }

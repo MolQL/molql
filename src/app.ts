@@ -12,8 +12,8 @@ import B from './reference-implementation/utils/expression-builder'
 import { Model } from './reference-implementation/molecule/data'
 import parseCIF from './reference-implementation/molecule/parser'
 import lispFormat from './reference-implementation/utils/expression-lisp-formatter'
-import Environment from './reference-implementation/runtime/environment'
 import { SymbolTable } from './reference-implementation/runtime/symbols'
+import Environment from './reference-implementation/runtime/environment'
 import Context from './reference-implementation/query/context'
 import AtomSelection from './reference-implementation/query/atom-selection'
 import { getSymbolsWithoutImplementation } from './language/symbols'
@@ -119,6 +119,8 @@ function run(model: Model) {
     const bfactor = B.Struct.atomSet(s => s.reduce.accumulator, 0, B.math(m => m.max, B.Struct.atomProperty('B_iso_or_equiv'), B.Struct.atomSet(s => s.reduce.value)));
     const q = B.Struct.modifier(m => m.includeSurroundings, fe, 5, true);
     //B.Struct.filter(f => f.pick, cn, B.rel(r => r.gr, bfactor, 80));
+
+    console.log(JSON.stringify(q, null, 2));
 
     console.log(lispFormat(q));
 

@@ -13,10 +13,12 @@
   "license": "MIT",
   "devDependencies": {
     "@types/node": "^8.0.17",
-    "typescript": "^2.4.2"
+    "typescript": "^2.4.2",
+    "webpack": "^3.4.1"
   },
   "dependencies": {
     "ciftools.js": "github:dsehnal/CIFTools.js#34cd913",
-    "immutable": "^3.8.1"
+    "immutable": "^3.8.1",
+    "litemol": "github:dsehnal/LiteMol#12d6a12"
   }
 }
