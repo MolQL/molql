@@ -145,10 +145,6 @@ const structure = {
                 ['group-by', Type.optional(Type.anyValue)]
             ]
         })
-        // connectedComponents: symbol({
-        //     type: Type.Structure.atomSelection,
-        //     description: 'Returns all covalently connected components.'
-        // })
     },
     modifier: {
         '@header': 'Selection Modifications',

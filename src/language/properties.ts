@@ -37,7 +37,8 @@ export const StaticAtomProperties = {
     'entity-key': 'Unique value for each tuple ``label_entity_id``.',
 
     //'is-ligand': 'Same as mmCIF',
-    //'ligand-key': 'Same as mmCIF'
+    //'ligand-key': 'Same as mmCIF',
+    // 'connected-component-key'
 }
 
 export const SecondaryStructureTypes = {
