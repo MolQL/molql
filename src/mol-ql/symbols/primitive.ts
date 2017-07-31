@@ -4,7 +4,7 @@
 
 import Type from '../../mini-lisp/type-system'
 import Symbol, { Arguments } from '../../mini-lisp/symbol'
-import symbol from './helpers'
+import { symbol } from './helpers'
 
 import Arg = Arguments.Argument
 
@@ -57,8 +57,7 @@ const operator = {
     arithmetic: {
         '@header': 'Arithmetic',
         add: binOp(Type.Num),
-        sub: binRel(Type.Num, Type.Num),
-        minus: unaryOp(Type.Num),
+        sub: binOp(Type.Num),
         mult: binOp(Type.Num),
         div: binRel(Type.Num, Type.Num),
         pow: binRel(Type.Num, Type.Num),
@@ -113,6 +112,6 @@ const operator = {
     }
 }
 
-export default { type, operator }
+export default { '@header': 'Langauge Primitives', type, operator }
 
 

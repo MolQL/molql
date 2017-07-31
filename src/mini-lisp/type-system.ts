@@ -9,7 +9,6 @@ type Type =
     | Type.Dictionary
     | Type.Or
     | Type.Optional
-    | Type.Fn
 
 namespace Type {
     export interface Any { kind: 'any' }
@@ -22,9 +21,10 @@ namespace Type {
     export function Value(name: string, parent?: Value): Value { return { kind: 'value', name, parent } }
 
     export const AnyValue = Value('value');
-    export const Bool = Value('bool', AnyValue);
-    export const Num = Value('number', AnyValue);
-    export const Str = Value('string', AnyValue);
+    export const LiteralValue = Value('value', AnyValue);
+    export const Bool = Value('bool', LiteralValue);
+    export const Num = Value('number', LiteralValue);
+    export const Str = Value('string', LiteralValue);
 
     export interface List { kind: 'list', type: Type }
     export function List(type: Type = Any): List { return { kind: 'list', type } }
@@ -37,9 +37,6 @@ namespace Type {
 
     export interface Optional { kind: 'optional', type: Type }
     export function Optional(type: Type): Optional { return { kind: 'optional', type } }
-
-    export interface Fn { kind: 'fn', from: Type, to: Type }
-    export function Fn(from: Type, to: Type): Fn { return { kind: 'fn', from, to } }
 }
 
 export default Type

@@ -21,6 +21,7 @@ export namespace Arguments {
 }
 
 interface Symbol {
+    id: string,
     namespace: string,
     name: string,
     type: Type,
@@ -28,7 +29,7 @@ interface Symbol {
     description?: string
 }
 
-function Symbol(namespace: string, name: string, type: Type, args: Arguments, description?: string): Symbol { return { namespace, name, type, arguments: args, description } }
+function Symbol(id: string, namespace: string, name: string, type: Type, args: Arguments, description?: string): Symbol { return { id, namespace, name, type, arguments: args, description } }
 
 export default Symbol
 
