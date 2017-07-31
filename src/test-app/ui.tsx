@@ -18,7 +18,7 @@ export default class Root extends React.Component<{ state: State }, { }> {
     render() {
         return <div style={{ margin: '40px auto', maxWidth: 1600 }}>
             <div className='row'>
-                <h1>MolQL <small>super awesome test app</small></h1>
+                <h1>MolQL <small>super awesome prototype test app</small></h1>
             </div>
             <div className='row'>
                 <div className='six columns'>
