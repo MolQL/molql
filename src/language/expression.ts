@@ -8,6 +8,8 @@ type Expression =
     | Expression.Apply
 
 namespace Expression {
+    export interface Serialized { encoder: string, version: string, expression: Expression }
+
     export type Literal = string | number | boolean
     export interface Symbol { readonly symbol: string }
     export interface Apply { readonly head: Symbol | Apply, readonly args?: Expression[] }

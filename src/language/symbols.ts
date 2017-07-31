@@ -129,7 +129,7 @@ const primitive = {
 const structure = {
     '@header': 'Molecular Structure Queries',
     constructor: {
-        '@header': 'Constructors',
+        '@header': 'Elements',
         elementSymbol: ctor(Type.Structure.elementSymbol, [['symbol', Type.Primitive.str]]),
         secondaryStructureType: ctor(Type.Structure.secondaryStructureType, [['symbol', Type.Primitive.str]]),
     },
@@ -265,7 +265,6 @@ function unaryOp(type: Type, description?: string) {
         ]
     });
 }
-
 
 function binOp(type: Type, description?: string) {
     return symbol({

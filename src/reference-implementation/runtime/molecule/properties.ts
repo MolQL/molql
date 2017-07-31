@@ -42,6 +42,7 @@ export function selectionPropertySet(env: Environment, prop: RuntimeExpression, 
 }
 
 export function accumulateAtomSet(env: Environment, initial: RuntimeExpression, f: RuntimeExpression) {
+    // TODO: no nested accumulators
     const ctx = env.queryCtx;
     const slot = Slot.push(env.atomSetReducer, initial(env));
     const element = Environment.beginIterateElemement(env);

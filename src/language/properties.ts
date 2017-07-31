@@ -38,7 +38,7 @@ export const StaticAtomProperties = {
 
     //'is-ligand': 'Same as mmCIF',
     //'ligand-key': 'Same as mmCIF',
-    // 'connected-component-key'
+    //'connected-component-key'
 }
 
 export const SecondaryStructureTypes = {

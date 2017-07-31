@@ -19,6 +19,9 @@
   },
   "dependencies": {
     "ciftools.js": "github:dsehnal/CIFTools.js#34cd913",
-    "litemol": "github:dsehnal/LiteMol#12d6a12"
+    "litemol": "github:dsehnal/LiteMol#e5893f1",
+    "react": "^15.6.1",
+    "react-ace": "^5.1.1",
+    "react-dom": "^15.6.1"
   }
 }

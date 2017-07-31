@@ -1,11 +1,11 @@
 import LiteMol from 'litemol'
 import State from './state'
 import UI from './ui'
+import * as React from 'react'
+import * as ReactDOM from 'react-dom'
 
-import React = LiteMol.Plugin.React
-
-const state = State()
-LiteMol.Plugin.ReactDOM.render(<UI state={state} />, document.getElementById('app'));
+const state = new State()
+ReactDOM.render(<UI state={state} />, document.getElementById('app'));
 
 // import { Model } from '../reference-implementation/molecule/data'
 // import parseCIF from '../reference-implementation/molecule/parser'
