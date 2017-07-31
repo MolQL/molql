@@ -43,11 +43,11 @@ const symbolDefinitions: CompileInfo[] = [
     // Primitives
 
     // ============= CONSTRUCTORS =============
-    [Symbols.primitive.constructor.bool, staticFunc((env, v) => !!v(env))],
-    [Symbols.primitive.constructor.number, staticFunc((env, v) => +v(env))],
-    [Symbols.primitive.constructor.str, staticFunc((env, v) => '' + v(env))],
+    [Symbols.primitive.type.bool, staticFunc((env, v) => !!v(env))],
+    [Symbols.primitive.type.number, staticFunc((env, v) => +v(env))],
+    [Symbols.primitive.type.str, staticFunc((env, v) => '' + v(env))],
     [
-        Symbols.primitive.constructor.list,
+        Symbols.primitive.type.list,
         staticFunc(function (env) {
             const list: any[] = [];
             for (let i = 1; i < arguments.length; i++) list[list.length] = arguments[i](env);
@@ -55,7 +55,7 @@ const symbolDefinitions: CompileInfo[] = [
         })
     ],
     [
-        Symbols.primitive.constructor.set,
+        Symbols.primitive.type.set,
         staticFunc(function(env) {
             const set = FastSet.create<any>();
             for (let i = 1; i < arguments.length; i++) set.add(arguments[i](env));
@@ -63,14 +63,14 @@ const symbolDefinitions: CompileInfo[] = [
         })
     ],
     [
-        Symbols.primitive.constructor.map,
+        Symbols.primitive.type.map,
         staticFunc(function (env) {
             const map = FastMap.create<any, any>();
             for (let i = 1; i < arguments.length; i += 2) map.set(arguments[i](env), arguments[i + 1](env));
             return map;
         })
     ],
-    [Symbols.primitive.constructor.regex, staticFunc((env, expr, flags) => new RegExp(expr(env), flags ? flags(env) : ''))],
+    [Symbols.primitive.type.regex, staticFunc((env, expr, flags) => new RegExp(expr(env), flags ? flags(env) : ''))],
 
     // ============= OPERATORS =============
 

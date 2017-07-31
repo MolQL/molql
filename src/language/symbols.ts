@@ -25,7 +25,7 @@ export interface SymbolInfo {
 
 const primitive = {
     '@header': 'Langauge Primitives',
-    constructor: {
+    type: {
         '@header': 'Constructors',
         bool: symbol({ type: Type.Primitive.bool, args: [['value', Type.anyValue]] }),
         number: symbol({ type: Type.Primitive.num, args: [['value', Type.anyValue]] }),

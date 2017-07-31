@@ -140,7 +140,7 @@ class CompiledQuery extends Observer<{ state: State }, { error?: string, express
     componentDidMount() {
         this.subscribe(this.props.state.query, q => {
             if (q.kind === 'error') this.setState({ error: q.message, expression: void 0 })
-            else this.setState({ error: void 0, expression: q.serialized.expression })
+            else this.setState({ error: void 0, expression: q.expression })
         });
         this.subscribe(this.props.state.compileTarget, target => {
             this.setState({ target })

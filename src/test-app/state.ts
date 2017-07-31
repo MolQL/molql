@@ -24,7 +24,7 @@ export interface MoleculeData {
 }
 
 export type Query =
-    | { kind: 'ok', sourceLanguage: string, text: string, serialized: Expression.Serialized, compiled: RuntimeExpression<AtomSelection> }
+    | { kind: 'ok', sourceLanguage: string, text: string, expression: Expression, compiled: RuntimeExpression<AtomSelection> }
     | { kind: 'error', message: string }
 
 class State {
@@ -106,9 +106,9 @@ class State {
         }
         try {
             console.log('parsing', text, text.substr(1280, 1290));
-            const serialized = JSON.parse(text) as Expression.Serialized;
-            const compiled = compile<AtomSelection>(serialized.expression);
-            this.query.onNext({ kind: 'ok', sourceLanguage: 'json', text, serialized, compiled });
+            const expression = JSON.parse(text) as Expression;
+            const compiled = compile<AtomSelection>(expression);
+            this.query.onNext({ kind: 'ok', sourceLanguage: 'json', text, expression, compiled });
         } catch (e) {
             this.query.onNext({ kind: 'error', message: '' + e });
         }
