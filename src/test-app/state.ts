@@ -105,6 +105,7 @@ class State {
             return;
         }
         try {
+            console.log('parsing', text, text.substr(1280, 1290));
             const serialized = JSON.parse(text) as Expression.Serialized;
             const compiled = compile<AtomSelection>(serialized.expression);
             this.query.onNext({ kind: 'ok', sourceLanguage: 'json', text, serialized, compiled });
@@ -114,7 +115,7 @@ class State {
     }
 
     constructor() {
-        this.queryString.throttle(250).subscribe(s => this.parseQuery(s));
+        this.queryString.debounce(350).subscribe(s => this.parseQuery(s));
     }
 }
 

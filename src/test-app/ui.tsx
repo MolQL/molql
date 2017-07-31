@@ -130,7 +130,7 @@ class QueryExpression extends Observer<{ state: State }, { queryString: string }
         console.log(this.editor);
     }
     render() {
-        return <AceEditor ref={e => this.editor = e!} onChange={v => this.props.state.queryString.onNext(v) } mode={'lisp'} width={'100%'} height={'320px'} value={this.state.queryString} setOptions={{ enableBasicAutocompletion: true, enableLiveAutocompletion: true, enableSnippets: true }} />;
+        return <AceEditor ref={e => this.editor = e!} onChange={v => this.props.state.queryString.onNext(v) } mode={'json'} width={'100%'} height={'320px'} value={this.state.queryString} setOptions={{ enableBasicAutocompletion: true, enableLiveAutocompletion: true, enableSnippets: true }} />;
     }
 }
 
