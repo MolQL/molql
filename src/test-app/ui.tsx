@@ -9,8 +9,14 @@ import AceEditor from 'react-ace'
 import Expression from '../language/expression'
 import lispFormat from '../reference-implementation/utils/expression-lisp-formatter'
 
+import 'brace/mode/jsx';
 import 'brace/mode/lisp';
 import 'brace/mode/json';
+import 'brace/mode/javascript';
+import 'brace/snippets/javascript';
+import 'brace/snippets/json';
+import 'brace/snippets/lisp';
+import 'brace/ext/language_tools';
 
 import Rx = LiteMol.Core.Rx
 
@@ -115,13 +121,16 @@ class QueryControls extends Observer<{ state: State }, { loaded: boolean, queryO
 
 class QueryExpression extends Observer<{ state: State }, { queryString: string }> {
     state = { queryString: '' }
+    editor: AceEditor
     componentDidMount() {
         this.subscribe(this.props.state.queryString, queryString => {
             this.setState({ queryString });
         });
+
+        console.log(this.editor);
     }
     render() {
-        return <AceEditor onChange={v => this.props.state.queryString.onNext(v) } mode={'json'} width={'100%'} height={'320px'} value={this.state.queryString} />;
+        return <AceEditor ref={e => this.editor = e!} onChange={v => this.props.state.queryString.onNext(v) } mode={'lisp'} width={'100%'} height={'320px'} value={this.state.queryString} setOptions={{ enableBasicAutocompletion: true, enableLiveAutocompletion: true, enableSnippets: true }} />;
     }
 }
 
