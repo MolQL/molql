@@ -8,11 +8,10 @@ type Expression =
 
 namespace Expression {
     export type Literal = string | number | boolean
-    export interface Symbol { readonly symbol: string }
     export type Arguments = Expression[] | { [name: string]: Expression }
-    export interface Apply { readonly head: Symbol | Apply, readonly args?: Arguments }
+    export interface Apply { readonly head: Expression, readonly args?: Arguments }
 
-    export function Apply(head: Symbol | Apply, args?: Arguments): Apply { return { head, args }; }
+    export function Apply(head: Expression, args?: Arguments): Apply { return { head, args }; }
 
     export function isArgumentsArray(e: Arguments): e is Expression[] { return e instanceof Array; }
     export function isArgumentsMap(e: Arguments): e is { [name: string]: Expression } { return !(e instanceof Array); }
