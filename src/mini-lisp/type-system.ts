@@ -4,10 +4,10 @@
 
 type Type =
     | Type.Any
+    | Type.Empty
     | Type.Value
     | Type.List
     | Type.Dictionary
-    | Type.Or
     | Type.Optional
 
 namespace Type {
@@ -31,9 +31,6 @@ namespace Type {
 
     export interface Dictionary { kind: 'dictionary', map: { [name: string]: Type } }
     export function Dictionary(map: { [name: string]: Type }): Dictionary { return { kind: 'dictionary', map } }
-
-    export interface Or { kind: 'or', types: Type[] }
-    export function Or(...types: Type[]): Or { return { kind: 'or', types } }
 
     export interface Optional { kind: 'optional', type: Type }
     export function Optional(type: Type): Optional { return { kind: 'optional', type } }

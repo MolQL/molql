@@ -11,8 +11,8 @@ export interface SymbolDefinition {
     arguments?: Arguments
 }
 
-export function symbol(type: Type, definition: SymbolDefinition = { }) {
-    return Symbol('', '', definition.name || '', type, definition.arguments || Arguments.None, definition.description);
+export function symbol<A, T>(type: Type, definition: SymbolDefinition = { }) {
+    return Symbol<A, T>(definition.name || '', type, definition.arguments || Arguments.None, definition.description);
 }
 
 export function normalizeTable(table: any) {

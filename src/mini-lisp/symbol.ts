@@ -10,17 +10,28 @@ export namespace Arguments {
     export type None = { kind: 'none' }
     export const None: None = { kind: 'none' }
 
-    export type List = { kind: 'list', type: Type.Value, description?: string }
-    export function List(type: Type.Value, description?: string): List { return { kind: 'list', type, description } }
+    export type List = { kind: 'list', type: Type.Value, description?: string, '@type': any[] }
+    export function List(type: Type.Value, description?: string): List { return { kind: 'list', type, description } as List; }
 
-    export interface Argument { type: Type.Value, isOptional: boolean, description?: string }
-    export function Argument(type: Type.Value, isOptional?: boolean, description?: string): Argument { return { type, isOptional: !!isOptional, description } }
+    export type Argument  =
+        | { kind: 'required', type: Type.Value, description?: string }
+        | { kind: 'optional', type: Type.Value, defaultValue: any, description?: string }
+
+    export function Argument(type: Type.Value, description?: string): Argument {
+        return { kind: 'required', type, description };
+    }
+
+    export function OptionalArgument(type: Type.Value, defaultValue: any, description?: string): Argument {
+        return { kind: 'optional', type, defaultValue, description };
+    }
 
     export type Dictionary = { kind: 'dictionary', map: { [name: string]: Argument } }
     export function Dictionary(map: { [name: string]: Argument }): Dictionary { return { kind: 'dictionary', map } }
 }
 
-interface Symbol {
+interface Symbol<A = any, T = any> {
+    '@arg-type': A,
+    '@ret-type': T,
     id: string,
     namespace: string,
     name: string,
@@ -29,7 +40,9 @@ interface Symbol {
     description?: string
 }
 
-function Symbol(id: string, namespace: string, name: string, type: Type, args: Arguments, description?: string): Symbol { return { id, namespace, name, type, arguments: args, description } }
+function Symbol<A, T>(name: string, type: Type, args: Arguments, description?: string) {
+    return { id: '', namespace: '', name, type, arguments: args, description, '@arg-type': void 0 as any } as Symbol<T>;
+}
 
 export default Symbol
 
