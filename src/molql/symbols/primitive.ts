@@ -35,7 +35,7 @@ const type = {
     set: symbol(Arguments.List(Type.AnyValue), Types.Set),
     map: symbol(Arguments.List(Type.AnyValue), Types.Map, 'Create a map from a list of key value pairs, e.g. (map 1 "x" 2 "y").'),
     regex: symbol(
-        Arguments.Dictionary({ expression: Argument(Type.Str), flags: Argument(Type.Optional(Type.Str)) }),
+        Arguments.Dictionary({ 0: Argument(Type.Str), 1: Argument(Type.Optional(Type.Str)) }),
         Types.Regex,
         'Creates a regular expression from a string using the ECMAscript syntax.')
 };

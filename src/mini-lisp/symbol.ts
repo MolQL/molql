@@ -36,7 +36,7 @@ export namespace Arguments {
         '@type': T,
         '@traits': { length: number }
     }
-    export function List<T extends Type.Value>(type: T, description?: string): Arguments<{ [key: number]: T['@type'] }, { length: number }> {
+    export function List<T extends Type.Value>(type: T, description?: string): Arguments<{ [key: string]: T['@type'] }, { length: number }> {
         return { kind: 'list', type, '@type': 0 as any, '@traits': 0 as any };
     }
 

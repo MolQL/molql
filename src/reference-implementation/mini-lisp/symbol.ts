@@ -6,7 +6,9 @@ import Symbol, { Arguments } from '../../mini-lisp/symbol'
 import Environment from './environment'
 import RuntimeExpression from './expression'
 
-export type RuntimeArguments<C = any, T extends Arguments = Arguments> = { [P in keyof T['@type']]: RuntimeExpression<T['@type'][P]> } & T['@traits']
+export type RuntimeArguments<C = any, Args extends Arguments = Arguments> =
+    Args['@traits'] & { [P in keyof Args['@type']]: RuntimeExpression<C, Args['@type'][P]> }
+    // { [P in keyof Args['@type']]: RuntimeExpression<Args['@type'][P]> } & Args['@traits']
 
 //RuntimeArguments.Dictionary<C, any> | RuntimeArguments.Array<C, any>
 
@@ -27,9 +29,9 @@ namespace SymbolRuntime {
     export interface Attributes { isStatic: boolean }
 }
 
-function SymbolRuntime<S extends Symbol, T>(symbol: S, attributes: Partial<SymbolRuntime.Attributes> = {}) {
+function SymbolRuntime<S extends Symbol>(symbol: S, attributes: Partial<SymbolRuntime.Attributes> = {}) {
     const { isStatic = false } = attributes;
-    return <C>(runtime: (env: Environment<C>, args: RuntimeArguments<C, S['arguments']>) => T): SymbolRuntime.Info<C, S['arguments'], T> =>
+    return <C>(runtime: (env: Environment<C>, args: RuntimeArguments<C, S['arguments']>) => S['type']['@type']): SymbolRuntime.Info<C, S['arguments'], S['type']['@type']> =>
         ({ symbol, runtime, attributes: { isStatic } });
     // return {
     //     ofMap<C>(runtime: (env: Environment<C>, args: RuntimeArguments.Dictionary<C, A>) => T): SymbolRuntime.Info<C, T> {

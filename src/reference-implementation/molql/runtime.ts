@@ -28,7 +28,7 @@ export const SymbolRuntime: Symbol.Info<Context>[] = [
         for (let i = 0; i < xs.length; i += 2) map.set(xs[i](env), xs[i + 1](env));
         return map;
     }),
-    Symbol(MolQL.primitive.type.regex, staticAttr)((env, v) => new RegExp(v.expression(env), (v.flags && v.flags(env)) || '')),
+    //Symbol(MolQL.primitive.type.regex, staticAttr)((env, v) => new RegExp(v[0](env), (v[1] && v[1](env)) || '')),
 
     // ============= OPERATORS =============
 
