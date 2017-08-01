@@ -12,11 +12,11 @@ export interface ExpressionInfo {
 
 namespace RuntimeExpression {
     export function constant<C, T>(c: T): RuntimeExpression<C, T> {
-        return function (env) { return c; };
+        return env => c;
     }
 
     export function func<C, T>(f: (env: Environment<C>) => T): RuntimeExpression<C, T> {
-        return function (env) { return f(env); };
+        return env => f(env);
     }
 }
 
