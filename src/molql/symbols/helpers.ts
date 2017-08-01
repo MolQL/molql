@@ -5,14 +5,8 @@
 import Type from '../../mini-lisp/type-system'
 import Symbol, { Arguments } from '../../mini-lisp/symbol'
 
-export interface SymbolDefinition<A extends Arguments> {
-    name?: string,
-    description?: string,
-    arguments?: A
-}
-
-export function symbol<A extends Arguments, T extends Type<S>, S>(type: T, definition: SymbolDefinition<A> = { }) {
-    return Symbol<A, T>(definition.name || '', definition.arguments! || Arguments.None, type, definition.description);
+export function symbol<A extends Arguments, T extends Type<S>, S>(args: A, type: T, description?: string) {
+    return Symbol('', args, type, description);
 }
 
 export function normalizeTable(table: any) {

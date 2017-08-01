@@ -15,29 +15,29 @@ export namespace Types {
 }
 
 function unaryOp<T extends Type>(type: T, description?: string) {
-    return symbol(type, { arguments: Arguments.Dictionary({ 0: Argument(type) }), description });
+    return symbol(Arguments.Dictionary({ 0: Argument(type) }), type, description);
 }
 
 function binOp<T extends Type.Value>(type: T, description?: string) {
-    return symbol(type, { arguments: Arguments.List(type), description });
+    return symbol(Arguments.List(type), type, description);
 }
 
 function binRel<A, T>(src: Type.Value, target: Type.Value, description?: string) {
-    return symbol(target, { arguments: Arguments.Dictionary({ 0: Argument(src), 1: Argument(src) }), description });
+    return symbol(Arguments.Dictionary({ 0: Argument(src), 1: Argument(src) }), target, description);
 }
 
 const type = {
     '@header': 'Types',
-    bool: symbol(Type.Bool, { arguments: Arguments.Dictionary({ 0: Argument(Type.AnyValue) }) }),
-    num: symbol(Type.Num, { arguments: Arguments.Dictionary({ 0: Argument(Type.AnyValue) }) }),
-    str: symbol(Type.Str, { arguments: Arguments.Dictionary({ 0: Argument(Type.AnyValue) }) }),
+    bool: symbol(Arguments.Dictionary({ 0: Argument(Type.AnyValue) }), Type.Bool),
+    num: symbol(Arguments.Dictionary({ 0: Argument(Type.AnyValue) }), Type.Num),
+    str: symbol(Arguments.Dictionary({ 0: Argument(Type.AnyValue) }), Type.Str),
 
-    set: symbol(Types.Set, { arguments: Arguments.List(Type.AnyValue) }),
-    map: symbol(Types.Map, { arguments: Arguments.List(Type.AnyValue), description: 'Create a map from a list of key value pairs, e.g. (map 1 "x" 2 "y").' }),
-    regex: symbol(Types.Regex, {
-        arguments: Arguments.Dictionary({ expression: Argument(Type.Str), flags: Argument(Type.Optional(Type.Str)) }),
-        description: 'Creates a regular expression from a string using the ECMAscript syntax.'
-    })
+    set: symbol(Arguments.List(Type.AnyValue), Types.Set),
+    map: symbol(Arguments.List(Type.AnyValue), Types.Map, 'Create a map from a list of key value pairs, e.g. (map 1 "x" 2 "y").'),
+    regex: symbol(
+        Arguments.Dictionary({ expression: Argument(Type.Str), flags: Argument(Type.Optional(Type.Str)) }),
+        Types.Regex,
+        'Creates a regular expression from a string using the ECMAscript syntax.')
 };
 
 const operator = {
@@ -51,7 +51,7 @@ const operator = {
 
     controlFlow: {
         '@header': 'Control Flow',
-        if: symbol(Type.AnyValue, { arguments: Arguments.Dictionary({ cond: Argument(Type.Bool), ifTrue: Argument(Type.AnyValue), ifFalse: Argument(Type.AnyValue) }) })
+        if: symbol(Arguments.Dictionary({ cond: Argument(Type.Bool), ifTrue: Argument(Type.AnyValue), ifFalse: Argument(Type.AnyValue) }), Type.AnyValue)
     },
 
     arithmetic: {
@@ -92,26 +92,26 @@ const operator = {
         lte: binRel(Type.Num, Type.Bool),
         gr: binRel(Type.Num, Type.Bool),
         gre: binRel(Type.Num, Type.Bool),
-        inRange: symbol(Type.Bool, { arguments: Arguments.Dictionary({
-            0: Argument(Type.Num, 'Minumum value'), 1: Argument(Type.Num, 'Maximum value'), 2: Argument(Type.Num, 'Value to test') })
-        }),
+        inRange: symbol(Arguments.Dictionary({
+            0: Argument(Type.Num, 'Minimum value'), 1: Argument(Type.Num, 'Maximum value'), 2: Argument(Type.Num, 'Value to test') }),
+            Type.Bool),
     },
 
     string: {
         '@header': 'Strings',
         concat: binOp(Type.Str),
-        match: symbol(Type.Bool, { arguments: Arguments.Dictionary({ 0: Argument(Types.Regex), 1: Argument(Type.Str) }) })
+        match: symbol(Arguments.Dictionary({ 0: Argument(Types.Regex), 1: Argument(Type.Str) }), Type.Bool)
     },
 
     set: {
         '@header': 'Sets',
-        has: symbol(Type.Bool, { arguments: Arguments.Dictionary({ 0: Argument(Types.Set), 1: Argument(Type.AnyValue) }) })
+        has: symbol(Arguments.Dictionary({ 0: Argument(Types.Set), 1: Argument(Type.AnyValue) }), Type.Bool)
     },
 
     map: {
         '@header': 'Maps',
-        has: symbol(Type.Bool, { arguments: Arguments.Dictionary({ 0: Argument(Types.Map), 1: Argument(Type.AnyValue) }) }),
-        get: symbol(Type.Bool, { arguments: Arguments.Dictionary({ 0: Argument(Types.Map), 1: Argument(Type.AnyValue), 2: Argument(Type.AnyValue, 'Default value if key is not present.') }) })
+        has: symbol(Arguments.Dictionary({ 0: Argument(Types.Map), 1: Argument(Type.AnyValue) }), Type.Bool),
+        get: symbol(Arguments.Dictionary({ 0: Argument(Types.Map), 1: Argument(Type.AnyValue), 2: Argument(Type.AnyValue, 'Default value if key is not present.') }), Type.AnyValue)
     }
 }
 

@@ -5,7 +5,7 @@
 import Type from './type-system'
 
 export type Argument<T extends Type>  = { type: T, defaultValue?: any, description?: string }
-export function Argument<T extends Type>(type: T, defaultValue?: T['@type'], description?: string): Argument<T> {
+export function Argument<T extends Type>(type: T, description?: string, defaultValue?: T['@type'], ): Argument<T> {
     return { type, defaultValue, description };
 }
 
@@ -15,6 +15,8 @@ export type Arguments<T extends { [key: string]: any, [key: number]: any } = {},
     | Arguments.None<T, Traits>
 
 export namespace Arguments {
+    type ArgMap = { [key: string]: Argument<any>, [key: number]: Argument<any> }
+
     export type None<T extends { [key: string]: any, [key: number]: any } = {}, Traits = {}> = { kind: 'none', '@type': T, '@traits': Traits }
     export const None: Arguments = { kind: 'none', '@type': 0 as any, '@traits': 0 as any }
 
@@ -24,7 +26,7 @@ export namespace Arguments {
         '@type': T,
         '@traits': Traits
     }
-    export function Dictionary<Map extends { [key: string]: Argument<any>, [key: number]: Argument<any> }>(map: Map): Arguments<{ [P in keyof Map]: Map[P]['type']['@type'] }> {
+    export function Dictionary<Map extends ArgMap>(map: Map): Arguments<{ [P in keyof Map]: Map[P]['type']['@type'] }> {
         return { kind: 'dictionary', map, '@type': 0 as any, '@traits': 0 as any };
     }
 

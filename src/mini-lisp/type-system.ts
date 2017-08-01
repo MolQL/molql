@@ -10,7 +10,7 @@ namespace Type {
     export interface Value<T = any> { kind: 'value', name: string, parent?: Value, '@type': T }
     export function Value<T>(name: string, parent?: Value): Value<T> { return { kind: 'value', name, parent, '@type': 0 as any } }
 
-    export const AnyValue = Value('value');
+    export const AnyValue = Value<any>('value');
     export const LiteralValue = Value<number | string | boolean>('value', AnyValue);
     export const Bool = Value<boolean>('bool', LiteralValue);
     export const Num = Value<number>('number', LiteralValue);
