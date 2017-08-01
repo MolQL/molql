@@ -105,7 +105,6 @@ class State {
             return;
         }
         try {
-            console.log('parsing', text, text.substr(1280, 1290));
             const expression = JSON.parse(text) as Expression;
             const compiled = compile<AtomSelection>(expression);
             this.query.onNext({ kind: 'ok', sourceLanguage: 'json', text, expression, compiled });
@@ -115,7 +114,7 @@ class State {
     }
 
     constructor() {
-        this.queryString.debounce(350).subscribe(s => this.parseQuery(s));
+        this.queryString.distinctUntilChanged().debounce(350).subscribe(s => this.parseQuery(s));
     }
 }
 

@@ -28,10 +28,10 @@ namespace SymbolRuntime {
 function SymbolRuntime<A, T>(symbol: Symbol<A, T>, attributes: Partial<SymbolRuntime.Attributes> = {}) {
     const { isStatic = false } = attributes;
     return {
-        dict<C>(runtime: (env: Environment<C>, args: RuntimeArguments.Dictionary<C, A>) => T): SymbolRuntime.Info<C, T> {
+        ofMap<C>(runtime: (env: Environment<C>, args: RuntimeArguments.Dictionary<C, A>) => T): SymbolRuntime.Info<C, T> {
             return { symbol, runtime, attributes: { isStatic } }
         },
-        array<C>(runtime: (env: Environment<C>, args: RuntimeArguments.Array<C, A>) => T): SymbolRuntime.Info<C, T> {
+        ofArray<C>(runtime: (env: Environment<C>, args: RuntimeArguments.Array<C, A>) => T): SymbolRuntime.Info<C, T> {
             return { symbol, runtime, attributes: { isStatic } }
         },
         none<C>(runtime: (env: Environment<C>, args: never) => T): SymbolRuntime.Info<C, T> {

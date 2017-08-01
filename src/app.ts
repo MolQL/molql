@@ -11,7 +11,7 @@ const expr = Expression.Apply(MolQL.primitive.operator.arithmetic.add.id, [1, 2,
 const compiled = compile<number>(expr);
 const result = compiled({});
 
-const expr1 = Expression.Apply(MolQL.primitive.operator.relational.inRange.id, { min: 0, max: 25, v: expr });
+const expr1 = Expression.Apply(MolQL.primitive.operator.arithmetic.sin.id, { min: 0, max: 25, v: expr });
 console.log(formatter(expr));
 console.log(formatter(expr1));
 console.log(result);
