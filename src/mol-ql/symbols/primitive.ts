@@ -9,9 +9,9 @@ import { symbol } from './helpers'
 export namespace Types {
     export type Set = { has(e: any): boolean }
     export type Map = { has(key: any): boolean, get(key: any): any }
-    export const Set = Type<Set>('set', Type.AnyValue);
-    export const Map = Type<Map>('map', Type.AnyValue);
-    export const Regex = Type<RegExp>('regex', Type.AnyValue);
+    export const Set = Type<Set>('set', Type.Any);
+    export const Map = Type<Map>('map', Type.Any);
+    export const Regex = Type<RegExp>('regex', Type.Any);
 }
 
 function unaryOp<T extends Type>(type: T, description?: string) {
@@ -28,12 +28,12 @@ function binRel<A, T>(src: Type, target: Type, description?: string) {
 
 const type = {
     '@header': 'Types',
-    bool: symbol(Arguments.Dictionary({ 0: Argument(Type.AnyValue) }), Type.Bool),
-    num: symbol(Arguments.Dictionary({ 0: Argument(Type.AnyValue) }), Type.Num),
-    str: symbol(Arguments.Dictionary({ 0: Argument(Type.AnyValue) }), Type.Str),
+    bool: symbol(Arguments.Dictionary({ 0: Argument(Type.Any) }), Type.Bool),
+    num: symbol(Arguments.Dictionary({ 0: Argument(Type.Any) }), Type.Num),
+    str: symbol(Arguments.Dictionary({ 0: Argument(Type.Any) }), Type.Str),
 
-    set: symbol(Arguments.List(Type.AnyValue), Types.Set),
-    map: symbol(Arguments.List(Type.AnyValue), Types.Map, 'Create a map from a list of key value pairs, e.g. (map 1 "x" 2 "y").'),
+    set: symbol(Arguments.List(Type.Any), Types.Set),
+    map: symbol(Arguments.List(Type.Any), Types.Map, 'Create a map from a list of key value pairs, e.g. (map 1 "x" 2 "y").'),
     regex: symbol(
         Arguments.Dictionary({ 0: Argument(Type.Str), 1: Argument(Type.Str, { isOptional: true }) }),
         Types.Regex,
@@ -51,7 +51,7 @@ const operator = {
 
     controlFlow: {
         '@header': 'Control Flow',
-        if: symbol(Arguments.Dictionary({ cond: Argument(Type.Bool), ifTrue: Argument(Type.AnyValue), ifFalse: Argument(Type.AnyValue) }), Type.AnyValue)
+        if: symbol(Arguments.Dictionary({ cond: Argument(Type.Bool), ifTrue: Argument(Type.Any), ifFalse: Argument(Type.Any) }), Type.Any)
     },
 
     arithmetic: {
@@ -86,8 +86,8 @@ const operator = {
 
     relational: {
         '@header': 'Relational',
-        eq: binRel(Type.AnyValue, Type.Bool),
-        neq: binRel(Type.AnyValue, Type.Bool),
+        eq: binRel(Type.Any, Type.Bool),
+        neq: binRel(Type.Any, Type.Bool),
         lt: binRel(Type.Num, Type.Bool),
         lte: binRel(Type.Num, Type.Bool),
         gr: binRel(Type.Num, Type.Bool),
@@ -107,17 +107,17 @@ const operator = {
 
     set: {
         '@header': 'Sets',
-        has: symbol(Arguments.Dictionary({ 0: Argument(Types.Set), 1: Argument(Type.AnyValue) }), Type.Bool)
+        has: symbol(Arguments.Dictionary({ 0: Argument(Types.Set), 1: Argument(Type.Any) }), Type.Bool)
     },
 
     map: {
         '@header': 'Maps',
-        has: symbol(Arguments.Dictionary({ 0: Argument(Types.Map), 1: Argument(Type.AnyValue) }), Type.Bool),
+        has: symbol(Arguments.Dictionary({ 0: Argument(Types.Map), 1: Argument(Type.Any) }), Type.Bool),
         get: symbol(Arguments.Dictionary({
             0: Argument(Types.Map),
-            1: Argument(Type.AnyValue),
-            2: Argument(Type.AnyValue, { description: 'Default value if key is not present.' }) 
-        }), Type.AnyValue)
+            1: Argument(Type.Any),
+            2: Argument(Type.Any, { description: 'Default value if key is not present.' }) 
+        }), Type.Any)
     }
 }
 
