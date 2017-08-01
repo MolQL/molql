@@ -38,6 +38,7 @@ function _normalizeTable(namespace: string, key: string, obj: any) {
     if (isSymbol(obj)) {
         obj.namespace = namespace;
         obj.name = obj.name || formatKey(key);
+        obj.id = `${obj.namespace}.${obj.name}`;
         return;
     }
     const currentNs = `${obj['@namespace'] || formatKey(key)}`;

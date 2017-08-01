@@ -22,7 +22,7 @@ function unaryOp<A>(type: Type.Value, description?: string) {
 }
 
 function binOp<A>(type: Type.Value, description?: string) {
-    return symbol<A[], A>(type, { arguments: Arguments.List(type), description });
+    return symbol<A, A>(type, { arguments: Arguments.List(type), description });
 }
 
 function binRel<A, T>(src: Type.Value, target: Type.Value, description?: string) {
@@ -35,8 +35,8 @@ const type = {
     num: symbol<{ value: any }, number>(Type.Num, { arguments: Arguments.Dictionary({ value: Arg(Type.AnyValue) }) }),
     str: symbol<{ value: any }, string>(Type.Str, { arguments: Arguments.Dictionary({ value: Arg(Type.AnyValue) }) }),
 
-    set: symbol<any[], Types.Set>(Types.Set, { arguments: Arguments.List(Type.AnyValue) }),
-    map: symbol<any[], Types.Map>(Types.Map, { arguments: Arguments.List(Type.AnyValue), description: 'Create a map from a list of key value pairs, e.g. (map 1 "x" 2 "y").' }),
+    set: symbol<any, Types.Set>(Types.Set, { arguments: Arguments.List(Type.AnyValue) }),
+    map: symbol<any, Types.Map>(Types.Map, { arguments: Arguments.List(Type.AnyValue), description: 'Create a map from a list of key value pairs, e.g. (map 1 "x" 2 "y").' }),
     regex: symbol<{ expression: string, flags?: string }, RegExp>(Types.Regex, {
         arguments: Arguments.Dictionary({ expression: Arg(Type.Str), flags: OptArg(Type.Str, '') }),
         description: 'Creates a regular expression from a string using the ECMAscript syntax.'

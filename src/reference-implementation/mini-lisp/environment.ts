@@ -2,7 +2,7 @@
  * Copyright (c) 2017 David Sehnal, licensed under MIT, See LICENSE file for more info.
  */
 
-import { SymbolTable } from './symbols'
+import { SymbolTable } from './symbol'
 
 interface Environment<T = any> {
     readonly symbolTable: SymbolTable,
