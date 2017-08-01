@@ -2,27 +2,27 @@
  * Copyright (c) 2017 MolQL contributors. licensed under MIT, See LICENSE file for more info.
  */
 
-import Type from '../../mini-lisp/type-system'
+import Type from '../../mini-lisp/type'
 import Symbol, { Arguments, Argument } from '../../mini-lisp/symbol'
 import { symbol } from './helpers'
 
 export namespace Types {
     export type Set = { has(e: any): boolean }
     export type Map = { has(key: any): boolean, get(key: any): any }
-    export const Set = Type.Value<Set>('set', Type.AnyValue);
-    export const Map = Type.Value<Map>('map', Type.AnyValue);
-    export const Regex = Type.Value<RegExp>('regex', Type.AnyValue);
+    export const Set = Type<Set>('set', Type.AnyValue);
+    export const Map = Type<Map>('map', Type.AnyValue);
+    export const Regex = Type<RegExp>('regex', Type.AnyValue);
 }
 
 function unaryOp<T extends Type>(type: T, description?: string) {
     return symbol(Arguments.Dictionary({ 0: Argument(type) }), type, description);
 }
 
-function binOp<T extends Type.Value>(type: T, description?: string) {
+function binOp<T extends Type>(type: T, description?: string) {
     return symbol(Arguments.List(type), type, description);
 }
 
-function binRel<A, T>(src: Type.Value, target: Type.Value, description?: string) {
+function binRel<A, T>(src: Type, target: Type, description?: string) {
     return symbol(Arguments.Dictionary({ 0: Argument(src), 1: Argument(src) }), target, description);
 }
 
@@ -35,7 +35,7 @@ const type = {
     set: symbol(Arguments.List(Type.AnyValue), Types.Set),
     map: symbol(Arguments.List(Type.AnyValue), Types.Map, 'Create a map from a list of key value pairs, e.g. (map 1 "x" 2 "y").'),
     regex: symbol(
-        Arguments.Dictionary({ 0: Argument(Type.Str), 1: Argument(Type.Optional(Type.Str)) }),
+        Arguments.Dictionary({ 0: Argument(Type.Str), 1: Argument(Type.Str, { isOptional: true }) }),
         Types.Regex,
         'Creates a regular expression from a string using the ECMAscript syntax.')
 };
@@ -93,8 +93,10 @@ const operator = {
         gr: binRel(Type.Num, Type.Bool),
         gre: binRel(Type.Num, Type.Bool),
         inRange: symbol(Arguments.Dictionary({
-            0: Argument(Type.Num, 'Minimum value'), 1: Argument(Type.Num, 'Maximum value'), 2: Argument(Type.Num, 'Value to test') }),
-            Type.Bool),
+            0: Argument(Type.Num, { description: 'Minimum value' }),
+            1: Argument(Type.Num, { description: 'Maximum value' }),
+            2: Argument(Type.Num, { description: 'Value to test' }) 
+        }), Type.Bool),
     },
 
     string: {
@@ -111,7 +113,11 @@ const operator = {
     map: {
         '@header': 'Maps',
         has: symbol(Arguments.Dictionary({ 0: Argument(Types.Map), 1: Argument(Type.AnyValue) }), Type.Bool),
-        get: symbol(Arguments.Dictionary({ 0: Argument(Types.Map), 1: Argument(Type.AnyValue), 2: Argument(Type.AnyValue, 'Default value if key is not present.') }), Type.AnyValue)
+        get: symbol(Arguments.Dictionary({
+            0: Argument(Types.Map),
+            1: Argument(Type.AnyValue),
+            2: Argument(Type.AnyValue, { description: 'Default value if key is not present.' }) 
+        }), Type.AnyValue)
     }
 }
 

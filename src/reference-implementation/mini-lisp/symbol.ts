@@ -7,15 +7,7 @@ import Environment from './environment'
 import RuntimeExpression from './expression'
 
 export type RuntimeArguments<C = any, Args extends Arguments = Arguments> =
-    Args['@traits'] & { [P in keyof Args['@type']]: RuntimeExpression<C, Args['@type'][P]> }
-    // { [P in keyof Args['@type']]: RuntimeExpression<Args['@type'][P]> } & Args['@traits']
-
-//RuntimeArguments.Dictionary<C, any> | RuntimeArguments.Array<C, any>
-
-// export namespace RuntimeArguments {
-//     export type Dictionary<C = any, T = any> = { [A in keyof T]: RuntimeExpression<C, T[A]> }
-//     export type Array<C = any, T = any> = RuntimeExpression<C, T>[]
-// }
+    { length?: number } & { [P in keyof Args['@type']]: RuntimeExpression<C, Args['@type'][P]> }
 
 type SymbolRuntime<C = {}, A extends Arguments = Arguments, T = any> = (env: Environment<C>, args: RuntimeArguments<C, A>) => T
 
@@ -31,19 +23,9 @@ namespace SymbolRuntime {
 
 function SymbolRuntime<S extends Symbol>(symbol: S, attributes: Partial<SymbolRuntime.Attributes> = {}) {
     const { isStatic = false } = attributes;
-    return <C>(runtime: (env: Environment<C>, args: RuntimeArguments<C, S['arguments']>) => S['type']['@type']): SymbolRuntime.Info<C, S['arguments'], S['type']['@type']> =>
-        ({ symbol, runtime, attributes: { isStatic } });
-    // return {
-    //     ofMap<C>(runtime: (env: Environment<C>, args: RuntimeArguments.Dictionary<C, A>) => T): SymbolRuntime.Info<C, T> {
-    //         return { symbol, runtime, attributes: { isStatic } }
-    //     },
-    //     ofArray<C>(runtime: (env: Environment<C>, args: RuntimeArguments.Array<C, A>) => T): SymbolRuntime.Info<C, T> {
-    //         return { symbol, runtime, attributes: { isStatic } }
-    //     },
-    //     none<C>(runtime: (env: Environment<C>, args: never) => T): SymbolRuntime.Info<C, T> {
-    //         return { symbol, runtime, attributes: { isStatic } }
-    //     }
-    // }
+    return <C>(runtime: SymbolRuntime<C, S['arguments'], S['type']['@type']>): SymbolRuntime.Info<C, S['arguments'], S['type']['@type']> => {
+        return ({ symbol, runtime, attributes: { isStatic } });
+    };
 }
 
 export type SymbolTable = { readonly [id: string]: SymbolRuntime.Info }

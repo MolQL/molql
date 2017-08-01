@@ -20,26 +20,26 @@ export const SymbolRuntime: Symbol.Info<Context>[] = [
     Symbol(MolQL.primitive.type.str, staticAttr)((env, v) => '' + v[0](env)),
     Symbol(MolQL.primitive.type.set, staticAttr)((env, xs) => {
         const set = FastSet.create<any>();
-        for (let i = 0, _i = xs.length; i < _i; i++) set.add(xs[i](env));
+        for (let i = 0, _i = xs.length!; i < _i; i++) set.add(xs[i](env));
         return set;
     }),
     Symbol(MolQL.primitive.type.map, staticAttr)((env, xs) => {
         const map = FastMap.create<any, any>();
-        for (let i = 0; i < xs.length; i += 2) map.set(xs[i](env), xs[i + 1](env));
+        for (let i = 0, _i = xs.length!; i < _i; i += 2) map.set(xs[i](env), xs[i + 1](env));
         return map;
     }),
-    //Symbol(MolQL.primitive.type.regex, staticAttr)((env, v) => new RegExp(v[0](env), (v[1] && v[1](env)) || '')),
+    Symbol(MolQL.primitive.type.regex, staticAttr)((env, v) => new RegExp(v[0](env), (v[1] && v[1](env)) || '')),
 
     // ============= OPERATORS =============
 
     // ============= LOGIC ================
     Symbol(MolQL.primitive.operator.logic.not, staticAttr)((env, v) => !v[0](env)),
     Symbol(MolQL.primitive.operator.logic.and, staticAttr)((env, args) => {
-        for (let i = 0, _i = args.length; i < _i; i++)  if (!args[i](env)) return false;
+        for (let i = 0, _i = args.length!; i < _i; i++)  if (!args[i](env)) return false;
         return true;
     }),
     Symbol(MolQL.primitive.operator.logic.or, staticAttr)((env, args) => {
-        for (let i = 0, _i = args.length; i < _i; i++)  if (args[i](env)) return true;
+        for (let i = 0, _i = args.length!; i < _i; i++)  if (args[i](env)) return true;
         return false;
     }),
 
@@ -49,7 +49,7 @@ export const SymbolRuntime: Symbol.Info<Context>[] = [
     // ============= ARITHMETIC ================
     Symbol(MolQL.primitive.operator.arithmetic.add, staticAttr)((env, args) => {
         let ret = 0;
-        for (let i = 0, _i = args.length; i < _i; i++) ret += args[i](env);
+        for (let i = 0, _i = args.length!; i < _i; i++) ret += args[i](env);
         return ret;
     }),
 
