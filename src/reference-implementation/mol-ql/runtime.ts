@@ -2,7 +2,7 @@
  * Copyright (c) 2017 David Sehnal, licensed under MIT, See LICENSE file for more info.
  */
 
-import MolQL from '../../molql/symbols'
+import MolQL from '../../mol-ql/symbols'
 import Symbol, { SymbolTable } from '../mini-lisp/symbol'
 import Context from './context'
 import { FastSet, FastMap } from '../utils/collections'

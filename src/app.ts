@@ -2,9 +2,9 @@
  * Copyright (c) 2017 David Sehnal, licensed under MIT, See LICENSE file for more info.
  */
 
-import compile from './reference-implementation/molql/compiler'
+import compile from './reference-implementation/mol-ql/compiler'
 import formatter from './reference-implementation/mini-lisp/formatter'
-import MolQL from './molql/symbols'
+import MolQL from './mol-ql/symbols'
 import Expression from './mini-lisp/expression'
 
 const expr = Expression.Apply(MolQL.primitive.operator.arithmetic.add.id, [1, 2, 3, 4, 5]);
