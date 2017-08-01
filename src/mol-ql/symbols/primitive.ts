@@ -111,7 +111,8 @@ const operator = {
 
     map: {
         '@header': 'Maps',
-        get: symbol(Type.Bool, { arguments: Arguments.Dictionary({ map: Arg(Types.Map), key: Arg(Type.AnyValue), default: Arg(Type.AnyValue) }) })
+        has: symbol<{ map: Types.Map, key: any }, any>(Type.Bool, { arguments: Arguments.Dictionary({ map: Arg(Types.Map), key: Arg(Type.AnyValue) }) }),
+        get: symbol<{ map: Types.Map, key: any, default: any }, any>(Type.Bool, { arguments: Arguments.Dictionary({ map: Arg(Types.Map), key: Arg(Type.AnyValue), default: Arg(Type.AnyValue) }) })
     }
 }
 

@@ -41,7 +41,7 @@ interface Symbol<A = any, T = any> {
 }
 
 function Symbol<A, T>(name: string, type: Type, args: Arguments, description?: string) {
-    return { id: '', namespace: '', name, type, arguments: args, description, '@arg-type': void 0 as any } as Symbol<T>;
+    return { id: '', namespace: '', name, type, arguments: args, description, '@arg-type': void 0 as any } as Symbol<A, T>;
 }
 
 export default Symbol
