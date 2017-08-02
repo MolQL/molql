@@ -62,7 +62,7 @@ const modifier = {
 
     intersectBy: symbol(Arguments.Dictionary({
         selection: Argument(Types.AtomSelection),
-        by: Argument(Type.Num),
+        by: Argument(Types.AtomSelection),
         'whole-residues': Argument(Type.Bool, { isOptional: true })
     }), Types.AtomSelection, 'Intersect each atom set from the first sequence from atoms in the second one.'),
 
@@ -153,7 +153,7 @@ const atomProperty = {
     label_entity_id: prop(Type.Str, 'Same as mmCIF'),
     label_seq_id: prop(Type.Num, 'Same as mmCIF'),
 
-    pdbx_PDB_ins_code: prop(Type.NullableStr, 'Same as mmCIF'),
+    pdbx_PDB_ins_code: prop(Type.Str, 'Same as mmCIF'),
     pdbx_formal_charge: prop(Type.Num, 'Same as mmCIF'),
 
     Cartn_x: prop(Type.Num, 'Same as mmCIF. Using this value, beacuse adding Frac_x, etc. might be an option in the future.'),

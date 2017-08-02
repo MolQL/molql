@@ -7,7 +7,7 @@ type Expression =
     | Expression.Apply
 
 namespace Expression {
-    export type Literal = string | number | boolean | null
+    export type Literal = string | number | boolean
     export type Arguments = Expression[] | { [name: string]: Expression }
     export interface Apply { readonly head: Expression, readonly args?: Arguments }
 

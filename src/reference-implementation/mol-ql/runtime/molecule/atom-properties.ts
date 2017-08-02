@@ -27,18 +27,18 @@ const properties = {
 
     // ================= mmCIF =================
 
-    group_PDB: prop((env, v) => env.context.atom_site.group_PDB.getString(env.context.element.value.dataIndex)),
-    id: prop((env, v) => env.context.atom_site.id.getString(env.context.element.value.dataIndex)),
+    group_PDB: prop((env, v) => env.context.atom_site.group_PDB.getString(env.context.element.value.dataIndex) || ''),
+    id: prop((env, v) => env.context.atom_site.id.getString(env.context.element.value.dataIndex) || ''),
 
-    type_symbol: prop((env, v) => ElementSymbol(env.context.atom_site.type_symbol.getString(env.context.element.value.dataIndex))),
+    type_symbol: prop((env, v) => ElementSymbol(env.context.atom_site.type_symbol.getString(env.context.element.value.dataIndex)) || ''),
 
-    label_atom_id: prop((env, v) => env.context.atom_site.label_atom_id.getString(env.context.element.value.dataIndex)),
-    label_alt_id: prop((env, v) => env.context.atom_site.label_alt_id.getString(env.context.element.value.dataIndex)),
-    label_asym_id: prop((env, v) => env.context.atom_site.label_asym_id.getString(env.context.element.value.dataIndex)),
-    label_comp_id: prop((env, v) => env.context.atom_site.label_comp_id.getString(env.context.element.value.dataIndex)),
+    label_atom_id: prop((env, v) => env.context.atom_site.label_atom_id.getString(env.context.element.value.dataIndex) || ''),
+    label_alt_id: prop((env, v) => env.context.atom_site.label_alt_id.getString(env.context.element.value.dataIndex) || ''),
+    label_asym_id: prop((env, v) => env.context.atom_site.label_asym_id.getString(env.context.element.value.dataIndex) || ''),
+    label_comp_id: prop((env, v) => env.context.atom_site.label_comp_id.getString(env.context.element.value.dataIndex) || ''),
     label_seq_id: prop((env, v) => env.context.atom_site.label_seq_id.getInteger(env.context.element.value.dataIndex)),
 
-    pdbx_PDB_ins_code: prop((env, v) => env.context.atom_site.pdbx_PDB_ins_code.getString(env.context.element.value.dataIndex)),
+    pdbx_PDB_ins_code: prop((env, v) => env.context.atom_site.pdbx_PDB_ins_code.getString(env.context.element.value.dataIndex) || ''),
     pdbx_formal_charge: prop((env, v) => env.context.atom_site.pdbx_formal_charge.getInteger(env.context.element.value.dataIndex)),
 
     Cartn_x: prop((env, v) => env.context.model.positions.x[env.context.element.value.atom]),
@@ -48,9 +48,9 @@ const properties = {
     occupancy: prop((env, v) => env.context.atom_site.occupancy.getFloat(env.context.element.value.dataIndex)),
     B_iso_or_equiv: prop((env, v) => env.context.atom_site.B_iso_or_equiv.getFloat(env.context.element.value.dataIndex)),
 
-    auth_asym_id: prop((env, v) => env.context.atom_site.auth_asym_id.getString(env.context.element.value.dataIndex)),
-    auth_atom_id: prop((env, v) => env.context.atom_site.auth_atom_id.getString(env.context.element.value.dataIndex)),
-    auth_comp_id: prop((env, v) => env.context.atom_site.auth_comp_id.getString(env.context.element.value.dataIndex)),
+    auth_asym_id: prop((env, v) => env.context.atom_site.auth_asym_id.getString(env.context.element.value.dataIndex) || ''),
+    auth_atom_id: prop((env, v) => env.context.atom_site.auth_atom_id.getString(env.context.element.value.dataIndex) || ''),
+    auth_comp_id: prop((env, v) => env.context.atom_site.auth_comp_id.getString(env.context.element.value.dataIndex) || ''),
     auth_seq_id: prop((env, v) => env.context.atom_site.auth_seq_id.getInteger(env.context.element.value.dataIndex)),
 
     pdbx_PDB_model_num: prop((env, v) => env.context.model.id),

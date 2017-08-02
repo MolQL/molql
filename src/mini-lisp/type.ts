@@ -8,13 +8,11 @@ function Type<T>(name: string, parent?: Type): Type<T> { return { name, parent, 
 
 namespace Type {
     export const Any = Type<any>('value');
-    export const LiteralValue = Type<number | string | boolean | null>('value', Any);
+    export const LiteralValue = Type<number | string | boolean>('value', Any);
 
     export const Bool = Type<boolean>('bool', LiteralValue);
     export const Num = Type<number>('number', LiteralValue);
     export const Str = Type<string>('string', LiteralValue);
-
-    export const NullableStr = Type<string | null>('string?', LiteralValue);
 }
 
 export default Type
