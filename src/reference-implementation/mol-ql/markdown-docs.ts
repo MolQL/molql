@@ -31,16 +31,14 @@ function formatArgs(args: Arguments) {
     const formatted: string[] = [];
     for (const a of Object.keys(map)) {
         const arg = (map as any)[a] as Argument<any>;
+        formatted.push(`${a}${arg.isOptional ? ':?' : ':'} ${arg.type.name}${arg.isRest ? '*' : ''}`);
     }
-    return Object.keys(map).map((a: keyof typeof map) => `${map[a]. }: ${Type.format(a[1])}`).join(', ')
+    return formatted.join(', ');
 }
 
-function formatSymbol(symbol: SymbolInfo, lines: string[]) {
-    const name = symbol.name;
-    const header = symbol.args && symbol.args.length
-        ? `${name} :: (${formatArgs(symbol.args)}) => ${Type.format(symbol.type)}`
-        : `${name} :: ${Type.format(symbol.type)}`;
-    lines.push(`### **${symbol.shortName}**&nbsp;&nbsp;&nbsp;\`\`${header}\`\`\n`);
+function formatSymbol(symbol: Symbol, lines: string[]) {
+    const header = `${symbol.id} :: (${formatArgs(symbol.arguments)}) => ${symbol.type.name}`
+    lines.push(`### **${symbol.name}**&nbsp;&nbsp;&nbsp;\`\`${header}\`\`\n`);
     if (symbol.description) {
         lines.push(`*${symbol.description}*\n`);
     }
@@ -48,10 +46,8 @@ function formatSymbol(symbol: SymbolInfo, lines: string[]) {
 }
 
 function format(depth: number, obj: any) {
-    if (isSymbolInfo(obj)) {
-        if (RuntimeSymbols[obj.name]) formatSymbol(obj, implemented);
-        else formatSymbol(obj, notImplemented);
-        return;
+    if (isSymbol(obj)) {
+        formatSymbol(obj, notImplemented);
     }
     if (obj['@header']) {
         implemented.push(`${depth >= 2 ? '##' : '#'} ${obj['@header']}\n`);
@@ -63,7 +59,7 @@ function format(depth: number, obj: any) {
         format(depth + 1, obj[childKey]);
     }
 }
-format(0, Symbols);
+format(0, MolQL);
 console.log(ToC.join('\n'));
 console.log(implemented.join('\n'));
 console.log(notImplemented.join('\n'));

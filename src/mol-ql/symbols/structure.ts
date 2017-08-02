@@ -55,6 +55,11 @@ const modifier = {
         wholeResidues: Argument(Type.Bool, { isOptional: true })
     }), Types.AtomSelection),
 
+    queryComplement: symbol(Arguments.Dictionary({
+        selection: Argument(Types.AtomSelection),
+        query: Argument(Types.AtomSelection)
+    }), Types.AtomSelection, 'Execute the query in a complement induced by the selection.'),
+
     intersectBy: symbol(Arguments.Dictionary({
         selection: Argument(Types.AtomSelection),
         by: Argument(Type.Num),
@@ -71,10 +76,6 @@ const modifier = {
         selection: Argument(Types.AtomSelection),
         by: Argument(Type.Num)
     }), Types.AtomSelection, `Remove all atoms from 'selection' that occur in 'by'.`),
-
-    complement: symbol(Arguments.Dictionary({
-        selection: Argument(Types.AtomSelection)
-    }), Types.AtomSelection),
 
     union: symbol(Arguments.Dictionary({
         selection: Argument(Types.AtomSelection)

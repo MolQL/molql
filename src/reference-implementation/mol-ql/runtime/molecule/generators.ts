@@ -80,6 +80,10 @@ function groupAtom({ env, groupBy, groups, selection }: GroupCtx, i: number) {
 function alwaysTrue(env: Environment) { return true; }
 function groupByAtom(env: Environment) { return env.context.element.value.atom; }
 
+function groupTrivial(env: Environment) {
+    
+}
+
 export function atomGroupsGenerator(env: Environment, params: Partial<GeneratorParams>): AtomSelection {
     const {
         entityTest = alwaysTrue,
