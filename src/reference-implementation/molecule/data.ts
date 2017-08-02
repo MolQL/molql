@@ -85,7 +85,7 @@ export function ResidueIdentifier(chain: string, seq_num: number, ins_code?: str
     return `${chain} ${seq_num}`;
 }
 export namespace ResidueIdentifier {
-    export function ofResidue(model: Model, residueIndex: number) {
+    export function ofResidueIndex(model: Model, residueIndex: number) {
         const row = model.atoms.dataIndex[model.residues.atomStartIndex[residueIndex]];
         const { atom_site } = model.data;
         if (atom_site.pdbx_PDB_ins_code.getValuePresence(row) === CIFTools.ValuePresence.Present) {

@@ -8,7 +8,8 @@ import MolQL from './mol-ql/symbols'
 import B from './mol-ql/builder'
 import Expression from './mini-lisp/expression'
 
-const expr =  B.operator(o => o.arithmetic.add, [1, 2, 3, 4, 5]);
+const expr =  B.operator(o => o.arithmetic.add, B.argArray([1, 2, 3, 4, 5]));
+
 //Expression.Apply(MolQL.primitive.operator.arithmetic.add.id, [1, 2, 3, 4, 5]);
 const compiled = compile<number>(expr);
 const result = compiled({} as any);

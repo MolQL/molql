@@ -7,11 +7,11 @@ type Expression =
     | Expression.Apply
 
 namespace Expression {
-    export type Literal = string | number | boolean
+    export type Literal = string | number | boolean | null
     export type Arguments = Expression[] | { [name: string]: Expression }
     export interface Apply { readonly head: Expression, readonly args?: Arguments }
 
-    export function Apply(head: Expression, args?: Arguments): Apply { return { head, args }; }
+    export function Apply(head: Expression, args?: Arguments): Apply { return args ? { head, args } : { head }; }
 
     export function isArgumentsArray(e: Arguments): e is Expression[] { return e instanceof Array; }
     export function isArgumentsMap(e: Arguments): e is { [name: string]: Expression } { return !(e instanceof Array); }

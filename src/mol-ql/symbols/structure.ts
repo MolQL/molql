@@ -153,8 +153,8 @@ const atomProperty = {
     label_entity_id: prop(Type.Str, 'Same as mmCIF'),
     label_seq_id: prop(Type.Num, 'Same as mmCIF'),
 
-    pdbx_PDB_ins_code: prop(Type.Str, 'Same as mmCIF'),
-    pdbx_formal_charge: prop(Type.Str, 'Same as mmCIF'),
+    pdbx_PDB_ins_code: prop(Type.NullableStr, 'Same as mmCIF'),
+    pdbx_formal_charge: prop(Type.Num, 'Same as mmCIF'),
 
     Cartn_x: prop(Type.Num, 'Same as mmCIF. Using this value, beacuse adding Frac_x, etc. might be an option in the future.'),
     Cartn_y: prop(Type.Num, 'Same as mmCIF. Using this value, beacuse adding Frac_x, etc. might be an option in the future.'),
@@ -177,9 +177,9 @@ const atomProperty = {
     entityKey: prop(Type.Any, 'Unique value for each tuple ``label_entity_id``. Main use case is grouping of atoms.'),
 
     residueId: prop(Types.ResidueId, 'Corresponds to tuple (auth_asym_id, auth_seq_id, pdbx_PDB_ins_code)'),
-    labelResidueId: prop(Types.ResidueId, 'Corresponds to tuple (label_entity_id, label_asym_id, label_seq_id, pdbx_PDB_ins_code)'),
+    // TODO: labelResidueId: prop(Types.ResidueId, 'Corresponds to tuple (label_entity_id, label_asym_id, label_seq_id, pdbx_PDB_ins_code)'),
 
-    // ================= Other =================
+    // ================= OTHER =================
     isHet: prop(Type.Num, 'For mmCIF files, Same as group_PDB !== ATOM'),
 }
 

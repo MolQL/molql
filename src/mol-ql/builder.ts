@@ -7,10 +7,14 @@ import Symbol from '../mini-lisp/symbol'
 import MolQL from './symbols'
 
 namespace Builder {
-    export type ExpressionArguments<T> = Partial<{ [P in keyof T]: Expression }> | Expression[]
+    export type ExpressionArguments<T> = Partial<{ [P in keyof T]: Expression }>
 
     function category<T>(symbols: T): <S extends Symbol>(s: (cat: T) => S, args?: ExpressionArguments<S['arguments']['@type']>) => Expression {
         return (s, args) => Expression.Apply(s(symbols).id, args as any);
+    }
+
+    export function argArray(expr: Expression[]): { [key: string]: Expression } {
+        return expr as any as { [key: string]: Expression };
     }
 
     export const type = category(MolQL.primitive.type);
