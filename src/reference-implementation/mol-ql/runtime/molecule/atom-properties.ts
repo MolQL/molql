@@ -24,7 +24,7 @@ const properties: { [P in keyof typeof MolQL.structure.atomProperty]?: SymbolRun
     group_PDB: prop((env, v) => env.context.atom_site.group_PDB.getString(env.context.element.value.dataIndex) || ''),
     id: prop((env, v) => env.context.atom_site.id.getString(env.context.element.value.dataIndex) || ''),
 
-    type_symbol: prop((env, v) => ElementSymbol(env.context.atom_site.type_symbol.getString(env.context.element.value.dataIndex)) || ''),
+    type_symbol: prop((env, v) => ElementSymbol(env.context.atom_site.type_symbol.getString(env.context.element.value.dataIndex) || '')),
 
     label_atom_id: prop((env, v) => env.context.atom_site.label_atom_id.getString(env.context.element.value.dataIndex) || ''),
     label_alt_id: prop((env, v) => env.context.atom_site.label_alt_id.getString(env.context.element.value.dataIndex) || ''),

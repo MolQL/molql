@@ -98,7 +98,7 @@ function _format(e: Expression, writer: Writer) {
         return;
     }
 
-    if (keys.length === 1) {
+    if (keys.length === 1 && isLiteral(e.args[keys[0]])) {
         writer.whitespace()
         writer.append(`:${keys[0]}`);
         writer.whitespace();

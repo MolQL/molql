@@ -1,0 +1,19 @@
+.docs h1 {
+    font-size: 16pt;
+}
+
+.docs h2 {
+    font-size: 14pt;
+}
+
+.docs h3 {
+    font-size: 13pt;
+}
+
+.docs {
+    background: #fefdfc;
+    font-size: 9pt;
+    word-wrap: break-word;
+    max-width: 100%;
+    width: 100%;
+}

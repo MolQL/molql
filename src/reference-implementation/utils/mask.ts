@@ -82,7 +82,7 @@ namespace Mask {
             this._forEach(f, ctx);
         }
         constructor(private set: FastSet<number>) {
-            this.size = 0;
+            this.size = set.size;
         }
     }
 

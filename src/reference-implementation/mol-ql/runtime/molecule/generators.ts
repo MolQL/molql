@@ -82,22 +82,23 @@ function groupAtomsSingleton(env: Environment, atomTest: Pred) {
     const ctx = env.context;
     const { model, mask } = ctx;
 
-    const ret = AtomSelection.linearBuilder();
+    const result = AtomSelection.linearBuilder();
     const element = Context.beginIterateElemement(ctx);
     for (let i = 0, _i = model.atoms.count; i < _i; i++) {
         if (!mask.has(i)) continue;
-        if (atomTest === alwaysTrue) ret.add(AtomSet([i]));
-        else {
+        if (atomTest === alwaysTrue) {
+             result.add(AtomSet([i]));
+        } else {
             ElementAddress.setAtom(model, element, i);
-            if (atomTest(env)) ret.add(AtomSet([i]));
+            if (atomTest(env)) result.add(AtomSet([i]));
         }
     }
-    return ret.getSelection();
+    return result.getSelection();
 }
 
 export function atomGroupsGenerator(env: Environment, params: Partial<GeneratorParams>): AtomSelection {
     if (!params.residueTest && !params.chainTest && !params.entityTest && !params.groupBy) {
-        return groupAtomsSingleton(env, params.groupBy || alwaysTrue);
+        return groupAtomsSingleton(env, params.atomTest || alwaysTrue);
     }
 
     const {

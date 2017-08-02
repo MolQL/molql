@@ -6,7 +6,7 @@
   "scripts": {
     "build": "./node_modules/.bin/tsc",
     "watch": "./node_modules/.bin/tsc -watch",
-    "docs": "node ./build/reference-implementation/mol-ql/markdown-docs.js > ./docs/language-reference.md",
+    "docs": "node ./build/reference-implementation/mol-ql/markdown-docs.js -print > ./docs/language-reference.md",
     "test": "echo \"Error: no test specified\" && exit 1",
     "testapp": "node_modules/.bin/webpack build/test-app/index.js test-app/index.js"
   },
@@ -14,6 +14,8 @@
   "license": "MIT",
   "devDependencies": {
     "@types/node": "^8.0.17",
+    "@types/react": "^16.0.0",
+    "@types/react-dom": "^15.5.1",
     "typescript": "^2.4.2",
     "webpack": "^3.4.1"
   },
@@ -22,6 +24,7 @@
     "litemol": "github:dsehnal/LiteMol#e5893f1",
     "react": "^15.6.1",
     "react-ace": "^5.1.1",
-    "react-dom": "^15.6.1"
+    "react-dom": "^15.6.1",
+    "react-markdown": "^2.5.0"
   }
 }
