@@ -4,7 +4,7 @@
 
 import MolQL from '../../mol-ql/symbols'
 import Symbol, { SymbolTable } from '../mini-lisp/symbol'
-import Context from './context'
+import Context from './runtime/context'
 import { FastSet, FastMap } from '../utils/collections'
 
 const staticAttr: Symbol.Attributes = { isStatic: true }

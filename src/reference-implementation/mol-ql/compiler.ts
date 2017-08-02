@@ -3,7 +3,7 @@
  */
 
 import Compiler from '../mini-lisp/compiler'
-import Context from './context'
-import Runtime from './runtime'
+import Context from './runtime/context'
+import Runtime from './symbols'
 
 export default Compiler<Context>(Runtime)

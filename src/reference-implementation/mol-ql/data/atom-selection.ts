@@ -4,6 +4,7 @@
 
 import { UniqueArrayBuilder, sortAsc, FastMap, FastSet } from '../utils/collections'
 import Mask from '../utils/mask'
+import Context from './context'
 import AtomSet from './atom-set'
 
 interface AtomSelection { '@type'?: 'atom-selection' }
