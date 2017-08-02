@@ -71,7 +71,7 @@ Language Reference
 
 ## Control Flow
 
-### **if**&nbsp;&nbsp;&nbsp;``primitive.operator.control-flow.if :: (cond: bool, ifTrue: value, ifFalse: value) => value``
+### **if**&nbsp;&nbsp;&nbsp;``primitive.operator.control-flow.if :: (cond: bool, if-true: value, if-false: value) => value``
 
 -------------------
 
@@ -251,11 +251,11 @@ Language Reference
 
 ## Selection Modifications
 
-### **include-surroundings**&nbsp;&nbsp;&nbsp;``structure.modifier.include-surroundings :: (selection: atom-selection, radius: number, wholeResidues?: bool) => atom-selection``
+### **include-surroundings**&nbsp;&nbsp;&nbsp;``structure.modifier.include-surroundings :: (selection: atom-selection, radius: number, whole-residues?: bool) => atom-selection``
 
 -------------------
 
-### **query-each**&nbsp;&nbsp;&nbsp;``structure.modifier.query-each :: (selection: atom-selection, query: atom-selection, wholeResidues?: bool) => atom-selection``
+### **query-each**&nbsp;&nbsp;&nbsp;``structure.modifier.query-each :: (selection: atom-selection, query: atom-selection, whole-residues?: bool) => atom-selection``
 
 -------------------
 
@@ -265,13 +265,13 @@ Language Reference
 
 -------------------
 
-### **intersect-by**&nbsp;&nbsp;&nbsp;``structure.modifier.intersect-by :: (selection: atom-selection, by: number, wholeResidues?: bool) => atom-selection``
+### **intersect-by**&nbsp;&nbsp;&nbsp;``structure.modifier.intersect-by :: (selection: atom-selection, by: number, whole-residues?: bool) => atom-selection``
 
 *Intersect each atom set from the first sequence from atoms in the second one.*
 
 -------------------
 
-### **union-by**&nbsp;&nbsp;&nbsp;``structure.modifier.union-by :: (selection: atom-selection, by: number, wholeResidues?: bool) => atom-selection``
+### **union-by**&nbsp;&nbsp;&nbsp;``structure.modifier.union-by :: (selection: atom-selection, by: number, whole-residues?: bool) => atom-selection``
 
 *For each atom set A in the orginal sequence, combine all atoms sets in the target selection that intersect with A.*
 

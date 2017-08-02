@@ -51,7 +51,7 @@ const operator = {
 
     controlFlow: {
         '@header': 'Control Flow',
-        if: symbol(Arguments.Dictionary({ cond: Argument(Type.Bool), ifTrue: Argument(Type.Any), ifFalse: Argument(Type.Any) }), Type.Any)
+        if: symbol(Arguments.Dictionary({ cond: Argument(Type.Bool), 'if-true': Argument(Type.Any), 'if-false': Argument(Type.Any) }), Type.Any)
     },
 
     arithmetic: {

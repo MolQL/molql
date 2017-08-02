@@ -46,13 +46,13 @@ const modifier = {
     includeSurroundings: symbol(Arguments.Dictionary({
         selection: Argument(Types.AtomSelection),
         radius: Argument(Type.Num),
-        wholeResidues: Argument(Type.Bool, { isOptional: true })
+        'whole-residues': Argument(Type.Bool, { isOptional: true })
     }), Types.AtomSelection),
 
     queryEach: symbol(Arguments.Dictionary({
         selection: Argument(Types.AtomSelection),
         query: Argument(Types.AtomSelection),
-        wholeResidues: Argument(Type.Bool, { isOptional: true })
+        'whole-residues': Argument(Type.Bool, { isOptional: true })
     }), Types.AtomSelection),
 
     queryComplement: symbol(Arguments.Dictionary({
@@ -63,13 +63,13 @@ const modifier = {
     intersectBy: symbol(Arguments.Dictionary({
         selection: Argument(Types.AtomSelection),
         by: Argument(Type.Num),
-        wholeResidues: Argument(Type.Bool, { isOptional: true })
+        'whole-residues': Argument(Type.Bool, { isOptional: true })
     }), Types.AtomSelection, 'Intersect each atom set from the first sequence from atoms in the second one.'),
 
     unionBy: symbol(Arguments.Dictionary({
         selection: Argument(Types.AtomSelection),
         by: Argument(Type.Num),
-        wholeResidues: Argument(Type.Bool, { isOptional: true })
+        'whole-residues': Argument(Type.Bool, { isOptional: true })
     }), Types.AtomSelection, 'For each atom set A in the orginal sequence, combine all atoms sets in the target selection that intersect with A.'),
 
     exceptBy: symbol(Arguments.Dictionary({
