@@ -3,7 +3,7 @@
  */
 
 import Type from '../../mini-lisp/type'
-import Symbol, { Arguments, Argument } from '../../mini-lisp/symbol'
+import { Arguments, Argument } from '../../mini-lisp/symbol'
 import { symbol } from './helpers'
 
 export namespace Types {
@@ -22,7 +22,7 @@ function binOp<T extends Type>(type: T, description?: string) {
     return symbol(Arguments.List(type), type, description);
 }
 
-function binRel<A, T>(src: Type, target: Type, description?: string) {
+function binRel<A extends Type, T extends Type>(src: A, target: T, description?: string) {
     return symbol(Arguments.Dictionary({ 0: Argument(src), 1: Argument(src) }), target, description);
 }
 
@@ -59,8 +59,8 @@ const operator = {
         add: binOp(Type.Num),
         sub: binOp(Type.Num),
         mult: binOp(Type.Num),
-        div: binRel<number, number>(Type.Num, Type.Num),
-        pow: binRel<number, number>(Type.Num, Type.Num),
+        div: binRel(Type.Num, Type.Num),
+        pow: binRel(Type.Num, Type.Num),
 
         min: binOp(Type.Num),
         max: binOp(Type.Num),
@@ -69,19 +69,20 @@ const operator = {
         ceil: unaryOp(Type.Num),
         roundInt: unaryOp(Type.Num),
         abs: unaryOp(Type.Num),
+        sqrt: unaryOp(Type.Num),
         sin: unaryOp(Type.Num),
         cos: unaryOp(Type.Num),
         tan: unaryOp(Type.Num),
         asin: unaryOp(Type.Num),
         acos: unaryOp(Type.Num),
         atan: unaryOp(Type.Num),
-        atan2: binRel(Type.Num, Type.Num),
         sinh: unaryOp(Type.Num),
         cosh: unaryOp(Type.Num),
         tanh: unaryOp(Type.Num),
         exp: unaryOp(Type.Num),
         log: unaryOp(Type.Num),
-        log10: unaryOp(Type.Num)
+        log10: unaryOp(Type.Num),
+        atan2: binRel(Type.Num, Type.Num)
     },
 
     relational: {
@@ -93,9 +94,9 @@ const operator = {
         gr: binRel(Type.Num, Type.Bool),
         gre: binRel(Type.Num, Type.Bool),
         inRange: symbol(Arguments.Dictionary({
-            0: Argument(Type.Num, { description: 'Minimum value' }),
-            1: Argument(Type.Num, { description: 'Maximum value' }),
-            2: Argument(Type.Num, { description: 'Value to test' }) 
+            0: Argument(Type.Num, { description: 'Value to test' }),
+            1: Argument(Type.Num, { description: 'Minimum value' }),
+            2: Argument(Type.Num, { description: 'Maximum value' })
         }), Type.Bool),
     },
 

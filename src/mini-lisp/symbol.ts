@@ -32,8 +32,6 @@ export namespace Arguments {
     }
 }
 
-type x = keyof string
-
 interface Symbol<A extends Arguments = Arguments, T extends Type = Type> {
     id: string,
     namespace: string,

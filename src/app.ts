@@ -4,9 +4,9 @@
 
 import compile from './reference-implementation/mol-ql/compiler'
 import formatter from './reference-implementation/mini-lisp/formatter'
-import MolQL from './mol-ql/symbols'
+//import MolQL from './mol-ql/symbols'
 import B from './mol-ql/builder'
-import Expression from './mini-lisp/expression'
+//import Expression from './mini-lisp/expression'
 
 const expr =  B.operator(o => o.arithmetic.add, B.argArray([1, 2, 3, 4, 5]));
 
@@ -23,6 +23,42 @@ console.log(formatter(expr1));
 console.log(result);
 
 // import * as fs from 'fs'
+
+const array = [1,2,3,4,5,6,7,8,9,10,11,12,13];
+function testI(i: number) {
+    array[0] = i;
+    let ret = 0;
+    for (let e = 0, _e = array.length; e < _e; e++) ret += array[e];
+    return ret;
+}
+function testO(i: number) {
+    array[0] = i;
+    let ret = 0;
+    for (const k of Object.keys(array)) ret += (array as any)[k];
+    return ret;
+}
+function suite(f: (i: number) => number) {
+    let ret = 0;
+    for (let i = 0; i < 1000000; i++) {
+        ret += f(i);
+    }
+    return ret;
+}
+
+console.time('i');
+suite(testI);
+console.timeEnd('i');
+console.time('o');
+suite(testO);
+console.timeEnd('o');
+console.time('i');
+suite(testI);
+console.timeEnd('i');
+console.time('o');
+suite(testO);
+console.timeEnd('o');
+
+
 
 // //import Expression from './language/expression'
 // //import S from './language/symbols'

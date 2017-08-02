@@ -42,7 +42,7 @@ namespace Mask {
         forEach<Ctx>(f: (i: number, ctx?: Ctx) => void, ctx?: Ctx) {
             this._forEach(f, ctx);
         }
-        constructor(private mask: number[], public size: number) { this.length = mask.length;  }
+        constructor(private mask: boolean[], public size: number) { this.length = mask.length;  }
     }
 
     class AllMask implements Mask {
@@ -66,16 +66,17 @@ namespace Mask {
         has(i: number) { return this.set.has(i); }
 
         private _forEach<Ctx>(f: (i: number, ctx?: Ctx) => void, ctx: Ctx | undefined) {
-            for (const idx of this._flat!) {
+            for (const idx of this.flatten()) {
                 f(idx, ctx);
             }
         }
         private flatten() {
-            if (this._flat) return;
+            if (this._flat) return this._flat;
             const indices = new Int32Array(this.size);
             this.set.forEach((i, ctx) => ctx!.indices[ctx!.offset++] = i, { indices, offset: 0 });
             sortAsc(indices);
             this._flat = indices as any as number[];
+            return this._flat;
         }
         forEach<Ctx>(f: (i: number, ctx?: Ctx) => void, ctx?: Ctx) {
             this._forEach(f, ctx);
@@ -111,14 +112,13 @@ namespace Mask {
         }
 
         const mask = new Int8Array(max + 1);
-        let size = 0;
         for (const i of (indices as number[])) {
             mask[i] = 1;
         }
-        return new BitMask(mask as any, indices.length);
+        return new BitMask(mask as any as boolean[], indices.length);
     }
 
-    export function ofMask(mask: number[], size: number): Mask {
+    export function ofMask(mask: boolean[], size: number): Mask {
         return new BitMask(mask, size);
     }
 
@@ -127,6 +127,37 @@ namespace Mask {
             if (mask.has(x)) return true;
         }
         return false;
+    }
+
+    export function complement(mask: Mask, against: Mask) {
+        const context = { mask, count: 0, max: 0 };
+        against.forEach((i, ctx: typeof context) => {
+            if (!ctx.mask.has(i)) {
+                ctx.count++;
+                if (i > ctx.max) ctx.max = i;
+            }
+        }, context);
+
+        const { count, max } = context;
+        if (count / max < 1 / 12) {
+            // set based
+            const setContext = { mask, set: FastSet.create<number>() };
+            against.forEach((i, ctx: typeof setContext) => {
+                if (!ctx.mask.has(i)) {
+                    ctx.set.add(i);
+                }
+            }, setContext);
+            return ofSet(setContext.set);
+        } else {
+            // mask based
+            const maskContext = { mask, target: new Uint8Array(context.max + 1) };
+            against.forEach((i, ctx: typeof maskContext) => {
+                if (!ctx.mask.has(i)) {
+                    ctx.target[i] = 1;
+                }
+            }, maskContext);
+            return ofMask(maskContext.target as any as boolean[], context.count);
+        }
     }
 }
 

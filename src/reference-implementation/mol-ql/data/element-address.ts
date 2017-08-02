@@ -3,9 +3,6 @@
  */
 
 import { Model } from '../../molecule/data'
-import Mask from '../../utils/mask'
-import AtomSet from './atom-set'
-import AtomSelection from './atom-selection'
 
 interface ElementAddress { dataIndex: number, atom: number, residue: number, chain: number, entity: number }
 function ElementAddress(): ElementAddress { return { dataIndex: 0, atom: 0, residue: 0, chain: 0, entity: 0 }; }

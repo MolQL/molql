@@ -4,18 +4,12 @@
 
 import MolQL from '../../../../mol-ql/symbols'
 import SymbolRuntime from '../../../mini-lisp/symbol'
-import Environment from '../../../mini-lisp/environment'
 import Context from '../context'
-import RuntimeExpression from '../../../mini-lisp/expression'
 import { ElementSymbol, ResidueIdentifier } from '../../../molecule/data'
-
-type Env = Environment<Context>
-
-const x = MolQL.structure.atomProperty
 
 function prop(runtime: SymbolRuntime<Context>) { return runtime; }
 
-const properties = {
+const properties: { [P in keyof typeof MolQL.structure.atomProperty]?: SymbolRuntime<Context> } = {
     // ================= KEYS =================
 
     atomKey: prop((env, v) => env.context.element.value.atom),

@@ -4,7 +4,7 @@
 
 import Expression from '../../mini-lisp/expression'
 
-const { isLiteral, isArgumentsArray, isArgumentsMap } = Expression;
+const { isLiteral, isArgumentsArray } = Expression;
 
 export default function format(e: Expression) {
     const writer = new Writer();
@@ -75,7 +75,8 @@ function _format(e: Expression, writer: Writer) {
     }
 
     writer.push();
-    const head = _format(e.head, writer);
+    _format(e.head, writer);
+
     if (!e.args) {
         writer.pop();
         return;

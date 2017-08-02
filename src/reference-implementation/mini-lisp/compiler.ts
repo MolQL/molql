@@ -22,8 +22,6 @@ namespace CompileResult {
     export function Dynamic(runtime: RuntimeExpression): CompileResult { return { isConst: false, runtime } }
 }
 
-type CompiledArguments = CompileResult[] | { [name: string]: CompileResult }
-
 function wrap<C, T>(symbolTable: SymbolTable, runtime: RuntimeExpression<C, T>) {
     return (ctx: C) => runtime(Environment(symbolTable, ctx));
 }

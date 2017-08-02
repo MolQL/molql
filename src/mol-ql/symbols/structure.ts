@@ -3,9 +3,8 @@
  */
 
 import Type from '../../mini-lisp/type'
-import Symbol, { Arguments, Argument } from '../../mini-lisp/symbol'
+import { Arguments, Argument } from '../../mini-lisp/symbol'
 import { symbol } from './helpers'
-import * as Primitive from './primitive'
 
 export namespace Types {
     export const ElementSymbol = Type('element-symbol', Type.Any);
@@ -22,12 +21,12 @@ const type = {
         1: Argument(Type.Num, { description: 'auth_seq_id' }),
         2: Argument(Type.Str, { description: 'pdbx_PDB_ins_code', isOptional: true })
     }), Types.ElementSymbol),
-    labelResidueId: symbol(Arguments.Dictionary({
-        0: Argument(Type.Str, { description: 'label_entity_id' }),
-        1: Argument(Type.Str, { description: 'label_asym_id' }),
-        2: Argument(Type.Num, { description: 'label_auth_seq_id' }),
-        3: Argument(Type.Str, { description: 'pdbx_PDB_ins_code' })
-    }), Types.ElementSymbol),
+    // TODO: labelResidueId: symbol(Arguments.Dictionary({
+    //     0: Argument(Type.Str, { description: 'label_entity_id' }),
+    //     1: Argument(Type.Str, { description: 'label_asym_id' }),
+    //     2: Argument(Type.Num, { description: 'label_auth_seq_id' }),
+    //     3: Argument(Type.Str, { description: 'pdbx_PDB_ins_code' })
+    // }), Types.ElementSymbol),
 };
 
 const generator = {
@@ -43,11 +42,6 @@ const generator = {
 
 const modifier = {
     '@header': 'Selection Modifications',
-    includeSurroundings: symbol(Arguments.Dictionary({
-        selection: Argument(Types.AtomSelection),
-        radius: Argument(Type.Num),
-        'whole-residues': Argument(Type.Bool, { isOptional: true })
-    }), Types.AtomSelection),
 
     queryEach: symbol(Arguments.Dictionary({
         selection: Argument(Types.AtomSelection),
@@ -62,20 +56,18 @@ const modifier = {
 
     intersectBy: symbol(Arguments.Dictionary({
         selection: Argument(Types.AtomSelection),
-        by: Argument(Types.AtomSelection),
-        'whole-residues': Argument(Type.Bool, { isOptional: true })
+        by: Argument(Types.AtomSelection)
     }), Types.AtomSelection, 'Intersect each atom set from the first sequence from atoms in the second one.'),
-
-    unionBy: symbol(Arguments.Dictionary({
-        selection: Argument(Types.AtomSelection),
-        by: Argument(Type.Num),
-        'whole-residues': Argument(Type.Bool, { isOptional: true })
-    }), Types.AtomSelection, 'For each atom set A in the orginal sequence, combine all atoms sets in the target selection that intersect with A.'),
 
     exceptBy: symbol(Arguments.Dictionary({
         selection: Argument(Types.AtomSelection),
-        by: Argument(Type.Num)
+        by: Argument(Types.AtomSelection)
     }), Types.AtomSelection, `Remove all atoms from 'selection' that occur in 'by'.`),
+
+    unionBy: symbol(Arguments.Dictionary({
+        selection: Argument(Types.AtomSelection),
+        by: Argument(Types.AtomSelection)
+    }), Types.AtomSelection, 'For each atom set A in the orginal sequence, combine all atoms sets in the target selection that intersect with A.'),
 
     union: symbol(Arguments.Dictionary({
         selection: Argument(Types.AtomSelection)
@@ -85,10 +77,21 @@ const modifier = {
         selection: Argument(Types.AtomSelection),
         radius: Argument(Type.Num)
     }), Types.AtomSelection, 'Combines are atom sets that are mutatually not further radius apart.'),
+
+    includeSurroundings: symbol(Arguments.Dictionary({
+        selection: Argument(Types.AtomSelection),
+        radius: Argument(Type.Num),
+        'as-whole-residues': Argument(Type.Bool, { isOptional: true })
+    }), Types.AtomSelection)
 }
 
 const filter = {
     '@header': 'Selection Filters',
+    pick: symbol(Arguments.Dictionary({
+        selection: Argument(Types.AtomSelection),
+        test: Argument(Type.Bool)
+    }), Types.AtomSelection, 'Pick all atom sets that satisfy the test.'),
+
     withSameProperties: symbol(Arguments.Dictionary({
         selection: Argument(Types.AtomSelection),
         source: Argument(Types.AtomSelection),
@@ -99,12 +102,7 @@ const filter = {
         selection: Argument(Types.AtomSelection),
         target: Argument(Types.AtomSelection),
         radius: Argument(Type.Num)
-    }), Types.AtomSelection, 'All atom sets from section that are within the radius of any atom from target'),
-
-    pick: symbol(Arguments.Dictionary({
-        selection: Argument(Types.AtomSelection),
-        test: Argument(Type.Bool)
-    }), Types.AtomSelection, 'Pick all atom sets that satisfy the test.'),
+    }), Types.AtomSelection, 'All atom sets from section that are within the radius of any atom from target')
 }
 
 const combinator = {

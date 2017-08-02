@@ -2,34 +2,32 @@
  * Copyright (c) 2017 David Sehnal, licensed under MIT, See LICENSE file for more info.
  */
 
-import Environment from '../../../mini-lisp/environment'
-import RuntimeExpression from '../../../mini-lisp/expression'
+import Environment from '../environment'
+import Expression from '../expression'
 import { FastMap } from '../../../utils/collections'
 import AtomSet from '../../data/atom-set'
 import AtomSelection from '../../data/atom-selection'
 import ElementAddress from '../../data/element-address'
 import Context from '../context'
-import Iterator from '../iterator'
 
-type Pred = RuntimeExpression<Context, boolean>
-type Env = Environment<Context>
+type Pred = Expression<boolean>
 
 export type GeneratorParams = {
     entityTest: Pred,
     chainTest: Pred,
     residueTest: Pred,
     atomTest: Pred,
-    groupBy: RuntimeExpression<Context, any>
+    groupBy: Expression<any>
 }
 
 type GroupCtx = {
-    env: Env,
-    groupBy: RuntimeExpression<Context>,
+    env: Environment,
+    groupBy: Expression,
     groups: FastMap<number, number[]>,
     selection: number[][]
 }
 
-function atomGroupsIterator(env: Env, { entityTest, chainTest, residueTest, atomTest }: GeneratorParams, groupCtx: GroupCtx) {
+function atomGroupsIterator(env: Environment, { entityTest, chainTest, residueTest, atomTest }: GeneratorParams, groupCtx: GroupCtx) {
     const ctx = env.context;
     const { model, mask } = ctx;
     const { chainStartIndex, chainEndIndex, count: entityCount } = model.entities;

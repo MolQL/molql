@@ -239,10 +239,6 @@ Language Reference
 
 -------------------
 
-### **label-residue-id**&nbsp;&nbsp;&nbsp;``structure.type.label-residue-id :: (string, string, number, string) => element-symbol``
-
--------------------
-
 ## Generators
 
 ### **atom-groups**&nbsp;&nbsp;&nbsp;``structure.generator.atom-groups :: (entity-test?: bool, chain-test?: bool, residue-test?: bool, atom-test?: bool, group-by?: value) => atom-selection``
@@ -265,7 +261,7 @@ Language Reference
 
 -------------------
 
-### **intersect-by**&nbsp;&nbsp;&nbsp;``structure.modifier.intersect-by :: (selection: atom-selection, by: number, whole-residues?: bool) => atom-selection``
+### **intersect-by**&nbsp;&nbsp;&nbsp;``structure.modifier.intersect-by :: (selection: atom-selection, by: atom-selection, whole-residues?: bool) => atom-selection``
 
 *Intersect each atom set from the first sequence from atoms in the second one.*
 
@@ -419,7 +415,7 @@ Language Reference
 
 -------------------
 
-### **pdbx_formal_charge**&nbsp;&nbsp;&nbsp;``structure.atom-property.pdbx_formal_charge :: () => string``
+### **pdbx_formal_charge**&nbsp;&nbsp;&nbsp;``structure.atom-property.pdbx_formal_charge :: () => number``
 
 *Same as mmCIF*
 
@@ -512,12 +508,6 @@ Language Reference
 ### **residue-id**&nbsp;&nbsp;&nbsp;``structure.atom-property.residue-id :: () => residue-id``
 
 *Corresponds to tuple (auth_asym_id, auth_seq_id, pdbx_PDB_ins_code)*
-
--------------------
-
-### **label-residue-id**&nbsp;&nbsp;&nbsp;``structure.atom-property.label-residue-id :: () => residue-id``
-
-*Corresponds to tuple (label_entity_id, label_asym_id, label_seq_id, pdbx_PDB_ins_code)*
 
 -------------------
 

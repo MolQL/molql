@@ -17,11 +17,11 @@ Language Reference
 `];
 const implemented: string[] = []
 
-const notImplemented: string[] = [`
-Not yet implemented
-===================
-`
-]
+// const notImplemented: string[] = [`
+// Not yet implemented
+// ===================
+// `
+// ]
 
 function formatArgs(args: Arguments) {
     if (args.kind === 'list') {
