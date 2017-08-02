@@ -4,10 +4,10 @@
 
 import Type from './type'
 
-export type Argument<T extends Type>  = { type: T, isOptional: boolean, defaultValue: T['@type'] | undefined, description: string | undefined }
-export function Argument<T extends Type>(type: T, params?: { description?: string, defaultValue?: T['@type'], isOptional?: boolean }): Argument<T> {
-    const { description = void 0, isOptional = false, defaultValue = void 0 } = params || {}
-    return { type, isOptional, defaultValue, description };
+export type Argument<T extends Type>  = { type: T, isOptional: boolean, isRest: boolean, defaultValue: T['@type'] | undefined, description: string | undefined }
+export function Argument<T extends Type>(type: T, params?: { description?: string, defaultValue?: T['@type'], isOptional?: boolean, isRest?: boolean }): Argument<T> {
+    const { description = void 0, isOptional = false, isRest = false, defaultValue = void 0 } = params || {}
+    return { type, isOptional, isRest, defaultValue, description };
 }
 
 export type Arguments<T extends { [key: string]: any, [key: number]: any } = {}> =

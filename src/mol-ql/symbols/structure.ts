@@ -82,6 +82,7 @@ const modifier = {
 }
 
 const filter = {
+    '@header': 'Selection Filters',
     withSameProperties: symbol(Arguments.Dictionary({
         selection: Argument(Types.AtomSelection),
         source: Argument(Types.AtomSelection),
@@ -101,17 +102,33 @@ const filter = {
 }
 
 const combinator = {
+    '@header': 'Selection Combinators',
     intersect: symbol(Arguments.List(Types.AtomSelection), Types.AtomSelection, 'Return all unique atom sets that appear in all of the source selections.'),
-    merge: symbol(Arguments.List(Types.AtomSelection), Types.AtomSelection, 'Merges multiple selections into a single one. Only unique atom sets are kept.')
-    // todo add near
+    merge: symbol(Arguments.List(Types.AtomSelection), Types.AtomSelection, 'Merges multiple selections into a single one. Only unique atom sets are kept.'),
+    near: symbol(Arguments.Dictionary({
+        0: Argument(Type.Num, { description: 'radius' }),
+        1: Argument(Types.AtomSelection, { isRest: true })
+    }), Types.AtomSelection, 'Pick combinations of atom sets from the source sequences that are mutually no more than radius apart.')
 }
 
 const atomSet = {
+    '@header': 'Atom Sets',
+    '@namespace': Types.AtomSet.name,
+
     atomCount: symbol(Arguments.None, Type.Num),
+
     count: symbol(Arguments.Dictionary({
         query: Argument(Types.AtomSelection)
     }), Type.Num, 'Counts the number of occurences of a specific query inside the current atom set.'),
-    // TODO add reducers
+
+    reduce: {
+        '@header': 'Atom Set Reducer',
+        accumulator: symbol(Arguments.Dictionary({
+            0: Argument(Type.Any, { description: 'Initial value.' }),
+            1: Argument(Type.Any, { description: 'Atom expression executed for each atom in the set.' })
+        }), Type.Any),
+        value: prop(Type.Any, 'Current value of the reducer.'),
+    }
 }
 
 const atomProperty = {
