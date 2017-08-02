@@ -196,7 +196,7 @@ export const SymbolRuntime: Symbol.Info<Context>[] = [
     Symbol(MolQL.structure.modifier.exceptBy)((env, v) => MoleculeRuntime.Modifiers.exceptBy(env, v.selection, v.by)),
     Symbol(MolQL.structure.modifier.unionBy)((env, v) => MoleculeRuntime.Modifiers.exceptBy(env, v.selection, v.by)),
     Symbol(MolQL.structure.modifier.union)((env, v) => MoleculeRuntime.Modifiers.union(env, v.selection)),
-    Symbol(MolQL.structure.modifier.cluster)((env, v) => MoleculeRuntime.Modifiers.cluster(env, v.selection, v.radius)),
+    Symbol(MolQL.structure.modifier.cluster)((env, v) => MoleculeRuntime.Modifiers.cluster(env, v.selection, v['max-radius'])),
     Symbol(MolQL.structure.modifier.includeSurroundings)((env, v) => MoleculeRuntime.Modifiers.includeSurroundings(env, v.selection, v.radius, v['as-whole-residues'])),
 
     // ============= FILTERS ================
