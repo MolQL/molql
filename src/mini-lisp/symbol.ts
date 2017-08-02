@@ -10,7 +10,7 @@ export function Argument<T extends Type>(type: T, params?: { description?: strin
     return { type, isOptional, isRest, defaultValue, description };
 }
 
-export type Arguments<T extends { [key: string]: any, [key: number]: any } = {}> =
+export type Arguments<T extends { [key: string]: any } = {}> =
     | Arguments.List<T>
     | Arguments.Dictionary<T>
 
@@ -45,6 +45,11 @@ interface Symbol<A extends Arguments = Arguments, T extends Type = Type> {
 
 function Symbol<A extends Arguments, T extends Type>(name: string, args: A, type: T, description?: string) {
     return { id: '', namespace: '', name, type, arguments: args, description, '@arg-type': void 0 as any } as Symbol<A, T>;
+}
+
+export function isSymbol(x: any): x is Symbol {
+    const s = x as Symbol;
+    return typeof s === 'object' && s.arguments && typeof s.name === 'string' && typeof s.namespace === 'string' && !!s.type && !!s.arguments;
 }
 
 export default Symbol

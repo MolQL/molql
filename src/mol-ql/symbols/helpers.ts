@@ -3,7 +3,7 @@
  */
 
 import Type from '../../mini-lisp/type'
-import Symbol, { Arguments } from '../../mini-lisp/symbol'
+import Symbol, { Arguments, isSymbol } from '../../mini-lisp/symbol'
 
 export function symbol<A extends Arguments, T extends Type<S>, S>(args: A, type: T, description?: string) {
     return Symbol('', args, type, description);
@@ -21,11 +21,6 @@ export function symbolList(table: any): Symbol[] {
 
 function formatKey(key: string) {
     return key.replace(/([a-z])([A-Z])([a-z]|$)/g, (s, a, b, c) => `${a}-${b.toLocaleLowerCase()}${c}`);
-}
-
-function isSymbol(x: any): x is Symbol {
-    const s = x as Symbol;
-    return typeof s === 'object' && s.arguments && typeof s.name === 'string' && typeof s.namespace === 'string';
 }
 
 function _normalizeTable(namespace: string, key: string, obj: any) {

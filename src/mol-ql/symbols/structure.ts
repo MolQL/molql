@@ -37,7 +37,7 @@ const generator = {
         'chain-test': Argument(Type.Bool, { isOptional: true, defaultValue: true }),
         'residue-test': Argument(Type.Bool, { isOptional: true, defaultValue: true }),
         'atom-test': Argument(Type.Bool, { isOptional: true, defaultValue: true }),
-        'group-by': Argument(Type.Any, { isOptional: true, defaultValue: 'atom-key' }),
+        'group-by': Argument(Type.Any, { isOptional: true, defaultValue: '`atom-key` symbol' }),
     }), Types.AtomSelection)
 }
 
@@ -66,6 +66,11 @@ const modifier = {
         by: Argument(Type.Num),
         wholeResidues: Argument(Type.Bool, { isOptional: true })
     }), Types.AtomSelection, 'For each atom set A in the orginal sequence, combine all atoms sets in the target selection that intersect with A.'),
+
+    exceptBy: symbol(Arguments.Dictionary({
+        selection: Argument(Types.AtomSelection),
+        by: Argument(Type.Num)
+    }), Types.AtomSelection, `Remove all atoms from 'selection' that occur in 'by'.`),
 
     complement: symbol(Arguments.Dictionary({
         selection: Argument(Types.AtomSelection)
