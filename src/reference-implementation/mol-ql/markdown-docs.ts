@@ -25,13 +25,19 @@ Not yet implemented
 
 function formatArgs(args: Arguments) {
     if (args.kind === 'list') {
-        return `values: ${args.type.name}*`
+        return `${args.type.name}*`;
     }
     const map = args.map;
+    const keys = Object.keys(map);
     const formatted: string[] = [];
-    for (const a of Object.keys(map)) {
-        const arg = (map as any)[a] as Argument<any>;
-        formatted.push(`${a}${arg.isOptional ? ':?' : ':'} ${arg.type.name}${arg.isRest ? '*' : ''}`);
+
+    for (const key of keys) {
+        const arg = (map as any)[key] as Argument<any>;
+        if (!isNaN(key as any)) {
+            formatted.push(`${arg.type.name}${arg.isRest ? '*' : ''}`);
+        } else {
+            formatted.push(`${key}${arg.isOptional ? '?:' : ':'} ${arg.type.name}${arg.isRest ? '*' : ''}`);
+        }
     }
     return formatted.join(', ');
 }
@@ -47,7 +53,8 @@ function formatSymbol(symbol: Symbol, lines: string[]) {
 
 function format(depth: number, obj: any) {
     if (isSymbol(obj)) {
-        formatSymbol(obj, notImplemented);
+        formatSymbol(obj, implemented);
+        return;
     }
     if (obj['@header']) {
         implemented.push(`${depth >= 2 ? '##' : '#'} ${obj['@header']}\n`);
@@ -62,4 +69,4 @@ function format(depth: number, obj: any) {
 format(0, MolQL);
 console.log(ToC.join('\n'));
 console.log(implemented.join('\n'));
-console.log(notImplemented.join('\n'));
+//console.log(notImplemented.join('\n'));

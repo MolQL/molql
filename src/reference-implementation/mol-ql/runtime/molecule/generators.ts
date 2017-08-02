@@ -80,11 +80,28 @@ function groupAtom({ env, groupBy, groups, selection }: GroupCtx, i: number) {
 function alwaysTrue(env: Environment) { return true; }
 function groupByAtom(env: Environment) { return env.context.element.value.atom; }
 
-function groupTrivial(env: Environment) {
-    
+function groupAtomsSingleton(env: Environment, atomTest: Pred) {
+    const ctx = env.context;
+    const { model, mask } = ctx;
+
+    const ret = AtomSelection.linearBuilder();
+    const element = Context.beginIterateElemement(ctx);
+    for (let i = 0, _i = model.atoms.count; i < _i; i++) {
+        if (!mask.has(i)) continue;
+        if (atomTest === alwaysTrue) ret.add(AtomSet([i]));
+        else {
+            ElementAddress.setAtom(model, element, i);
+            if (atomTest(env)) ret.add(AtomSet([i]));
+        }
+    }
+    return ret.getSelection();
 }
 
 export function atomGroupsGenerator(env: Environment, params: Partial<GeneratorParams>): AtomSelection {
+    if (!params.residueTest && !params.chainTest && !params.entityTest && !params.groupBy) {
+        return groupAtomsSingleton(env, params.groupBy || alwaysTrue);
+    }
+
     const {
         entityTest = alwaysTrue,
         chainTest = alwaysTrue,
