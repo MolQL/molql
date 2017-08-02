@@ -2,9 +2,9 @@
  * Copyright (c) 2017 David Sehnal, licensed under MIT, See LICENSE file for more info.
  */
 
-import { UniqueArrayBuilder, sortAsc, FastMap, FastSet } from '../utils/collections'
-import Mask from '../utils/mask'
-import Context from './context'
+import { UniqueArrayBuilder, sortAsc, FastMap, FastSet } from '../../utils/collections'
+import Mask from '../../utils/mask'
+import Context from '../runtime/context'
 import AtomSet from './atom-set'
 
 interface AtomSelection { '@type'?: 'atom-selection' }
@@ -34,7 +34,7 @@ namespace AtomSelection {
         return AtomSet(sortAsc(atoms));
     }
 
-    export function getMask(seq: AtomSelection) {
+    export function getMask(seq: AtomSelection): Mask {
         const sets = atomSets(seq);
         if (!sets.length) return Mask.never;
         if (sets.length === 1) return AtomSet.getMask(sets[0]);

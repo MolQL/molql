@@ -83,7 +83,8 @@ function _format(e: Expression, writer: Writer) {
 
     if (isArgumentsArray(e.args)) {
         for (const a of e.args) {
-            writer.whitespace();
+            if (isLiteral(a)) writer.whitespace();
+            else writer.newline();
             _format(a, writer);
         }
         writer.pop();

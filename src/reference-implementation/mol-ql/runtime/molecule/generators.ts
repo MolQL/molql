@@ -15,11 +15,11 @@ type Pred = RuntimeExpression<Context, boolean>
 type Env = Environment<Context>
 
 export type GeneratorParams = {
-    entityP: Pred,
-    chainP: Pred,
-    residueP: Pred,
-    atomP: Pred,
-    groupBy?: RuntimeExpression<Context>
+    entityTest: Pred,
+    chainTest: Pred,
+    residueTest: Pred,
+    atomTest: Pred,
+    groupBy: RuntimeExpression<Context, any>
 }
 
 type GroupCtx = {
@@ -29,7 +29,7 @@ type GroupCtx = {
     selection: number[][]
 }
 
-function atomGroupsIterator(env: Env, { entityP, chainP, residueP, atomP }: GeneratorParams, groupCtx: GroupCtx) {
+function atomGroupsIterator(env: Env, { entityTest, chainTest, residueTest, atomTest }: GeneratorParams, groupCtx: GroupCtx) {
     const ctx = env.context;
     const { model, mask } = ctx;
     const { chainStartIndex, chainEndIndex, count: entityCount } = model.entities;
@@ -38,22 +38,22 @@ function atomGroupsIterator(env: Env, { entityP, chainP, residueP, atomP }: Gene
 
     const element = Context.beginIterateElemement(ctx);
     for (let eI = 0; eI < entityCount; eI++) {
-        ElementAddress.setEntityLayer(ctx, element, eI);
-        if (!entityP(env)) continue;
+        ElementAddress.setEntityLayer(model, element, eI);
+        if (!entityTest(env)) continue;
 
         for (let cI = chainStartIndex[eI], _cI = chainEndIndex[eI]; cI < _cI; cI++) {
-            ElementAddress.setChainLayer(ctx, element, cI);
-            if (!chainP(env)) continue;
+            ElementAddress.setChainLayer(model, element, cI);
+            if (!chainTest(env)) continue;
 
             for (let rI = residueStartIndex[cI], _rI = residueEndIndex[cI]; rI < _rI; rI++) {
-                ElementAddress.setResidueLayer(ctx, element, rI);
-                if (!residueP(env)) continue;
+                ElementAddress.setResidueLayer(model, element, rI);
+                if (!residueTest(env)) continue;
 
                 for (let aI = atomStartIndex[rI], _aI = atomEndIndex[rI]; aI < _aI; aI++) {
                     if (!mask.has(aI)) continue;
 
-                    ElementAddress.setAtomLayer(ctx, element, aI);
-                    if (!atomP(env)) continue;
+                    ElementAddress.setAtomLayer(model, element, aI);
+                    if (!atomTest(env)) continue;
 
                     groupAtom(groupCtx, aI);
                 }
@@ -77,12 +77,20 @@ function groupAtom({ env, groupBy, groups, selection }: GroupCtx, i: number) {
     atomSet.push(i);
 }
 
+function alwaysTrue(env: Environment) { return true; }
 function groupByAtom(env: Environment) { return env.context.element.value.atom; }
 
-export function atomGroupsGenerator(env: Environment, params: GeneratorParams): AtomSelection {
-    const groupBy = params.groupBy || groupByAtom;
+export function atomGroupsGenerator(env: Environment, params: Partial<GeneratorParams>): AtomSelection {
+    const {
+        entityTest = alwaysTrue,
+        chainTest = alwaysTrue,
+        residueTest = alwaysTrue,
+        atomTest = alwaysTrue,
+        groupBy = groupByAtom
+    } = params;
+
     const groupCtx: GroupCtx = { env, groupBy, groups: FastMap.create(), selection: [] };
-    atomGroupsIterator(env, params, groupCtx);
+    atomGroupsIterator(env, { entityTest, chainTest, residueTest, atomTest, groupBy }, groupCtx);
     const result = AtomSelection.linearBuilder();
     for (const set of groupCtx.selection) {
         result.add(AtomSet(set));

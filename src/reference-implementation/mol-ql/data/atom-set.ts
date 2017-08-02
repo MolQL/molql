@@ -2,9 +2,9 @@
  * Copyright (c) 2017 David Sehnal, licensed under MIT, See LICENSE file for more info.
  */
 
-import { UniqueArrayBuilder, sortAsc } from '../utils/collections'
-import { Model } from '../molecule/data'
-import Mask from '../utils/mask'
+import { UniqueArrayBuilder, sortAsc } from '../../utils/collections'
+import { Model } from '../../molecule/data'
+import Mask from '../../utils/mask'
 
 interface AtomSet { '@kind'?: 'atom-set' }
 

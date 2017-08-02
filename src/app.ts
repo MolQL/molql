@@ -5,13 +5,18 @@
 import compile from './reference-implementation/mol-ql/compiler'
 import formatter from './reference-implementation/mini-lisp/formatter'
 import MolQL from './mol-ql/symbols'
+import B from './mol-ql/builder'
 import Expression from './mini-lisp/expression'
 
-const expr = Expression.Apply(MolQL.primitive.operator.arithmetic.add.id, [1, 2, 3, 4, 5]);
+const expr =  B.operator(o => o.arithmetic.add, [1, 2, 3, 4, 5]);
+//Expression.Apply(MolQL.primitive.operator.arithmetic.add.id, [1, 2, 3, 4, 5]);
 const compiled = compile<number>(expr);
-const result = compiled({});
+const result = compiled({} as any);
 
-const expr1 = Expression.Apply(MolQL.primitive.operator.arithmetic.sin.id, { min: 0, max: 25, v: expr });
+const expr1 = B.Struct.gen(g => g.atomGroups, {
+    'chain-test': B.operator(o => o.relational.eq, [B.Struct.atomProp(a => a.label_asym_id), 'A']),
+    'atom-test': B.operator(o => o.relational.eq, [B.Struct.atomProp(a => a.type_symbol), B.Struct.type(t => t.elementSymbol, ['FE'])])
+});
 console.log(formatter(expr));
 console.log(formatter(expr1));
 console.log(result);

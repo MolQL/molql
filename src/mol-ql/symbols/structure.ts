@@ -20,7 +20,7 @@ const type = {
     authResidueId: symbol(Arguments.Dictionary({
         0: Argument(Type.Str, { description: 'auth_asym_id' }),
         1: Argument(Type.Num, { description: 'auth_seq_id' }),
-        2: Argument(Type.Str, { description: 'pdbx_PDB_ins_code' })
+        2: Argument(Type.Str, { description: 'pdbx_PDB_ins_code', isOptional: true })
     }), Types.ElementSymbol),
     labelResidueId: symbol(Arguments.Dictionary({
         0: Argument(Type.Str, { description: 'label_entity_id' }),
@@ -34,41 +34,130 @@ const generator = {
     '@header': 'Generators',
     atomGroups: symbol(Arguments.Dictionary({
         'entity-test': Argument(Type.Bool, { isOptional: true, defaultValue: true }),
-        'chain-test': Argument(Type.Bool, { isOptional: true, defaultValue: true  }),
-        'residue-test': Argument(Type.Bool, { isOptional: true, defaultValue: true  }),
-        'atom-test': Argument(Type.Bool, { isOptional: true, defaultValue: true  }),
+        'chain-test': Argument(Type.Bool, { isOptional: true, defaultValue: true }),
+        'residue-test': Argument(Type.Bool, { isOptional: true, defaultValue: true }),
+        'atom-test': Argument(Type.Bool, { isOptional: true, defaultValue: true }),
         'group-by': Argument(Type.Any, { isOptional: true, defaultValue: 'atom-key' }),
     }), Types.AtomSelection)
 }
 
 const modifier = {
+    '@header': 'Selection Modifications',
+    includeSurroundings: symbol(Arguments.Dictionary({
+        selection: Argument(Types.AtomSelection),
+        radius: Argument(Type.Num),
+        wholeResidues: Argument(Type.Bool, { isOptional: true })
+    }), Types.AtomSelection),
 
+    queryEach: symbol(Arguments.Dictionary({
+        selection: Argument(Types.AtomSelection),
+        query: Argument(Types.AtomSelection),
+        wholeResidues: Argument(Type.Bool, { isOptional: true })
+    }), Types.AtomSelection),
+
+    intersectBy: symbol(Arguments.Dictionary({
+        selection: Argument(Types.AtomSelection),
+        by: Argument(Type.Num),
+        wholeResidues: Argument(Type.Bool, { isOptional: true })
+    }), Types.AtomSelection, 'Intersect each atom set from the first sequence from atoms in the second one.'),
+
+    unionBy: symbol(Arguments.Dictionary({
+        selection: Argument(Types.AtomSelection),
+        by: Argument(Type.Num),
+        wholeResidues: Argument(Type.Bool, { isOptional: true })
+    }), Types.AtomSelection, 'For each atom set A in the orginal sequence, combine all atoms sets in the target selection that intersect with A.'),
+
+    complement: symbol(Arguments.Dictionary({
+        selection: Argument(Types.AtomSelection)
+    }), Types.AtomSelection),
+
+    union: symbol(Arguments.Dictionary({
+        selection: Argument(Types.AtomSelection)
+    }), Types.AtomSelection, 'Collects all atom sets in the sequence into a single atom set.'),
+
+    cluster: symbol(Arguments.Dictionary({
+        selection: Argument(Types.AtomSelection),
+        radius: Argument(Type.Num)
+    }), Types.AtomSelection, 'Combines are atom sets that are mutatually not further radius apart.'),
 }
 
 const filter = {
+    withSameProperties: symbol(Arguments.Dictionary({
+        selection: Argument(Types.AtomSelection),
+        source: Argument(Types.AtomSelection),
+        property: Argument(Type.Any)
+    }), Types.AtomSelection),
 
+    within: symbol(Arguments.Dictionary({
+        selection: Argument(Types.AtomSelection),
+        target: Argument(Types.AtomSelection),
+        radius: Argument(Type.Num)
+    }), Types.AtomSelection, 'All atom sets from section that are within the radius of any atom from target'),
+
+    pick: symbol(Arguments.Dictionary({
+        selection: Argument(Types.AtomSelection),
+        test: Argument(Type.Bool)
+    }), Types.AtomSelection, 'Pick all atom sets that satisfy the test.'),
 }
 
 const combinator = {
-
+    intersect: symbol(Arguments.List(Types.AtomSelection), Types.AtomSelection, 'Return all unique atom sets that appear in all of the source selections.'),
+    merge: symbol(Arguments.List(Types.AtomSelection), Types.AtomSelection, 'Merges multiple selections into a single one. Only unique atom sets are kept.')
+    // todo add near
 }
 
 const atomSet = {
-
+    atomCount: symbol(Arguments.None, Type.Num),
+    count: symbol(Arguments.Dictionary({
+        query: Argument(Types.AtomSelection)
+    }), Type.Num, 'Counts the number of occurences of a specific query inside the current atom set.'),
+    // TODO add reducers
 }
 
 const atomProperty = {
     '@header': 'Atom Properties',
-    'type_symbol': prop(Types.ElementSymbol, 'Same as mmCIF'),
-    'auth_atom_id': prop(Type.Str, 'Same as mmCIF'),
-    'auth_comp_id': prop(Type.Str, 'Same as mmCIF'),
-    'auth_asym_id': prop(Type.Str, 'Same as mmCIF'),
-    'auth_seq_id': prop(Type.Num, 'Same as mmCIF'),
 
-    'atom-key': prop(Type.Str, 'Unique value for each atom.'),
-    'residue-key': prop(Type.Str, 'Unique value for each tuple ``(label_entity_id,auth_asym_id,auth_seq_id,pdbx_PDB_ins_code)``.'),
-    'chain-key': prop(Type.Str, 'Unique value for each tuple ``(label_entity_id,auth_asym_id)``.'),
-    'entity-key': prop(Type.Str, 'Unique value for each tuple ``label_entity_id``.')
+    // ================= mmCIF =================
+    group_PDB: prop(Type.Str, 'Same as mmCIF'),
+    id: prop(Type.Num, 'Same as mmCIF'),
+
+    type_symbol: prop(Types.ElementSymbol, 'Same as mmCIF'),
+
+    label_atom_id: prop(Type.Str, 'Same as mmCIF'),
+    label_alt_id: prop(Type.Str, 'Same as mmCIF'),
+    label_comp_id: prop(Type.Str, 'Same as mmCIF'),
+    label_asym_id: prop(Type.Str, 'Same as mmCIF'),
+    label_entity_id: prop(Type.Str, 'Same as mmCIF'),
+    label_seq_id: prop(Type.Num, 'Same as mmCIF'),
+
+    pdbx_PDB_ins_code: prop(Type.Str, 'Same as mmCIF'),
+    pdbx_formal_charge: prop(Type.Str, 'Same as mmCIF'),
+
+    Cartn_x: prop(Type.Num, 'Same as mmCIF. Using this value, beacuse adding Frac_x, etc. might be an option in the future.'),
+    Cartn_y: prop(Type.Num, 'Same as mmCIF. Using this value, beacuse adding Frac_x, etc. might be an option in the future.'),
+    Cartn_z: prop(Type.Num, 'Same as mmCIF. Using this value, beacuse adding Frac_x, etc. might be an option in the future.'),
+
+    occupancy: prop(Type.Num, 'Same as mmCIF'),
+    B_iso_or_equiv: prop(Type.Num, 'Same as mmCIF'),
+
+    auth_atom_id: prop(Type.Str, 'Same as mmCIF'),
+    auth_comp_id: prop(Type.Str, 'Same as mmCIF'),
+    auth_asym_id: prop(Type.Str, 'Same as mmCIF'),
+    auth_seq_id: prop(Type.Num, 'Same as mmCIF'),
+
+    pdbx_PDB_model_num: prop(Type.Num, 'Same as mmCIF'),
+
+    // ================= KEYS =================
+    atomKey: prop(Type.Any, 'Unique value for each atom. Main use case is grouping of atoms.'),
+    residueKey: prop(Type.Any, 'Unique value for each tuple ``(label_entity_id,auth_asym_id,auth_seq_id,pdbx_PDB_ins_code)``. Main use case is grouping of atoms.'),
+    chainKey: prop(Type.Any, 'Unique value for each tuple ``(label_entity_id,auth_asym_id)``. Main use case is grouping of atoms.'),
+    entityKey: prop(Type.Any, 'Unique value for each tuple ``label_entity_id``. Main use case is grouping of atoms.'),
+
+    residueId: prop(Types.ResidueId, 'Corresponds to tuple (auth_asym_id, auth_seq_id, pdbx_PDB_ins_code)'),
+    labelResidueId: prop(Types.ResidueId, 'Corresponds to tuple (label_entity_id, label_asym_id, label_seq_id, pdbx_PDB_ins_code)'),
+
+    // ================= Other =================
+    isHet: prop(Type.Num, 'For mmCIF files, Same as group_PDB !== ATOM'),
 }
 
 function prop(type: Type, description?: string) {

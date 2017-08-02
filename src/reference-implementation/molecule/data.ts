@@ -77,6 +77,24 @@ export function ElementSymbol(symbol: any): string {
     return val;
 }
 
+export type ResidueIdentifier = string
+export function ResidueIdentifier(chain: string, seq_num: number, ins_code?: string): ResidueIdentifier {
+    if (ins_code) {
+        return `${chain} ${seq_num} ${ins_code}`;
+    }
+    return `${chain} ${seq_num}`;
+}
+export namespace ResidueIdentifier {
+    export function ofResidue(model: Model, residueIndex: number) {
+        const row = model.atoms.dataIndex[model.residues.atomStartIndex[residueIndex]];
+        const { atom_site } = model.data;
+        if (atom_site.pdbx_PDB_ins_code.getValuePresence(row) === CIFTools.ValuePresence.Present) {
+            return `${atom_site.auth_asym_id.getString(row)} ${atom_site.auth_seq_id.getInteger(row)} ${atom_site.pdbx_PDB_ins_code.getString(row)}`;
+        }
+        return `${atom_site.auth_asym_id.getString(row)} ${atom_site.auth_seq_id.getInteger(row)}`;
+    }
+}
+
 export namespace Model {
     export function spatialLookup(model: Model): SpatialLookup {
         if (model['@spatialLookup']) return model['@spatialLookup']!;

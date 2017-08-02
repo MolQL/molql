@@ -2,7 +2,7 @@
  * Copyright (c) 2017 David Sehnal, licensed under MIT, See LICENSE file for more info.
  */
 
-import { Model } from '../data'
+import { Model } from '../../molecule/data'
 import Mask from '../../utils/mask'
 import AtomSet from './atom-set'
 import AtomSelection from './atom-selection'

@@ -3,9 +3,10 @@
  */
 
 import primitive from './symbols/primitive'
+import structure from './symbols/structure'
 import { normalizeTable, symbolList } from './symbols/helpers'
 
-const table = { primitive };
+const table = { primitive, structure };
 
 normalizeTable(table);
 

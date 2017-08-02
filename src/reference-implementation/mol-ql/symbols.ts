@@ -4,8 +4,11 @@
 
 import MolQL from '../../mol-ql/symbols'
 import Symbol, { SymbolTable } from '../mini-lisp/symbol'
-import Context from './runtime/context'
 import { FastSet, FastMap } from '../utils/collections'
+import Context from './runtime/context'
+import { ElementSymbol, ResidueIdentifier } from '../molecule/data'
+import MoleculeRuntime from './runtime/molecule'
+
 
 const staticAttr: Symbol.Attributes = { isStatic: true }
 
@@ -55,6 +58,37 @@ export const SymbolRuntime: Symbol.Info<Context>[] = [
 
     // ============= SET ================
     Symbol(MolQL.primitive.operator.set.has, staticAttr)((env, v) => v[0](env).has(v[1](env))),
+
+    ////////////////////////////////////
+    // Structure
+
+    // ============= TYPES ================
+    Symbol(MolQL.structure.type.elementSymbol, staticAttr)((env, v) => ElementSymbol(v[0](env))),
+    Symbol(MolQL.structure.type.authResidueId, staticAttr)((env, v) => ResidueIdentifier(v[0](env), v[1](env), v[2] && v[2](env))),
+
+    // ============= GENERATORS ================
+    Symbol(MolQL.structure.generator.atomGroups)((env, v) => {
+        return MoleculeRuntime.Generators.atomGroupsGenerator(env, {
+            entityTest: v['entity-test'],
+            chainTest: v['chain-test'],
+            residueTest: v['residue-test'],
+            atomTest: v['atom-test'],
+            groupBy: v['group-by']
+        })
+    }),
+
+    // ============= ATOM PROPERTIES ================
+    Symbol(MolQL.structure.atomProperty.atomKey)(MoleculeRuntime.AtomProperties.atomKey),
+    Symbol(MolQL.structure.atomProperty.residueKey)(MoleculeRuntime.AtomProperties.residueKey),
+    Symbol(MolQL.structure.atomProperty.chainKey)(MoleculeRuntime.AtomProperties.chainKey),
+    Symbol(MolQL.structure.atomProperty.entityKey)(MoleculeRuntime.AtomProperties.entityKey),
+
+    Symbol(MolQL.structure.atomProperty.type_symbol)(MoleculeRuntime.AtomProperties.type_symbol),
+
+    Symbol(MolQL.structure.atomProperty.auth_asym_id)(MoleculeRuntime.AtomProperties.auth_asym_id),
+    Symbol(MolQL.structure.atomProperty.auth_atom_id)(MoleculeRuntime.AtomProperties.auth_atom_id),
+    Symbol(MolQL.structure.atomProperty.auth_comp_id)(MoleculeRuntime.AtomProperties.auth_comp_id),
+    Symbol(MolQL.structure.atomProperty.auth_seq_id)(MoleculeRuntime.AtomProperties.auth_seq_id),
 ]
 
 const table = (function() {
