@@ -97,7 +97,7 @@ const operator = {
             0: Argument(Type.Num, { description: 'Value to test' }),
             1: Argument(Type.Num, { description: 'Minimum value' }),
             2: Argument(Type.Num, { description: 'Maximum value' })
-        }), Type.Bool),
+        }), Type.Bool, 'Check if the value of the 1st argument is >= 2nd and <= 3rd.'),
     },
 
     string: {

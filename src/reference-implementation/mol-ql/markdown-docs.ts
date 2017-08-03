@@ -25,27 +25,42 @@ Language Reference
 
     function formatArgs(args: Arguments) {
         if (args.kind === 'list') {
-            return `${args.type.name}*`;
+            return `(${args.type.name}*)`;
         }
         const map = args.map;
         const keys = Object.keys(map);
         const formatted: string[] = [];
 
+        let isArgArray = true, argIndex = 0;
+        for (const key of keys) {
+            if (isNaN(key as any) || +key !== argIndex) {
+                isArgArray = false;
+                break;
+            }
+            argIndex++;
+        }
+
+        formatted.push(isArgArray ? '(' : '{\n');
+        argIndex = 0;
         for (const key of keys) {
             const arg = (map as any)[key] as Argument<any>;
             if (!isNaN(key as any)) {
                 formatted.push(`${arg.type.name}${arg.isRest ? '*' : ''}`);
             } else {
-                formatted.push(`${key}${arg.isOptional ? '?:' : ':'} ${arg.type.name}${arg.isRest ? '*' : ''}`);
+                formatted.push(`  ${key}${arg.isOptional ? '?:' : ':'} ${arg.type.name}${arg.isRest ? '*' : ''}`);
             }
+            if (argIndex < keys.length - 1) formatted.push(', ')
+            if (!isArgArray) formatted.push('\n');
+            argIndex++;
         }
-        return formatted.join(', ');
+        formatted.push(isArgArray ? ')' : '}')
+        return formatted.join('');
     }
 
     function formatSymbol(symbol: Symbol, lines: string[]) {
-        const header = `${symbol.id} :: (${formatArgs(symbol.arguments)}) => ${symbol.type.name}`
+        const header = `${symbol.id} :: ${formatArgs(symbol.arguments)} => ${symbol.type.name}`
         lines.push(`### **${symbol.name}**`);
-        lines.push(`\`\`${header}\`\`\n`);
+        lines.push(`\`\`\`\n${header}\n\`\`\`\n`);
         if (symbol.description) {
             lines.push(`*${symbol.description}*\n`);
         }
