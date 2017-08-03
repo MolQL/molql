@@ -3,6 +3,7 @@
  */
 
 import Type from './type'
+import Expression from './expression'
 
 export type Argument<T extends Type>  = { type: T, isOptional: boolean, isRest: boolean, defaultValue: T['@type'] | undefined, description: string | undefined }
 export function Argument<T extends Type>(type: T, params?: { description?: string, defaultValue?: T['@type'], isOptional?: boolean, isRest?: boolean }): Argument<T> {
@@ -32,7 +33,10 @@ export namespace Arguments {
     }
 }
 
+export type ExpressionArguments<T> = Partial<{ [P in keyof T]: Expression }>
+
 interface Symbol<A extends Arguments = Arguments, T extends Type = Type> {
+    apply(args?: ExpressionArguments<A['@type']>): Expression,
     id: string,
     namespace: string,
     name: string,
@@ -42,7 +46,16 @@ interface Symbol<A extends Arguments = Arguments, T extends Type = Type> {
 }
 
 function Symbol<A extends Arguments, T extends Type>(name: string, args: A, type: T, description?: string) {
-    return { id: '', namespace: '', name, type, arguments: args, description, '@arg-type': void 0 as any } as Symbol<A, T>;
+    const s: Symbol<A, T> = {
+        apply(this: Symbol, args: ExpressionArguments<A['@type']>) { return Expression.Apply(this.id, args as any) },
+        id: '',
+        namespace: '',
+        name,
+        type,
+        arguments: args,
+        description
+    };
+    return s;
 }
 
 export function isSymbol(x: any): x is Symbol {

@@ -15,7 +15,7 @@ import B from './mol-ql/builder'
 
 function run(model: Model) {
 
-    const es = (s: string) => B.Struct.type(c => c.elementSymbol, [s])
+    const es = (s: string) => B.Struct.type.elementSymbol.apply([s])
 
     // const query = B.Struct.gen(g => g.atomGroups, {
     //     'residue-test': B.operator(o => o.relational.eq, [B.Struct.atomProp(p => p.auth_comp_id), 'ALA']),
@@ -24,8 +24,8 @@ function run(model: Model) {
     //         B.Struct.atomProp(p => p.type_symbol)
     //     ]),
     // });
-    const query =  B.Struct.gen(g => g.atomGroups, {
-        'atom-test': B.operator(o => o.relational.eq, [B.Struct.atomProp(p => p.type_symbol), es('Fe')]),
+    const query =  B.Struct.gen.atomGroups.apply({
+        'atom-test': B.operator.relational.eq.apply([B.Struct.atomProp.type_symbol.apply(), es('Fe')]),
     });
 
     const compiled = compile(query);
