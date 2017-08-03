@@ -3,6 +3,7 @@
  */
 
 import Expression from '../mini-lisp/expression'
+import Symbol from '../mini-lisp/symbol'
 import MolQL from './symbols'
 
 namespace Builder {
@@ -17,11 +18,14 @@ namespace Builder {
     export namespace Struct {
         export const type = MolQL.structure.type;
         export const gen = MolQL.structure.generator;
-        export const atomProp = MolQL.structure.atomProperty;
         export const filter = MolQL.structure.filter;
         export const mod = MolQL.structure.modifier;
         export const comb = MolQL.structure.combinator;
         export const atomSet = MolQL.structure.atomSet;
+
+        const _atomProp = MolQL.structure.atomProperty;
+        export function atomProp(p: keyof typeof _atomProp) { return (_atomProp[p] as Symbol).apply() };
+        export function el(s: string) { return type.elementSymbol.apply([s]); }
     }
 }
 
