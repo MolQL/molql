@@ -12,6 +12,12 @@ import mmCIFwriter from './reference-implementation/molecule/writer'
 import Context from './reference-implementation/mol-ql/runtime/context'
 import B from './mol-ql/builder'
 
+const a = AtomSet([1,5,7])
+const b = AtomSet([4,6,8])
+const v = AtomSet([5, 7, 9])
+console.log(AtomSet.atomIndices(AtomSet.union(a, b)))
+console.log(AtomSet.atomIndices(AtomSet.union(a, v)))
+
 function run(model: Model) {
 
     //const es = (s: string) => B.Struct.type.elementSymbol.apply([s])

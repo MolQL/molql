@@ -120,7 +120,7 @@ namespace AtomSet {
         if (a === b) return 0;
         let distSq = Number.POSITIVE_INFINITY;
         const { x, y, z } = model.positions;
-        const xs = (a as AtomSetImpl).atomIndices, ys = (b as AtomSetImpl).atomIndices;
+        const xs = atomIndices(a), ys = atomIndices(b);
         for (const i of xs) {
             for (const j of ys) {
                 const d = atomDistanceSq(x, y, z, i, j);
@@ -135,13 +135,45 @@ namespace AtomSet {
         const dSq = maxDistance * maxDistance;
         const { x, y, z } = model.positions;
 
-        const xs = (a as AtomSetImpl).atomIndices, ys = (b as AtomSetImpl).atomIndices;
+        const xs = atomIndices(a), ys = atomIndices(b);
         for (const i of xs) {
             for (const j of ys) {
                 if (atomDistanceSq(x, y, z, i, j) <= dSq) return true;
             }
         }
         return false;
+    }
+
+    export function union(a: AtomSet, b: AtomSet): AtomSet {
+        const xs = atomIndices(a), ys = atomIndices(b);
+        const la = xs.length, lb = ys.length;
+
+        let i = 0, j = 0, count = 0;
+
+        while (i < la && j < lb) {
+            const x = xs[i], y = ys[j];
+            count++;
+            if (x < y) i++;
+            else if (x > y) j++;
+            else { i++; j++; }
+        }
+        count += Math.max(la - i, lb - j);
+
+        const indices = new Int32Array(count);
+        let offset = 0;
+        i = 0;
+        j = 0;
+        while (i < la && j < lb) {
+            const x = xs[i], y = ys[j];
+            count++;
+            if (x < y) { indices[offset++] = x; i++; }
+            else if (x > y) { indices[offset++] = y; j++; }
+            else { indices[offset++] = x; i++; j++; }
+        }
+        for (; i < la; i++) indices[offset++] = xs[i];
+        for (; j < lb; j++) indices[offset++] = ys[j];
+
+        return AtomSet(indices);
     }
 }
 

@@ -74,10 +74,10 @@ const modifier = {
 
     cluster: symbol(Arguments.Dictionary({
         selection: Argument(Types.AtomSelection),
-        'min-radius': Argument(Type.Num),
-        'max-radius': Argument(Type.Num),
-        'minimum-size': Argument(Type.Num, { description: 'Minimal number of sets to merge, must be at least 2', isOptional: true, defaultValue: 2 }),
-        'maximum-size': Argument(Type.Num, { description: 'Maximal number of sets to merge, if not set, no limit', isOptional: true }),
+        'min-distance': Argument(Type.Num, { isOptional: true, defaultValue: 0 }),
+        'max-distance': Argument(Type.Num),
+        'min-size': Argument(Type.Num, { description: 'Minimal number of sets to merge, must be at least 2', isOptional: true, defaultValue: 2 }),
+        'max-size': Argument(Type.Num, { description: 'Maximal number of sets to merge, if not set, no limit', isOptional: true }),
     }), Types.AtomSelection, 'Combines atom sets that have mutual distance in the interval [min-radius, max-radius]. Minimum/maximum size determines how many atom sets can be combined.'),
 
     includeSurroundings: symbol(Arguments.Dictionary({
