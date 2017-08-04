@@ -51,8 +51,3 @@ export function merge(env: Environment, selections: VarArgs<AtomSelection>) {
     }
     return ret;
 }
-
-export function near(env: Environment, selections: VarArgs): AtomSelection {
-    // TODO: implement
-    throw 'near: not imlemented';
-}

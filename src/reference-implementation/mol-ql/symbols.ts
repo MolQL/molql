@@ -185,18 +185,12 @@ export const SymbolRuntime: Symbol.Info<Context>[] = [
 
     // ============= TYPES ================
     Symbol(MolQL.structure.type.elementSymbol, staticAttr)((env, v) => ElementSymbol(v[0](env))),
-    Symbol(MolQL.structure.type.authResidueId, staticAttr)((env, v) => ResidueIdentifier(v[0](env), v[1](env), v[2] && v[2](env))),
+    Symbol(MolQL.structure.type.authResidueId, staticAttr)((env, v) => ResidueIdentifier.auth(v[0](env), v[1](env), v[2] && v[2](env))),
+    Symbol(MolQL.structure.type.labelResidueId, staticAttr)((env, v) => ResidueIdentifier.label(v[0](env), v[1](env), v[2](env), v[3] && v[3](env))),
 
     // ============= GENERATORS ================
-    Symbol(MolQL.structure.generator.atomGroups)((env, v) => {
-        return StructureRuntime.Generators.atomGroupsGenerator(env, {
-            entityTest: v['entity-test'],
-            chainTest: v['chain-test'],
-            residueTest: v['residue-test'],
-            atomTest: v['atom-test'],
-            groupBy: v['group-by']
-        })
-    }),
+    Symbol(MolQL.structure.generator.atomGroups)((env, v) =>
+        StructureRuntime.Generators.atomGroupsGenerator(env, { entityTest: v['entity-test'], chainTest: v['chain-test'], residueTest: v['residue-test'], atomTest: v['atom-test'], groupBy: v['group-by'] })),
     Symbol(MolQL.structure.generator.querySelection)((env, v) => StructureRuntime.Generators.querySelection(env, v.selection, v.query, v['in-complement'])),
 
     // ============= MODIFIERS ================
@@ -216,7 +210,6 @@ export const SymbolRuntime: Symbol.Info<Context>[] = [
     // ============= COMBINATORS ================
     Symbol(MolQL.structure.combinator.intersect)((env, v) => StructureRuntime.Combinators.intersect(env, v)),
     Symbol(MolQL.structure.combinator.merge)((env, v) => StructureRuntime.Combinators.merge(env, v)),
-    Symbol(MolQL.structure.combinator.near)((env, v) => StructureRuntime.Combinators.near(env, v as any /* yeah, sometimes we pretty much have to :) */)),
 
     // ============= ATOM SETS ================
     Symbol(MolQL.structure.atomSet.atomCount)((env, v) => StructureRuntime.AtomSet.atomCount(env)),

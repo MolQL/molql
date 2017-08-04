@@ -78,20 +78,31 @@ export function ElementSymbol(symbol: any): string {
 }
 
 export type ResidueIdentifier = string
-export function ResidueIdentifier(chain: string, seq_num: number, ins_code?: string): ResidueIdentifier {
-    if (ins_code) {
-        return `${chain} ${seq_num} ${ins_code}`;
-    }
-    return `${chain} ${seq_num}`;
-}
 export namespace ResidueIdentifier {
-    export function ofResidueIndex(model: Model, residueIndex: number) {
+    export function auth(chain: string, seq_num: number, ins_code?: string | null): ResidueIdentifier {
+        if (ins_code) {
+            return `${chain} ${seq_num} ${ins_code}`;
+        }
+        return `${chain} ${seq_num}`;
+    }
+
+    export function label(entity: string, chain: string, seq_num: number, ins_code?: string | null): ResidueIdentifier {
+        if (ins_code) {
+            return `${entity} ${chain} ${seq_num || '.'} ${ins_code}`;
+        }
+        return `${entity} ${chain} ${seq_num || '.'}`;
+    }
+
+    export function authOfResidueIndex(model: Model, residueIndex: number) {
         const row = model.atoms.dataIndex[model.residues.atomStartIndex[residueIndex]];
         const { atom_site } = model.data;
-        if (atom_site.pdbx_PDB_ins_code.getValuePresence(row) === CIFTools.ValuePresence.Present) {
-            return `${atom_site.auth_asym_id.getString(row)} ${atom_site.auth_seq_id.getInteger(row)} ${atom_site.pdbx_PDB_ins_code.getString(row)}`;
-        }
-        return `${atom_site.auth_asym_id.getString(row)} ${atom_site.auth_seq_id.getInteger(row)}`;
+        return auth(atom_site.auth_asym_id.getString(row)!, atom_site.auth_seq_id.getInteger(row), atom_site.pdbx_PDB_ins_code.getString(row));
+    }
+
+    export function labelOfResidueIndex(model: Model, residueIndex: number) {
+        const row = model.atoms.dataIndex[model.residues.atomStartIndex[residueIndex]];
+        const { atom_site } = model.data;
+        return label(atom_site.label_entity_id.getString(row)!, atom_site.label_asym_id.getString(row)!, atom_site.label_seq_id.getInteger(row), atom_site.pdbx_PDB_ins_code.getString(row));
     }
 }
 

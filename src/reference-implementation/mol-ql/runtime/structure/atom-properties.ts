@@ -21,8 +21,8 @@ export const Core: { [P in keyof typeof MolQL.structure.atomProperty.core]?: Sym
 
 export const Macromolecular: { [P in keyof typeof MolQL.structure.atomProperty.macromolecular]?: SymbolRuntime<Context> } = {
     // ================= IDENTIFIERS =================
-    labelResidueId: prop((env, v) => { throw 'not implemented' }), // TODO
-    authResidueId: prop((env, v) => ResidueIdentifier.ofResidueIndex(env.context.model, env.context.element.value.residue)),
+    labelResidueId: prop((env, v) => ResidueIdentifier.labelOfResidueIndex(env.context.model, env.context.element.value.residue)),
+    authResidueId: prop((env, v) => ResidueIdentifier.authOfResidueIndex(env.context.model, env.context.element.value.residue)),
 
     // ================= KEYS =================
     residueKey: prop((env, v) => env.context.model.residues.key[env.context.element.value.residue]),

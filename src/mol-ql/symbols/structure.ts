@@ -20,13 +20,13 @@ const type = {
         0: Argument(Type.Str, { description: 'auth_asym_id' }),
         1: Argument(Type.Num, { description: 'auth_seq_id' }),
         2: Argument(Type.Str, { description: 'pdbx_PDB_ins_code', isOptional: true })
-    }), Types.ResidueId),
+    }), Types.ResidueId, `Residue identifier based on "author" annotation.`),
     labelResidueId: symbol(Arguments.Dictionary({
         0: Argument(Type.Str, { description: 'label_entity_id' }),
         1: Argument(Type.Str, { description: 'label_asym_id' }),
         2: Argument(Type.Num, { description: 'label_auth_seq_id' }),
         3: Argument(Type.Str, { description: 'pdbx_PDB_ins_code' })
-    }), Types.ResidueId)
+    }), Types.ResidueId, `Residue identifier based on mmCIF's "label_" annotation.`)
 };
 
 const generator = {
@@ -50,8 +50,7 @@ const modifier = {
 
     queryEach: symbol(Arguments.Dictionary({
         selection: Argument(Types.AtomSelection),
-        query: Argument(Types.AtomSelection),
-        'whole-residues': Argument(Type.Bool, { isOptional: true })
+        query: Argument(Types.AtomSelection)
     }), Types.AtomSelection),
 
     intersectBy: symbol(Arguments.Dictionary({
@@ -112,10 +111,10 @@ const combinator = {
     '@header': 'Selection Combinators',
     intersect: symbol(Arguments.List(Types.AtomSelection), Types.AtomSelection, 'Return all unique atom sets that appear in all of the source selections.'),
     merge: symbol(Arguments.List(Types.AtomSelection), Types.AtomSelection, 'Merges multiple selections into a single one. Only unique atom sets are kept.'),
-    near: symbol(Arguments.Dictionary({
-        0: Argument(Type.Num, { description: 'radius' }),
-        1: Argument(Types.AtomSelection, { isRest: true })
-    }), Types.AtomSelection, 'Pick combinations of atom sets from the source sequences that are mutually no more than radius apart.')
+    // near: symbol(Arguments.Dictionary({
+    //     0: Argument(Type.Num, { description: 'radius' }),
+    //     1: Argument(Types.AtomSelection, { isRest: true })
+    // }), Types.AtomSelection, 'Pick combinations of atom sets from the source sequences that are mutually no more than radius apart.')
 }
 
 const atomSet = {
