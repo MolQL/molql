@@ -117,3 +117,7 @@ export function atomGroupsGenerator(env: Environment, params: Partial<GeneratorP
     }
     return result.getSelection();
 }
+
+export function querySelection(env: Environment, selection: Expression<AtomSelection>, query: Expression<AtomSelection>, ): AtomSelection {
+    return query(Environment(Context.ofAtomSelection(env.context.model, selection(env))))
+}

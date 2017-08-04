@@ -8,7 +8,7 @@ import { isSymbol } from '../../mini-lisp/symbol'
 import { FastSet, FastMap } from '../utils/collections'
 import Context from './runtime/context'
 import { ElementSymbol, ResidueIdentifier } from '../molecule/data'
-import MoleculeRuntime from './runtime/molecule'
+import StructureRuntime from './runtime/structure'
 
 
 const staticAttr: Symbol.Attributes = { isStatic: true }
@@ -180,7 +180,7 @@ export const SymbolRuntime: Symbol.Info<Context>[] = [
 
     // ============= GENERATORS ================
     Symbol(MolQL.structure.generator.atomGroups)((env, v) => {
-        return MoleculeRuntime.Generators.atomGroupsGenerator(env, {
+        return StructureRuntime.Generators.atomGroupsGenerator(env, {
             entityTest: v['entity-test'],
             chainTest: v['chain-test'],
             residueTest: v['residue-test'],
@@ -188,35 +188,36 @@ export const SymbolRuntime: Symbol.Info<Context>[] = [
             groupBy: v['group-by']
         })
     }),
+    Symbol(MolQL.structure.generator.querySelection)((env, v) => StructureRuntime.Generators.querySelection(env, v.selection, v.query)),
 
     // ============= MODIFIERS ================
-    Symbol(MolQL.structure.modifier.queryEach)((env, v) => MoleculeRuntime.Modifiers.queryEach(env, v.selection, v.query)),
-    Symbol(MolQL.structure.modifier.queryComplement)((env, v) => MoleculeRuntime.Modifiers.queryComplement(env, v.selection, v.query)),
-    Symbol(MolQL.structure.modifier.intersectBy)((env, v) => MoleculeRuntime.Modifiers.intersectBy(env, v.selection, v.by)),
-    Symbol(MolQL.structure.modifier.exceptBy)((env, v) => MoleculeRuntime.Modifiers.exceptBy(env, v.selection, v.by)),
-    Symbol(MolQL.structure.modifier.unionBy)((env, v) => MoleculeRuntime.Modifiers.exceptBy(env, v.selection, v.by)),
-    Symbol(MolQL.structure.modifier.union)((env, v) => MoleculeRuntime.Modifiers.union(env, v.selection)),
-    Symbol(MolQL.structure.modifier.cluster)((env, v) => MoleculeRuntime.Modifiers.cluster(env, v.selection, v['max-radius'])),
-    Symbol(MolQL.structure.modifier.includeSurroundings)((env, v) => MoleculeRuntime.Modifiers.includeSurroundings(env, v.selection, v.radius, v['as-whole-residues'])),
+    Symbol(MolQL.structure.modifier.queryEach)((env, v) => StructureRuntime.Modifiers.queryEach(env, v.selection, v.query)),
+    Symbol(MolQL.structure.modifier.queryComplement)((env, v) => StructureRuntime.Modifiers.queryComplement(env, v.selection, v.query)),
+    Symbol(MolQL.structure.modifier.intersectBy)((env, v) => StructureRuntime.Modifiers.intersectBy(env, v.selection, v.by)),
+    Symbol(MolQL.structure.modifier.exceptBy)((env, v) => StructureRuntime.Modifiers.exceptBy(env, v.selection, v.by)),
+    Symbol(MolQL.structure.modifier.unionBy)((env, v) => StructureRuntime.Modifiers.exceptBy(env, v.selection, v.by)),
+    Symbol(MolQL.structure.modifier.union)((env, v) => StructureRuntime.Modifiers.union(env, v.selection)),
+    Symbol(MolQL.structure.modifier.cluster)((env, v) => StructureRuntime.Modifiers.cluster(env, v.selection, v['max-radius'])),
+    Symbol(MolQL.structure.modifier.includeSurroundings)((env, v) => StructureRuntime.Modifiers.includeSurroundings(env, v.selection, v.radius, v['as-whole-residues'])),
 
     // ============= FILTERS ================
-    Symbol(MolQL.structure.filter.pick)((env, v) => MoleculeRuntime.Filters.pick(env, v.selection, v.test)),
-    Symbol(MolQL.structure.filter.withSameProperties)((env, v) => MoleculeRuntime.Filters.withProperties(env, v.selection, v.source, v.property)),
-    Symbol(MolQL.structure.filter.within)((env, v) => MoleculeRuntime.Filters.within(env, v.selection, v.target, v.radius)),
+    Symbol(MolQL.structure.filter.pick)((env, v) => StructureRuntime.Filters.pick(env, v.selection, v.test)),
+    Symbol(MolQL.structure.filter.withSameProperties)((env, v) => StructureRuntime.Filters.withProperties(env, v.selection, v.source, v.property)),
+    Symbol(MolQL.structure.filter.within)((env, v) => StructureRuntime.Filters.within(env, v.selection, v.target, v.radius)),
 
     // ============= COMBINATORS ================
-    Symbol(MolQL.structure.combinator.intersect)((env, v) => MoleculeRuntime.Combinators.intersect(env, v)),
-    Symbol(MolQL.structure.combinator.merge)((env, v) => MoleculeRuntime.Combinators.merge(env, v)),
-    Symbol(MolQL.structure.combinator.near)((env, v) => MoleculeRuntime.Combinators.near(env, v as any /* yeah, sometimes we pretty much have to :) */)),
+    Symbol(MolQL.structure.combinator.intersect)((env, v) => StructureRuntime.Combinators.intersect(env, v)),
+    Symbol(MolQL.structure.combinator.merge)((env, v) => StructureRuntime.Combinators.merge(env, v)),
+    Symbol(MolQL.structure.combinator.near)((env, v) => StructureRuntime.Combinators.near(env, v as any /* yeah, sometimes we pretty much have to :) */)),
 
     // ============= ATOM PROPERTIES ================
     ...Object.keys(MolQL.structure.atomProperty)
-        .filter(k => isSymbol((MolQL.structure.atomProperty as any)[k]) && !!(MoleculeRuntime.AtomProperties as any)[k])
+        .filter(k => isSymbol((MolQL.structure.atomProperty as any)[k]) && !!(StructureRuntime.AtomProperties as any)[k])
         .map(k => atomProp(k as any))
 ]
 
 function atomProp(p: keyof typeof MolQL.structure.atomProperty) {
-    return Symbol(MolQL.structure.atomProperty[p] as any)(MoleculeRuntime.AtomProperties[p]!)
+    return Symbol(MolQL.structure.atomProperty[p] as any)(StructureRuntime.AtomProperties[p]!)
 }
 
 const table = (function() {
