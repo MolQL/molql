@@ -36,7 +36,7 @@ const generator = {
         'chain-test': Argument(Type.Bool, { isOptional: true, defaultValue: true }),
         'residue-test': Argument(Type.Bool, { isOptional: true, defaultValue: true }),
         'atom-test': Argument(Type.Bool, { isOptional: true, defaultValue: true }),
-        'group-by': Argument(Type.Any, { isOptional: true, defaultValue: `(atom-property.core.atom-key)` }),
+        'group-by': Argument(Type.Any, { isOptional: true, defaultValue: `atom-key` }),
     }), Types.AtomSelection),
     querySelection: symbol(Arguments.Dictionary({
         selection: Argument(Types.AtomSelection),
@@ -76,8 +76,8 @@ const modifier = {
         selection: Argument(Types.AtomSelection),
         'min-radius': Argument(Type.Num),
         'max-radius': Argument(Type.Num),
-        'minimum-size': Argument(Type.Num, { description: 'Minimal number of sets to merge. Must be at least 2.', isOptional: true, defaultValue: 2 }),
-        'maximum-size': Argument(Type.Num, { description: 'Maximal number of sets to merge. Is no set, no limit.', isOptional: true }),
+        'minimum-size': Argument(Type.Num, { description: 'Minimal number of sets to merge, must be at least 2', isOptional: true, defaultValue: 2 }),
+        'maximum-size': Argument(Type.Num, { description: 'Maximal number of sets to merge, if not set, no limit', isOptional: true }),
     }), Types.AtomSelection, 'Combines atom sets that have mutual distance in the interval [min-radius, max-radius]. Minimum/maximum size determines how many atom sets can be combined.'),
 
     includeSurroundings: symbol(Arguments.Dictionary({
@@ -92,7 +92,7 @@ const filter = {
     pick: symbol(Arguments.Dictionary({
         selection: Argument(Types.AtomSelection),
         test: Argument(Type.Bool)
-    }), Types.AtomSelection, 'Pick all atom sets that satisfy the test.'),
+    }), Types.AtomSelection, 'Pick all atom sets that satisfy the test'),
 
     withSameProperties: symbol(Arguments.Dictionary({
         selection: Argument(Types.AtomSelection),
@@ -130,8 +130,8 @@ const atomSet = {
     reduce: {
         '@header': 'Atom Set Reducer',
         accumulator: symbol(Arguments.Dictionary({
-            initial: Argument(Type.Any, { description: 'Initial value.' }),
-            value: Argument(Type.Any, { description: 'Expression executed for each atom in the set.' })
+            initial: Argument(Type.Any, { description: 'Initial value' }),
+            value: Argument(Type.Any, { description: 'Expression executed for each atom in the set' })
         }), Type.Any),
         value: prop(Type.Any, 'Current value of the reducer.'),
     }
@@ -145,9 +145,9 @@ const atomProperty = {
 
         elementSymbol: prop(Types.ElementSymbol),
 
-        x: prop(Type.Num, 'Cartesian X coordinate.'),
-        y: prop(Type.Num, 'Cartesian Y coordinate.'),
-        z: prop(Type.Num, 'Cartesian Z coordinate.'),
+        x: prop(Type.Num, 'Cartesian X coordinate'),
+        y: prop(Type.Num, 'Cartesian Y coordinate'),
+        z: prop(Type.Num, 'Cartesian Z coordinate'),
 
         atomKey: prop(Type.Any, 'Unique value for each atom. Main use case is grouping of atoms.')
     },
@@ -155,12 +155,12 @@ const atomProperty = {
     macromolecular: {
         '@header': 'Macromolecular Properties (derived from the mmCIF format)',
 
-        authResidueId: prop(Types.ResidueId, `type.authResidueId symbol executed on current atom's residue.`),
-        labelResidueId: prop(Types.ResidueId, `type.labelResidueId symbol executed on current atom's residue.`),
+        authResidueId: prop(Types.ResidueId, `type.authResidueId symbol executed on current atom's residue`),
+        labelResidueId: prop(Types.ResidueId, `type.labelResidueId symbol executed on current atom's residue`),
 
-        residueKey: prop(Type.Any, 'Unique value for each tuple ``(label_entity_id,auth_asym_id,auth_seq_id,pdbx_PDB_ins_code)``. Main use case is grouping of atoms.'),
-        chainKey: prop(Type.Any, 'Unique value for each tuple ``(label_entity_id,auth_asym_id)``. Main use case is grouping of atoms.'),
-        entityKey: prop(Type.Any, 'Unique value for each tuple ``label_entity_id``. Main use case is grouping of atoms.'),
+        residueKey: prop(Type.Any, 'Unique value for each tuple ``(label_entity_id,auth_asym_id,auth_seq_id,pdbx_PDB_ins_code)``, main use case is grouping of atoms'),
+        chainKey: prop(Type.Any, 'Unique value for each tuple ``(label_entity_id,auth_asym_id)``, main use case is grouping of atoms'),
+        entityKey: prop(Type.Any, 'Unique value for each tuple ``label_entity_id``, main use case is grouping of atoms'),
 
         isHet: prop(Type.Num, 'Equivalent to atom_site.group_PDB !== ATOM'),
 

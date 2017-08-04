@@ -55,8 +55,8 @@ core.type.str :: List [
 ### **regex**
 ```
 core.type.regex :: List [
-  string, 
-  string
+  string (* Expression *), 
+  ?string (* Flags, e.g. 'i' for ignore case *)
 ] => regex
 ```
 
@@ -416,7 +416,7 @@ core.map.has :: List [
 core.map.get :: List [
   map, 
   value, 
-  value (* Default value if key is not present. *)
+  value (* Default value if key is not present *)
 ] => value
 ```
 
@@ -440,9 +440,11 @@ structure.type.element-symbol :: List [
 structure.type.auth-residue-id :: List [
   string (* auth_asym_id *), 
   number (* auth_seq_id *), 
-  string (* pdbx_PDB_ins_code *)
+  ?string (* pdbx_PDB_ins_code *)
 ] => residue-id
 ```
+
+*Residue identifier based on "author" annotation.*
 
 ### **label-residue-id**
 ```
@@ -453,6 +455,8 @@ structure.type.label-residue-id :: List [
   string (* pdbx_PDB_ins_code *)
 ] => residue-id
 ```
+
+*Residue identifier based on mmCIF's "label_" annotation.*
 
 ## Generators
 
@@ -465,7 +469,7 @@ structure.generator.atom-groups :: Map {
   chain-test?: bool = true, 
   residue-test?: bool = true, 
   atom-test?: bool = true, 
-  group-by?: value = (atom-property.core.atom-key)
+  group-by?: value = atom-key
 } => atom-selection
 ```
 
@@ -488,8 +492,7 @@ structure.generator.query-selection :: Map {
 ```
 structure.modifier.query-each :: Map {
   selection: atom-selection, 
-  query: atom-selection, 
-  whole-residues?: bool
+  query: atom-selection
 } => atom-selection
 ```
 
@@ -538,8 +541,8 @@ structure.modifier.cluster :: Map {
   selection: atom-selection, 
   min-radius: number, 
   max-radius: number, 
-  minimum-size?: number = 2 (* Minimal number of sets to merge. Must be at least 2. *), 
-  maximum-size?: number (* Maximal number of sets to merge. Is no set, no limit. *)
+  minimum-size?: number = 2 (* Minimal number of sets to merge, must be at least 2 *), 
+  maximum-size?: number (* Maximal number of sets to merge, if not set, no limit *)
 } => atom-selection
 ```
 
@@ -566,7 +569,7 @@ structure.filter.pick :: Map {
 } => atom-selection
 ```
 
-*Pick all atom sets that satisfy the test.*
+*Pick all atom sets that satisfy the test*
 
 ### **with-same-properties**
 ```
@@ -610,16 +613,6 @@ structure.combinator.merge :: List [
 
 *Merges multiple selections into a single one. Only unique atom sets are kept.*
 
-### **near**
-```
-structure.combinator.near :: List [
-  number (* radius *), 
-  atom-selection*
-] => atom-selection
-```
-
-*Pick combinations of atom sets from the source sequences that are mutually no more than radius apart.*
-
 ## Atom Sets
 
 -------------------
@@ -645,10 +638,10 @@ structure.atom-set.count-selection :: Map {
 
 ### **accumulator**
 ```
-structure.atom-set.reduce.accumulator :: List [
-  value (* Initial value. *), 
-  value (* Atom expression executed for each atom in the set. *)
-] => value
+structure.atom-set.reduce.accumulator :: Map {
+  initial: value (* Initial value *), 
+  value: value (* Expression executed for each atom in the set *)
+} => value
 ```
 
 ### **value**
@@ -679,7 +672,7 @@ structure.atom-property.core.x :: ()
    => number
 ```
 
-*Cartesian X coordinate.*
+*Cartesian X coordinate*
 
 ### **y**
 ```
@@ -687,7 +680,7 @@ structure.atom-property.core.y :: ()
    => number
 ```
 
-*Cartesian Y coordinate.*
+*Cartesian Y coordinate*
 
 ### **z**
 ```
@@ -695,7 +688,7 @@ structure.atom-property.core.z :: ()
    => number
 ```
 
-*Cartesian Z coordinate.*
+*Cartesian Z coordinate*
 
 ### **atom-key**
 ```
@@ -715,7 +708,7 @@ structure.atom-property.macromolecular.auth-residue-id :: ()
    => residue-id
 ```
 
-*type.authResidueId symbol executed on current atom's residue.*
+*type.authResidueId symbol executed on current atom's residue*
 
 ### **label-residue-id**
 ```
@@ -723,7 +716,7 @@ structure.atom-property.macromolecular.label-residue-id :: ()
    => residue-id
 ```
 
-*type.labelResidueId symbol executed on current atom's residue.*
+*type.labelResidueId symbol executed on current atom's residue*
 
 ### **residue-key**
 ```
@@ -731,7 +724,7 @@ structure.atom-property.macromolecular.residue-key :: ()
    => value
 ```
 
-*Unique value for each tuple ``(label_entity_id,auth_asym_id,auth_seq_id,pdbx_PDB_ins_code)``. Main use case is grouping of atoms.*
+*Unique value for each tuple ``(label_entity_id,auth_asym_id,auth_seq_id,pdbx_PDB_ins_code)``, main use case is grouping of atoms*
 
 ### **chain-key**
 ```
@@ -739,7 +732,7 @@ structure.atom-property.macromolecular.chain-key :: ()
    => value
 ```
 
-*Unique value for each tuple ``(label_entity_id,auth_asym_id)``. Main use case is grouping of atoms.*
+*Unique value for each tuple ``(label_entity_id,auth_asym_id)``, main use case is grouping of atoms*
 
 ### **entity-key**
 ```
@@ -747,7 +740,7 @@ structure.atom-property.macromolecular.entity-key :: ()
    => value
 ```
 
-*Unique value for each tuple ``label_entity_id``. Main use case is grouping of atoms.*
+*Unique value for each tuple ``label_entity_id``, main use case is grouping of atoms*
 
 ### **is-het**
 ```

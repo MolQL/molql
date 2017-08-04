@@ -48,11 +48,11 @@ Language Reference
         for (const key of keys) {
             const arg = (map as any)[key] as Argument<any>;
             if (!isNaN(key as any)) {
-                formatted.push(`  ${arg.type.name}${arg.isRest ? '*' : ''}`);
+                formatted.push(`  ${arg.isOptional ? '?' : ''}${arg.type.name}${arg.isRest ? '*' : ''}`);
             } else {
                 formatted.push(`  ${key}${arg.isOptional ? '?:' : ':'} ${arg.type.name}${arg.isRest ? '*' : ''}`);
-                if (arg.defaultValue !== void 0) formatted.push(` = ${arg.defaultValue}`);
             }
+            if (arg.defaultValue !== void 0) formatted.push(` = ${arg.defaultValue}`);
             if (arg.description !== void 0) formatted.push(` (* ${arg.description} *)`);
             if (argIndex < keys.length - 1) formatted.push(', ')
             formatted.push('\n');

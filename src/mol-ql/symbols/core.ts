@@ -34,9 +34,10 @@ const type = {
     num: symbol(Arguments.Dictionary({ 0: Argument(Type.Any) }), Type.Num),
     str: symbol(Arguments.Dictionary({ 0: Argument(Type.Any) }), Type.Str),
     regex: symbol(
-        Arguments.Dictionary({ 0: Argument(Type.Str), 1: Argument(Type.Str, { isOptional: true }) }),
-        Types.Regex,
-        'Creates a regular expression from a string using the ECMAscript syntax.'),
+        Arguments.Dictionary({
+            0: Argument(Type.Str, { description: 'Expression' }),
+            1: Argument(Type.Str, { isOptional: true, description: `Flags, e.g. 'i' for ignore case` })
+        }), Types.Regex, 'Creates a regular expression from a string using the ECMAscript syntax.'),
 
     list: symbol(Arguments.List(Type.Any), Types.List),
     set: symbol(Arguments.List(Type.Any), Types.Set),
@@ -53,7 +54,11 @@ const logic = {
 
 const ctrl = {
     '@header': 'Control Flow',
-    if: symbol(Arguments.Dictionary({ cond: Argument(Type.Bool), 'if-true': Argument(Type.Any), 'if-false': Argument(Type.Any) }), Type.Any)
+    if: symbol(Arguments.Dictionary({
+        cond: Argument(Type.Bool),
+        'if-true': Argument(Type.Any),
+        'if-false': Argument(Type.Any) 
+    }), Type.Any)
 };
 
 const math = {
@@ -119,7 +124,7 @@ const map = {
     get: symbol(Arguments.Dictionary({
         0: Argument(Types.Map),
         1: Argument(Type.Any),
-        2: Argument(Type.Any, { description: 'Default value if key is not present.' })
+        2: Argument(Type.Any, { description: 'Default value if key is not present' })
     }), Type.Any)
 };
 
