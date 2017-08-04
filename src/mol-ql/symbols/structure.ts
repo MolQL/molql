@@ -131,8 +131,8 @@ const atomSet = {
     reduce: {
         '@header': 'Atom Set Reducer',
         accumulator: symbol(Arguments.Dictionary({
-            0: Argument(Type.Any, { description: 'Initial value.' }),
-            1: Argument(Type.Any, { description: 'Atom expression executed for each atom in the set.' })
+            initial: Argument(Type.Any, { description: 'Initial value.' }),
+            value: Argument(Type.Any, { description: 'Expression executed for each atom in the set.' })
         }), Type.Any),
         value: prop(Type.Any, 'Current value of the reducer.'),
     }

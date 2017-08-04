@@ -218,6 +218,12 @@ export const SymbolRuntime: Symbol.Info<Context>[] = [
     Symbol(MolQL.structure.combinator.merge)((env, v) => StructureRuntime.Combinators.merge(env, v)),
     Symbol(MolQL.structure.combinator.near)((env, v) => StructureRuntime.Combinators.near(env, v as any /* yeah, sometimes we pretty much have to :) */)),
 
+    // ============= ATOM SETS ================
+    Symbol(MolQL.structure.atomSet.atomCount)((env, v) => StructureRuntime.AtomSet.atomCount(env)),
+    Symbol(MolQL.structure.atomSet.countSelection)((env, v) => StructureRuntime.AtomSet.countSelection(env, v.query)),
+    Symbol(MolQL.structure.atomSet.reduce.accumulator)((env, v) => StructureRuntime.AtomSet.accumulateAtomSet(env, v.initial, v.value)),
+    Symbol(MolQL.structure.atomSet.reduce.value)((env, v) => env.context.atomSetReducer.value),
+
     // ============= ATOM PROPERTIES ================
     ...atomProps(MolQL.structure.atomProperty.core, StructureRuntime.AtomProperties.Core),
     ...atomProps(MolQL.structure.atomProperty.macromolecular, StructureRuntime.AtomProperties.Macromolecular)

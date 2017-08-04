@@ -1,37 +1,39 @@
-// function _atomSetPropertySet(env: Environment, atomSet: AtomSet, prop: RuntimeExpression, set: FastSet<any>) {
-//     const ctx = env.queryCtx;
-//     const element = Environment.beginIterateElemement(env);
-//     for (const a of AtomSet.atomIndices(atomSet)) {
-//         ElementAddress.setAtom(ctx, element, a);
-//         const p = prop(env);
-//         if (p !== void 0) set.add(prop(env));
-//     }
-//     Environment.endIterateElement(env);
+/*
+ * Copyright (c) 2017 David Sehnal, licensed under MIT, See LICENSE file for more info.
+ */
 
-//     return set;
-// }
+import Environment from '../environment'
+import Expression from '../expression'
+import Context from '../context'
+import AtomSet from '../../data/atom-set'
+import AtomSelection from '../../data/atom-selection'
+import ElementAddress from '../../data/element-address'
+import Slot from '../slot'
 
-// export function atomSetPropertySet(env: Environment, prop: RuntimeExpression, set: AtomSet) {
-//     return _atomSetPropertySet(env, set, prop, FastSet.create());
-// }
+export function atomCount(env: Environment) {
+    return AtomSet.count(env.context.atomSet.value);
+}
 
-// export function selectionPropertySet(env: Environment, prop: RuntimeExpression, selection: AtomSelection) {
-//     const set = FastSet.create<any>();
-//     for (const atomSet of AtomSelection.atomSets(selection)) {
-//         _atomSetPropertySet(env, atomSet, prop, set);
-//     }
-//     return set;
-// }
+export function countSelection(env: Environment, query: Expression<AtomSelection>) {
+    const sel = query(Environment(Context.ofAtomSet(env.context, env.context.atomSet.value)))
+    return AtomSelection.atomSets(sel).length;
+}
 
-// export function accumulateAtomSet(env: Environment, initial: RuntimeExpression, f: RuntimeExpression) {
-//     // TODO: no nested accumulators
-//     const ctx = env.queryCtx;
-//     const slot = Slot.push(env.atomSetReducer, initial(env));
-//     const element = Environment.beginIterateElemement(env);
-//     for (const a of AtomSet.atomIndices(env.atomSet.value)) {
-//         ElementAddress.setAtom(ctx, element, a);
-//         slot.value = f(env);
-//     }
-//     Environment.endIterateElement(env);
-//     return Slot.pop(slot);
-// }
+function noNestedAccumulators() {
+    throw new Error('atom-set accumulators cannot be nested.');
+}
+
+export function accumulateAtomSet(env: Environment, initial: Expression<any>, value: Expression<any>) {
+    const ctx = env.context;
+    const slot = ctx.atomSetReducer;
+    if (Slot.depth(slot) > 0) noNestedAccumulators();
+    Slot.push(ctx.atomSetReducer, initial(env));
+
+    const element = Context.beginIterateElemement(ctx);
+    for (const a of AtomSet.atomIndices(ctx.atomSet.value)) {
+        ElementAddress.setAtom(ctx.model, element, a);
+        slot.value = value(env);
+    }
+    Context.endIterateElement(ctx);
+    return Slot.pop(slot);
+}
