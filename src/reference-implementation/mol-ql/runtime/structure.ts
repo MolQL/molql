@@ -6,7 +6,7 @@ import * as Generators from './structure/generators'
 import * as Modifiers from './structure/modifiers'
 import * as Filters from './structure/filters'
 import * as Combinators from './structure/combinators'
-import AtomProperties from './structure/atom-properties'
+import * as AtomProperties from './structure/atom-properties'
 
 export default {
     Generators,

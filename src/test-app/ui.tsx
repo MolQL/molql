@@ -29,10 +29,10 @@ import Rx = LiteMol.Core.Rx
 export default class Root extends React.Component<{ state: State }, { }> {
     render() {
         return <div style={{ position: 'absolute', top: 0, right: 0, left: 0, bottom: 0 }}>
-            <div style={{ position: 'absolute', top: 0, right: '540px', left: 0, bottom: 0, overflowX: 'hidden', overflowY: 'scroll', padding: '20px' }}>
+            <div style={{ position: 'absolute', top: 0, right: '440px', left: 0, bottom: 0, overflowX: 'hidden', overflowY: 'scroll', padding: '20px' }}>
                 <MolQL {...this.props} />
             </div>
-            <div className='docs' style={{ position: 'absolute', top: 0, right: 0, bottom: 0, overflowX: 'scroll', maxWidth: '500px', width: '500px', padding: '20px' }}>
+            <div className='docs' style={{ position: 'absolute', top: 0, right: 0, bottom: 0, overflowX: 'auto', maxWidth: '400px', width: '400px', padding: '20px' }}>
                 <ReactMarkdown source={getDocs(false)} />
             </div>
         </div>
@@ -55,11 +55,11 @@ class MolQL extends React.Component<{ state: State }, { }> {
                     <CompiledQuery {...this.props} />
                 </div>
             </div>
+            <QueryControls {...this.props} />
             <div className='row' style={{ marginTop: 15 }}>
                 <Plugin {...this.props} isMain={true} />
                 <Plugin {...this.props} isMain={false} />
             </div>
-            <QueryControls {...this.props} />
             <div className='row' style={{ marginTop: 15 }}>
                 <h3>Query result in mmCIF</h3>
                 <QueryResult {...this.props} />

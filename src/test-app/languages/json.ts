@@ -13,18 +13,18 @@ const lang: Language = {
     examples: [{
         name: 'All C or N atoms in ALA residues',
         value: JSON.stringify(
-            B.Struct.gen.atomGroups.apply({
-                'residue-test': B.operator.relational.eq.apply([B.Struct.atomProp('auth_comp_id'), 'ALA']),
-                'atom-test': B.operator.set.has.apply([
-                    B.type.set.apply(B.argArray([B.Struct.el('C'), B.Struct.el('N')])),
-                    B.Struct.atomProp('type_symbol')
+            B.struct.generator.atomGroups.apply({
+                'residue-test': B.core.rel.eq.apply([B.ammp('auth_comp_id'), 'ALA']),
+                'atom-test': B.core.set.has.apply([
+                    B.core.type.set.apply(B.argArray([B.es('C'), B.es('N')])),
+                    B.acp('elementSymbol')
                 ])
             }), null, 2)
     }, {
         name: 'All residues within 5 ang from Fe atom',
-        value: JSON.stringify(B.Struct.mod.includeSurroundings.apply({
-            'selection': B.Struct.gen.atomGroups.apply({
-                'atom-test': B.operator.relational.eq.apply([B.Struct.atomProp('type_symbol'), B.Struct.el('Fe')]),
+        value: JSON.stringify(B.struct.modifier.includeSurroundings.apply({
+            'selection': B.struct.generator.atomGroups.apply({
+                'atom-test': B.core.rel.eq.apply([B.acp('elementSymbol'), B.es('Fe')]),
             }),
             'radius': 5,
             'as-whole-residues': true

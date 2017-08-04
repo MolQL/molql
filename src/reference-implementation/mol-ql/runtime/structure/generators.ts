@@ -9,6 +9,7 @@ import AtomSet from '../../data/atom-set'
 import AtomSelection from '../../data/atom-selection'
 import ElementAddress from '../../data/element-address'
 import Context from '../context'
+import Mask from '../../../utils/mask'
 
 type Pred = Expression<boolean>
 
@@ -118,6 +119,12 @@ export function atomGroupsGenerator(env: Environment, params: Partial<GeneratorP
     return result.getSelection();
 }
 
-export function querySelection(env: Environment, selection: Expression<AtomSelection>, query: Expression<AtomSelection>, ): AtomSelection {
-    return query(Environment(Context.ofAtomSelection(env.context.model, selection(env))))
+export function querySelection(env: Environment, selection: Expression<AtomSelection>, query: Expression<AtomSelection>, inComplement?: Expression<boolean>): AtomSelection {
+    if (inComplement && inComplement(env)) {
+        const selectionMask = AtomSelection.getMask(selection(env));
+        const complementCtx = Context(env.context.model, Mask.complement(selectionMask, env.context.mask));
+        return query(Environment(complementCtx));
+    } else {
+        return query(Environment(Context.ofAtomSelection(env.context.model, selection(env))))
+    }
 }

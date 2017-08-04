@@ -2,11 +2,11 @@
  * Copyright (c) 2017 MolQL contributors. licensed under MIT, See LICENSE file for more info.
  */
 
-import primitive from './symbols/primitive'
+import core from './symbols/core'
 import structure from './symbols/structure'
 import { normalizeTable, symbolList } from './symbols/helpers'
 
-const table = { primitive, structure };
+const table = { core, structure };
 
 normalizeTable(table);
 

@@ -15,14 +15,23 @@ const staticAttr: Symbol.Attributes = { isStatic: true }
 
 export const SymbolRuntime: Symbol.Info<Context>[] = [
     ////////////////////////////////////
-    // Primitives
+    // Core
 
     // ============= TYPES =============
 
-    Symbol(MolQL.primitive.type.bool, staticAttr)((env, v) => !!v[0](env)),
-    Symbol(MolQL.primitive.type.num, staticAttr)((env, v) => +v[0](env)),
-    Symbol(MolQL.primitive.type.str, staticAttr)((env, v) => '' + v[0](env)),
-    Symbol(MolQL.primitive.type.set, staticAttr)((env, xs) => {
+    Symbol(MolQL.core.type.bool, staticAttr)((env, v) => !!v[0](env)),
+    Symbol(MolQL.core.type.num, staticAttr)((env, v) => +v[0](env)),
+    Symbol(MolQL.core.type.str, staticAttr)((env, v) => '' + v[0](env)),
+    Symbol(MolQL.core.type.list, staticAttr)((env, xs) => {
+        const list: any[] = [];
+        if (typeof xs.length === 'number') {
+            for (let i = 0, _i = xs.length; i < _i; i++) list.push(xs[i](env));
+        } else {
+            for (const k of Object.keys(xs)) list.push(xs[k](env));
+        }
+        return list;
+    }),
+    Symbol(MolQL.core.type.set, staticAttr)((env, xs) => {
         const set = FastSet.create<any>();
         if (typeof xs.length === 'number') {
             for (let i = 0, _i = xs.length; i < _i; i++) set.add(xs[i](env));
@@ -31,7 +40,7 @@ export const SymbolRuntime: Symbol.Info<Context>[] = [
         }
         return set;
     }),
-    Symbol(MolQL.primitive.type.map, staticAttr)((env, xs) => {
+    Symbol(MolQL.core.type.map, staticAttr)((env, xs) => {
         const map = FastMap.create<any, any>();
         if (typeof xs.length === 'number') {
             for (let i = 0, _i = xs.length; i < _i; i += 2) map.set(xs[i](env), xs[i + 1](env));
@@ -41,13 +50,13 @@ export const SymbolRuntime: Symbol.Info<Context>[] = [
         }
         return map;
     }),
-    Symbol(MolQL.primitive.type.regex, staticAttr)((env, v) => new RegExp(v[0](env), (v[1] && v[1](env)) || '')),
+    Symbol(MolQL.core.type.regex, staticAttr)((env, v) => new RegExp(v[0](env), (v[1] && v[1](env)) || '')),
 
     // ============= OPERATORS =============
 
     // ============= LOGIC ================
-    Symbol(MolQL.primitive.operator.logic.not, staticAttr)((env, v) => !v[0](env)),
-    Symbol(MolQL.primitive.operator.logic.and, staticAttr)((env, xs) => {
+    Symbol(MolQL.core.logic.not, staticAttr)((env, v) => !v[0](env)),
+    Symbol(MolQL.core.logic.and, staticAttr)((env, xs) => {
         if (typeof xs.length === 'number') {
             for (let i = 0, _i = xs.length; i < _i; i++) if (!xs[i](env)) return false;
         } else {
@@ -55,7 +64,7 @@ export const SymbolRuntime: Symbol.Info<Context>[] = [
         }
         return true;
     }),
-    Symbol(MolQL.primitive.operator.logic.or, staticAttr)((env, xs) => {
+    Symbol(MolQL.core.logic.or, staticAttr)((env, xs) => {
         if (typeof xs.length === 'number') {
             for (let i = 0, _i = xs.length; i < _i; i++) if (xs[i](env)) return true;
         } else {
@@ -65,22 +74,22 @@ export const SymbolRuntime: Symbol.Info<Context>[] = [
     }),
 
     // ============= RELATIONAL ================
-    Symbol(MolQL.primitive.operator.relational.eq, staticAttr)((env, v) => v[0](env) === v[1](env)),
-    Symbol(MolQL.primitive.operator.relational.neq, staticAttr)((env, v) => v[0](env) !== v[1](env)),
-    Symbol(MolQL.primitive.operator.relational.lt, staticAttr)((env, v) => v[0](env) < v[1](env)),
-    Symbol(MolQL.primitive.operator.relational.lte, staticAttr)((env, v) => v[0](env) <= v[1](env)),
-    Symbol(MolQL.primitive.operator.relational.gr, staticAttr)((env, v) => v[0](env) > v[1](env)),
-    Symbol(MolQL.primitive.operator.relational.gre, staticAttr)((env, v) => v[0](env) >= v[1](env)),
-    Symbol(MolQL.primitive.operator.relational.inRange, staticAttr)((env, v) => {
+    Symbol(MolQL.core.rel.eq, staticAttr)((env, v) => v[0](env) === v[1](env)),
+    Symbol(MolQL.core.rel.neq, staticAttr)((env, v) => v[0](env) !== v[1](env)),
+    Symbol(MolQL.core.rel.lt, staticAttr)((env, v) => v[0](env) < v[1](env)),
+    Symbol(MolQL.core.rel.lte, staticAttr)((env, v) => v[0](env) <= v[1](env)),
+    Symbol(MolQL.core.rel.gr, staticAttr)((env, v) => v[0](env) > v[1](env)),
+    Symbol(MolQL.core.rel.gre, staticAttr)((env, v) => v[0](env) >= v[1](env)),
+    Symbol(MolQL.core.rel.inRange, staticAttr)((env, v) => {
         const x = v[0](env);
         return x >= v[1](env) && x <= v[2](env)
     }),
 
     // ============= CONTROL FLOW ================
-    Symbol(MolQL.primitive.operator.controlFlow.if, staticAttr)((env, v) => v['cond'](env) ? v['if-true'](env) : v['if-false'](env)),
+    Symbol(MolQL.core.ctrl.if, staticAttr)((env, v) => v['cond'](env) ? v['if-true'](env) : v['if-false'](env)),
 
     // ============= ARITHMETIC ================
-    Symbol(MolQL.primitive.operator.arithmetic.add, staticAttr)((env, xs) => {
+    Symbol(MolQL.core.math.add, staticAttr)((env, xs) => {
         let ret = 0;
         if (typeof xs.length === 'number') {
             for (let i = 0, _i = xs.length; i < _i; i++) ret += xs[i](env);
@@ -89,7 +98,7 @@ export const SymbolRuntime: Symbol.Info<Context>[] = [
         }
         return ret;
     }),
-    Symbol(MolQL.primitive.operator.arithmetic.sub, staticAttr)((env, xs) => {
+    Symbol(MolQL.core.math.sub, staticAttr)((env, xs) => {
         let ret = 0;
         if (typeof xs.length === 'number') {
             for (let i = 0, _i = xs.length; i < _i; i++) ret -= xs[i](env);
@@ -98,7 +107,7 @@ export const SymbolRuntime: Symbol.Info<Context>[] = [
         }
         return ret;
     }),
-    Symbol(MolQL.primitive.operator.arithmetic.mult, staticAttr)((env, xs) => {
+    Symbol(MolQL.core.math.mult, staticAttr)((env, xs) => {
         let ret = 1;
         if (typeof xs.length === 'number') {
             for (let i = 0, _i = xs.length; i < _i; i++) ret *= xs[i](env);
@@ -107,10 +116,10 @@ export const SymbolRuntime: Symbol.Info<Context>[] = [
         }
         return ret;
     }),
-    Symbol(MolQL.primitive.operator.arithmetic.div, staticAttr)((env, v) => v[0](env) / v[1](env)),
-    Symbol(MolQL.primitive.operator.arithmetic.pow, staticAttr)((env, v) => Math.pow(v[0](env), v[1](env))),
+    Symbol(MolQL.core.math.div, staticAttr)((env, v) => v[0](env) / v[1](env)),
+    Symbol(MolQL.core.math.pow, staticAttr)((env, v) => Math.pow(v[0](env), v[1](env))),
 
-    Symbol(MolQL.primitive.operator.arithmetic.min, staticAttr)((env, xs) => {
+    Symbol(MolQL.core.math.min, staticAttr)((env, xs) => {
         let ret = Number.POSITIVE_INFINITY;
         if (typeof xs.length === 'number') {
             for (let i = 0, _i = xs.length; i < _i; i++) ret = Math.min(xs[i](env), ret);
@@ -119,7 +128,7 @@ export const SymbolRuntime: Symbol.Info<Context>[] = [
         }
         return ret;
     }),
-    Symbol(MolQL.primitive.operator.arithmetic.max, staticAttr)((env, xs) => {
+    Symbol(MolQL.core.math.max, staticAttr)((env, xs) => {
         let ret = Number.NEGATIVE_INFINITY;
         if (typeof xs.length === 'number') {
             for (let i = 0, _i = xs.length; i < _i; i++) ret = Math.max(xs[i](env), ret);
@@ -129,28 +138,28 @@ export const SymbolRuntime: Symbol.Info<Context>[] = [
         return ret;
     }),
 
-    Symbol(MolQL.primitive.operator.arithmetic.floor, staticAttr)((env, v) => Math.floor(v[0](env))),
-    Symbol(MolQL.primitive.operator.arithmetic.ceil, staticAttr)((env, v) => Math.ceil(v[0](env))),
-    Symbol(MolQL.primitive.operator.arithmetic.roundInt, staticAttr)((env, v) => Math.round(v[0](env))),
-    Symbol(MolQL.primitive.operator.arithmetic.abs, staticAttr)((env, v) => Math.abs(v[0](env))),
-    Symbol(MolQL.primitive.operator.arithmetic.sqrt, staticAttr)((env, v) => Math.sqrt(v[0](env))),
-    Symbol(MolQL.primitive.operator.arithmetic.sin, staticAttr)((env, v) => Math.sin(v[0](env))),
-    Symbol(MolQL.primitive.operator.arithmetic.cos, staticAttr)((env, v) => Math.cos(v[0](env))),
-    Symbol(MolQL.primitive.operator.arithmetic.tan, staticAttr)((env, v) => Math.tan(v[0](env))),
-    Symbol(MolQL.primitive.operator.arithmetic.asin, staticAttr)((env, v) => Math.asin(v[0](env))),
-    Symbol(MolQL.primitive.operator.arithmetic.acos, staticAttr)((env, v) => Math.acos(v[0](env))),
-    Symbol(MolQL.primitive.operator.arithmetic.atan, staticAttr)((env, v) => Math.atan(v[0](env))),
-    Symbol(MolQL.primitive.operator.arithmetic.sinh, staticAttr)((env, v) => Math.sinh(v[0](env))),
-    Symbol(MolQL.primitive.operator.arithmetic.cosh, staticAttr)((env, v) => Math.cosh(v[0](env))),
-    Symbol(MolQL.primitive.operator.arithmetic.tanh, staticAttr)((env, v) => Math.tanh(v[0](env))),
-    Symbol(MolQL.primitive.operator.arithmetic.exp, staticAttr)((env, v) => Math.exp(v[0](env))),
-    Symbol(MolQL.primitive.operator.arithmetic.log, staticAttr)((env, v) => Math.log(v[0](env))),
-    Symbol(MolQL.primitive.operator.arithmetic.log10, staticAttr)((env, v) => Math.log10(v[0](env))),
-    Symbol(MolQL.primitive.operator.arithmetic.atan2, staticAttr)((env, v) => Math.atan2(v[0](env), v[1](env))),
+    Symbol(MolQL.core.math.floor, staticAttr)((env, v) => Math.floor(v[0](env))),
+    Symbol(MolQL.core.math.ceil, staticAttr)((env, v) => Math.ceil(v[0](env))),
+    Symbol(MolQL.core.math.roundInt, staticAttr)((env, v) => Math.round(v[0](env))),
+    Symbol(MolQL.core.math.abs, staticAttr)((env, v) => Math.abs(v[0](env))),
+    Symbol(MolQL.core.math.sqrt, staticAttr)((env, v) => Math.sqrt(v[0](env))),
+    Symbol(MolQL.core.math.sin, staticAttr)((env, v) => Math.sin(v[0](env))),
+    Symbol(MolQL.core.math.cos, staticAttr)((env, v) => Math.cos(v[0](env))),
+    Symbol(MolQL.core.math.tan, staticAttr)((env, v) => Math.tan(v[0](env))),
+    Symbol(MolQL.core.math.asin, staticAttr)((env, v) => Math.asin(v[0](env))),
+    Symbol(MolQL.core.math.acos, staticAttr)((env, v) => Math.acos(v[0](env))),
+    Symbol(MolQL.core.math.atan, staticAttr)((env, v) => Math.atan(v[0](env))),
+    Symbol(MolQL.core.math.sinh, staticAttr)((env, v) => Math.sinh(v[0](env))),
+    Symbol(MolQL.core.math.cosh, staticAttr)((env, v) => Math.cosh(v[0](env))),
+    Symbol(MolQL.core.math.tanh, staticAttr)((env, v) => Math.tanh(v[0](env))),
+    Symbol(MolQL.core.math.exp, staticAttr)((env, v) => Math.exp(v[0](env))),
+    Symbol(MolQL.core.math.log, staticAttr)((env, v) => Math.log(v[0](env))),
+    Symbol(MolQL.core.math.log10, staticAttr)((env, v) => Math.log10(v[0](env))),
+    Symbol(MolQL.core.math.atan2, staticAttr)((env, v) => Math.atan2(v[0](env), v[1](env))),
 
     // ============= STRING ================
-    Symbol(MolQL.primitive.operator.string.match, staticAttr)((env, v) => v[0](env).test(v[1](env))),
-    Symbol(MolQL.primitive.operator.string.concat, staticAttr)((env, xs) => {
+    Symbol(MolQL.core.str.match, staticAttr)((env, v) => v[0](env).test(v[1](env))),
+    Symbol(MolQL.core.str.concat, staticAttr)((env, xs) => {
         let ret: string[] = [];
         if (typeof xs.length === 'number') {
             for (let i = 0, _i = xs.length; i < _i; i++) ret.push(xs[i](env).toString());
@@ -161,11 +170,11 @@ export const SymbolRuntime: Symbol.Info<Context>[] = [
     }),
 
     // ============= SET ================
-    Symbol(MolQL.primitive.operator.set.has, staticAttr)((env, v) => v[0](env).has(v[1](env))),
+    Symbol(MolQL.core.set.has, staticAttr)((env, v) => v[0](env).has(v[1](env))),
 
     // ============= MAP ================
-    Symbol(MolQL.primitive.operator.map.has, staticAttr)((env, v) => v[0](env).has(v[1](env))),
-    Symbol(MolQL.primitive.operator.map.get, staticAttr)((env, v) => {
+    Symbol(MolQL.core.map.has, staticAttr)((env, v) => v[0](env).has(v[1](env))),
+    Symbol(MolQL.core.map.get, staticAttr)((env, v) => {
         const map = v[0](env), key = v[1](env);
         if (map.has(key)) return map.get(key);
         return v[2](env);
@@ -188,11 +197,10 @@ export const SymbolRuntime: Symbol.Info<Context>[] = [
             groupBy: v['group-by']
         })
     }),
-    Symbol(MolQL.structure.generator.querySelection)((env, v) => StructureRuntime.Generators.querySelection(env, v.selection, v.query)),
+    Symbol(MolQL.structure.generator.querySelection)((env, v) => StructureRuntime.Generators.querySelection(env, v.selection, v.query, v['in-complement'])),
 
     // ============= MODIFIERS ================
     Symbol(MolQL.structure.modifier.queryEach)((env, v) => StructureRuntime.Modifiers.queryEach(env, v.selection, v.query)),
-    Symbol(MolQL.structure.modifier.queryComplement)((env, v) => StructureRuntime.Modifiers.queryComplement(env, v.selection, v.query)),
     Symbol(MolQL.structure.modifier.intersectBy)((env, v) => StructureRuntime.Modifiers.intersectBy(env, v.selection, v.by)),
     Symbol(MolQL.structure.modifier.exceptBy)((env, v) => StructureRuntime.Modifiers.exceptBy(env, v.selection, v.by)),
     Symbol(MolQL.structure.modifier.unionBy)((env, v) => StructureRuntime.Modifiers.exceptBy(env, v.selection, v.by)),
@@ -211,13 +219,14 @@ export const SymbolRuntime: Symbol.Info<Context>[] = [
     Symbol(MolQL.structure.combinator.near)((env, v) => StructureRuntime.Combinators.near(env, v as any /* yeah, sometimes we pretty much have to :) */)),
 
     // ============= ATOM PROPERTIES ================
-    ...Object.keys(MolQL.structure.atomProperty)
-        .filter(k => isSymbol((MolQL.structure.atomProperty as any)[k]) && !!(StructureRuntime.AtomProperties as any)[k])
-        .map(k => atomProp(k as any))
+    ...atomProps(MolQL.structure.atomProperty.core, StructureRuntime.AtomProperties.Core),
+    ...atomProps(MolQL.structure.atomProperty.macromolecular, StructureRuntime.AtomProperties.Macromolecular)
 ]
 
-function atomProp(p: keyof typeof MolQL.structure.atomProperty) {
-    return Symbol(MolQL.structure.atomProperty[p] as any)(StructureRuntime.AtomProperties[p]!)
+function atomProps<S>(symbols: S, implementation: { [P in keyof S]?: any }) {
+    return Object.keys(symbols)
+        .filter(k => isSymbol((symbols as any)[k]) && !!(implementation)[k])
+        .map(k => Symbol((symbols as any)[k])(implementation[k]));
 }
 
 const table = (function() {

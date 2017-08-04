@@ -25,11 +25,13 @@ Language Reference
 
     function formatArgs(args: Arguments) {
         if (args.kind === 'list') {
-            return `(${args.type.name}*)`;
+            return `List [\n  ${args.type.name}*\n]`;
         }
         const map = args.map;
         const keys = Object.keys(map);
         const formatted: string[] = [];
+
+        if (!keys.length) return '()\n  '
 
         let isArgArray = true, argIndex = 0;
         for (const key of keys) {
@@ -40,20 +42,23 @@ Language Reference
             argIndex++;
         }
 
-        formatted.push(isArgArray ? '(' : '{\n');
+        formatted.push(isArgArray ? 'List [\n' : 'Map {\n');
         argIndex = 0;
+
         for (const key of keys) {
             const arg = (map as any)[key] as Argument<any>;
             if (!isNaN(key as any)) {
-                formatted.push(`${arg.type.name}${arg.isRest ? '*' : ''}`);
+                formatted.push(`  ${arg.type.name}${arg.isRest ? '*' : ''}`);
             } else {
                 formatted.push(`  ${key}${arg.isOptional ? '?:' : ':'} ${arg.type.name}${arg.isRest ? '*' : ''}`);
+                if (arg.defaultValue !== void 0) formatted.push(` = ${arg.defaultValue}`);
             }
+            if (arg.description !== void 0) formatted.push(` (* ${arg.description} *)`);
             if (argIndex < keys.length - 1) formatted.push(', ')
-            if (!isArgArray) formatted.push('\n');
+            formatted.push('\n');
             argIndex++;
         }
-        formatted.push(isArgArray ? ')' : '}')
+        formatted.push(isArgArray ? ']' : '}')
         return formatted.join('');
     }
 
@@ -64,7 +69,6 @@ Language Reference
         if (symbol.description) {
             lines.push(`*${symbol.description}*\n`);
         }
-        lines.push(`-------------------\n`);
     }
 
     function format(depth: number, obj: any) {
@@ -74,6 +78,7 @@ Language Reference
         }
         if (obj['@header']) {
             implemented.push(`${depth >= 2 ? '##' : '#'} ${obj['@header']}\n`);
+            implemented.push(`-------------------\n`);
             const tocLink = obj['@header'].toLowerCase().replace(/\s/g, '-');
             ToC.push(`${new Array(depth + 1).join('  ')} * [${obj['@header']}](#${tocLink})`);
         }

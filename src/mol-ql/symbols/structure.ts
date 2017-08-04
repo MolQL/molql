@@ -20,13 +20,13 @@ const type = {
         0: Argument(Type.Str, { description: 'auth_asym_id' }),
         1: Argument(Type.Num, { description: 'auth_seq_id' }),
         2: Argument(Type.Str, { description: 'pdbx_PDB_ins_code', isOptional: true })
-    }), Types.ElementSymbol),
-    // TODO: labelResidueId: symbol(Arguments.Dictionary({
-    //     0: Argument(Type.Str, { description: 'label_entity_id' }),
-    //     1: Argument(Type.Str, { description: 'label_asym_id' }),
-    //     2: Argument(Type.Num, { description: 'label_auth_seq_id' }),
-    //     3: Argument(Type.Str, { description: 'pdbx_PDB_ins_code' })
-    // }), Types.ElementSymbol),
+    }), Types.ResidueId),
+    labelResidueId: symbol(Arguments.Dictionary({
+        0: Argument(Type.Str, { description: 'label_entity_id' }),
+        1: Argument(Type.Str, { description: 'label_asym_id' }),
+        2: Argument(Type.Num, { description: 'label_auth_seq_id' }),
+        3: Argument(Type.Str, { description: 'pdbx_PDB_ins_code' })
+    }), Types.ResidueId)
 };
 
 const generator = {
@@ -36,12 +36,13 @@ const generator = {
         'chain-test': Argument(Type.Bool, { isOptional: true, defaultValue: true }),
         'residue-test': Argument(Type.Bool, { isOptional: true, defaultValue: true }),
         'atom-test': Argument(Type.Bool, { isOptional: true, defaultValue: true }),
-        'group-by': Argument(Type.Any, { isOptional: true, defaultValue: '`atom-key` symbol' }),
+        'group-by': Argument(Type.Any, { isOptional: true, defaultValue: `(atom-property.core.atom-key)` }),
     }), Types.AtomSelection),
     querySelection: symbol(Arguments.Dictionary({
         selection: Argument(Types.AtomSelection),
-        query: Argument(Types.AtomSelection)
-    }), Types.AtomSelection)
+        query: Argument(Types.AtomSelection),
+        'in-complement': Argument(Type.Bool, { isOptional: true, defaultValue: false })
+    }), Types.AtomSelection, 'Executes query only on atoms that are in the source selection.')
 }
 
 const modifier = {
@@ -52,11 +53,6 @@ const modifier = {
         query: Argument(Types.AtomSelection),
         'whole-residues': Argument(Type.Bool, { isOptional: true })
     }), Types.AtomSelection),
-
-    queryComplement: symbol(Arguments.Dictionary({
-        selection: Argument(Types.AtomSelection),
-        query: Argument(Types.AtomSelection)
-    }), Types.AtomSelection, 'Execute the query in a complement induced by the selection.'),
 
     intersectBy: symbol(Arguments.Dictionary({
         selection: Argument(Types.AtomSelection),
@@ -128,7 +124,7 @@ const atomSet = {
 
     atomCount: symbol(Arguments.None, Type.Num),
 
-    count: symbol(Arguments.Dictionary({
+    countSelection: symbol(Arguments.Dictionary({
         query: Argument(Types.AtomSelection)
     }), Type.Num, 'Counts the number of occurences of a specific query inside the current atom set.'),
 
@@ -145,47 +141,50 @@ const atomSet = {
 const atomProperty = {
     '@header': 'Atom Properties',
 
-    // ================= mmCIF =================
-    group_PDB: prop(Type.Str, 'Same as mmCIF'),
-    id: prop(Type.Num, 'Same as mmCIF'),
+    core: {
+        '@header': 'Core Properties',
 
-    type_symbol: prop(Types.ElementSymbol, 'Same as mmCIF'),
+        elementSymbol: prop(Types.ElementSymbol),
 
-    label_atom_id: prop(Type.Str, 'Same as mmCIF'),
-    label_alt_id: prop(Type.Str, 'Same as mmCIF'),
-    label_comp_id: prop(Type.Str, 'Same as mmCIF'),
-    label_asym_id: prop(Type.Str, 'Same as mmCIF'),
-    label_entity_id: prop(Type.Str, 'Same as mmCIF'),
-    label_seq_id: prop(Type.Num, 'Same as mmCIF'),
+        x: prop(Type.Num, 'Cartesian X coordinate.'),
+        y: prop(Type.Num, 'Cartesian Y coordinate.'),
+        z: prop(Type.Num, 'Cartesian Z coordinate.'),
 
-    pdbx_PDB_ins_code: prop(Type.Str, 'Same as mmCIF'),
-    pdbx_formal_charge: prop(Type.Num, 'Same as mmCIF'),
+        atomKey: prop(Type.Any, 'Unique value for each atom. Main use case is grouping of atoms.')
+    },
 
-    Cartn_x: prop(Type.Num, 'Same as mmCIF. Using this value, beacuse adding Frac_x, etc. might be an option in the future.'),
-    Cartn_y: prop(Type.Num, 'Same as mmCIF. Using this value, beacuse adding Frac_x, etc. might be an option in the future.'),
-    Cartn_z: prop(Type.Num, 'Same as mmCIF. Using this value, beacuse adding Frac_x, etc. might be an option in the future.'),
+    macromolecular: {
+        '@header': 'Macromolecular Properties (derived from the mmCIF format)',
 
-    occupancy: prop(Type.Num, 'Same as mmCIF'),
-    B_iso_or_equiv: prop(Type.Num, 'Same as mmCIF'),
+        authResidueId: prop(Types.ResidueId, `type.authResidueId symbol executed on current atom's residue.`),
+        labelResidueId: prop(Types.ResidueId, `type.labelResidueId symbol executed on current atom's residue.`),
 
-    auth_atom_id: prop(Type.Str, 'Same as mmCIF'),
-    auth_comp_id: prop(Type.Str, 'Same as mmCIF'),
-    auth_asym_id: prop(Type.Str, 'Same as mmCIF'),
-    auth_seq_id: prop(Type.Num, 'Same as mmCIF'),
+        residueKey: prop(Type.Any, 'Unique value for each tuple ``(label_entity_id,auth_asym_id,auth_seq_id,pdbx_PDB_ins_code)``. Main use case is grouping of atoms.'),
+        chainKey: prop(Type.Any, 'Unique value for each tuple ``(label_entity_id,auth_asym_id)``. Main use case is grouping of atoms.'),
+        entityKey: prop(Type.Any, 'Unique value for each tuple ``label_entity_id``. Main use case is grouping of atoms.'),
 
-    pdbx_PDB_model_num: prop(Type.Num, 'Same as mmCIF'),
+        isHet: prop(Type.Num, 'Equivalent to atom_site.group_PDB !== ATOM'),
 
-    // ================= KEYS =================
-    atomKey: prop(Type.Any, 'Unique value for each atom. Main use case is grouping of atoms.'),
-    residueKey: prop(Type.Any, 'Unique value for each tuple ``(label_entity_id,auth_asym_id,auth_seq_id,pdbx_PDB_ins_code)``. Main use case is grouping of atoms.'),
-    chainKey: prop(Type.Any, 'Unique value for each tuple ``(label_entity_id,auth_asym_id)``. Main use case is grouping of atoms.'),
-    entityKey: prop(Type.Any, 'Unique value for each tuple ``label_entity_id``. Main use case is grouping of atoms.'),
+        id: prop(Type.Num),
 
-    residueId: prop(Types.ResidueId, 'Corresponds to tuple (auth_asym_id, auth_seq_id, pdbx_PDB_ins_code)'),
-    // TODO: labelResidueId: prop(Types.ResidueId, 'Corresponds to tuple (label_entity_id, label_asym_id, label_seq_id, pdbx_PDB_ins_code)'),
+        label_atom_id: prop(Type.Str),
+        label_alt_id: prop(Type.Str),
+        label_comp_id: prop(Type.Str),
+        label_asym_id: prop(Type.Str),
+        label_entity_id: prop(Type.Str),
+        label_seq_id: prop(Type.Num),
 
-    // ================= OTHER =================
-    isHet: prop(Type.Num, 'For mmCIF files, Same as group_PDB !== ATOM'),
+        auth_atom_id: prop(Type.Str),
+        auth_comp_id: prop(Type.Str),
+        auth_asym_id: prop(Type.Str),
+        auth_seq_id: prop(Type.Num),
+
+        pdbx_PDB_ins_code: prop(Type.Str),
+        pdbx_formal_charge: prop(Type.Num),
+
+        occupancy: prop(Type.Num),
+        B_iso_or_equiv: prop(Type.Num)
+    }
 }
 
 function prop(type: Type, description?: string) {
@@ -193,6 +192,7 @@ function prop(type: Type, description?: string) {
 }
 
 export default {
+    '@header': 'Structure Queries',
     type,
     generator,
     modifier,

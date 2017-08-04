@@ -12,21 +12,18 @@ namespace Builder {
         return expr as any as { [key: string]: Expression };
     }
 
-    export const type = MolQL.primitive.type;
-    export const operator = MolQL.primitive.operator;
+    export const core = MolQL.core;
+    export const struct = MolQL.structure;
 
-    export namespace Struct {
-        export const type = MolQL.structure.type;
-        export const gen = MolQL.structure.generator;
-        export const filter = MolQL.structure.filter;
-        export const mod = MolQL.structure.modifier;
-        export const comb = MolQL.structure.combinator;
-        export const atomSet = MolQL.structure.atomSet;
+    export function es(s: string) { return struct.type.elementSymbol.apply([s]); }
 
-        const _atomProp = MolQL.structure.atomProperty;
-        export function atomProp(p: keyof typeof _atomProp) { return (_atomProp[p] as Symbol).apply() };
-        export function el(s: string) { return type.elementSymbol.apply([s]); }
-    }
+    const _acp = MolQL.structure.atomProperty.core, _ammp = MolQL.structure.atomProperty.macromolecular;
+
+    // atom core property
+    export function acp(p: keyof typeof _acp) { return (_acp[p] as Symbol).apply() };
+
+    // atom macromolecular property
+    export function ammp(p: keyof typeof _ammp) { return (_ammp[p] as Symbol).apply() };
 }
 
 export default Builder

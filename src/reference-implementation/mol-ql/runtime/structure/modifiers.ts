@@ -8,7 +8,6 @@ import Context from '../context'
 import AtomSet from '../../data/atom-set'
 import AtomSelection from '../../data/atom-selection'
 import { UniqueArrayBuilder, sortAsc, FastSet } from '../../../utils/collections'
-import Mask from '../../../utils/mask'
 import { Model } from '../../../molecule/data'
 
 type Selection = Expression<AtomSelection>
@@ -22,12 +21,6 @@ export function queryEach(env: Environment, selection: Selection, query: Selecti
         }
     }
     return builder.getSelection();
-}
-
-export function queryComplement(env: Environment, selection: Selection, query: Selection): AtomSelection {
-    const selectionMask = AtomSelection.getMask(selection(env));
-    const complementCtx = Context(env.context.model, Mask.complement(selectionMask, env.context.mask));
-    return query(Environment(complementCtx));
 }
 
 export function intersectBy(env: Environment, selection: Selection, by: Selection): AtomSelection {

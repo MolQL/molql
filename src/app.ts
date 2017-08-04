@@ -12,7 +12,6 @@ import mmCIFwriter from './reference-implementation/molecule/writer'
 import Context from './reference-implementation/mol-ql/runtime/context'
 import B from './mol-ql/builder'
 
-
 function run(model: Model) {
 
     //const es = (s: string) => B.Struct.type.elementSymbol.apply([s])
@@ -24,8 +23,8 @@ function run(model: Model) {
     //         B.Struct.atomProp(p => p.type_symbol)
     //     ]),
     // });
-    const query =  B.Struct.gen.atomGroups.apply({
-        'atom-test': B.operator.relational.eq.apply([B.Struct.atomProp('type_symbol'), B.Struct.el('Fe')]),
+    const query =  B.struct.generator.atomGroups.apply({
+        'atom-test': B.core.rel.eq.apply([B.acp('elementSymbol'), B.es('Fe')]),
     });
 
     const compiled = compile(query);
@@ -39,7 +38,7 @@ function run(model: Model) {
     //console.log(model.chains);
 }
 
-fs.readFile('e:/test/quick/1tqn_updated.cif', 'utf-8', (err, data) => {
+fs.readFile('c:/test/quick/1tqn_updated.cif', 'utf-8', (err, data) => {
     if (err) {
         console.error(err);
         return;
