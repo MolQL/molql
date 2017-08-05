@@ -124,4 +124,27 @@ describe('generator', () => {
         const sel = Data.compile(q)(Data.ctx);
         expect(AtomSelection.atomSets(sel).length).toBe(Data.model.entities.count);
     });
+
+    it(`querySelection`, function() {
+        const q = B.struct.generator.querySelection({
+            selection: B.struct.generator.atomGroups({ 'residue-test': B.core.rel.eq([B.ammp('auth_comp_id'), 'ALA']) }),
+            query: B.struct.generator.atomGroups({ 'atom-test': B.core.rel.eq([B.acp('elementSymbol'), B.es('C')]) })
+        });
+        const sel = Data.compile(q)(Data.ctx);
+        expect(AtomSelection.atomSets(sel).length).toBeGreaterThan(0);
+        const check = Data.checkAtomSelection(Data.model, sel, (i, cols) => cols.auth_comp_id.stringEquals(i, 'ALA') && cols.type_symbol.stringEquals(i, 'C'));
+        expect(check).toBe(true);
+    });
+
+    it(`querySelection complement`, function() {
+        const q = B.struct.generator.querySelection({
+            selection: B.struct.generator.atomGroups({ 'residue-test': B.core.rel.eq([B.ammp('auth_comp_id'), 'ALA']) }),
+            query: B.struct.generator.atomGroups({ 'atom-test': B.core.rel.eq([B.acp('elementSymbol'), B.es('C')]) }),
+            'in-complement': true
+        });
+        const sel = Data.compile(q)(Data.ctx);
+        expect(AtomSelection.atomSets(sel).length).toBeGreaterThan(0);
+        const check = Data.checkAtomSelection(Data.model, sel, (i, cols) => !cols.auth_comp_id.stringEquals(i, 'ALA') && cols.type_symbol.stringEquals(i, 'C'));
+        expect(check).toBe(true);
+    });
 });
