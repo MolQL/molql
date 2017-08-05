@@ -55,9 +55,9 @@ const logic = {
 const ctrl = {
     '@header': 'Control Flow',
     if: symbol(Arguments.Dictionary({
-        cond: Argument(Type.Bool),
-        'if-true': Argument(Type.Any),
-        'if-false': Argument(Type.Any)
+        0: Argument(Type.Bool, { description: 'Condition' }),
+        1: Argument(Type.Any, { description: 'If true' }),
+        2: Argument(Type.Any, { description: 'If false' })
     }), Type.Any)
 };
 

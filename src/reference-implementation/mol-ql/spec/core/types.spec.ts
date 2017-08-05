@@ -35,32 +35,6 @@ describe('types', () => {
         expect(c.test('Test')).toBe(true);
     });
 
-    it('not', function () {
-        const e = B.core.logic.not([true]);
-        const c = Data.compile(e)(Data.ctx) as boolean;
-        expect(c).toBe(false);
-    });
-
-    it('if true', function () {
-        const e = B.core.ctrl.if({
-            cond: true,
-            'if-true': 1,
-            'if-false': 2
-        });
-        const c = Data.compile(e)(Data.ctx) as number;
-        expect(c).toBe(1);
-    });
-
-    it('if false', function () {
-        const e = B.core.ctrl.if({
-            cond: false,
-            'if-true': 1,
-            'if-false': 2
-        });
-        const c = Data.compile(e)(Data.ctx) as number;
-        expect(c).toBe(2);
-    });
-
     function testFn(symbol: any, args: any[], expected: any) {
         it(symbol.id + ' ' + expected, function () {
             const e = symbol(args);
@@ -68,6 +42,11 @@ describe('types', () => {
             expect(c).toBe(expected);
         });
     }
+
+    testFn(B.core.ctrl.if, [true, 1, 2], 1);
+    testFn(B.core.ctrl.if, [false, 1, 2], 2);
+
+    testFn(B.core.logic.not, [true], false);
 
     testFn(B.core.logic.and, [true, false, true], false);
     testFn(B.core.logic.and, [true, true, true], true);
