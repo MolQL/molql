@@ -25,15 +25,15 @@ function formatKey(key: string) {
 
 function _normalizeTable(namespace: string, key: string, obj: any) {
     if (isSymbol(obj)) {
-        obj.namespace = namespace;
-        obj.name = obj.name || formatKey(key);
-        obj.id = `${obj.namespace}.${obj.name}`;
+        obj.info.namespace = namespace;
+        obj.info.name = obj.info.name || formatKey(key);
+        obj.id = `${obj.info.namespace}.${obj.info.name}`;
         return;
     }
     const currentNs = `${obj['@namespace'] || formatKey(key)}`;
     const newNs = namespace ? `${namespace}.${currentNs}` : currentNs;
     for (const childKey of Object.keys(obj)) {
-        if (typeof obj[childKey] !== 'object') continue;
+        if (typeof obj[childKey] !== 'object' && !isSymbol(obj[childKey])) continue;
         _normalizeTable(newNs, childKey, obj[childKey]);
     }
 }
@@ -44,7 +44,7 @@ function _symbolList(obj: any, list: Symbol[]) {
         return;
     }
     for (const childKey of Object.keys(obj)) {
-        if (typeof obj[childKey] !== 'object') continue;
+        if (typeof obj[childKey] !== 'object' && !isSymbol(obj[childKey])) continue;
         _symbolList(obj[childKey], list);
     }
 }

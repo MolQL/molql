@@ -63,11 +63,12 @@ Language Reference
     }
 
     function formatSymbol(symbol: Symbol, lines: string[]) {
-        const header = `${symbol.id} :: ${formatArgs(symbol.arguments)} => ${symbol.type.name}`
-        lines.push(`### **${symbol.name}**`);
+        const info = symbol.info;
+        const header = `${symbol.id} :: ${formatArgs(symbol.args)} => ${symbol.type.name}`
+        lines.push(`### **${symbol.info.name}**`);
         lines.push(`\`\`\`\n${header}\n\`\`\`\n`);
-        if (symbol.description) {
-            lines.push(`*${symbol.description}*\n`);
+        if (info.description) {
+            lines.push(`*${info.description}*\n`);
         }
     }
 
@@ -83,7 +84,7 @@ Language Reference
             ToC.push(`${new Array(depth + 1).join('  ')} * [${obj['@header']}](#${tocLink})`);
         }
         for (const childKey of Object.keys(obj)) {
-            if (typeof obj[childKey] !== 'object') continue;
+            if (typeof obj[childKey] !== 'object' && !isSymbol(obj[childKey])) continue;
             format(depth + 1, obj[childKey]);
         }
     }

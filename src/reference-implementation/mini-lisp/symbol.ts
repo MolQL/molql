@@ -23,7 +23,7 @@ namespace SymbolRuntime {
 
 function SymbolRuntime<S extends Symbol>(symbol: S, attributes: Partial<SymbolRuntime.Attributes> = {}) {
     const { isStatic = false } = attributes;
-    return <C>(runtime: SymbolRuntime<C, S['arguments'], S['type']['@type']>): SymbolRuntime.Info<C, S['arguments'], S['type']['@type']> => {
+    return <C>(runtime: SymbolRuntime<C, S['args'], S['type']['@type']>): SymbolRuntime.Info<C, S['args'], S['type']['@type']> => {
         return ({ symbol, runtime, attributes: { isStatic } });
     };
 }

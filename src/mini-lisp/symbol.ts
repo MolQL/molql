@@ -33,34 +33,34 @@ export namespace Arguments {
     }
 }
 
-export type ExpressionArguments<T> = Partial<{ [P in keyof T]: Expression }>
+export type ExpressionArguments<T> = { [P in keyof T]?: Expression } | { [index: number]: Expression }
 
 interface Symbol<A extends Arguments = Arguments, T extends Type = Type> {
-    apply(args?: ExpressionArguments<A['@type']>): Expression,
-    id: string,
-    namespace: string,
-    name: string,
+    (args?: ExpressionArguments<A['@type']>): Expression,
+    info: {
+        namespace: string,
+        name: string,
+        description?: string
+    },
+    args: A
     type: T,
-    arguments: A,
-    description?: string
+    id: string,
 }
 
 function Symbol<A extends Arguments, T extends Type>(name: string, args: A, type: T, description?: string) {
-    const s: Symbol<A, T> = {
-        apply(this: Symbol, args: ExpressionArguments<A['@type']>) { return Expression.Apply(this.id, args as any) },
-        id: '',
-        namespace: '',
-        name,
-        type,
-        arguments: args,
-        description
-    };
-    return s;
+    const symbol: Symbol<A, T> = function(args: ExpressionArguments<A['@type']>) {
+        return Expression.Apply(symbol.id, args as any);
+    } as any;
+    symbol.info = { namespace: '', name, description };
+    symbol.id = '';
+    symbol.args = args;
+    symbol.type = type;
+    return symbol;
 }
 
 export function isSymbol(x: any): x is Symbol {
     const s = x as Symbol;
-    return typeof s === 'object' && s.arguments && typeof s.name === 'string' && typeof s.namespace === 'string' && !!s.type && !!s.arguments;
+    return typeof s === 'function' && !!s.info && !!s.args && typeof s.info.namespace === 'string' && !!s.type;
 }
 
 export default Symbol

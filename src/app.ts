@@ -19,9 +19,6 @@ console.log(AtomSet.atomIndices(AtomSet.union(a, b)))
 console.log(AtomSet.atomIndices(AtomSet.union(a, v)))
 
 function run(model: Model) {
-
-    //const es = (s: string) => B.Struct.type.elementSymbol.apply([s])
-
     // const query = B.Struct.gen(g => g.atomGroups, {
     //     'residue-test': B.operator(o => o.relational.eq, [B.Struct.atomProp(p => p.auth_comp_id), 'ALA']),
     //     'atom-test': B.operator(o => o.set.has, [
@@ -29,8 +26,8 @@ function run(model: Model) {
     //         B.Struct.atomProp(p => p.type_symbol)
     //     ]),
     // });
-    const query =  B.struct.generator.atomGroups.apply({
-        'atom-test': B.core.rel.eq.apply([B.acp('elementSymbol'), B.es('Fe')]),
+    const query =  B.struct.generator.atomGroups({
+        'atom-test': B.core.rel.eq([B.acp('elementSymbol'), B.es('Fe')]),
     });
 
     const compiled = compile(query);
