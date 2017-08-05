@@ -139,9 +139,7 @@ interface ClusterCtx {
     minSize: number,
     maxSize: number,
     selection: AtomSelection,
-    lookup: AtomSelection.Lookup3d,
     builder: AtomSelection.Builder,
-    processed: FastSet<number>,
     model: Model
 }
 
@@ -159,7 +157,7 @@ function clusterAround(ctx: ClusterCtx, a: AtomSet, included: number[], candidat
 
     const lastIncluded = included[included.length - 1];
     for (const bI of candidates) {
-        if (bI <= lastIncluded || ctx.processed.has(bI) || included.indexOf(bI) >= 0) continue;
+        if (bI <= lastIncluded) continue;
 
         const b = atomSets[bI];
 
@@ -181,26 +179,23 @@ function clusterAround(ctx: ClusterCtx, a: AtomSet, included: number[], candidat
 
 function _cluster(ctx: ClusterCtx) {
     let i = 0;
+    const lookup = AtomSelection.lookup3d(ctx.model, ctx.selection);
     for (const atomSet of AtomSelection.atomSets(ctx.selection)) {
-        const candidates = ctx.lookup.queryAtomSet(atomSet, ctx.maxDist);
+        const candidates = lookup.queryAtomSet(atomSet, ctx.maxDist);
         sortAsc(candidates);
-        ctx.processed.add(i);
         clusterAround(ctx, atomSet, [i], candidates);
         i++;
     }
 }
 
 export function cluster(env: Environment, params: ClusterParams): AtomSelection {
-    const selection = params.selection(env);
     const cCtx: ClusterCtx = {
-        selection,
-        lookup: AtomSelection.lookup3d(env.context.model, selection),
+        selection: params.selection(env),
         minDist: (params.minDist && params.minDist(env)) || 0,
         maxDist: (params.maxDist && params.maxDist(env)),
         minSize: Math.max((params.minSize && params.minSize(env)) || 2, 2),
         maxSize: (params.maxSize && params.maxSize(env)) || Number.POSITIVE_INFINITY,
         builder: AtomSelection.linearBuilder(),
-        processed: FastSet.create(),
         model: env.context.model
     };
     _cluster(cCtx);
