@@ -57,7 +57,7 @@ const ctrl = {
     if: symbol(Arguments.Dictionary({
         cond: Argument(Type.Bool),
         'if-true': Argument(Type.Any),
-        'if-false': Argument(Type.Any) 
+        'if-false': Argument(Type.Any)
     }), Type.Any)
 };
 

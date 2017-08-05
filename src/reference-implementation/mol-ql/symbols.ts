@@ -52,8 +52,6 @@ export const SymbolRuntime: Symbol.Info<Context>[] = [
     }),
     Symbol(MolQL.core.type.regex, staticAttr)((env, v) => new RegExp(v[0](env), (v[1] && v[1](env)) || '')),
 
-    // ============= OPERATORS =============
-
     // ============= LOGIC ================
     Symbol(MolQL.core.logic.not, staticAttr)((env, v) => !v[0](env)),
     Symbol(MolQL.core.logic.and, staticAttr)((env, xs) => {
@@ -101,9 +99,14 @@ export const SymbolRuntime: Symbol.Info<Context>[] = [
     Symbol(MolQL.core.math.sub, staticAttr)((env, xs) => {
         let ret = 0;
         if (typeof xs.length === 'number') {
-            for (let i = 0, _i = xs.length; i < _i; i++) ret -= xs[i](env);
+            if (xs.length === 1) return -xs[0](env);
+            ret = xs[0](env) || 0;
+            for (let i = 1, _i = xs.length; i < _i; i++) ret -= xs[i](env);
         } else {
-            for (const k of Object.keys(xs)) ret -= xs[k](env);
+            const keys = Object.keys(xs);
+            if (keys.length === 1)
+            ret = xs[keys[0]](env) || 0;
+            for (let i = 1, _i = keys.length; i < _i; i++) ret -= xs[keys[i]](env);
         }
         return ret;
     }),
