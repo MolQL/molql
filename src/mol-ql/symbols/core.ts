@@ -10,10 +10,10 @@ export namespace Types {
     export type List = { [index: string]: any, [index: number]: any, length: number }
     export type Set = { has(e: any): boolean }
     export type Map = { has(key: any): boolean, get(key: any): any }
-    export const List = Type<List>('list', Type.Any);
-    export const Set = Type<Set>('set', Type.Any);
-    export const Map = Type<Map>('map', Type.Any);
-    export const Regex = Type<RegExp>('regex', Type.Any);
+    export const List = Type<List>('List', Type.Any);
+    export const Set = Type<Set>('Set', Type.Any);
+    export const Map = Type<Map>('Map', Type.Any);
+    export const Regex = Type<RegExp>('Regex', Type.Any);
 }
 
 function unaryOp<T extends Type>(type: T, description?: string) {
@@ -123,7 +123,7 @@ const map = {
     has: symbol(Arguments.Dictionary({ 0: Argument(Types.Map), 1: Argument(Type.Any) }), Type.Bool),
     get: symbol(Arguments.Dictionary({
         0: Argument(Types.Map),
-        1: Argument(Type.Any),
+        1: Argument(Type.LiteralValue, { description: 'Key' }),
         2: Argument(Type.Any, { description: 'Default value if key is not present' })
     }), Type.Any)
 };

@@ -7,10 +7,10 @@ import { Arguments, Argument } from '../../mini-lisp/symbol'
 import { symbol } from './helpers'
 
 export namespace Types {
-    export const ElementSymbol = Type('element-symbol', Type.Any);
-    export const ResidueId = Type('residue-id', Type.Any);
-    export const AtomSet = Type('atom-set', Type.Any);
-    export const AtomSelection = Type('atom-selection', Type.Any);
+    export const ElementSymbol = Type('ElementSymbol', Type.Any);
+    export const ResidueId = Type('ResidueId', Type.Any);
+    export const AtomSet = Type('AtomSet', Type.Any);
+    export const AtomSelection = Type('AtomSelection', Type.Any);
 }
 
 const type = {

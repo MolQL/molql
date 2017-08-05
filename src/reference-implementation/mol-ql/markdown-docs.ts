@@ -25,7 +25,7 @@ Language Reference
 
     function formatArgs(args: Arguments) {
         if (args.kind === 'list') {
-            return `List [\n  ${args.type.name}*\n]`;
+            return `array [\n  ${args.type.name}*\n]`;
         }
         const map = args.map;
         const keys = Object.keys(map);
@@ -42,7 +42,7 @@ Language Reference
             argIndex++;
         }
 
-        formatted.push(isArgArray ? 'List [\n' : 'Map {\n');
+        formatted.push(isArgArray ? 'array [\n' : 'object {\n');
         argIndex = 0;
 
         for (const key of keys) {
