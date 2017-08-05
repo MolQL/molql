@@ -98,6 +98,13 @@ namespace AtomSet {
         if (impl.boundingSphere) return impl.boundingSphere;
 
         const { x, y, z } = model.positions;
+
+        if (impl.atomIndices.length === 1) {
+            const i = impl.atomIndices[0];
+            impl.boundingSphere = { center: [x[i], y[i], z[i]], radius: 0 };
+            return impl.boundingSphere;
+        }
+
         const center: [number, number, number] = [0, 0, 0];
         for (const i of impl.atomIndices) {
             center[0] += x[i];

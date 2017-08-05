@@ -116,11 +116,11 @@ core.logic.or :: List [
 
 ### **if**
 ```
-core.ctrl.if :: Map {
-  cond: bool, 
-  if-true: value, 
-  if-false: value
-} => value
+core.ctrl.if :: List [
+  bool (* Condition *), 
+  value (* If true *), 
+  value (* If false *)
+] => value
 ```
 
 ## Math
@@ -539,10 +539,10 @@ structure.modifier.union :: Map {
 ```
 structure.modifier.cluster :: Map {
   selection: atom-selection, 
-  min-radius: number, 
-  max-radius: number, 
-  minimum-size?: number = 2 (* Minimal number of sets to merge, must be at least 2 *), 
-  maximum-size?: number (* Maximal number of sets to merge, if not set, no limit *)
+  min-distance?: number = 0, 
+  max-distance: number, 
+  min-size?: number = 2 (* Minimal number of sets to merge, must be at least 2 *), 
+  max-size?: number (* Maximal number of sets to merge, if not set, no limit *)
 } => atom-selection
 ```
 
@@ -623,9 +623,9 @@ structure.atom-set.atom-count :: ()
    => number
 ```
 
-### **count-selection**
+### **count-query**
 ```
-structure.atom-set.count-selection :: Map {
+structure.atom-set.count-query :: Map {
   query: atom-selection
 } => number
 ```
@@ -639,7 +639,7 @@ structure.atom-set.count-selection :: Map {
 ### **accumulator**
 ```
 structure.atom-set.reduce.accumulator :: Map {
-  initial: value (* Initial value *), 
+  initial: value (* Initial value. Current atom is set to the 1st atom of the current set for this. *), 
   value: value (* Expression executed for each atom in the set *)
 } => value
 ```
@@ -839,4 +839,12 @@ structure.atom-property.macromolecular.occupancy :: ()
 structure.atom-property.macromolecular.B_iso_or_equiv :: ()
    => number
 ```
+
+### **entity-type**
+```
+structure.atom-property.macromolecular.entity-type :: ()
+   => string
+```
+
+*Type of the entity as defined in mmCIF (polymer, non-polymer, water)*
 

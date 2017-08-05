@@ -17,7 +17,7 @@ export interface Result {
     readonly squaredDistances: number[]
 }
 
-export interface Positions { x: number[], y: number[], z: number[] }
+export interface Positions { x: ArrayLike<number>, y: ArrayLike<number>, z: ArrayLike<number> }
 
 interface SpatialLookup { find: (mask: Mask) => FindFunc, check: (mask: Mask) => CheckFunc }
 
@@ -123,7 +123,7 @@ namespace QueryContext {
     }
 }
 
-function createInputData(positions: { x: number[], y: number[], z: number[] }): InputData {
+function createInputData(positions: { x: ArrayLike<number>, y: ArrayLike<number>, z: ArrayLike<number> }): InputData {
     const { x, y, z } = positions;
     const bounds = Box3D.createInfinite();
     const count = x.length;

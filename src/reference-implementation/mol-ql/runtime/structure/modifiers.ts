@@ -125,9 +125,86 @@ export function union(env: Environment, selection: Selection): AtomSelection {
     return AtomSelection([AtomSelection.toAtomSet(selection(env))]);
 }
 
-export function cluster(env: Environment, selection: Selection, radius: Expression<number>): AtomSelection {
-    // TODO: implement me
-    throw new Error('cluster: not implmented');
+export interface ClusterParams {
+    selection: Selection,
+    minDist?: Expression<number>,
+    maxDist: Expression<number>,
+    minSize?: Expression<number>,
+    maxSize?: Expression<number>
+}
+
+interface ClusterCtx {
+    minDist: number,
+    maxDist: number,
+    minSize: number,
+    maxSize: number,
+    selection: AtomSelection,
+    lookup: AtomSelection.Lookup3d,
+    builder: AtomSelection.Builder,
+    processed: FastSet<number>,
+    model: Model
+}
+
+function clusterAround(ctx: ClusterCtx, a: AtomSet, included: number[], candidates: number[]) {
+    const depth = included.length;
+    if (depth >= ctx.minSize) {
+        ctx.builder.add(a);
+    }
+    if (depth >= ctx.maxSize || depth >= candidates.length) {
+        return;
+    }
+
+    const { minDist, maxDist } = ctx;
+    const atomSets = AtomSelection.atomSets(ctx.selection);
+
+    const lastIncluded = included[included.length - 1];
+    for (const bI of candidates) {
+        if (bI <= lastIncluded || ctx.processed.has(bI) || included.indexOf(bI) >= 0) continue;
+
+        const b = atomSets[bI];
+
+        let canInclude = true;
+        for (const iI of included) {
+            const dist = AtomSet.distance(ctx.model, b, atomSets[iI]);
+            if (dist < minDist || dist > maxDist) {
+                canInclude = false;
+                break;
+            }
+        }
+        if (!canInclude) continue;
+
+        included.push(bI);
+        clusterAround(ctx, AtomSet.union(a, b), included, candidates);
+        included.pop();
+    }
+}
+
+function _cluster(ctx: ClusterCtx) {
+    let i = 0;
+    for (const atomSet of AtomSelection.atomSets(ctx.selection)) {
+        const candidates = ctx.lookup.queryAtomSet(atomSet, ctx.maxDist);
+        sortAsc(candidates);
+        ctx.processed.add(i);
+        clusterAround(ctx, atomSet, [i], candidates);
+        i++;
+    }
+}
+
+export function cluster(env: Environment, params: ClusterParams): AtomSelection {
+    const selection = params.selection(env);
+    const cCtx: ClusterCtx = {
+        selection,
+        lookup: AtomSelection.lookup3d(env.context.model, selection),
+        minDist: (params.minDist && params.minDist(env)) || 0,
+        maxDist: (params.maxDist && params.maxDist(env)),
+        minSize: Math.max((params.minSize && params.minSize(env)) || 2, 2),
+        maxSize: (params.maxSize && params.maxSize(env)) || Number.POSITIVE_INFINITY,
+        builder: AtomSelection.linearBuilder(),
+        processed: FastSet.create(),
+        model: env.context.model
+    };
+    _cluster(cCtx);
+    return cCtx.builder.getSelection();
 }
 
 export function includeSurroundings(env: Environment, selection: Selection, radius: Expression<number>, wholeResidues?: Expression<boolean>): AtomSelection {

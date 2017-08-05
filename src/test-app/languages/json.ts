@@ -29,6 +29,15 @@ const lang: Language = {
             'radius': 5,
             'as-whole-residues': true
         }), null, 2)
+    }, {
+        name: 'Cluster LYS residues within 5 ang',
+        value: JSON.stringify(B.struct.modifier.cluster({
+            'selection': B.struct.generator.atomGroups({
+                'residue-test': B.core.rel.eq([B.ammp('auth_comp_id'), 'LYS']),
+                'group-by': B.ammp('residueKey')
+            }),
+            'max-distance': 5
+        }), null, 2)
     }]
 }
 

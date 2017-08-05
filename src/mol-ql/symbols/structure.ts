@@ -38,6 +38,7 @@ const generator = {
         'atom-test': Argument(Type.Bool, { isOptional: true, defaultValue: true }),
         'group-by': Argument(Type.Any, { isOptional: true, defaultValue: `atom-key` }),
     }), Types.AtomSelection),
+
     querySelection: symbol(Arguments.Dictionary({
         selection: Argument(Types.AtomSelection),
         query: Argument(Types.AtomSelection),

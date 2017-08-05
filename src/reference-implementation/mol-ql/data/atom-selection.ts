@@ -4,6 +4,8 @@
 
 import { sortAsc, FastMap, FastSet } from '../../utils/collections'
 import Mask from '../../utils/mask'
+import { Model } from '../../molecule/data'
+import SpatialLookup, { FindFunc } from '../../utils/spatial-lookup'
 import AtomSet from './atom-set'
 
 interface AtomSelection { '@type'?: 'atom-selection' }
@@ -146,6 +148,54 @@ namespace AtomSelection {
             }
             return set;
         }
+    }
+
+    export class Lookup3d {
+        private lookup: FindFunc;
+        private mask: Mask;
+        private maxRadius: number = 0;
+
+        queryAtomSet(a: AtomSet, radius: number): number[]  {
+            const { center, radius: bsRadius } = AtomSet.boundingSphere(this.model, a);
+            const { count, indices } = this.lookup(center[0], center[1], center[2], this.maxRadius + bsRadius + radius)
+            const atomSets = AtomSelection.atomSets(this.selection);
+
+            const setIndices: number[] = [];
+            for (let i = 0; i < count; i++) {
+                const b = atomSets[indices[i]];
+                const d = AtomSet.distance(this.model, a, b);
+                if (d < radius) {
+                    setIndices.push(indices[i]);
+                }
+            }
+
+            return setIndices;
+        }
+
+        constructor(private model: Model, private selection: AtomSelection) {
+            const sets = atomSets(selection);
+            const positions = {
+                x: new Float32Array(sets.length),
+                y: new Float32Array(sets.length),
+                z: new Float32Array(sets.length)
+            };
+            let radius = 0, i = 0;
+            for (const set of sets) {
+                const bs = AtomSet.boundingSphere(model, set);
+                positions.x[i] = bs.center[0];
+                positions.y[i] = bs.center[1];
+                positions.z[i] = bs.center[2];
+                i++;
+                if (bs.radius > radius) radius = bs.radius;
+            }
+            this.maxRadius = radius;
+            this.mask = Mask.always(sets.length);
+            this.lookup = SpatialLookup(positions).find(Mask.always(sets.length));
+        }
+    }
+
+    export function lookup3d(model: Model, selection: AtomSelection) {
+        return new Lookup3d(model, selection);
     }
 }
 
