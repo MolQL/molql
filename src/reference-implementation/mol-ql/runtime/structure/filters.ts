@@ -58,7 +58,7 @@ function getAtomSelectionProperties(env: Environment, selection: Selection, prop
     return set;
 }
 
-export function withProperties(env: Environment, selection: Selection, source: Selection, prop: Expression) {
+export function withSameProperties(env: Environment, selection: Selection, source: Selection, prop: Expression) {
     const sel = selection(env);
     const propSet = getAtomSelectionProperties(env, source, prop);
     const ret = AtomSelection.linearBuilder();

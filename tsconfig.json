@@ -13,7 +13,5 @@
         "lib": [ "es6", "dom" ],
         "outDir": "build"
     },
-    "include": [
-        "src/**/*"
-    ]
+    "include": [ "src/**/*" ]
 }

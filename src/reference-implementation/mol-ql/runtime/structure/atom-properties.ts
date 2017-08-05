@@ -31,7 +31,8 @@ export const Macromolecular: { [P in keyof typeof MolQL.structure.atomProperty.m
 
     // ================= mmCIF =================
     isHet: prop((env, v) => !env.context.atom_site.group_PDB.stringEquals(env.context.element.value.dataIndex, 'ATOM')),
-    id: prop((env, v) => env.context.atom_site.id.getString(env.context.element.value.dataIndex) || ''),
+
+    id: prop((env, v) => env.context.atom_site.id.getInteger(env.context.element.value.dataIndex)),
 
     label_atom_id: prop((env, v) => env.context.atom_site.label_atom_id.getString(env.context.element.value.dataIndex) || ''),
     label_alt_id: prop((env, v) => env.context.atom_site.label_alt_id.getString(env.context.element.value.dataIndex) || ''),
@@ -49,5 +50,11 @@ export const Macromolecular: { [P in keyof typeof MolQL.structure.atomProperty.m
     pdbx_formal_charge: prop((env, v) => env.context.atom_site.pdbx_formal_charge.getInteger(env.context.element.value.dataIndex)),
 
     occupancy: prop((env, v) => env.context.atom_site.occupancy.getFloat(env.context.element.value.dataIndex)),
-    B_iso_or_equiv: prop((env, v) => env.context.atom_site.B_iso_or_equiv.getFloat(env.context.element.value.dataIndex))
+    B_iso_or_equiv: prop((env, v) => env.context.atom_site.B_iso_or_equiv.getFloat(env.context.element.value.dataIndex)),
+
+    // ================= Mapped =================
+    entityType: prop((env, v) => {
+        const { model, element } = env.context;
+        return model.data.entity.type.getString(model.entities.dataIndex[element.value.entity])
+    }),
 }

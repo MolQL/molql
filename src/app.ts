@@ -18,6 +18,14 @@ const v = AtomSet([5, 7, 9])
 console.log(AtomSet.atomIndices(AtomSet.union(a, b)))
 console.log(AtomSet.atomIndices(AtomSet.union(a, v)))
 
+const aResId = (c: string, r: number, i?: string) => B.struct.type.authResidueId([c, r, i]);
+const resSet = B.core.type.set([aResId('A', 7), aResId('A', 9)]);
+const has = B.core.set.has([resSet, aResId('A', 7)])
+const comp = compile(has);
+
+console.log(comp(0 as any));
+
+
 function run(model: Model) {
     // const query = B.Struct.gen(g => g.atomGroups, {
     //     'residue-test': B.operator(o => o.relational.eq, [B.Struct.atomProp(p => p.auth_comp_id), 'ALA']),
@@ -41,7 +49,7 @@ function run(model: Model) {
     //console.log(model.chains);
 }
 
-fs.readFile('c:/test/quick/1tqn_updated.cif', 'utf-8', (err, data) => {
+fs.readFile('spec/1tqn_updated.cif', 'utf-8', (err, data) => {
     if (err) {
         console.error(err);
         return;

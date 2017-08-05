@@ -99,7 +99,7 @@ function createModel(moleculeId: string, data: Data, startRow: number, rowCount:
         atoms: { dataIndex, residueIndex, count: atom },
         residues: { atomStartIndex, atomEndIndex, secondaryStructureType, secondaryStructureIndex, chainIndex, count: residue, key: new Int32Array(residue) as any },
         chains: { residueStartIndex, residueEndIndex, entityIndex, count: chain, key: new Int32Array(residue) as any },
-        entities: { chainStartIndex, chainEndIndex, count: entity, key: new Int32Array(residue) as any },
+        entities: { chainStartIndex, chainEndIndex, count: entity, key: new Int32Array(residue) as any, dataIndex: new Int32Array(residue) as any },
         positions: { x, y, z },
         data,
         '@spatialLookup': void 0
@@ -120,7 +120,13 @@ function getElementSubstructureKeyMap(map: FastMap<number, FastMap<string, numbe
     return ret;
 }
 
-function assignKeys(model: Model) {
+function assignKeysAndDataIndices(model: Model) {
+    // TODO: expose maps to allow fast key lookup!
+
+    const entityDataIndexMap = FastMap.create<string, number>();
+    const entity = model.data.entity;
+    for (let i = 0; i < entity.rowCount; i++) entityDataIndexMap.set(entity.id.getString(i) || '', i);
+
     const entityMap = FastMap.create<string, number>(), entityCounter = { index: 0 };
     const chainMaps = FastMap.create<number, FastMap<string, number>>(), chainCounter = { index: 0 };;
     const residueMaps = FastMap.create<number, FastMap<string, number>>(), residueCounter = { index: 0 };;
@@ -128,7 +134,7 @@ function assignKeys(model: Model) {
     const { dataIndex } = model.atoms;
     const { key: residueKey, atomStartIndex } = model.residues;
     const { key: chainKey, residueStartIndex, residueEndIndex } = model.chains;
-    const { key: entityKey, count: entityCount, chainStartIndex, chainEndIndex  } = model.entities;
+    const { key: entityKey, count: entityCount, chainStartIndex, chainEndIndex, dataIndex: entityDataIndex } = model.entities;
 
     const { label_entity_id, auth_asym_id, auth_seq_id, pdbx_PDB_ins_code } = model.data.atom_site;
 
@@ -136,7 +142,10 @@ function assignKeys(model: Model) {
         const chainStart = chainStartIndex[eI], chainEnd = chainEndIndex[eI];
         let dataRow = dataIndex[atomStartIndex[residueStartIndex[chainStart]]];
 
-        const eKey = getElementKey(entityMap, label_entity_id.getString(dataRow)!, entityCounter);
+        const entId = label_entity_id.getString(dataRow)!;
+        entityDataIndex[eI] = entityDataIndexMap.get(entId) || 0;
+
+        const eKey = getElementKey(entityMap, entId, entityCounter);
         entityKey[eI] = eKey;
         const chainMap = getElementSubstructureKeyMap(chainMaps, eKey);
         for (let cI = chainStart; cI < chainEnd; cI++) {
@@ -153,6 +162,7 @@ function assignKeys(model: Model) {
                     : `${auth_seq_id.getInteger(dataRow)} ${pdbx_PDB_ins_code.getString(dataRow)}`, residueCounter);
             }
         }
+
     }
 }
 
@@ -265,7 +275,7 @@ export default function parseCIF(cifData: string): Molecule {
     let modelStartIndex = 0;
     while (modelStartIndex < data.atom_site.rowCount) {
         const model = createModel(dataBlock.header, data, modelStartIndex, data.atom_site.rowCount);
-        assignKeys(model);
+        assignKeysAndDataIndices(model);
         assignSecondaryStructure(model);
         models.push(model);
         modelStartIndex += model.atoms.count;

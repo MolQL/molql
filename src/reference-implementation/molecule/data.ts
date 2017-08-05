@@ -38,6 +38,7 @@ export interface Chains {
 export interface Entities {
     chainStartIndex: number[],
     chainEndIndex: number[],
+    dataIndex: number[],
     key: number[],
     count: number
 }

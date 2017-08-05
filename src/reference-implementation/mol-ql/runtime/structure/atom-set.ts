@@ -14,7 +14,7 @@ export function atomCount(env: Environment) {
     return AtomSet.count(env.context.atomSet.value);
 }
 
-export function countSelection(env: Environment, query: Expression<AtomSelection>) {
+export function countQuery(env: Environment, query: Expression<AtomSelection>) {
     const sel = query(Environment(Context.ofAtomSet(env.context, env.context.atomSet.value)))
     return AtomSelection.atomSets(sel).length;
 }
@@ -27,10 +27,13 @@ export function accumulateAtomSet(env: Environment, initial: Expression<any>, va
     const ctx = env.context;
     const slot = ctx.atomSetReducer;
     if (Slot.depth(slot) > 0) noNestedAccumulators();
+
+    const atoms = AtomSet.atomIndices(ctx.atomSet.value);
+    const element = Context.beginIterateElemement(ctx);
+    ElementAddress.setAtom(ctx.model, element, atoms[0]);
     Slot.push(ctx.atomSetReducer, initial(env));
 
-    const element = Context.beginIterateElemement(ctx);
-    for (const a of AtomSet.atomIndices(ctx.atomSet.value)) {
+    for (const a of atoms) {
         ElementAddress.setAtom(ctx.model, element, a);
         slot.value = value(env);
     }

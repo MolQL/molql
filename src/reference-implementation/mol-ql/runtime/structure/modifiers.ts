@@ -66,8 +66,7 @@ export function exceptBy(env: Environment, selection: Selection, by: Selection):
 }
 
 
-export function unionBy(env: Environment, selection: Selection, by: Selection): AtomSelection {
-    const atomCount = env.context.model.atoms.count;
+export function unionBy(env: Environment, selection: Selection, by: Selection): AtomSelection {const atomCount = env.context.model.atoms.count;
     const atomSets = AtomSelection.atomSets(selection(env));
     const glue = by(env);
 
@@ -101,7 +100,7 @@ export function unionBy(env: Environment, selection: Selection, by: Selection): 
     for (const glueSet of AtomSelection.atomSets(glue)) {
         const toGlue = UniqueArrayBuilder<number>();
         for (const g of AtomSet.atomIndices(glueSet)) {
-            const o = atomMap[occurentOffsets[g]];
+            const o = occurentOffsets[g];
             for (let i = 0, _i = occurenceCount[g]; i < _i; i++) {
                 const key = atomMap[o + i];
                 UniqueArrayBuilder.add(toGlue, key, key);
@@ -109,8 +108,10 @@ export function unionBy(env: Environment, selection: Selection, by: Selection): 
         }
 
         const indices = UniqueArrayBuilder<number>();
+        let cnt = 0;
         for (const atomSetIndex of toGlue.array) {
             for (const a of AtomSet.atomIndices(atomSets[atomSetIndex])) {
+                cnt++;
                 UniqueArrayBuilder.add(indices, a, a);
             }
         }

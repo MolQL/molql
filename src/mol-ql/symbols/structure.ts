@@ -123,14 +123,14 @@ const atomSet = {
 
     atomCount: symbol(Arguments.None, Type.Num),
 
-    countSelection: symbol(Arguments.Dictionary({
+    countQuery: symbol(Arguments.Dictionary({
         query: Argument(Types.AtomSelection)
     }), Type.Num, 'Counts the number of occurences of a specific query inside the current atom set.'),
 
     reduce: {
         '@header': 'Atom Set Reducer',
         accumulator: symbol(Arguments.Dictionary({
-            initial: Argument(Type.Any, { description: 'Initial value' }),
+            initial: Argument(Type.Any, { description: 'Initial value. Current atom is set to the 1st atom of the current set for this.' }),
             value: Argument(Type.Any, { description: 'Expression executed for each atom in the set' })
         }), Type.Any),
         value: prop(Type.Any, 'Current value of the reducer.'),
@@ -182,7 +182,9 @@ const atomProperty = {
         pdbx_formal_charge: prop(Type.Num),
 
         occupancy: prop(Type.Num),
-        B_iso_or_equiv: prop(Type.Num)
+        B_iso_or_equiv: prop(Type.Num),
+
+        entityType: prop(Type.Str, 'Type of the entity as defined in mmCIF (polymer, non-polymer, water)'),
     }
 }
 

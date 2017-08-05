@@ -197,14 +197,14 @@ export const SymbolRuntime: Symbol.Info<Context>[] = [
     Symbol(MolQL.structure.modifier.queryEach)((env, v) => StructureRuntime.Modifiers.queryEach(env, v.selection, v.query)),
     Symbol(MolQL.structure.modifier.intersectBy)((env, v) => StructureRuntime.Modifiers.intersectBy(env, v.selection, v.by)),
     Symbol(MolQL.structure.modifier.exceptBy)((env, v) => StructureRuntime.Modifiers.exceptBy(env, v.selection, v.by)),
-    Symbol(MolQL.structure.modifier.unionBy)((env, v) => StructureRuntime.Modifiers.exceptBy(env, v.selection, v.by)),
+    Symbol(MolQL.structure.modifier.unionBy)((env, v) => StructureRuntime.Modifiers.unionBy(env, v.selection, v.by)),
     Symbol(MolQL.structure.modifier.union)((env, v) => StructureRuntime.Modifiers.union(env, v.selection)),
     Symbol(MolQL.structure.modifier.cluster)((env, v) => StructureRuntime.Modifiers.cluster(env, v.selection, v['min-distance'])),
     Symbol(MolQL.structure.modifier.includeSurroundings)((env, v) => StructureRuntime.Modifiers.includeSurroundings(env, v.selection, v.radius, v['as-whole-residues'])),
 
     // ============= FILTERS ================
     Symbol(MolQL.structure.filter.pick)((env, v) => StructureRuntime.Filters.pick(env, v.selection, v.test)),
-    Symbol(MolQL.structure.filter.withSameProperties)((env, v) => StructureRuntime.Filters.withProperties(env, v.selection, v.source, v.property)),
+    Symbol(MolQL.structure.filter.withSameProperties)((env, v) => StructureRuntime.Filters.withSameProperties(env, v.selection, v.source, v.property)),
     Symbol(MolQL.structure.filter.within)((env, v) => StructureRuntime.Filters.within(env, v.selection, v.target, v.radius)),
 
     // ============= COMBINATORS ================
@@ -213,7 +213,7 @@ export const SymbolRuntime: Symbol.Info<Context>[] = [
 
     // ============= ATOM SETS ================
     Symbol(MolQL.structure.atomSet.atomCount)((env, v) => StructureRuntime.AtomSet.atomCount(env)),
-    Symbol(MolQL.structure.atomSet.countSelection)((env, v) => StructureRuntime.AtomSet.countSelection(env, v.query)),
+    Symbol(MolQL.structure.atomSet.countQuery)((env, v) => StructureRuntime.AtomSet.countQuery(env, v.query)),
     Symbol(MolQL.structure.atomSet.reduce.accumulator)((env, v) => StructureRuntime.AtomSet.accumulateAtomSet(env, v.initial, v.value)),
     Symbol(MolQL.structure.atomSet.reduce.value)((env, v) => env.context.atomSetReducer.value),
 

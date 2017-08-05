@@ -16,7 +16,7 @@ namespace Expression {
     export function isArgumentsArray(e: Arguments): e is Expression[] { return e instanceof Array; }
     export function isArgumentsMap(e: Arguments): e is { [name: string]: Expression } { return !(e instanceof Array); }
     export function isLiteral(e: Expression): e is Expression.Literal { return !isApply(e); }
-    export function isApply(e: Expression): e is Expression.Apply { return !!(e as Expression.Apply).head && typeof e === 'object'; }
+    export function isApply(e: Expression): e is Expression.Apply { return !! e && !!(e as Expression.Apply).head && typeof e === 'object'; }
 }
 
 export default Expression

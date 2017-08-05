@@ -94,6 +94,7 @@ function groupAtomsSingleton(env: Environment, atomTest: Pred) {
             if (atomTest(env)) result.add(AtomSet([i]));
         }
     }
+    Context.endIterateElement(ctx);
     return result.getSelection();
 }
 
