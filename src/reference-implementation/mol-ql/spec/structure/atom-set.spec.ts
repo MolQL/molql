@@ -11,7 +11,7 @@ import * as Data from '../data'
 describe('atom-set', () => {
     const residues = B.struct.generator.atomGroups({ 'group-by': B.ammp('residueKey') });
 
-    it('all residues with min b-factor greater less 40', function () {
+    it('all residues with min b-factor greater than 40', function () {
         const q = B.struct.filter.pick({
             selection: residues,
             test: B.core.rel.gr([

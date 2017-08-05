@@ -83,9 +83,16 @@ function _format(e: Expression, writer: Writer) {
     }
 
     if (isArgumentsArray(e.args)) {
+        let prevLiteral = true;
         for (const a of e.args) {
-            if (isLiteral(a)) writer.whitespace();
-            else writer.newline();
+            if (isLiteral(a)) {
+                if (prevLiteral) writer.whitespace();
+                else writer.newline();
+                prevLiteral = true;
+            } else {
+                prevLiteral = false;
+                writer.newline();
+            }
             _format(a, writer);
         }
         writer.pop();

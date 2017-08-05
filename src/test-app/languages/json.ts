@@ -38,6 +38,21 @@ const lang: Language = {
             }),
             'max-distance': 5
         }), null, 2)
+    }, {
+        name: 'Residues with max b-factor < 45',
+        value: JSON.stringify(B.struct.filter.pick({
+            selection: B.struct.generator.atomGroups({ 'group-by': B.ammp('residueKey') }),
+            test: B.core.rel.lt([
+                B.struct.atomSet.reduce.accumulator({
+                    initial: B.ammp('B_iso_or_equiv'),
+                    value: B.core.math.max([
+                        B.struct.atomSet.reduce.value(),
+                        B.ammp('B_iso_or_equiv')
+                    ])
+                }),
+                35
+            ])
+        }), null, 2)
     }]
 }
 
