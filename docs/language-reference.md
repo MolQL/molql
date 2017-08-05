@@ -619,13 +619,13 @@ structure.combinator.merge :: array [
 
 ### **atom-count**
 ```
-structure.AtomSet.atom-count :: ()
+structure.atom-set.atom-count :: ()
    => Number
 ```
 
 ### **count-query**
 ```
-structure.AtomSet.count-query :: object {
+structure.atom-set.count-query :: object {
   query: AtomSelection
 } => Number
 ```
@@ -638,7 +638,7 @@ structure.AtomSet.count-query :: object {
 
 ### **accumulator**
 ```
-structure.AtomSet.reduce.accumulator :: object {
+structure.atom-set.reduce.accumulator :: object {
   initial: Any (* Initial value. Current atom is set to the 1st atom of the current set for this. *), 
   value: Any (* Expression executed for each atom in the set *)
 } => Any
@@ -646,7 +646,7 @@ structure.AtomSet.reduce.accumulator :: object {
 
 ### **value**
 ```
-structure.AtomSet.reduce.value :: ()
+structure.atom-set.reduce.value :: ()
    => Any
 ```
 

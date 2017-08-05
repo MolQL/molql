@@ -120,7 +120,6 @@ const combinator = {
 
 const atomSet = {
     '@header': 'Atom Sets',
-    '@namespace': Types.AtomSet.name,
 
     atomCount: symbol(Arguments.None, Type.Num),
 
