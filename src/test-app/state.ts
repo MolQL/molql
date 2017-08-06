@@ -73,11 +73,11 @@ class State {
 
     execute() {
         try {
-            this.resultPlugin.clear();
-            this.queryResult.onNext({ kind: 'content', content: 'No query executed yet...'});
-
             const query = this.query.getValue();
             if (query.kind !== 'ok') return;
+
+            this.resultPlugin.command(LiteMol.Bootstrap.Command.Tree.RemoveNode, 'selection');
+            this.queryResult.onNext({ kind: 'content', content: 'No query executed yet...'});
 
             const model = this.moleculeData!.model;
 
@@ -89,11 +89,29 @@ class State {
 
             const queryP = this.resultPlugin;
             const tQ = queryP.createTransform();
-            tQ.add(queryP.context.tree.root, Transformer.Data.FromData, { data: cif })
+
+            if (!this.resultPlugin.selectEntities('whole').length) {
+                const backgroundStyle: LiteMol.Bootstrap.Visualization.Molecule.Style<LiteMol.Bootstrap.Visualization.Molecule.BallsAndSticksParams> = {
+                    type: 'BallsAndSticks',
+                    taskType: 'Silent',
+                    params: { useVDW: false, atomRadius: 0.10, bondRadius: 0.05, detail: 'Automatic' },
+                    theme: { template: LiteMol.Bootstrap.Visualization.Molecule.Default.UniformThemeTemplate, colors: LiteMol.Bootstrap.Visualization.Molecule.Default.UniformThemeTemplate.colors!.set('Uniform', { r: 0.2, g: 0.2, b: 0.2 }), transparency: { alpha: 0.1 } },
+                    isNotSelectable: true
+                }
+
+                tQ.add(queryP.context.tree.root, Transformer.Data.FromData, { data: this.moleculeData!.data }, { ref: 'whole' })
+                    .then(Transformer.Data.ParseCif, {})
+                    .then(Transformer.Molecule.CreateFromMmCif, { blockIndex: 0 }, {})
+                    .then(Transformer.Molecule.CreateModel, { modelIndex: 0 }, {})
+                    .then(Transformer.Molecule.CreateVisual, { style: backgroundStyle }, {});
+            }
+
+            tQ.add(queryP.context.tree.root, Transformer.Data.FromData, { data: cif }, { ref: 'selection' })
                 .then(Transformer.Data.ParseCif, {})
                 .then(Transformer.Molecule.CreateFromMmCif, { blockIndex: 0 }, {})
                 .then(Transformer.Molecule.CreateModel, { modelIndex: 0 }, {})
                 .then(Transformer.Molecule.CreateVisual, { style: LiteMol.Bootstrap.Visualization.Molecule.Default.ForType.get('BallsAndSticks') }, {});
+
             queryP.applyTransform(tQ);
         } catch (e) {
             console.error(e);

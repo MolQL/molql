@@ -5,70 +5,44 @@
 import LiteMol from 'litemol'
 import State from './state'
 import * as React from 'react'
-import AceEditor from 'react-ace'
 import Expression from '../mini-lisp/expression'
 import lispFormat from '../reference-implementation/mini-lisp/formatter'
 import getDocs from '../reference-implementation/mol-ql/markdown-docs'
 import Language, { Example } from './languages/language'
 import Languages from './languages'
 import * as ReactMarkdown from 'react-markdown'
-
-import 'brace/mode/jsx';
-import 'brace/mode/lisp';
-import 'brace/mode/json';
-import 'brace/mode/javascript';
-import 'brace/snippets/javascript';
-import 'brace/snippets/json';
-import 'brace/snippets/lisp';
-import 'brace/ext/language_tools';
+import QueryEditor from './query-editor'
 
 import Rx = LiteMol.Core.Rx
 
-
-
-export class _Root extends React.Component<{ state: State }, { }> {
-    render() {
-        return <div style={{ position: 'absolute', top: 0, right: 0, left: 0, bottom: 0 }}>
-            <div style={{ position: 'absolute', top: 0, right: '440px', left: 0, bottom: 0, overflowX: 'hidden', overflowY: 'scroll', padding: '20px' }}>
-                <MolQL {...this.props} />
-            </div>
-            <div className='docs' style={{ position: 'absolute', top: 0, right: 0, bottom: 0, overflowX: 'auto', maxWidth: '400px', width: '400px', padding: '20px' }}>
-                <h1 style={{ fontWeight: 'bold', color: '#ccaa99', textAlign: 'center' }}>Language Reference</h1>
-                <hr />
-                <ReactMarkdown source={getDocs(false)} />
-            </div>
-        </div>
-    }
-}
-
 export default class Root extends React.Component<{ state: State }, { }> {
     render() {
-        const col1 = '37%', col2 = '37%', col12 = '74%', col3 = '26%';
+        const col1 = '37%', col2 = '37%', col12 = '74%', col3 = '26%', heightTop = '45%', heightBottom = '55%';
         return <div style={{ position: 'absolute', top: 0, right: 0, left: 0, bottom: 0, overflow: 'hidden' }}>
-            <div className='layout-box' style={{position: 'absolute', top: 0, left: 0, width: col1, height: '50%', overflowX: 'hidden', overflowY: 'hidden' }}>
+            <div className='layout-box' style={{position: 'absolute', top: 0, left: 0, width: col1, height: heightTop, overflowX: 'hidden', overflowY: 'hidden' }}>
                 <LanguageSelection {...this.props} />
                 <OffsetBox><QueryExpression {...this.props} /></OffsetBox>
             </div>
-            <div className='layout-box' style={{ position: 'absolute', top: 0, left: col1, width: col2, height: '50%', overflowX: 'hidden', overflowY: 'hidden' }}>
+            <div className='layout-box' style={{ position: 'absolute', top: 0, left: col1, width: col2, height: heightTop, overflowX: 'hidden', overflowY: 'hidden' }}>
                 <select className='u-full-width' onChange={e => this.props.state.compileTarget.onNext(e.target.value as any) }>
                     <option value='lisp'>Compiled: LISP-like</option>
                     <option value='json'>Compiled: JSON</option>
                 </select>
                 <OffsetBox><CompiledQuery {...this.props} /></OffsetBox>
             </div>
-            <div className='layout-box' style={{ position: 'absolute', top: 0, left: col12, width: col3, height: '50%', overflowX: 'hidden', overflowY: 'hidden' }}>
+            <div className='layout-box' style={{ position: 'absolute', top: 0, left: col12, width: col3, height: heightTop, overflowX: 'hidden', overflowY: 'hidden' }}>
                 <div style={{ textAlign: 'center', fontSize: '30px', lineHeight: '60px', position: 'absolute', left: 0, right: 0, bottom: 20, top: 0, height: 60, color: 'rgb(250,250,250)' }}>MolQL Language Reference</div>
                 <OffsetBox className='docs'><ReactMarkdown source={getDocs(false)} /></OffsetBox>
             </div>
-            <div className='layout-box' style={{ position: 'absolute', top: '50%', left: 0, width: col1, height: '50%', overflowX: 'hidden', overflowY: 'hidden' }}>                
+            <div className='layout-box' style={{ position: 'absolute', top: heightTop, left: 0, width: col1, height: heightBottom, overflowX: 'hidden', overflowY: 'hidden' }}>
                 <LoadMolecule {...this.props} />
-                <OffsetBox><Plugin {...this.props} isMain={true} /></OffsetBox>
+                <OffsetBox><LiteMolPlugin {...this.props} isMain={true} /></OffsetBox>
             </div>
-            <div className='layout-box' style={{ position: 'absolute', top: '50%', left: col1, width: col2, height: '50%', overflowX: 'hidden', overflowY: 'hidden' }}>
+            <div className='layout-box' style={{ position: 'absolute', top: heightTop, left: col1, width: col2, height: heightBottom, overflowX: 'hidden', overflowY: 'hidden' }}>
                 <ExecuteQuery {...this.props} />
-                <OffsetBox><Plugin {...this.props} isMain={false} /></OffsetBox>
+                <OffsetBox><LiteMolPlugin {...this.props} isMain={false} /></OffsetBox>
             </div>
-            <div className='layout-box' style={{ position: 'absolute', top: '50%', left: col12, width: col3, height: '50%', overflowX: 'hidden', overflowY: 'hidden' }}>
+            <div className='layout-box' style={{ position: 'absolute', top: heightTop, left: col12, width: col3, height: heightBottom, overflowX: 'hidden', overflowY: 'hidden' }}>
                 <div style={{ textAlign: 'center', fontSize: '30px', lineHeight: '60px', position: 'absolute', left: 0, right: 0, bottom: 20, top: 0, height: 60, color: 'rgb(250,250,250)' }}>Query Result</div>
                 <OffsetBox><QueryResult {...this.props} /></OffsetBox>
             </div>
@@ -123,11 +97,11 @@ class LanguageSelection extends Observer<{ state: State}, { language: Language, 
     }
 }
 
-class Plugin extends React.Component<{ state: State, isMain: boolean }, {}> {
+class LiteMolPlugin extends React.Component<{ state: State, isMain: boolean }, {}> {
     private target: HTMLDivElement;
 
     componentDidMount() {
-        const plugin = LiteMol.Plugin.create({ target: this.target, layoutState: { hideControls: true }, viewportBackground: '#fffefd' });
+        const plugin = LiteMol.Plugin.create({ target: this.target, layoutState: { hideControls: true, collapsedControlsLayout: LiteMol.Bootstrap.Components.CollapsedControlsLayout.Landscape }, viewportBackground: '#F1F1F1' });
         if (this.props.isMain) this.props.state.fullPlugin = plugin;
         else this.props.state.resultPlugin = plugin;
     }
@@ -174,28 +148,20 @@ class ExecuteQuery extends Observer<{ state: State }, { loaded: boolean, queryOk
     render() {
         const isOk = this.state.loaded && this.state.queryOk;
         return <div className='row'>
-            <button className={`u-full-width ${isOk ? 'button-primary' : ''}`} onClick={() => this.props.state.execute()} disabled={!isOk}>Execute Query</button>
+            <button className={`u-full-width ${isOk ? 'button-primary' : ''}`} onClick={() => this.props.state.execute()} disabled={!isOk}>Execute Query (Ctrl/Cmd + Enter)</button>
         </div>;
     }
 }
 
 class QueryExpression extends Observer<{ state: State }, { queryString: string }> {
     state = { queryString: '' }
-    //editor: AceEditor
     componentDidMount() {
         this.subscribe(this.props.state.queryString, queryString => {
             if (this.state.queryString !== queryString) this.setState({ queryString });
         });
     }
     render() {
-        return <AceEditor
-            onChange={v => this.props.state.queryString.onNext(v)}
-            mode={this.props.state.currentLanguage.getValue().language.editorMode}
-            width={'100%'}
-            height={'100%'}
-            value={this.state.queryString}
-            setOptions={{ enableBasicAutocompletion: true, enableLiveAutocompletion: true, enableSnippets: true }} 
-        />;
+        return <QueryEditor value={this.state.queryString} onEdit={v => this.props.state.queryString.onNext(v)} onExecute={() => this.props.state.execute()} />
     }
 }
 
@@ -236,7 +202,7 @@ class QueryResult extends Observer<{ state: State }, { content: string, isError:
         });
     }
     render() {
-        return <pre style={{ position: 'absolute', left: 0, right: 0, bottom: 0, top: 0, background: 'white', margin: 0, padding: '10px', color: this.state.isError ? 'red' : void 0  }}>
+        return <pre style={{ position: 'absolute', left: 0, right: 0, bottom: 0, top: 0, background: 'white', margin: 0, padding: '10px', color: this.state.isError ? 'red' : void 0, backgroundColor: '#F1F1F1' }}>
             {this.state.content}
         </pre>;
     }

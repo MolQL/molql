@@ -41,3 +41,5 @@
     background: rgb(33,33,33);
     padding: 10px
 }
+
+.CodeMirror { height: 100%; }
