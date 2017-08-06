@@ -1,19 +1,43 @@
+* {
+    box-sizing: border-box;
+}
+
+
 .docs h1 {
     font-size: 16pt;
+    margin-bottom: 6px;
+    font-weight: bold;
 }
 
 .docs h2 {
     font-size: 14pt;
+    margin-top: 18px;
+    margin-bottom: 6px;
+    font-weight: bold;
 }
 
 .docs h3 {
     font-size: 13pt;
+    margin-bottom: 6px;
+}
+
+.docs hr {
+    margin: 12px 0;
+}
+
+.docs pre, p {
+    margin: 12px 0;
 }
 
 .docs {
-    background: #fefdfc;
+    background: white;
     font-size: 9pt;
     word-wrap: break-word;
-    max-width: 100%;
-    width: 100%;
+    overflow-x: auto;
+    padding: 10px;
+}
+
+.layout-box {
+    background: rgb(33,33,33);
+    padding: 10px
 }

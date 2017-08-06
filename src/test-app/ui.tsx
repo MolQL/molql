@@ -26,46 +26,59 @@ import Rx = LiteMol.Core.Rx
 
 
 
-export default class Root extends React.Component<{ state: State }, { }> {
+export class _Root extends React.Component<{ state: State }, { }> {
     render() {
         return <div style={{ position: 'absolute', top: 0, right: 0, left: 0, bottom: 0 }}>
             <div style={{ position: 'absolute', top: 0, right: '440px', left: 0, bottom: 0, overflowX: 'hidden', overflowY: 'scroll', padding: '20px' }}>
                 <MolQL {...this.props} />
             </div>
             <div className='docs' style={{ position: 'absolute', top: 0, right: 0, bottom: 0, overflowX: 'auto', maxWidth: '400px', width: '400px', padding: '20px' }}>
+                <h1 style={{ fontWeight: 'bold', color: '#ccaa99', textAlign: 'center' }}>Language Reference</h1>
+                <hr />
                 <ReactMarkdown source={getDocs(false)} />
             </div>
         </div>
     }
 }
 
-class MolQL extends React.Component<{ state: State }, { }> {
+export default class Root extends React.Component<{ state: State }, { }> {
     render() {
-        return <div style={{ width: '100%' }}>
-            <div className='row'>
-                <div className='six columns'>
-                    <LanguageSelection {...this.props} />
-                    <QueryExpression {...this.props} />
-                </div>
-                <div className='six columns'>
-                    <select className='u-full-width' onChange={e => this.props.state.compileTarget.onNext(e.target.value as any) }>
-                        <option value='lisp'>Compiled: LISP-like</option>
-                        <option value='json'>Compiled: JSON</option>
-                    </select>
-                    <CompiledQuery {...this.props} />
-                </div>
+        const col1 = '37%', col2 = '37%', col12 = '74%', col3 = '26%';
+        return <div style={{ position: 'absolute', top: 0, right: 0, left: 0, bottom: 0, overflow: 'hidden' }}>
+            <div className='layout-box' style={{position: 'absolute', top: 0, left: 0, width: col1, height: '50%', overflowX: 'hidden', overflowY: 'hidden' }}>
+                <LanguageSelection {...this.props} />
+                <OffsetBox><QueryExpression {...this.props} /></OffsetBox>
             </div>
-            <QueryControls {...this.props} />
-            <div className='row' style={{ marginTop: 15 }}>
-                <Plugin {...this.props} isMain={true} />
-                <Plugin {...this.props} isMain={false} />
+            <div className='layout-box' style={{ position: 'absolute', top: 0, left: col1, width: col2, height: '50%', overflowX: 'hidden', overflowY: 'hidden' }}>
+                <select className='u-full-width' onChange={e => this.props.state.compileTarget.onNext(e.target.value as any) }>
+                    <option value='lisp'>Compiled: LISP-like</option>
+                    <option value='json'>Compiled: JSON</option>
+                </select>
+                <OffsetBox><CompiledQuery {...this.props} /></OffsetBox>
             </div>
-            <div className='row' style={{ marginTop: 15 }}>
-                <h3>Query result in mmCIF</h3>
-                <QueryResult {...this.props} />
+            <div className='layout-box' style={{ position: 'absolute', top: 0, left: col12, width: col3, height: '50%', overflowX: 'hidden', overflowY: 'hidden' }}>
+                <div style={{ textAlign: 'center', fontSize: '30px', lineHeight: '60px', position: 'absolute', left: 0, right: 0, bottom: 20, top: 0, height: 60, color: 'rgb(250,250,250)' }}>MolQL Language Reference</div>
+                <OffsetBox className='docs'><ReactMarkdown source={getDocs(false)} /></OffsetBox>
             </div>
-        </div>;
+            <div className='layout-box' style={{ position: 'absolute', top: '50%', left: 0, width: col1, height: '50%', overflowX: 'hidden', overflowY: 'hidden' }}>                
+                <LoadMolecule {...this.props} />
+                <OffsetBox><Plugin {...this.props} isMain={true} /></OffsetBox>
+            </div>
+            <div className='layout-box' style={{ position: 'absolute', top: '50%', left: col1, width: col2, height: '50%', overflowX: 'hidden', overflowY: 'hidden' }}>
+                <ExecuteQuery {...this.props} />
+                <OffsetBox><Plugin {...this.props} isMain={false} /></OffsetBox>
+            </div>
+            <div className='layout-box' style={{ position: 'absolute', top: '50%', left: col12, width: col3, height: '50%', overflowX: 'hidden', overflowY: 'hidden' }}>
+                <div style={{ textAlign: 'center', fontSize: '30px', lineHeight: '60px', position: 'absolute', left: 0, right: 0, bottom: 20, top: 0, height: 60, color: 'rgb(250,250,250)' }}>Query Result</div>
+                <OffsetBox><QueryResult {...this.props} /></OffsetBox>
+            </div>
+        </div>
     }
+}
+
+function OffsetBox(props: { children: JSX.Element, className?: string }) {
+    const padding = '0';
+    return <div className={props.className} style={{ position: 'absolute', left: padding, right: padding, bottom: padding, top: '60px' }}>{props.children}</div>
 }
 
 class Observer<S, P> extends React.Component<S, P> {
@@ -114,20 +127,39 @@ class Plugin extends React.Component<{ state: State, isMain: boolean }, {}> {
     private target: HTMLDivElement;
 
     componentDidMount() {
-        const plugin = LiteMol.Plugin.create({ target: this.target, layoutState: { hideControls: true }, viewportBackground: '#fcfbfa' });
+        const plugin = LiteMol.Plugin.create({ target: this.target, layoutState: { hideControls: true }, viewportBackground: '#fffefd' });
         if (this.props.isMain) this.props.state.fullPlugin = plugin;
         else this.props.state.resultPlugin = plugin;
     }
 
     render() {
-        return <div className='six columns'>
-            {/* <h3>{this.props.isMain ? 'Full Structure' : 'Selection'}</h3> */}
-            <div style={{ position: 'relative', height: 400 }} ref={ref => this.target = ref!} />
-        </div>
+        return <div style={{ position: 'absolute',  top: 0, right: 0, left: 0, bottom: 0 }} ref={ref => this.target = ref!} />
     }
 }
 
-class QueryControls extends Observer<{ state: State }, { loaded: boolean, queryOk: boolean }> {
+class LoadMolecule extends Observer<{ state: State }, { }> {
+    componentDidMount() {
+        this.subscribe(this.props.state.loaded, loaded => {
+            this.setState({ loaded });
+        });
+        this.subscribe(this.props.state.query, query => {
+            this.setState({ queryOk: query.kind === 'ok' });
+        });
+    }
+
+    render() {
+        return <div className='row'>
+            <div className='six columns'>
+                 <input className='u-full-width' type='text' placeholder='PDB id...' defaultValue={this.props.state.pdbId} onChange={e => this.props.state.pdbId = e.target.value }  />
+            </div>
+            <div className='six columns'>
+                <button className='u-full-width button-primary' onClick={() => this.props.state.loadMolecule()}>Load Molecule</button>
+            </div>
+        </div>;
+    }
+}
+
+class ExecuteQuery extends Observer<{ state: State }, { loaded: boolean, queryOk: boolean }> {
     state = { loaded: false, queryOk: false }
 
     componentDidMount() {
@@ -141,16 +173,8 @@ class QueryControls extends Observer<{ state: State }, { loaded: boolean, queryO
 
     render() {
         const isOk = this.state.loaded && this.state.queryOk;
-        return <div className='row' style={{ marginTop: 15 }}>
-            <div className='three columns'>
-                 <input className='u-full-width' type='text' placeholder='PDB id...' defaultValue={this.props.state.pdbId} onChange={e => this.props.state.pdbId = e.target.value }  />
-            </div>
-            <div className='three columns'>
-                <button className='u-full-width button-primary' onClick={() => this.props.state.loadMolecule()}>Load Molecule</button>
-            </div>
-            <div className='six columns'>
-                <button className={`u-full-width ${isOk ? 'button-primary' : ''}`} onClick={() => this.props.state.execute()} disabled={!isOk}>Execute</button>
-            </div>
+        return <div className='row'>
+            <button className={`u-full-width ${isOk ? 'button-primary' : ''}`} onClick={() => this.props.state.execute()} disabled={!isOk}>Execute Query</button>
         </div>;
     }
 }
@@ -168,7 +192,7 @@ class QueryExpression extends Observer<{ state: State }, { queryString: string }
             onChange={v => this.props.state.queryString.onNext(v)}
             mode={this.props.state.currentLanguage.getValue().language.editorMode}
             width={'100%'}
-            height={'320px'}
+            height={'100%'}
             value={this.state.queryString}
             setOptions={{ enableBasicAutocompletion: true, enableLiveAutocompletion: true, enableSnippets: true }} 
         />;
@@ -189,29 +213,31 @@ class CompiledQuery extends Observer<{ state: State }, { error?: string, express
     }
 
     render() {
+        let content = '';
         if (this.state.error) {
-            return <pre style={{ margin: 0, height: 320, maxHeight: 320, color: 'red' }}>
-                {this.state.error}
-            </pre>;
+            content = '' + this.state.error;
+        } else {
+            content = this.state.expression
+                ? this.state.target === 'lisp' ? lispFormat(this.state.expression!) : JSON.stringify(this.state.expression, null, 2)
+                : 'Enter query...';
         }
-        return <pre style={{ margin: 0, height: 320, maxHeight: 320 }}>
-            {this.state.expression
-                ? this.state.target === 'lisp' ? lispFormat(this.state.expression!) : JSON.stringify(this.state.expression, null, 2) 
-                : 'Enter query...'}
+
+        return <pre style={{ position: 'absolute', left: 0, right: 0, bottom: 0, top: 0, background: 'white', margin: 0, padding: '10px', color: this.state.error ? 'red' : void 0 }}>
+            {content}
         </pre>
     }
 }
 
-class QueryResult extends Observer<{ state: State }, { cif: string }> {
-    state = { cif: '' }
+class QueryResult extends Observer<{ state: State }, { content: string, isError: boolean }> {
+    state = { content: '', isError: false }
     componentDidMount() {
-        this.subscribe(this.props.state.queryResultCIF, cif => {
-            this.setState({ cif });
+        this.subscribe(this.props.state.queryResult, ({ content, kind }) => {
+            this.setState({ content, isError: kind === 'error' });
         });
     }
     render() {
-        return <pre style={{ margin: 0, height: 320, maxHeight: 320 }}>
-            {this.state.cif}
+        return <pre style={{ position: 'absolute', left: 0, right: 0, bottom: 0, top: 0, background: 'white', margin: 0, padding: '10px', color: this.state.isError ? 'red' : void 0  }}>
+            {this.state.content}
         </pre>;
     }
 }

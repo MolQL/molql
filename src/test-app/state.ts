@@ -43,13 +43,13 @@ class State {
     moleculeData: MoleculeData | undefined = void 0;
     loaded = new Rx.BehaviorSubject<boolean>(false);
 
-    queryResultCIF = new Rx.BehaviorSubject<string>('');
+    queryResult = new Rx.BehaviorSubject<{ kind: 'content' | 'error', content: string }>({ kind: 'content', content: 'No query executed yet...'});
 
     async loadMolecule() {
         try {
             this.fullPlugin.clear();
             this.resultPlugin.clear();
-            this.queryResultCIF.onNext('');
+            this.queryResult.onNext({ kind: 'content', content: 'No query executed yet...'});
 
             const data = await LiteMol.Bootstrap.Utils.ajaxGetString(`https://webchem.ncbr.muni.cz/CoordinateServer/${this.pdbId}/full`).run(this.fullPlugin.context);
 
@@ -74,7 +74,7 @@ class State {
     execute() {
         try {
             this.resultPlugin.clear();
-            this.queryResultCIF.onNext('');
+            this.queryResult.onNext({ kind: 'content', content: 'No query executed yet...'});
 
             const query = this.query.getValue();
             if (query.kind !== 'ok') return;
@@ -85,7 +85,7 @@ class State {
             const res = query.compiled(ctx);
             const cif = mmCIFwriter(model, AtomSet.atomIndices(AtomSelection.toAtomSet(res)));
 
-            this.queryResultCIF.onNext(cif);
+            this.queryResult.onNext({ kind: 'content', content: cif });
 
             const queryP = this.resultPlugin;
             const tQ = queryP.createTransform();
@@ -96,7 +96,8 @@ class State {
                 .then(Transformer.Molecule.CreateVisual, { style: LiteMol.Bootstrap.Visualization.Molecule.Default.ForType.get('BallsAndSticks') }, {});
             queryP.applyTransform(tQ);
         } catch (e) {
-            this.queryResultCIF.onNext(`Error: ${e}`);
+            console.error(e);
+            this.queryResult.onNext({ kind: 'error', content: '' + e.message });
         }
     }
 
@@ -116,7 +117,7 @@ class State {
     }
 
     constructor() {
-        this.queryString.distinctUntilChanged().debounce(350).subscribe(s => this.parseQuery(s));
+        this.queryString.distinctUntilChanged().debounce(100).subscribe(s => this.parseQuery(s));
         this.currentLanguage.subscribe(l => this.queryString.onNext(l.example ? l.example.value : ''));
     }
 }
