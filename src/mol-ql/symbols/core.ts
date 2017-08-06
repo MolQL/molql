@@ -10,10 +10,10 @@ export namespace Types {
     export type List = { [index: string]: any, [index: number]: any, length: number }
     export type Set = { has(e: any): boolean }
     export type Map = { has(key: any): boolean, get(key: any): any }
-    export const List = Type<List>('List', Type.Any);
-    export const Set = Type<Set>('Set', Type.Any);
-    export const Map = Type<Map>('Map', Type.Any);
-    export const Regex = Type<RegExp>('Regex', Type.Any);
+    export const List = Type<List>('Core', 'List', Type.Any);
+    export const Set = Type<Set>('Core', 'Set', Type.Any);
+    export const Map = Type<Map>('Core', 'Map', Type.Any);
+    export const Regex = Type<RegExp>('Core', 'Regex', Type.Any);
 }
 
 function unaryOp<T extends Type>(type: T, description?: string) {
@@ -21,11 +21,14 @@ function unaryOp<T extends Type>(type: T, description?: string) {
 }
 
 function binOp<T extends Type>(type: T, description?: string) {
-    return symbol(Arguments.List(type), type, description);
+    return symbol(Arguments.List(type, { nonEmpty: true }), type, description);
 }
 
 function binRel<A extends Type, T extends Type>(src: A, target: T, description?: string) {
-    return symbol(Arguments.Dictionary({ 0: Argument(src), 1: Argument(src) }), target, description);
+    return symbol(Arguments.Dictionary({
+        0: Argument(src, { typeName: 'x' }),
+        1: Argument(src, { typeName: 'x' })
+    }), target, description);
 }
 
 const type = {

@@ -99,14 +99,14 @@ core.logic.not :: array [
 ### **and**
 ```
 core.logic.and :: array [
-  Bool*
+  Bool+
 ] => Bool
 ```
 
 ### **or**
 ```
 core.logic.or :: array [
-  Bool*
+  Bool+
 ] => Bool
 ```
 
@@ -130,21 +130,21 @@ core.ctrl.if :: array [
 ### **add**
 ```
 core.math.add :: array [
-  Number*
+  Number+
 ] => Number
 ```
 
 ### **sub**
 ```
 core.math.sub :: array [
-  Number*
+  Number+
 ] => Number
 ```
 
 ### **mult**
 ```
 core.math.mult :: array [
-  Number*
+  Number+
 ] => Number
 ```
 
@@ -167,14 +167,14 @@ core.math.pow :: array [
 ### **min**
 ```
 core.math.min :: array [
-  Number*
+  Number+
 ] => Number
 ```
 
 ### **max**
 ```
 core.math.max :: array [
-  Number*
+  Number+
 ] => Number
 ```
 
@@ -375,7 +375,7 @@ core.rel.in-range :: array [
 ### **concat**
 ```
 core.str.concat :: array [
-  String*
+  String+
 ] => String
 ```
 

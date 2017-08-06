@@ -128,8 +128,8 @@ function assignKeysAndDataIndices(model: Model) {
     for (let i = 0; i < entity.rowCount; i++) entityDataIndexMap.set(entity.id.getString(i) || '', i);
 
     const entityMap = FastMap.create<string, number>(), entityCounter = { index: 0 };
-    const chainMaps = FastMap.create<number, FastMap<string, number>>(), chainCounter = { index: 0 };;
-    const residueMaps = FastMap.create<number, FastMap<string, number>>(), residueCounter = { index: 0 };;
+    const chainMaps = FastMap.create<number, FastMap<string, number>>(), chainCounter = { index: 0 };
+    const residueMaps = FastMap.create<number, FastMap<string, number>>(), residueCounter = { index: 0 };
 
     const { dataIndex } = model.atoms;
     const { key: residueKey, atomStartIndex } = model.residues;

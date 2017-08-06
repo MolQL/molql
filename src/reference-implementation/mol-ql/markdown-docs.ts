@@ -25,7 +25,7 @@ Language Reference
 
     function formatArgs(args: Arguments) {
         if (args.kind === 'list') {
-            return `array [\n  ${args.type.name}*\n]`;
+            return `array [\n  ${args.type.name}${args.nonEmpty ? '+' : '*'}\n]`;
         }
         const map = args.map;
         const keys = Object.keys(map);
@@ -102,6 +102,6 @@ export default function getDocs(includeToC = true) {
     return md;
 }
 
-if (typeof process !== undefined && process.argv[2] === '-print') {
+if (typeof process !== void 0 && process.argv[2] === '-print') {
     console.log(getDocs());
 }

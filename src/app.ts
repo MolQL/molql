@@ -10,6 +10,8 @@ import parseCIF from './reference-implementation/molecule/parser'
 import compile from './reference-implementation/mol-ql/compiler'
 import mmCIFwriter from './reference-implementation/molecule/writer'
 import Context from './reference-implementation/mol-ql/runtime/context'
+import typeCheck from './reference-implementation/mini-lisp/type-checker'
+import { SymbolMap } from './mol-ql/symbols'
 import B from './mol-ql/builder'
 
 // const a = AtomSet([1,5,7])
@@ -44,6 +46,9 @@ function run(model: Model) {
         }),
         'max-distance': 5
     });
+
+    //console.log('check');
+    typeCheck(SymbolMap, B.struct.type.elementSymbol([1]));
 
     const compiled = compile(query);
     const ctx = Context.ofModel(model);

@@ -69,7 +69,7 @@ class Writer {
 
 function _format(e: Expression, writer: Writer) {
     if (isLiteral(e)) {
-        if (typeof e === 'string' && /\s/.test(e)) writer.append(`\`${e}\``);
+        if (typeof e === 'string' && (/\s/.test(e) || !e.length)) writer.append(`\`${e}\``);
         else writer.append(`${e}`);
         return;
     }

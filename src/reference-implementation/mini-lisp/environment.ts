@@ -2,14 +2,14 @@
  * Copyright (c) 2017 David Sehnal, licensed under MIT, See LICENSE file for more info.
  */
 
-import { SymbolTable } from './symbol'
+import { SymbolRuntimeTable } from './symbol'
 
 interface Environment<T = any> {
-    readonly symbolTable: SymbolTable,
+    readonly symbolTable: SymbolRuntimeTable,
     readonly context: T
 }
 
-function Environment<T>(symbolTable: SymbolTable, context: T): Environment<T> {
+function Environment<T>(symbolTable: SymbolRuntimeTable, context: T): Environment<T> {
     return { symbolTable, context };
 }
 

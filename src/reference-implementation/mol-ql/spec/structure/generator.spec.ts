@@ -4,7 +4,6 @@
 
 import 'jasmine'
 
-//import AtomSet from '../../data/atom-set'
 import AtomSelection from '../../data/atom-selection'
 import B from '../../../../mol-ql/builder'
 import * as Data from '../data'

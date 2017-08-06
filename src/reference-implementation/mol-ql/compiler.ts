@@ -5,6 +5,7 @@
 import Compiler, { CompiledExpression } from '../mini-lisp/compiler'
 import Context from './runtime/context'
 import Runtime from './symbols'
+import { SymbolMap } from '../../mol-ql/symbols'
 
 export type Compiled<T = any> = CompiledExpression<Context, T>
-export default Compiler<Context>(Runtime)
+export default Compiler<Context>(SymbolMap, Runtime)

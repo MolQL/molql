@@ -5,10 +5,17 @@
 import Type from './type'
 import Expression from './expression'
 
-export type Argument<T extends Type>  = { type: T, isOptional: boolean, isRest: boolean, defaultValue: T['@type'] | undefined, description: string | undefined }
-export function Argument<T extends Type>(type: T, params?: { description?: string, defaultValue?: T['@type'], isOptional?: boolean, isRest?: boolean }): Argument<T> {
-    const { description = void 0, isOptional = false, isRest = false, defaultValue = void 0 } = params || {}
-    return { type, isOptional, isRest, defaultValue, description };
+export type Argument<T extends Type = Type>  = {
+    type: T,
+    typeName: string | undefined,
+    isOptional: boolean,
+    isRest: boolean,
+    defaultValue: T['@type'] | undefined,
+    description: string | undefined
+}
+export function Argument<T extends Type>(type: T, params?: { description?: string, defaultValue?: T['@type'], isOptional?: boolean, isRest?: boolean, typeName?: string }): Argument<T> {
+    const { description = void 0, isOptional = false, isRest = false, defaultValue = void 0, typeName = void 0 } = params || {}
+    return { type, typeName, isOptional, isRest, defaultValue, description };
 }
 
 export type Arguments<T extends { [key: string]: any } = {}> =
@@ -27,9 +34,16 @@ export namespace Arguments {
         return { kind: 'dictionary', map, '@type': 0 as any };
     }
 
-    export interface List<T extends { [key: string]: any } = {}, Traits = {}> { kind: 'list', type: Type, '@type': T }
-    export function List<T extends Type>(type: T, description?: string): Arguments<{ [key: string]: T['@type'] }> {
-        return { kind: 'list', type, '@type': 0 as any };
+    export interface List<T extends { [key: string]: any } = {}, Traits = {}> {
+        kind: 'list',
+        type: Type,
+        nonEmpty: boolean,
+        '@type': T
+    }
+
+    export function List<T extends Type>(type: T, params?: { nonEmpty?: boolean }): Arguments<{ [key: string]: T['@type'] }> {
+        const { nonEmpty = false } = params || { }
+        return { kind: 'list', type, nonEmpty, '@type': 0 as any };
     }
 }
 
@@ -62,6 +76,8 @@ export function isSymbol(x: any): x is Symbol {
     const s = x as Symbol;
     return typeof s === 'function' && !!s.info && !!s.args && typeof s.info.namespace === 'string' && !!s.type;
 }
+
+export type SymbolMap = { [id: string]: Symbol | undefined }
 
 export default Symbol
 

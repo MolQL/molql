@@ -3,7 +3,7 @@
  */
 
 import MolQL from '../../mol-ql/symbols'
-import Symbol, { SymbolTable } from '../mini-lisp/symbol'
+import Symbol, { SymbolRuntimeTable } from '../mini-lisp/symbol'
 import { isSymbol } from '../../mini-lisp/symbol'
 import { FastSet, FastMap } from '../utils/collections'
 import Context from './runtime/context'
@@ -245,7 +245,7 @@ const table = (function() {
         }
         ret[r.symbol.id] = r;
     }
-    return ret as SymbolTable;
+    return ret as SymbolRuntimeTable;
 })();
 
 export default table

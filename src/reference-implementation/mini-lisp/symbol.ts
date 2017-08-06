@@ -28,6 +28,6 @@ function SymbolRuntime<S extends Symbol>(symbol: S, attributes: Partial<SymbolRu
     };
 }
 
-export type SymbolTable = { readonly [id: string]: SymbolRuntime.Info }
+export type SymbolRuntimeTable = { readonly [id: string]: SymbolRuntime.Info }
 
 export default SymbolRuntime

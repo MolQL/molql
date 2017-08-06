@@ -19,7 +19,7 @@ interface AtomSetImpl extends AtomSet {
 }
 
 function AtomSetImpl(indices: ArrayLike<number>): AtomSetImpl {
-    return { 
+    return {
         atomIndices: indices as ReadonlyArray<number>,
         hashCode: 0,
         hashCodeComputed: false,
