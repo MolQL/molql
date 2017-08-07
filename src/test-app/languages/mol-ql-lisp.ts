@@ -3,15 +3,36 @@
  */
 
 import Language from './language'
-//import transpiler from '../../reference-implementation/transpilers/json'
+import transpiler from '../../reference-implementation/transpilers/mol-ql-lisp/parser'
 
 const lang: Language = {
     name: 'MolQL Lisp',
     editorMode: 'lisp',
-    transpiler: e => { throw 'not implemented' },
+    transpiler,
     examples: [{
-        name: 'Example',
-        value: '(implement-me\n  alex\n  (you-are my only hope))'
+        name: 'Example 1',
+        value: `
+(structure.generator.atom-groups
+  :residue-test (core.rel.eq
+    (structure.atom-property.macromolecular.auth_comp_id)
+    ALA)
+  :atom-test (core.set.has
+    (core.type.set
+      (structure.type.element-symbol C)
+      (structure.type.element-symbol N))
+    (structure.atom-property.core.element-symbol)))`
+    }, {
+        name: 'Example 2',
+        value: `
+(atomGroups
+  :residue-test (eq
+    (mmcif.auth_comp_id)
+    ALA)
+  :atom-test (set.has
+    (make.set
+      (make.elementSymbol C)
+      (make.elementSymbol N))
+    (elementSymbol)))`
     }]
 }
 
