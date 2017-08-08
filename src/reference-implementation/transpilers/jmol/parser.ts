@@ -35,6 +35,27 @@ function atomExpressionQuery (x: any[]) {
 const _ = P.optWhitespace
 const __ = P.whitespace
 
+const opList = [
+  { 
+    // Selects atoms that are not included in s1.
+    type: h.prefix, 
+    rule: P.alt(P.regex(/NOT/i).skip(__), P.string('!').skip(_)), 
+    map: Q.invert 
+  },
+  {
+    // Selects atoms included in both s1 and s2.
+    type: h.binaryLeft, 
+    rule: h.infixOp(/AND|&/i), 
+    map: Q.intersect
+  },
+  { 
+    // Selects atoms included in either s1 or s2.
+    type: h.binaryLeft,
+    rule: h.infixOp(/OR|\|/i),
+    map: Q.merge 
+  }
+]
+
 const lang = P.createLanguage({
   Integer: () => P.regexp(/-?[0-9]+/).map(Number).desc('integer'),
 
@@ -71,19 +92,7 @@ const lang = P.createLanguage({
   },
 
   Operator: function(r) {
-    return h.binaryLeft(
-            r.Or,
-            h.binaryLeft(
-              r.And,
-              h.prefix(
-                r.Not,
-                P.alt(r.Parens, r.Expression),
-                Q.invert
-              ),
-              Q.intersect
-            ),
-            Q.merge
-          )
+    return h.combineOperators(opList, P.alt(r.Parens, r.Expression))
   },
 
   AtomExpression: function(r) {

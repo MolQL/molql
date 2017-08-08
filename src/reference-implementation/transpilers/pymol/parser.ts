@@ -7,6 +7,7 @@ import * as h from '../helper'
 
 import Transpiler from '../transpiler'
 import B from '../../../mol-ql/builder'
+import Expression from '../../../mini-lisp/expression'
 
 const Q = h.QueryBuilder
 
@@ -130,15 +131,147 @@ function orNull(rule: P.Parser<any>) {
   return rule.or(P.of(null))
 }
 
-const not = P.alt(P.regex(/NOT/i).skip(__), P.string('!').skip(_))
-const and = __.then(P.regex(/AND/i).skip(__))
-const or = __.then(P.regex(/OR/i).skip(__))
+
+
+function ofOp (name: string, short?: string) {
+  const op = short ? `${name}|${h.escapeRegExp(short)}` : name
+  const re = RegExp(`(${op})\\s+([-+]?[0-9]*\\.?[0-9]+)\\s+OF`, 'i')
+  return h.infixOp(re, 2).map(parseFloat)
+}
 
 const opList = [
-  { type: h.prefix, rule: not, map: Q.invert },
-  { type: h.binaryLeft, rule: and, map: Q.intersect },
-  { type: h.binaryLeft, rule: or, map: Q.merge }
+  { 
+    // Selects atoms that are not included in s1.
+    type: h.prefix, 
+    rule: P.alt(P.regex(/NOT/i).skip(__), P.string('!').skip(_)), 
+    map: Q.invert 
+  },
+  {
+    // Selects atoms included in both s1 and s2.
+    type: h.binaryLeft, 
+    rule: h.infixOp(/AND|&/i), 
+    map: Q.intersect
+  },
+  { 
+    // Selects atoms included in either s1 or s2.
+    type: h.binaryLeft,
+    rule: h.infixOp(/OR|\|/i),
+    map: Q.merge 
+  },
+  { 
+    // Selects atoms in s1 whose identifiers name, resi, resn, chain and segi 
+    // all match atoms in s2.
+    type: h.binaryLeft, 
+    rule: h.infixOp(/IN/i),
+    map: (op: string, s1: Expression, s2: Expression) => [op, s1, s2]
+  },
+  { 
+    // Selects atoms in s1 whose identifiers name and resi match atoms in s2.
+    type: h.binaryLeft, 
+    rule: h.infixOp(/LIKE|l\./i),
+    map: (op: string, s1: Expression, s2: Expression) => [op, s1, s2]
+  },
+  { 
+    // Selects all atoms whose van der Waals radii are separated from the 
+    // van der Waals radii of s1 by a minimum of X Angstroms.
+    type: h.binaryLeft, 
+    rule: h.infixOp(/GAP/i),
+    map: (op: string, s1: Expression, s2: Expression) => [op, s1, s2]
+  },
+  { 
+    // Selects atoms with centers within X Angstroms of the center of any atom ins1.
+    type: h.binaryLeft, 
+    rule: h.infixOp(/AROUND|a\./i),
+    map: (op: string, s1: Expression, s2: Expression) => [op, s1, s2]
+  },
+  { 
+    // Expands s1 by all atoms within X Angstroms of the center of any atom in s1.
+    type: h.binaryLeft, 
+    rule: h.infixOp(/EXPAND|x\./i),
+    map: (op: string, s1: Expression, s2: Expression) => [op, s1, s2]
+  },
+  { 
+    // Selects atoms in s1 that are within X Angstroms of any atom in s2.
+    type: h.binaryLeft, 
+    rule: ofOp('WITHIN', 'w.'),
+    map: (radius: number, s1: Expression, s2: Expression) => [radius, s1, s2]
+  },
+  { 
+    // Same as within, but excludes s2 from the selection
+    // (and thus is identical to s1 and s2 around X).
+    type: h.binaryLeft, 
+    rule: ofOp('NEAR_TO', 'nto.'),
+    map: (radius: number, s1: Expression, s2: Expression) => [radius, s1, s2]
+  },
+  { 
+    // Selects atoms in s1 that are at least X Anstroms away from s2.
+    type: h.binaryLeft, 
+    rule: ofOp('BEYOND', 'be.'),
+    map: (radius: number, s1: Expression, s2: Expression) => [radius, s1, s2]
+  },
+  { 
+    // Expands selection to complete residues.
+    type: h.prefix, 
+    rule: h.prefixOp(/BYRES|br\./i),
+    map: (op: string, selection: Expression) => [op, selection]
+  },
+  { 
+    // Expands selection to complete molecules.
+    type: h.prefix, 
+    rule: h.prefixOp(/BYMOLECULE|bm\./i),
+    map: (op: string, selection: Expression) => [op, selection]
+  },
+  { 
+    // Expands selection to complete fragments.
+    type: h.prefix, 
+    rule: h.prefixOp(/BYFRAGMENT|bf\./i),
+    map: (op: string, selection: Expression) => [op, selection]
+  },
+  { 
+    // Expands selection to complete segments.
+    type: h.prefix, 
+    rule: h.prefixOp(/BYSEGMENT|bs\./i),
+    map: (op: string, selection: Expression) => [op, selection]
+  },
+  { 
+    // Expands selection to complete objects.
+    type: h.prefix, 
+    rule: h.prefixOp(/BYOBJECT|bo\./i),
+    map: (op: string, selection: Expression) => [op, selection]
+  },
+  { 
+    // Expands selection to unit cell.
+    type: h.prefix, 
+    rule: h.prefixOp(/BYCELL/i),
+    map: (op: string, selection: Expression) => [op, selection]
+  },
+  { 
+    // All rings of size ≤ 7 which have at least one atom in s1
+    type: h.prefix, 
+    rule: h.prefixOp(/BYRING/i),
+    map: (op: string, selection: Expression) => [op, selection]
+  },
+  { 
+    // Selects atoms directly bonded to s1, excludes s1.
+    type: h.prefix, 
+    rule: h.prefixOp(/NEIGHBOUR|nbr\./i),
+    map: (op: string, selection: Expression) => [op, selection]
+  },
+  { 
+    // Selects atoms directly bonded to s1, may include s1.
+    type: h.prefix, 
+    rule: h.prefixOp(/BOUND_TO|bto\./i),
+    map: (op: string, selection: Expression) => [op, selection]
+  },
+  { 
+    // Extends s1 by X bonds connected to atoms in s1.
+    type: h.postfix, 
+    rule: h.postfixOp(/(EXTEND|xt\.)\s+([0-9]+)/i, 2),
+    map: (count: string, selection: Expression) => [count, selection]
+  }
 ]
+
+
 
 function atomSelectionQuery(x: any) {
   const tests: h.AtomGroupArgs = {}
@@ -174,7 +307,9 @@ const lang = P.createLanguage({
   Expression: function(r) {
     return P.alt(
       r.AtomSelectionMacro.map(atomSelectionQuery),
-      r.NamedAtomProperties
+      r.NamedAtomProperties,
+      r.Pepseq,
+      r.Rep
     )
   },
 
@@ -240,21 +375,15 @@ const lang = P.createLanguage({
 
   Object: () => P.regex(/[a-zA-Z0-9+]+/),
 
+  // Selects peptide sequence matching upper-case one-letter
+  // sequence SEQ (see also FindSeq).
+  Pepseq: () => P.regex(/(PEPSEQ|ps\.)\s+([a-z]+)/i, 2),
+
+  // Selects atoms which show representation rep.
+  Rep: () => P.regex(/REP\s+(spheres|lines)/i, 1),
+
   Operator: function(r) {
     return h.combineOperators(opList, P.alt(r.Parens, r.Expression))
-    // return h.binaryLeft(
-    //         r.Or,
-    //         h.binaryLeft(
-    //           r.And,
-    //           h.prefix(
-    //             r.Not,
-    //             P.alt(r.Parens, r.Expression),
-    //             Q.invert
-    //           ),
-    //           Q.intersect
-    //         ),
-    //         Q.merge
-    //       )
   },
 
   Query: function(r) {

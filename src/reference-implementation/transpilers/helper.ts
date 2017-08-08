@@ -27,7 +27,7 @@ export function escapeRegExp(s: String){
 export function prefix(operatorsParser: P.Parser<any>, nextParser: P.Parser<any>, mapFn: any) {
   let parser: P.Parser<any> = P.lazy(() => {
     return P.seq(operatorsParser, parser)
-      .map(mapFn)
+      .map(x => mapFn(...x))
       .or(nextParser)
   })
   return parser
@@ -42,7 +42,7 @@ export function prefix(operatorsParser: P.Parser<any>, nextParser: P.Parser<any>
 // takes the first possible match, even if subsequent matches are longer, so the
 // parser will never actually look far enough ahead to see the postfix
 // operators.
-export function postfix(operatorsParser: P.Parser<any>, nextParser: P.Parser<any>) {
+export function postfix(operatorsParser: P.Parser<any>, nextParser: P.Parser<any>, mapFn: any) {
   // Because we can't use recursion like stated above, we just match a flat list
   // of as many occurrences of the postfix operator as possible, then use
   // `.reduce` to manually nest the list.
@@ -56,7 +56,9 @@ export function postfix(operatorsParser: P.Parser<any>, nextParser: P.Parser<any
     nextParser,
     operatorsParser.many(),
     (x, suffixes) =>
-      suffixes.reduce((acc, x) => [x, acc], x)
+      suffixes.reduce((acc, x) => {
+        return mapFn(x, acc)
+      }, x)
   )
 }
 
@@ -109,8 +111,21 @@ export function combineOperators (opList: any[], rule: P.Parser<any>) {
     (acc, level) => level.type(level.rule, acc, level.map),
     rule
   )
-  console.log(x)
   return x
+}
+
+const __ = P.whitespace
+
+export function infixOp (re: RegExp, group: number = 0) {
+  return __.then(P.regex(re, group).skip(__))
+}
+
+export function prefixOp (re: RegExp, group: number = 0) {
+  return P.regex(re, group).skip(__)
+}
+
+export function postfixOp (re: RegExp, group: number = 0) {
+  return __.then(P.regex(re, group))
 }
 
 export namespace QueryBuilder {
@@ -147,17 +162,17 @@ export namespace QueryBuilder {
     }
   }
 
-  export function invert (x: any) {
+  export function invert (op: string, selection: Expression) {
     return B.struct.generator.querySelection({
-      selection: x[1], query: B.struct.generator.atomGroups(), 'in-complement': true
+      selection, query: B.struct.generator.atomGroups(), 'in-complement': true
     })
   }
 
-  export function merge (op: any, acc: any, another: any) {
+  export function merge (op: string, acc: Expression, another: Expression) {
     return B.struct.combinator.merge([acc, another])
   }
 
-  export function intersect (op: any, acc: any, another: any) {
+  export function intersect (op: string, acc: Expression, another: Expression) {
     return B.struct.modifier.intersectBy({ selection: acc, by: another })
   }
 }
