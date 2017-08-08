@@ -5,12 +5,12 @@
 import LiteMol from 'litemol'
 import Expression from '../mini-lisp/expression'
 import { Model } from '../reference-implementation/molecule/data'
-import AtomSelection from '../reference-implementation/mol-ql/data/atom-selection'
-import AtomSet from '../reference-implementation/mol-ql/data/atom-set'
+import AtomSelection from '../reference-implementation/molql/data/atom-selection'
+import AtomSet from '../reference-implementation/molql/data/atom-set'
 import parseCIF from '../reference-implementation/molecule/parser'
-import compile, { Compiled } from '../reference-implementation/mol-ql/compiler'
+import compile, { Compiled } from '../reference-implementation/molql/compiler'
 import mmCIFwriter from '../reference-implementation/molecule/writer'
-import Context from '../reference-implementation/mol-ql/runtime/context'
+import Context from '../reference-implementation/molql/runtime/context'
 
 import Language, { Example } from './languages/language'
 import Languages from './languages'
@@ -42,6 +42,9 @@ class State {
     pdbId = '1tqn';
     moleculeData: MoleculeData | undefined = void 0;
     loaded = new Rx.BehaviorSubject<boolean>(false);
+
+    currentSymbol = new Rx.BehaviorSubject<string>('');
+    editorActive = new Rx.BehaviorSubject<boolean>(false);
 
     queryResult = new Rx.BehaviorSubject<{ kind: 'content' | 'error', content: string }>({ kind: 'content', content: 'No query executed yet...'});
 

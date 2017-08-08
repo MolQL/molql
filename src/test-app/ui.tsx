@@ -7,21 +7,24 @@ import State from './state'
 import * as React from 'react'
 import Expression from '../mini-lisp/expression'
 import lispFormat from '../reference-implementation/mini-lisp/formatter'
-import getDocs from '../reference-implementation/mol-ql/markdown-docs'
+import getDocs, { formatSymbol } from '../reference-implementation/molql/markdown-docs'
 import Language, { Example } from './languages/language'
 import Languages from './languages'
 import * as ReactMarkdown from 'react-markdown'
 import QueryEditor from './query-editor'
+import * as MolQLLisp from '../reference-implementation/transpilers/molql-lisp/symbols'
 
 import Rx = LiteMol.Core.Rx
 
 export default class Root extends React.Component<{ state: State }, { }> {
     render() {
-        const col1 = '37%', col2 = '37%', col12 = '74%', col3 = '26%', heightTop = '45%', heightBottom = '55%';
+        const col1 = '37%', col2 = '37%', col12 = '74%', col3 = '26%', heightTop = '50%', heightBottom = '50%';
         return <div style={{ position: 'absolute', top: 0, right: 0, left: 0, bottom: 0, overflow: 'hidden' }}>
             <div className='layout-box' style={{position: 'absolute', top: 0, left: 0, width: col1, height: heightTop, overflowX: 'hidden', overflowY: 'hidden' }}>
                 <LanguageSelection {...this.props} />
-                <OffsetBox><QueryExpression {...this.props} /></OffsetBox>
+                <OffsetBox>
+                    <QueryExpression {...this.props} />
+                </OffsetBox>
             </div>
             <div className='layout-box' style={{ position: 'absolute', top: 0, left: col1, width: col2, height: heightTop, overflowX: 'hidden', overflowY: 'hidden' }}>
                 <select className='u-full-width' onChange={e => this.props.state.compileTarget.onNext(e.target.value as any) }>
@@ -29,6 +32,7 @@ export default class Root extends React.Component<{ state: State }, { }> {
                     <option value='json'>Compiled: JSON</option>
                 </select>
                 <OffsetBox><CompiledQuery {...this.props} /></OffsetBox>
+                <QueryHint {...this.props} />
             </div>
             <div className='layout-box' style={{ position: 'absolute', top: 0, left: col12, width: col3, height: heightTop, overflowX: 'hidden', overflowY: 'hidden' }}>
                 <div style={{ textAlign: 'center', fontSize: '30px', lineHeight: '60px', position: 'absolute', left: 0, right: 0, bottom: 20, top: 0, height: 60, color: 'rgb(250,250,250)' }}>MolQL Language Reference</div>
@@ -50,7 +54,7 @@ export default class Root extends React.Component<{ state: State }, { }> {
     }
 }
 
-function OffsetBox(props: { children: JSX.Element, className?: string }) {
+function OffsetBox(props: { children: JSX.Element | JSX.Element[], className?: string }) {
     const padding = '0';
     return <div className={props.className} style={{ position: 'absolute', left: padding, right: padding, bottom: padding, top: '60px' }}>{props.children}</div>
 }
@@ -161,7 +165,39 @@ class QueryExpression extends Observer<{ state: State }, { queryString: string }
         });
     }
     render() {
-        return <QueryEditor value={this.state.queryString} onEdit={v => this.props.state.queryString.onNext(v)} onExecute={() => this.props.state.execute()} />
+        return <QueryEditor
+            mode={this.props.state.currentLanguage.getValue().language.editorMode}
+            value={this.state.queryString}
+            onEdit={v => this.props.state.queryString.onNext(v)}
+            onSymbol={s => this.props.state.currentSymbol.onNext(s)}
+            onActive={a => this.props.state.editorActive.onNext(a)}
+            onExecute={() => this.props.state.execute()} />
+    }
+}
+
+class QueryHint extends Observer<{ state: State }, { isActive: boolean, description: string | undefined, info: string }> {
+    state = { description: '', info: '', isActive: false }
+    componentDidMount() {
+        this.subscribe(this.props.state.editorActive, isActive => this.setState({ isActive: isActive && this.props.state.currentLanguage.getValue().language.editorMode === 'molql-lisp' }));
+        this.subscribe(this.props.state.currentLanguage, lang => this.setState({ isActive: lang.language.editorMode === 'molql-lisp' && this.props.state.editorActive.getValue() }));
+        this.subscribe(this.props.state.currentSymbol.distinctUntilChanged(), symbol => {
+            if (!this.state.isActive) return;
+            const _s = MolQLLisp.SymbolMap[symbol]
+            const symb = _s && _s.symbol;
+            if (symb) this.setState({ description: symb.info.description, info: formatSymbol(symb, symbol) });
+        });
+    }
+    render() {
+        if (!this.state.info || !this.state.isActive) return <div />;
+        return <div style={{ position: 'absolute', left: 0, right: 0, bottom: 0, background: 'white', margin: 0, padding: '10px', fontSize: 'smaller' }}>
+            <div style={{ backgroundColor: '#F1F1F1', border: '1px solid #E1E1E1', borderRadius: '4px', padding: '1rem 1.5rem' }}>
+                <div style={{ float: 'right', fontWeight: 'bold' }}>Symbol Info</div>
+                <pre style={{ whiteSpace: 'pre-wrap', wordWrap: 'break-word', margin: 0 }}>{this.state.info}</pre>
+                {!!this.state.description
+                    ? <div style={{ fontStyle: 'italic', marginTop: '1rem' }}>{this.state.description}</div>
+                    : void 0}
+            </div>
+        </div>;
     }
 }
 

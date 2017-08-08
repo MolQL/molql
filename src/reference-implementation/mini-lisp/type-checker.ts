@@ -50,7 +50,7 @@ function isAssignableTo(symbols: SymbolMap, symbolId: string, exprArgs: Expressi
     } else {
         const keys = Object.keys(args.map);
         if (!exprArgs) {
-            if (keys.length) throwError(`'${symbolId}': argument(s) required.`);
+            if (keys.length && !keys.every(k => ((args.map as any)[k] as Argument).isOptional)) throwError(`'${symbolId}': argument(s) required.`);
             return;
         }
         let isArrayLike = true, i = 0;

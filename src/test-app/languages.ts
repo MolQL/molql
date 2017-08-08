@@ -3,9 +3,9 @@
  */
 
 import json from './languages/json'
-import lisp from './languages/mol-ql-lisp'
+import lisp from './languages/molql-lisp'
 
 export default [
-    json,
-    lisp
+    lisp,
+    json
 ];
