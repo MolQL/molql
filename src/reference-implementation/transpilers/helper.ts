@@ -1,3 +1,6 @@
+/*
+ * Copyright (c) 2017 MolQL contributors. licensed under MIT, See LICENSE file for more info.
+ */
 
 import * as P from 'parsimmon'
 import B from '../../mol-ql/builder'
@@ -99,6 +102,15 @@ export function binaryLeft(operatorsParser: P.Parser<any>, nextParser: P.Parser<
       }, first)
     }
   )
+}
+
+export function combineOperators (opList: any[], rule: P.Parser<any>) {
+  const x = opList.reduce(
+    (acc, level) => level.type(level.rule, acc, level.map),
+    rule
+  )
+  console.log(x)
+  return x
 }
 
 export namespace QueryBuilder {

@@ -1,3 +1,6 @@
+/*
+ * Copyright (c) 2017 MolQL contributors. licensed under MIT, See LICENSE file for more info.
+ */
 
 import * as P from 'parsimmon'
 import * as h from '../helper'
@@ -10,6 +13,9 @@ const Q = h.QueryBuilder
 const _ = P.optWhitespace
 const __ = P.whitespace
 const slash = P.string('/')
+
+const reFloat = /[-+]?[0-9]*\.?[0-9]+/
+const rePosInt = /[0-9]+/
 
 function listMap(x: string) { return x.split('+') }
 function rangeMap(x: string) {
@@ -35,7 +41,7 @@ interface PropertySpec {
 
 const propertiesSpec: { [k: string]: PropertySpec } = {
   symbol: { 
-    short: 'e.', regex: /[a-zA-Z0-9+]+/, map: listMap,
+    short: 'e.', regex: /[a-zA-Z+]+/, map: listMap,
     level: 'atom-test', property: B.acp('elementSymbol')
   },
   name: {
@@ -47,7 +53,7 @@ const propertiesSpec: { [k: string]: PropertySpec } = {
     level: 'residue-test', property: B.ammp('label_comp_id') 
   },
   resi: { 
-    short: 'i.', regex: /[a-zA-Z0-9+-]+/, map: listOrRangeMap, 
+    short: 'i.', regex: /[0-9+-]+/, map: listOrRangeMap, 
     level: 'residue-test', property: B.ammp('label_seq_id') 
   },
   alt: { 
@@ -69,30 +75,30 @@ const propertiesSpec: { [k: string]: PropertySpec } = {
     level: 'atom-test', property: B.acp('elementSymbol')
   },
   id: {
-    short: 'id', regex: /[0-9]+/, map: parseInt,
+    short: 'id', regex: rePosInt, map: parseInt,
     level: 'atom-test', property: B.ammp('id')
   },
-  // index: { short: 'idx.', regex: /[0-9]+/, map: intMap, level: 'atom' },
+  // index: { short: 'idx.', regex: rePosInt, map: intMap, level: 'atom' },
   // ss: { short: 'ss', regex: /[a-zA-Z+]+/, map: listMap, level: 'residue' }
 
   b: { 
     isNumeric: true,
-    short: 'b', regex: /[-+]?[0-9]*\.?[0-9]+/, map: parseFloat,
+    short: 'b', regex: reFloat, map: parseFloat,
     level: 'atom-test', property: B.ammp('B_iso_or_equiv')
   },
   q: { 
     isNumeric: true,
-    short: 'q', regex: /[-+]?[0-9]*\.?[0-9]+/, map: parseFloat,
+    short: 'q', regex: reFloat, map: parseFloat,
     level: 'atom-test', property: B.ammp('occupancy')
   },
   formal_charge: { 
     isNumeric: true,
-    short: 'fc.', regex: /[-+]?[0-9]*\.?[0-9]+/, map: parseFloat,
+    short: 'fc.', regex: reFloat, map: parseFloat,
     level: 'atom-test', property: B.ammp('pdbx_formal_charge')
   },
   // partial_charge: { 
   //   isNumeric: true,
-  //   short: 'pc.', regex: /[-+]?[0-9]*\.?[0-9]+/, map: parseFloat,
+  //   short: 'pc.', regex: reFloat, map: parseFloat,
   //   level: 'atom-test', property: B.acp('partialCharge')
   // }
 }
@@ -124,6 +130,16 @@ function orNull(rule: P.Parser<any>) {
   return rule.or(P.of(null))
 }
 
+const not = P.alt(P.regex(/NOT/i).skip(__), P.string('!').skip(_))
+const and = __.then(P.regex(/AND/i).skip(__))
+const or = __.then(P.regex(/OR/i).skip(__))
+
+const opList = [
+  { type: h.prefix, rule: not, map: Q.invert },
+  { type: h.binaryLeft, rule: and, map: Q.intersect },
+  { type: h.binaryLeft, rule: or, map: Q.merge }
+]
+
 function atomSelectionQuery(x: any) {
   const tests: h.AtomGroupArgs = {}
   const props: {[k: string]: any[]} = {}
@@ -136,7 +152,6 @@ function atomSelectionQuery(x: any) {
     }
     if (x[k] === null) continue
     if (!props[ps.level]) props[ps.level] = []
-    // props[ps.level].push(Q.test(ps.property, x[k]))
     props[ps.level].push(x[k])
   }
 
@@ -225,33 +240,21 @@ const lang = P.createLanguage({
 
   Object: () => P.regex(/[a-zA-Z0-9+]+/),
 
-  Not: () => {
-    return P.alt(
-      P.regex(/NOT/i).skip(__),
-      P.string('!').skip(_)
-    )
-  },
-  And: () => {
-    return __.then(P.regex(/AND/i).skip(__))
-  },
-  Or: () => {
-    return __.then(P.regex(/OR/i).skip(__))
-  },
-
   Operator: function(r) {
-    return h.binaryLeft(
-            r.Or,
-            h.binaryLeft(
-              r.And,
-              h.prefix(
-                r.Not,
-                P.alt(r.Parens, r.Expression),
-                Q.invert
-              ),
-              Q.intersect
-            ),
-            Q.merge
-          )
+    return h.combineOperators(opList, P.alt(r.Parens, r.Expression))
+    // return h.binaryLeft(
+    //         r.Or,
+    //         h.binaryLeft(
+    //           r.And,
+    //           h.prefix(
+    //             r.Not,
+    //             P.alt(r.Parens, r.Expression),
+    //             Q.invert
+    //           ),
+    //           Q.intersect
+    //         ),
+    //         Q.merge
+    //       )
   },
 
   Query: function(r) {
