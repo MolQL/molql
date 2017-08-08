@@ -109,18 +109,18 @@ CodeMirror.defineMode('molql-lisp', (config) => {
                     // else
                     state.ctx.indentTo = 'next';
                 } else if (state.ctx.indentTo === 'next') {
-                    state.ctx.indentTo = stream.column();
+                    state.ctx.indentTo = state.ctx.start; //stream.column();
                 }
                 state.lastType = type;
             }
-            if (type === 'open') state.ctx = { prev: state.ctx, start: stream.column(), indentTo: null };
+            if (type === 'open') state.ctx = { prev: state.ctx, start: state.ctx.start + 2, indentTo: null };
             else if (type === 'close') state.ctx = state.ctx.prev || state.ctx;
             return style;
         },
 
         indent: function (state, _textAfter) {
             //const i = state.ctx.indentTo;
-            return state.ctx.start + 2; //typeof i === 'number' ? i : state.ctx.start + 2;
+            return state.ctx.start; //typeof i === 'number' ? i : state.ctx.start + 2;
         },
 
         closeBrackets: { pairs: '()[]``' },

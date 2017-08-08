@@ -6,7 +6,7 @@
   "scripts": {
     "build": "./node_modules/.bin/tsc",
     "watch": "./node_modules/.bin/tsc -watch",
-    "docs": "node ./build/reference-implementation/mol-ql/markdown-docs.js -print > ./docs/language-reference.md",
+    "docs": "node ./build/reference-implementation/molql/markdown-docs.js -print > ./docs/language-reference.md",
     "test": "jasmine",
     "testapp": "node_modules/.bin/webpack build/test-app/index.js test-app/index.js"
   },
@@ -26,6 +26,7 @@
     "ciftools.js": "github:dsehnal/CIFTools.js#34cd913",
     "codemirror": "^5.28.0",
     "litemol": "github:dsehnal/LiteMol#e5893f1",
+    "parsimmon": "^1.6.2",
     "react": "^15.6.1",
     "react-dom": "^15.6.1",
     "react-markdown": "^2.5.0"
