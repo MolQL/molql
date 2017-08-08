@@ -49,6 +49,8 @@ export default class QueryEditor extends React.Component<QueryEditorProps, {}> {
     }
 
     private autoComplete = (editor: CodeMirror.Editor) => {
+        if (this.props.mode !== 'molql-lisp') return;
+
         const hint = (CodeMirror as any).hint['molql-lisp'];
         (this.editor as any).showHint({ hint, completeSingle: false, whatIsThis: 'test', closeCharacters: /[\s()\[\];]/ });
 
