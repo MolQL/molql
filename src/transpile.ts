@@ -90,9 +90,11 @@ const testStrings: {[index: string]: string[]} = {
 
     'segi A IN segi B',
     'segi A LIKE segi B',
-    'segi A GAP segi B',
-    'segi A AROUND segi B',
-    'segi A EXPAND segi B',
+
+    'segi A GAP 2',
+    'segi A AROUND 2',
+    'segi A EXPAND 2',
+    
     'segi A WITHIN 3.01 OF segi B',
     'segi A NEAR_TO 3.01 OF segi B',
     'segi A BEYOND 3.01 OF segi B',

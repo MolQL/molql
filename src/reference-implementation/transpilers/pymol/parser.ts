@@ -131,8 +131,6 @@ function orNull(rule: P.Parser<any>) {
   return rule.or(P.of(null))
 }
 
-
-
 function ofOp (name: string, short?: string) {
   const op = short ? `${name}|${h.escapeRegExp(short)}` : name
   const re = RegExp(`(${op})\\s+([-+]?[0-9]*\\.?[0-9]+)\\s+OF`, 'i')
@@ -142,18 +140,21 @@ function ofOp (name: string, short?: string) {
 const opList = [
   { 
     // Selects atoms that are not included in s1.
+    // NOT s1
     type: h.prefix, 
     rule: P.alt(P.regex(/NOT/i).skip(__), P.string('!').skip(_)), 
     map: Q.invert 
   },
   {
     // Selects atoms included in both s1 and s2.
+    // s1 AND s2
     type: h.binaryLeft, 
     rule: h.infixOp(/AND|&/i), 
     map: Q.intersect
   },
   { 
     // Selects atoms included in either s1 or s2.
+    // s1 OR s2
     type: h.binaryLeft,
     rule: h.infixOp(/OR|\|/i),
     map: Q.merge 
@@ -161,12 +162,14 @@ const opList = [
   { 
     // Selects atoms in s1 whose identifiers name, resi, resn, chain and segi 
     // all match atoms in s2.
+    // s1 IN s2
     type: h.binaryLeft, 
     rule: h.infixOp(/IN/i),
     map: (op: string, s1: Expression, s2: Expression) => [op, s1, s2]
   },
   { 
     // Selects atoms in s1 whose identifiers name and resi match atoms in s2.
+    // s1 LIKE s2
     type: h.binaryLeft, 
     rule: h.infixOp(/LIKE|l\./i),
     map: (op: string, s1: Expression, s2: Expression) => [op, s1, s2]
@@ -174,97 +177,146 @@ const opList = [
   { 
     // Selects all atoms whose van der Waals radii are separated from the 
     // van der Waals radii of s1 by a minimum of X Angstroms.
-    type: h.binaryLeft, 
-    rule: h.infixOp(/GAP/i),
-    map: (op: string, s1: Expression, s2: Expression) => [op, s1, s2]
+    // s1 GAP X
+    type: h.postfix, 
+    rule: h.postfixOp(/GAP\s+([-+]?[0-9]*\.?[0-9]+)/i, 1).map(parseFloat),
+    map: (distance: number, target: Expression) => {
+      return B.struct.filter.within({
+        selection: B.struct.generator.atomGroups(),
+        target,
+        radius: B.core.math.add([distance, B.acp('x')]) // TODO replace by vdw
+      })
+    }
   },
   { 
     // Selects atoms with centers within X Angstroms of the center of any atom ins1.
-    type: h.binaryLeft, 
-    rule: h.infixOp(/AROUND|a\./i),
-    map: (op: string, s1: Expression, s2: Expression) => [op, s1, s2]
+    // s1 AROUND X
+    type: h.postfix, 
+    rule: h.postfixOp(/(AROUND|a\.)\s+([-+]?[0-9]*\.?[0-9]+)/i, 2).map(parseFloat),
+    map: (radius: number, target: Expression) => {
+      return B.struct.filter.within({
+        selection: B.struct.generator.atomGroups(), target, radius
+      })
+    }
   },
   { 
     // Expands s1 by all atoms within X Angstroms of the center of any atom in s1.
-    type: h.binaryLeft, 
-    rule: h.infixOp(/EXPAND|x\./i),
-    map: (op: string, s1: Expression, s2: Expression) => [op, s1, s2]
+    // s1 EXPAND X
+    type: h.postfix, 
+    rule: h.postfixOp(/(EXPAND|x\.)\s+([-+]?[0-9]*\.?[0-9]+)/i, 2).map(parseFloat),
+    map: (radius: number, selection: Expression) => {
+      return B.struct.modifier.includeSurroundings({ selection, radius })
+    }
   },
   { 
     // Selects atoms in s1 that are within X Angstroms of any atom in s2.
+    // s1 WITHIN X OF s2
     type: h.binaryLeft, 
     rule: ofOp('WITHIN', 'w.'),
-    map: (radius: number, s1: Expression, s2: Expression) => [radius, s1, s2]
+    map: (radius: number, selection: Expression, target: Expression) => {
+      return B.struct.filter.within({ selection, target, radius })
+    }
   },
   { 
     // Same as within, but excludes s2 from the selection
     // (and thus is identical to s1 and s2 around X).
+    // s1 NEAR_TO X OF s2
     type: h.binaryLeft, 
     rule: ofOp('NEAR_TO', 'nto.'),
-    map: (radius: number, s1: Expression, s2: Expression) => [radius, s1, s2]
+    map: (radius: number, selection: Expression, target: Expression) => {
+      // return B.struct.modifier.exceptBy({
+      //   selection: B.struct.filter.within({ selection, target, radius }),
+      //   by: target
+      // })
+      return B.struct.filter.within({
+        selection: B.struct.generator.atomGroups(),
+        target: B.struct.modifier.intersectBy({ selection, by: target }), 
+        radius
+      })
+    }
   },
   { 
     // Selects atoms in s1 that are at least X Anstroms away from s2.
+    // s1 BEYOND X OF s2
     type: h.binaryLeft, 
     rule: ofOp('BEYOND', 'be.'),
-    map: (radius: number, s1: Expression, s2: Expression) => [radius, s1, s2]
+    map: (radius: number, selection: Expression, target: Expression) => {
+      return B.struct.modifier.intersectBy({
+        selection,
+        by: B.struct.generator.querySelection({
+          selection: B.struct.modifier.includeSurroundings({ selection: target, radius }),
+          query: B.struct.generator.atomGroups(),
+          'in-complement': true
+        })
+      })
+    }
   },
   { 
     // Expands selection to complete residues.
+    // BYRES s1
     type: h.prefix, 
     rule: h.prefixOp(/BYRES|br\./i),
     map: (op: string, selection: Expression) => [op, selection]
   },
   { 
     // Expands selection to complete molecules.
+    // BYMOLECULE s1
     type: h.prefix, 
     rule: h.prefixOp(/BYMOLECULE|bm\./i),
     map: (op: string, selection: Expression) => [op, selection]
   },
   { 
     // Expands selection to complete fragments.
+    // BYFRAGMENT s1
     type: h.prefix, 
     rule: h.prefixOp(/BYFRAGMENT|bf\./i),
     map: (op: string, selection: Expression) => [op, selection]
   },
   { 
     // Expands selection to complete segments.
+    // BYSEGMENT s1
     type: h.prefix, 
     rule: h.prefixOp(/BYSEGMENT|bs\./i),
     map: (op: string, selection: Expression) => [op, selection]
   },
   { 
     // Expands selection to complete objects.
+    // BYOBJECT s1
     type: h.prefix, 
     rule: h.prefixOp(/BYOBJECT|bo\./i),
     map: (op: string, selection: Expression) => [op, selection]
   },
   { 
     // Expands selection to unit cell.
+    // BYCELL s1
     type: h.prefix, 
     rule: h.prefixOp(/BYCELL/i),
     map: (op: string, selection: Expression) => [op, selection]
   },
   { 
     // All rings of size ≤ 7 which have at least one atom in s1
+    // BYRING s1
     type: h.prefix, 
     rule: h.prefixOp(/BYRING/i),
     map: (op: string, selection: Expression) => [op, selection]
   },
   { 
     // Selects atoms directly bonded to s1, excludes s1.
+    // NEIGHBOUR s1
     type: h.prefix, 
     rule: h.prefixOp(/NEIGHBOUR|nbr\./i),
     map: (op: string, selection: Expression) => [op, selection]
   },
   { 
     // Selects atoms directly bonded to s1, may include s1.
+    // BOUND_TO s1
     type: h.prefix, 
     rule: h.prefixOp(/BOUND_TO|bto\./i),
     map: (op: string, selection: Expression) => [op, selection]
   },
   { 
     // Extends s1 by X bonds connected to atoms in s1.
+    // s1 EXTEND X
     type: h.postfix, 
     rule: h.postfixOp(/(EXTEND|xt\.)\s+([0-9]+)/i, 2),
     map: (count: string, selection: Expression) => [count, selection]
@@ -377,9 +429,11 @@ const lang = P.createLanguage({
 
   // Selects peptide sequence matching upper-case one-letter
   // sequence SEQ (see also FindSeq).
+  // PEPSEQ seq
   Pepseq: () => P.regex(/(PEPSEQ|ps\.)\s+([a-z]+)/i, 2),
 
   // Selects atoms which show representation rep.
+  // REP rep
   Rep: () => P.regex(/REP\s+(spheres|lines)/i, 1),
 
   Operator: function(r) {

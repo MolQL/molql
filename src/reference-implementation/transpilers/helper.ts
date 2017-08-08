@@ -106,6 +106,9 @@ export function binaryLeft(operatorsParser: P.Parser<any>, nextParser: P.Parser<
   )
 }
 
+/**
+ * combine operators of decreasing binding strength
+ */
 export function combineOperators (opList: any[], rule: P.Parser<any>) {
   const x = opList.reduce(
     (acc, level) => level.type(level.rule, acc, level.map),
