@@ -10,6 +10,7 @@ Language Reference
      * [Math](#math)
      * [Relational](#relational)
      * [Strings](#strings)
+     * [Lists](#lists)
      * [Sets](#sets)
      * [Maps](#maps)
    * [Structure Queries](#structure-queries)
@@ -159,6 +160,14 @@ core.math.div :: array [
 ### **pow**
 ```
 core.math.pow :: array [
+  Number, 
+  Number
+] => Number
+```
+
+### **mod**
+```
+core.math.mod :: array [
   Number, 
   Number
 ] => Number
@@ -387,6 +396,18 @@ core.str.match :: array [
 ] => Bool
 ```
 
+## Lists
+
+-------------------
+
+### **get-at**
+```
+core.list.get-at :: array [
+  List, 
+  Number
+] => Any
+```
+
 ## Sets
 
 -------------------
@@ -452,7 +473,7 @@ structure.type.label-residue-id :: array [
   String (* label_entity_id *), 
   String (* label_asym_id *), 
   Number (* label_auth_seq_id *), 
-  String (* pdbx_PDB_ins_code *)
+  ?String (* pdbx_PDB_ins_code *)
 ] => ResidueId
 ```
 
@@ -473,9 +494,9 @@ structure.generator.atom-groups :: object {
 } => AtomSelection
 ```
 
-### **query-selection**
+### **query-inSelection**
 ```
-structure.generator.query-selection :: object {
+structure.generator.query-inSelection :: object {
   selection: AtomSelection, 
   query: AtomSelection, 
   in-complement?: Bool = false
@@ -708,7 +729,7 @@ structure.atom-property.macromolecular.auth-residue-id :: ()
    => ResidueId
 ```
 
-*type.authResidueId symbol executed on current atom's residue*
+*type.auth-residue-id symbol executed on current atom's residue*
 
 ### **label-residue-id**
 ```
@@ -716,7 +737,7 @@ structure.atom-property.macromolecular.label-residue-id :: ()
    => ResidueId
 ```
 
-*type.labelResidueId symbol executed on current atom's residue*
+*type.label-residue-id symbol executed on current atom's residue*
 
 ### **residue-key**
 ```
@@ -745,7 +766,7 @@ structure.atom-property.macromolecular.entity-key :: ()
 ### **is-het**
 ```
 structure.atom-property.macromolecular.is-het :: ()
-   => Number
+   => Bool
 ```
 
 *Equivalent to atom_site.group_PDB !== ATOM*

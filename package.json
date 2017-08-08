@@ -6,7 +6,7 @@
   "scripts": {
     "build": "./node_modules/.bin/tsc",
     "watch": "./node_modules/.bin/tsc -watch",
-    "docs": "node ./build/reference-implementation/mol-ql/markdown-docs.js -print > ./docs/language-reference.md",
+    "docs": "node ./build/reference-implementation/molql/markdown-docs.js -print > ./docs/language-reference.md",
     "test": "jasmine",
     "testapp": "node_modules/.bin/webpack build/test-app/index.js test-app/index.js"
   },

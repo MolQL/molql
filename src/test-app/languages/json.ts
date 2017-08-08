@@ -3,13 +3,13 @@
  */
 
 import Language from './language'
-import transpiler from '../../reference-implementation/transpilers/json'
-import B from '../../mol-ql/builder'
+import Transpilers from '../../reference-implementation/transpilers/all'
+import B from '../../molql/builder'
 
 const lang: Language = {
     name: 'JSON',
-    editorMode: 'json',
-    transpiler,
+    editorMode: 'javascript',
+    transpiler: Transpilers.json,
     examples: [{
         name: 'All C or N atoms in ALA residues',
         value: JSON.stringify(

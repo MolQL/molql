@@ -4,12 +4,12 @@
 
 import jmol from './jmol/parser'
 import json from './json'
-import lisp from './mol-ql-lisp/parser'
+import molQLlisp from './molql-lisp/parser'
 import pymol from './pymol/parser'
 
 export default {
     jmol,
     json,
-    lisp,
+    molQLlisp,
     pymol
 }

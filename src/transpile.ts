@@ -37,28 +37,17 @@ const testStrings: {[index: string]: string[]} = {
     '.CA and (2 or 3) and ^A',
     '!32 or :A and .CA'
   ],
-  lisp: [
+  molQLlisp: [
     `
-    (structure.generator.atom-groups
-      :residue-test (core.rel.eq
-        (structure.atom-property.macromolecular.auth_comp_id)
-        ALA)
-      :atom-test (core.set.has
-        (core.type.set
-          (structure.type.element-symbol C)
-          (structure.type.element-symbol N))
-        (structure.atom-property.core.element-symbol)))
-    `,
-    `
-    (atomGroups
+    (struct.atom-groups
       :residue-test (eq
-        (mmcif.auth_comp_id)
+        (atom.auth_comp_id)
         ALA)
-      :atom-test (set.has
-        (make.set
-          (make.elementSymbol C)
-          (make.elementSymbol N))
-        (elementSymbol)))
+      :atom-test (set-has
+        (set
+          (struct.create-es C)
+          (struct.create-es N))
+        (atom.es)))
     `
   ],
   pymol: [

@@ -4,13 +4,13 @@
 
 import 'jasmine'
 
-import B from '../../../mol-ql/builder'
+import B from '../../../molql/builder'
 import transpiler from '../pymol/parser'
 
 describe('pymol', () => {
-    it('resn ALA', function() {
-        const q = B.struct.generator.atomGroups({ 'atom-test': B.core.rel.eq([B.ammp('label_comp_id'), 'ALA']) });
-        const tq = transpiler('resn ALA');
-        expect(tq).toBe(q);
-    });
+  it('resn ALA', function() {
+    const q = B.struct.generator.atomGroups({ 'atom-test': B.core.rel.eq([B.ammp('label_comp_id'), 'ALA']) });
+    const tq = transpiler('resn ALA');
+    expect(tq).toBe(q);
+  });
 });

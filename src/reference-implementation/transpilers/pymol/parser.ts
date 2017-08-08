@@ -6,7 +6,7 @@ import * as P from 'parsimmon'
 import * as h from '../helper'
 
 import Transpiler from '../transpiler'
-import B from '../../../mol-ql/builder'
+import B from '../../../molql/builder'
 import Expression from '../../../mini-lisp/expression'
 
 const Q = h.QueryBuilder
@@ -243,7 +243,7 @@ const opList = [
     map: (radius: number, selection: Expression, target: Expression) => {
       return B.struct.modifier.intersectBy({
         selection,
-        by: B.struct.generator.querySelection({
+        by: B.struct.generator.queryInSelection({
           selection: B.struct.modifier.includeSurroundings({ selection: target, radius }),
           query: B.struct.generator.atomGroups(),
           'in-complement': true

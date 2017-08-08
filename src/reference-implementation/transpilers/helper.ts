@@ -3,7 +3,7 @@
  */
 
 import * as P from 'parsimmon'
-import B from '../../mol-ql/builder'
+import B from '../../molql/builder'
 import Expression from '../../mini-lisp/expression'
 
 // TODO replace by type
@@ -166,7 +166,7 @@ export namespace QueryBuilder {
   }
 
   export function invert (op: string, selection: Expression) {
-    return B.struct.generator.querySelection({
+    return B.struct.generator.queryInSelection({
       selection, query: B.struct.generator.atomGroups(), 'in-complement': true
     })
   }

@@ -6,7 +6,7 @@ import * as P from 'parsimmon'
 import * as h from '../helper'
 
 import Transpiler from '../transpiler'
-import B from '../../../mol-ql/builder'
+import B from '../../../molql/builder'
 
 const Q = h.QueryBuilder
 
