@@ -18,7 +18,7 @@ export namespace Types {
 
     export const Set = <T extends Type>(t?: T) => Type.Container<Set<T['@type']>>('Core', 'Set', t || A);
     export const List = <T extends Type>(t?: T) => Type.Container<List<T['@type']>>('Core', 'List', t || A);
-    export const Fn = <T extends Type>(t?: T) => Type.Container<(...args: any[]) => T['@type']>('Core', 'Fn', t || A);
+    export const Fn = <T extends Type>(t?: T) => Type.Container<(env: any) => T['@type']>('Core', 'Fn', t || A);
 }
 
 function unaryOp<T extends Type>(type: T, description?: string) {
@@ -59,7 +59,7 @@ const logic = {
 };
 
 const ctrl = {
-    '@header': 'Control Flow',
+    '@header': 'Control',
     eval: symbol(Arguments.Dictionary({ 0: Argument(Types.Fn(Types.A)) }), Types.A, 'Evaluate a function.'),
     fn: symbol(Arguments.Dictionary({ 0: Argument(Types.A) }), Types.Fn(Types.A), 'Wrap an expression to a "lazy" function.'),
     if: symbol(Arguments.Dictionary({
