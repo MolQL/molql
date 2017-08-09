@@ -1,6 +1,15 @@
 
+import Expression from './mini-lisp/expression'
 import Transpiler from './reference-implementation/transpilers/transpiler'
 import _transpiler from './reference-implementation/transpilers/all'
+
+import * as fs from 'fs'
+// import { Model } from './reference-implementation/molecule/data'
+import AtomSelection from './reference-implementation/molql/data/atom-selection'
+import AtomSet from './reference-implementation/molql/data/atom-set'
+import parseCIF from './reference-implementation/molecule/parser'
+import compile from './reference-implementation/molql/compiler'
+import Context from './reference-implementation/molql/runtime/context'
 
 const transpiler: {[index: string]: Transpiler} = _transpiler
 
@@ -104,17 +113,46 @@ const testStrings: {[index: string]: string[]} = {
   ]
 }
 
+function run (query: Expression) {
+    const compiled = compile(query);
+    
+    fs.readFile('spec/1tqn_updated.cif', 'utf-8', (err, data) => {
+        if (err) {
+            console.error(err);
+            return;
+        }
+
+        try {
+            const mol = parseCIF(data);
+            const ctx = Context.ofModel(mol.models[0]);
+            const res = compiled(ctx);
+            console.log('count', AtomSelection.atomSets(res).length);
+            // const cif = mmCIFwriter(model, AtomSet.atomIndices(AtomSelection.toAtomSet(res)));
+
+            // console.log(cif.substr(0, 100));
+            console.log(AtomSet.atomIndices(AtomSelection.toAtomSet(res)));
+            //console.log(model.entities);
+            //console.log(model.chains);
+        } catch (e) {
+            console.error(e);
+            return;
+        }
+    })
+}
+
 function parse(lang: string, str: string) {
-  const result = transpiler[lang](str)
+  const query = transpiler[lang](str)
   console.log(str)
-  console.log(util.inspect(result, {depth: 20, color: true}))
+  console.log(util.inspect(query, {depth: 20, color: true}))
   console.log('\n')
+  return query
 }
 
 const [,,lang, str] = process.argv
 
 if (lang && str) {
-  parse(lang, str)
+  const q = parse(lang, str)
+  run(q)
 } else if (lang) {
   testStrings[lang].forEach(str => parse(lang, str))
 }

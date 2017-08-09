@@ -54,7 +54,13 @@ class State {
             this.resultPlugin.clear();
             this.queryResult.onNext({ kind: 'content', content: 'No query executed yet...'});
 
-            const data = await LiteMol.Bootstrap.Utils.ajaxGetString(`https://webchem.ncbr.muni.cz/CoordinateServer/${this.pdbId}/full`).run(this.fullPlugin.context);
+            let url
+            if (this.pdbId === '1tqn') {
+                url = `../spec/1tqn_updated.cif`
+            } else {
+                url = `https://webchem.ncbr.muni.cz/CoordinateServer/${this.pdbId}/full`
+            }
+            const data = await LiteMol.Bootstrap.Utils.ajaxGetString(url).run(this.fullPlugin.context);
 
             const main = this.fullPlugin;
             const t = this.fullPlugin.createTransform();

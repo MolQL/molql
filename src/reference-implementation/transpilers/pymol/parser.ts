@@ -20,11 +20,11 @@ const rePosInt = /[0-9]+/
 
 function listMap(x: string) { return x.split('+') }
 function rangeMap(x: string) {
-  const [min, max] = x.split('-')
+  const [min, max] = x.split('-').map(parseInt)
   return {min, max}
 }
 function listOrRangeMap(x: string) {
-  return x.includes('-') ? rangeMap(x) : listMap(x)
+  return x.includes('-') ? rangeMap(x) : listMap(x).map(parseInt)
 }
 function elementListMap(x: string) {
   return x.split('+').map(B.struct.type.elementSymbol)
@@ -55,7 +55,7 @@ const propertiesSpec: { [k: string]: PropertySpec } = {
   },
   resi: { 
     short: 'i.', regex: /[0-9+-]+/, map: listOrRangeMap, 
-    level: 'residue-test', property: B.ammp('label_seq_id') 
+    level: 'residue-test', property: B.ammp('auth_seq_id') 
   },
   alt: { 
     short: 'alt', regex: /[a-zA-Z0-9+]+/, map: listMap, 
@@ -224,14 +224,9 @@ const opList = [
     type: h.binaryLeft, 
     rule: ofOp('NEAR_TO', 'nto.'),
     map: (radius: number, selection: Expression, target: Expression) => {
-      // return B.struct.modifier.exceptBy({
-      //   selection: B.struct.filter.within({ selection, target, radius }),
-      //   by: target
-      // })
-      return B.struct.filter.within({
-        selection: B.struct.generator.atomGroups(),
-        target: B.struct.modifier.intersectBy({ selection, by: target }), 
-        radius
+      return B.struct.modifier.exceptBy({
+        selection: B.struct.filter.within({ selection, target, radius }),
+        by: target
       })
     }
   },
