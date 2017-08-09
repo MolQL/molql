@@ -7,13 +7,18 @@ import { Arguments, Argument } from '../../mini-lisp/symbol'
 import { symbol } from './helpers'
 
 export namespace Types {
-    export type List = ArrayLike<any>
-    export type Set = { has(e: any): boolean }
-    export type Map = { has(key: any): boolean, get(key: any): any }
-    export const List = Type<List>('Core', 'List', Type.Any);
-    export const Set = Type<Set>('Core', 'Set', Type.Any);
-    export const Map = Type<Map>('Core', 'Map', Type.Any);
-    export const Regex = Type<RegExp>('Core', 'Regex', Type.Any);
+    export type List<T = any> = ArrayLike<T>
+    export type Set<T = any> = { has(e: T): boolean }
+
+    export const A = Type.Variable('a');
+
+    //export const List = Type.Container<List>('Core', 'List', Type.Any);
+    //export const Set = Type.Container<Set>('Core', 'Set', Type.Variable('a'));
+    export const Regex = Type.Value<RegExp>('Core', 'Regex', Type.AnyValue);
+
+    export const Set = <T extends Type>(t?: T) => Type.Container<Set<T['@type']>>('Core', 'Set', t || A);
+    export const List = <T extends Type>(t?: T) => Type.Container<List<T['@type']>>('Core', 'List', t || A);
+    export const Fn = <T extends Type>(t?: T) => Type.Container<(...args: any[]) => T['@type']>('Core', 'Fn', t || A);
 }
 
 function unaryOp<T extends Type>(type: T, description?: string) {
@@ -26,27 +31,25 @@ function binOp<T extends Type>(type: T, description?: string) {
 
 function binRel<A extends Type, T extends Type>(src: A, target: T, description?: string) {
     return symbol(Arguments.Dictionary({
-        0: Argument(src, { typeName: 'x' }),
-        1: Argument(src, { typeName: 'x' })
+        0: Argument(src),
+        1: Argument(src)
     }), target, description);
 }
 
 const type = {
     '@header': 'Types',
-    bool: symbol(Arguments.Dictionary({ 0: Argument(Type.Any) }), Type.Bool),
-    num: symbol(Arguments.Dictionary({ 0: Argument(Type.Any) }), Type.Num),
-    str: symbol(Arguments.Dictionary({ 0: Argument(Type.Any) }), Type.Str),
+    bool: symbol(Arguments.Dictionary({ 0: Argument(Type.AnyValue) }), Type.Bool, 'Convert a value to boolean.'),
+    num: symbol(Arguments.Dictionary({ 0: Argument(Type.AnyValue) }), Type.Num, 'Convert a value to number.'),
+    str: symbol(Arguments.Dictionary({ 0: Argument(Type.AnyValue) }), Type.Str, 'Convert a value to string.'),
     regex: symbol(
         Arguments.Dictionary({
             0: Argument(Type.Str, { description: 'Expression' }),
             1: Argument(Type.Str, { isOptional: true, description: `Flags, e.g. 'i' for ignore case` })
         }), Types.Regex, 'Creates a regular expression from a string using the ECMAscript syntax.'),
 
-    list: symbol(Arguments.List(Type.Any), Types.List),
-    set: symbol(Arguments.List(Type.Any), Types.Set),
-    map: symbol(Arguments.List(Type.Any), Types.Map, 'Create a map from a list of key value pairs, e.g. (map 1 "x" 2 "y").')
+    list: symbol(Arguments.List(Types.A), Types.List()),
+    set: symbol(Arguments.List(Types.A), Types.Set())
 };
-
 
 const logic = {
     '@header': 'Logic',
@@ -57,12 +60,28 @@ const logic = {
 
 const ctrl = {
     '@header': 'Control Flow',
-    hold: symbol(Arguments.Dictionary({ 0: Argument(Type.Any) }), Type.Any, 'Hold a value to be evaluated lazily.'),
+    eval: symbol(Arguments.Dictionary({ 0: Argument(Types.Fn(Types.A)) }), Types.A, 'Evaluate a function.'),
+    fn: symbol(Arguments.Dictionary({ 0: Argument(Types.A) }), Types.Fn(Types.A), 'Wrap an expression to a "lazy" function.'),
     if: symbol(Arguments.Dictionary({
         0: Argument(Type.Bool, { description: 'Condition' }),
-        1: Argument(Type.Any, { description: 'If true' }),
-        2: Argument(Type.Any, { description: 'If false' })
-    }), Type.Any)
+        1: Argument(Type.Variable('a'), { description: 'If true' }),
+        2: Argument(Type.Variable('b'), { description: 'If false' })
+    }), Type.Union(Type.Variable('a'), Type.Variable('b')))
+};
+
+const rel = {
+    '@header': 'Relational',
+    eq: binRel(Type.Variable('a', Type.AnyValue), Type.Bool),
+    neq: binRel(Type.Variable('a', Type.AnyValue), Type.Bool),
+    lt: binRel(Type.Num, Type.Bool),
+    lte: binRel(Type.Num, Type.Bool),
+    gr: binRel(Type.Num, Type.Bool),
+    gre: binRel(Type.Num, Type.Bool),
+    inRange: symbol(Arguments.Dictionary({
+        0: Argument(Type.Num, { description: 'Value to test' }),
+        1: Argument(Type.Num, { description: 'Minimum value' }),
+        2: Argument(Type.Num, { description: 'Maximum value' })
+    }), Type.Bool, 'Check if the value of the 1st argument is >= 2nd and <= 3rd.'),
 };
 
 const math = {
@@ -97,21 +116,6 @@ const math = {
     atan2: binRel(Type.Num, Type.Num)
 };
 
-const rel = {
-    '@header': 'Relational',
-    eq: binRel(Type.Any, Type.Bool),
-    neq: binRel(Type.Any, Type.Bool),
-    lt: binRel(Type.Num, Type.Bool),
-    lte: binRel(Type.Num, Type.Bool),
-    gr: binRel(Type.Num, Type.Bool),
-    gre: binRel(Type.Num, Type.Bool),
-    inRange: symbol(Arguments.Dictionary({
-        0: Argument(Type.Num, { description: 'Value to test' }),
-        1: Argument(Type.Num, { description: 'Minimum value' }),
-        2: Argument(Type.Num, { description: 'Maximum value' })
-    }), Type.Bool, 'Check if the value of the 1st argument is >= 2nd and <= 3rd.'),
-};
-
 const str = {
     '@header': 'Strings',
     concat: binOp(Type.Str),
@@ -120,22 +124,12 @@ const str = {
 
 const list = {
     '@header': 'Lists',
-    getAt: symbol(Arguments.Dictionary({ 0: Argument(Types.List), 1: Argument(Type.Num) }), Type.Any)
+    getAt: symbol(Arguments.Dictionary({ 0: Argument(Types.List()), 1: Argument(Type.Num) }), Types.A)
 };
 
 const set = {
     '@header': 'Sets',
-    has: symbol(Arguments.Dictionary({ 0: Argument(Types.Set), 1: Argument(Type.Any) }), Type.Bool)
-};
-
-const map = {
-    '@header': 'Maps',
-    has: symbol(Arguments.Dictionary({ 0: Argument(Types.Map), 1: Argument(Type.Any) }), Type.Bool),
-    get: symbol(Arguments.Dictionary({
-        0: Argument(Types.Map),
-        1: Argument(Type.LiteralValue, { description: 'Key' }),
-        2: Argument(Type.Any, { description: 'Default value if key is not present' })
-    }), Type.Any)
+    has: symbol(Arguments.Dictionary({ 0: Argument(Types.Set()), 1: Argument(Types.A) }), Type.Bool)
 };
 
 export default {
@@ -143,12 +137,11 @@ export default {
     type,
     logic,
     ctrl,
-    math,
     rel,
+    math,
     str,
     list,
-    set,
-    map
+    set
 }
 
 

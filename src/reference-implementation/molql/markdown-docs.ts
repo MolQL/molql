@@ -3,16 +3,17 @@
  */
 
 import MolQL from '../../molql/symbols'
+import Type from '../../mini-lisp/type'
 import Symbol, { isSymbol, Arguments, Argument } from '../../mini-lisp/symbol'
+import typeFormatter from '../mini-lisp/type-formatter'
 
 /**
  * Generates markdown documentation from the language spec.
  */
 
-
 function formatArgs(args: Arguments) {
     if (args.kind === 'list') {
-        return `array [\n  ${args.type.name}${args.nonEmpty ? '+' : '*'}\n]`;
+        return `array [\n  ${typeFormatter(args.type)}${args.nonEmpty ? '+' : '*'}\n]`;
     }
     const map = args.map;
     const keys = Object.keys(map);
@@ -33,11 +34,11 @@ function formatArgs(args: Arguments) {
     argIndex = 0;
 
     for (const key of keys) {
-        const arg = (map as any)[key] as Argument<any>;
+        const arg = (map as any)[key] as Argument<Type>;
         if (!isNaN(key as any)) {
-            formatted.push(`  ${arg.isOptional ? '?' : ''}${arg.type.name}${arg.isRest ? '*' : ''}`);
+            formatted.push(`  ${arg.isOptional ? '?' : ''}${typeFormatter(arg.type)}${arg.isRest ? '*' : ''}`);
         } else {
-            formatted.push(`  ${key}${arg.isOptional ? '?:' : ':'} ${arg.type.name}${arg.isRest ? '*' : ''}`);
+            formatted.push(`  ${key}${arg.isOptional ? '?:' : ':'} ${typeFormatter(arg.type)}${arg.isRest ? '*' : ''}`);
         }
         if (arg.defaultValue !== void 0) formatted.push(` = ${arg.defaultValue}`);
         if (arg.description !== void 0) formatted.push(` (* ${arg.description} *)`);
@@ -50,7 +51,7 @@ function formatArgs(args: Arguments) {
 }
 
 export function formatSymbol(symbol: Symbol, alias: string) {
-    return `${alias} :: ${formatArgs(symbol.args)} => ${symbol.type.name}`;
+    return `${alias} :: ${formatArgs(symbol.args)} => ${typeFormatter(symbol.type)}`;
 }
 
 
@@ -64,7 +65,7 @@ Language Reference
 
     function formatSymbol(symbol: Symbol, lines: string[]) {
         const info = symbol.info;
-        const header = `${symbol.id} :: ${formatArgs(symbol.args)} => ${symbol.type.name}`
+        const header = `${symbol.id} :: ${formatArgs(symbol.args)} => ${typeFormatter(symbol.type)}`
         lines.push(`### **${symbol.info.name}**`);
         lines.push(`\`\`\`\n${header}\n\`\`\`\n`);
         if (info.description) {

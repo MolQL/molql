@@ -8,7 +8,7 @@ import Expression from '../expression'
 import AtomSet from '../../data/atom-set'
 import AtomSelection from '../../data/atom-selection'
 
-type VarArgs<T = any> = { [key: string]: Expression<T> }
+type VarArgs<T = any> = { [key: string]: Expression<Expression<T>> }
 
 export function intersect(env: Environment, selectionArgs: VarArgs<AtomSelection>) {
     const keys = Object.keys(selectionArgs);
@@ -16,7 +16,7 @@ export function intersect(env: Environment, selectionArgs: VarArgs<AtomSelection
     if (keys.length === 1) return selectionArgs[keys[0]](env);
 
     const selections = keys.map(k => selectionArgs[k]);
-    const sequences = selections.map(s => s(env));
+    const sequences = selections.map(s => s(env)(env));
     let pivotIndex = 0, pivotLength = AtomSelection.atomSets(sequences[0]).length;
     for (let i = 1; i < sequences.length; i++) {
         const len = AtomSelection.atomSets(sequences[i]).length;
@@ -46,8 +46,8 @@ export function intersect(env: Environment, selectionArgs: VarArgs<AtomSelection
 export function merge(env: Environment, selections: VarArgs<AtomSelection>) {
     const ret = AtomSelection.uniqueBuilder();
     for (const key of Object.keys(selections)) {
-        const sel = selections[key];
-        for (const atomSet of AtomSelection.atomSets(sel(env))) {
+        const sel = selections[key](env)(env);
+        for (const atomSet of AtomSelection.atomSets(sel)) {
             ret.add(atomSet);
         }
     }
@@ -131,7 +131,6 @@ function cluster(env: Environment, matrix: Float64Array, selections: AtomSelecti
 export function distanceCluster(env: Environment,
         matrix: Expression<ArrayLike<ArrayLike<number>>>,
         selections: Expression<ArrayLike<Expression<AtomSelection>>>): AtomSelection {
-
     const atomSelections: AtomSelection[] = [];
     const selList = selections(env);
     for (let i = 0; i < selList.length; i++) {

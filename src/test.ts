@@ -11,6 +11,7 @@ import compile from './reference-implementation/molql/compiler'
 import mmCIFwriter from './reference-implementation/molecule/writer'
 import Context from './reference-implementation/molql/runtime/context'
 import typeCheck from './reference-implementation/mini-lisp/type-checker'
+//import formatE from './reference-implementation/mini-lisp/expression-formatter'
 import { SymbolMap } from './molql/symbols'
 import B from './molql/builder'
 
@@ -63,21 +64,23 @@ function run(model: Model) {
     })
       //B.core.rel.eq([B.ammp('auth_comp_id'), 'LYS']);
 
-    // const query =  B.struct.modifier.cluster({
+    //const query = B.evaluate(B.struct.modifier.cluster({
     //     'selection': B.struct.generator.atomGroups({
     //         'residue-test': B.core.rel.eq([B.ammp('auth_comp_id'), 'LYS']),
     //         'group-by': B.ammp('residueKey')
     //     }),
     //     'max-distance': 5
-    // });
+    // }));
     const l = B.core.type.list;
-    const query = B.struct.combinator.distanceCluster({
+    const query = B.evaluate(B.struct.combinator.distanceCluster({
         matrix: l([l([0, 5, 5]), l([0, 0, 5]), l([0, 0, 0])]),
-        selections: l([lys, lys, lys].map(B.hold))
-    });
+        selections: l([lys, lys, lys])
+    }));
 
     //console.log('check');
     typeCheck(SymbolMap, B.struct.type.elementSymbol(['C']));
+
+    //console.log(formatE(query));
 
     const compiled = compile(query);
     const ctx = Context.ofModel(model);

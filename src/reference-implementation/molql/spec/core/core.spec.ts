@@ -21,13 +21,6 @@ describe('types', () => {
         expect(c.has(10)).toBe(false);
     });
 
-    it('map', function () {
-        const e = B.core.type.map([1, 'x']);
-        const c = Data.compile(e)(Data.ctx) as Map<number, string>;
-        expect(c.get(1)).toBe('x');
-        expect(c.get(10)).toBe(void 0);
-    });
-
     it('regex', function () {
         const e = B.core.type.regex(['te.t', 'i']);
         const c = Data.compile(e)(Data.ctx) as RegExp;
@@ -42,6 +35,12 @@ describe('types', () => {
             expect(c).toBe(expected);
         });
     }
+
+    it('eval/fn', function () {
+        const e = B.evaluate(B.fn(1));
+        const c = Data.compile(e)(Data.ctx) as any;
+        expect(c).toBe(1);
+    });
 
     testFn(B.core.ctrl.if, [true, 1, 2], 1);
     testFn(B.core.ctrl.if, [false, 1, 2], 2);
@@ -100,6 +99,4 @@ describe('types', () => {
 
     testFn(B.core.list.getAt, [[1, 2, 3], 1], 2);
     testFn(B.core.set.has, [new Set([1, 2, 3]), 2], true);
-    testFn(B.core.map.has, [new Map([[1, 2], [3, 4]]), 2], false);
-    testFn(B.core.map.get, [new Map([[1, 2], [3, 4]]), 3, 1], 4);
 });

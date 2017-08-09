@@ -14,7 +14,7 @@ describe('combinator', () => {
             B.struct.generator.atomGroups({ 'atom-test': B.core.rel.inRange([B.ammp('id'), 10, 20]) }),
             B.struct.generator.atomGroups({ 'atom-test': B.core.rel.inRange([B.ammp('id'), 15, 30]) })
         ]);
-        const sel = Data.compile(q)(Data.ctx);
+        const sel = Data.compileQuery(q)(Data.ctx);
         expect(AtomSelection.atomSets(sel).length).toBe(6);
     });
 
@@ -23,7 +23,7 @@ describe('combinator', () => {
             B.struct.generator.atomGroups({ 'residue-test': B.core.rel.inRange([B.ammp('id'), 10, 20]) }),
             B.struct.generator.atomGroups({ 'residue-test': B.core.rel.inRange([B.ammp('id'), 15, 30]) })
         ]);
-        const sel = Data.compile(q)(Data.ctx);
+        const sel = Data.compileQuery(q)(Data.ctx);
         expect(AtomSelection.atomSets(sel).length).toBe(20);
     });
 });

@@ -5,7 +5,7 @@
 import MolQL from '../../molql/symbols'
 import Symbol, { SymbolRuntimeTable } from '../mini-lisp/symbol'
 import { isSymbol } from '../../mini-lisp/symbol'
-import { FastSet, FastMap } from '../utils/collections'
+import { FastSet } from '../utils/collections'
 import Context from './runtime/context'
 import { ElementSymbol, ResidueIdentifier } from '../molecule/data'
 import StructureRuntime from './runtime/structure'
@@ -39,16 +39,6 @@ export const SymbolRuntime: Symbol.Info<Context>[] = [
             for (const k of Object.keys(xs)) set.add(xs[k](env));
         }
         return set;
-    }),
-    Symbol(MolQL.core.type.map, staticAttr)((env, xs) => {
-        const map = FastMap.create<any, any>();
-        if (typeof xs.length === 'number') {
-            for (let i = 0, _i = xs.length; i < _i; i += 2) map.set(xs[i](env), xs[i + 1](env));
-        } else {
-            const keys = Object.keys(xs);
-            for (let i = 0, _i = keys.length; i < _i; i += 2) map.set(xs[keys[i]](env), xs[keys[i + 1]](env));
-        }
-        return map;
     }),
     Symbol(MolQL.core.type.regex, staticAttr)((env, v) => new RegExp(v[0](env), (v[1] && v[1](env)) || '')),
 
@@ -85,7 +75,8 @@ export const SymbolRuntime: Symbol.Info<Context>[] = [
 
     // ============= CONTROL FLOW ================
     Symbol(MolQL.core.ctrl.if, staticAttr)((env, v) => v[0](env) ? v[1](env) : v[2](env)),
-    Symbol(MolQL.core.ctrl.hold)((env, v) => v[0]),
+    Symbol(MolQL.core.ctrl.fn)((env, v) => v[0]),
+    Symbol(MolQL.core.ctrl.eval)((env, v) => v[0](env)(env)),
 
     // ============= ARITHMETIC ================
     Symbol(MolQL.core.math.add, staticAttr)((env, xs) => {
@@ -180,14 +171,6 @@ export const SymbolRuntime: Symbol.Info<Context>[] = [
     // ============= SET ================
     Symbol(MolQL.core.set.has, staticAttr)((env, v) => v[0](env).has(v[1](env))),
 
-    // ============= MAP ================
-    Symbol(MolQL.core.map.has, staticAttr)((env, v) => v[0](env).has(v[1](env))),
-    Symbol(MolQL.core.map.get, staticAttr)((env, v) => {
-        const map = v[0](env), key = v[1](env);
-        if (map.has(key)) return map.get(key);
-        return v[2](env);
-    }),
-
     ////////////////////////////////////
     // Structure
 
@@ -198,37 +181,37 @@ export const SymbolRuntime: Symbol.Info<Context>[] = [
 
     // ============= GENERATORS ================
     Symbol(MolQL.structure.generator.atomGroups)((env, v) =>
-        StructureRuntime.Generators.atomGroupsGenerator(env, { entityTest: v['entity-test'], chainTest: v['chain-test'], residueTest: v['residue-test'], atomTest: v['atom-test'], groupBy: v['group-by'] })),
-    Symbol(MolQL.structure.generator.queryInSelection)((env, v) => StructureRuntime.Generators.querySelection(env, v.selection, v.query, v['in-complement'])),
+        (env) => StructureRuntime.Generators.atomGroupsGenerator(env, { entityTest: v['entity-test'], chainTest: v['chain-test'], residueTest: v['residue-test'], atomTest: v['atom-test'], groupBy: v['group-by'] })),
+    Symbol(MolQL.structure.generator.queryInSelection)((env, v) => env => StructureRuntime.Generators.querySelection(env, v.selection(env), v.query(env), v['in-complement'])),
 
     // ============= MODIFIERS ================
-    Symbol(MolQL.structure.modifier.queryEach)((env, v) => StructureRuntime.Modifiers.queryEach(env, v.selection, v.query)),
-    Symbol(MolQL.structure.modifier.intersectBy)((env, v) => StructureRuntime.Modifiers.intersectBy(env, v.selection, v.by)),
-    Symbol(MolQL.structure.modifier.exceptBy)((env, v) => StructureRuntime.Modifiers.exceptBy(env, v.selection, v.by)),
-    Symbol(MolQL.structure.modifier.unionBy)((env, v) => StructureRuntime.Modifiers.unionBy(env, v.selection, v.by)),
-    Symbol(MolQL.structure.modifier.union)((env, v) => StructureRuntime.Modifiers.union(env, v.selection)),
-    Symbol(MolQL.structure.modifier.cluster)((env, v) => StructureRuntime.Modifiers.cluster(env, {
-        selection: v.selection,
+    Symbol(MolQL.structure.modifier.queryEach)((env, v) => env => StructureRuntime.Modifiers.queryEach(env, v.selection(env), v.query(env))),
+    Symbol(MolQL.structure.modifier.intersectBy)((env, v) => env => StructureRuntime.Modifiers.intersectBy(env, v.selection(env), v.by(env))),
+    Symbol(MolQL.structure.modifier.exceptBy)((env, v) => env => StructureRuntime.Modifiers.exceptBy(env, v.selection(env), v.by(env))),
+    Symbol(MolQL.structure.modifier.unionBy)((env, v) => env => StructureRuntime.Modifiers.unionBy(env, v.selection(env), v.by(env))),
+    Symbol(MolQL.structure.modifier.union)((env, v) => env => StructureRuntime.Modifiers.union(env, v.selection(env))),
+    Symbol(MolQL.structure.modifier.cluster)((env, v) => env => StructureRuntime.Modifiers.cluster(env, {
+        selection: v.selection(env),
         minDist: v['min-distance'],
         maxDist: v['max-distance'],
         minSize: v['min-size'],
         maxSize: v['max-size'],
     })),
-    Symbol(MolQL.structure.modifier.includeSurroundings)((env, v) => StructureRuntime.Modifiers.includeSurroundings(env, v.selection, v.radius, v['as-whole-residues'])),
+    Symbol(MolQL.structure.modifier.includeSurroundings)((env, v) => env => StructureRuntime.Modifiers.includeSurroundings(env, v.selection(env), v.radius, v['as-whole-residues'])),
 
     // ============= FILTERS ================
-    Symbol(MolQL.structure.filter.pick)((env, v) => StructureRuntime.Filters.pick(env, v.selection, v.test)),
-    Symbol(MolQL.structure.filter.withSameProperties)((env, v) => StructureRuntime.Filters.withSameProperties(env, v.selection, v.source, v.property)),
-    Symbol(MolQL.structure.filter.within)((env, v) => StructureRuntime.Filters.within(env, v.selection, v.target, v.radius)),
+    Symbol(MolQL.structure.filter.pick)((env, v) => env => StructureRuntime.Filters.pick(env, v.selection(env), v.test)),
+    Symbol(MolQL.structure.filter.withSameProperties)((env, v) => env => StructureRuntime.Filters.withSameProperties(env, v.selection(env), v.source(env), v.property)),
+    Symbol(MolQL.structure.filter.within)((env, v) => env => StructureRuntime.Filters.within(env, v.selection(env), v.target(env), v.radius)),
 
     // ============= COMBINATORS ================
-    Symbol(MolQL.structure.combinator.intersect)((env, v) => StructureRuntime.Combinators.intersect(env, v)),
-    Symbol(MolQL.structure.combinator.merge)((env, v) => StructureRuntime.Combinators.merge(env, v)),
-    Symbol(MolQL.structure.combinator.distanceCluster)((env, v) => StructureRuntime.Combinators.distanceCluster(env, v.matrix, v.selections)),
+    Symbol(MolQL.structure.combinator.intersect)((env, xs) => env => StructureRuntime.Combinators.intersect(env, xs)),
+    Symbol(MolQL.structure.combinator.merge)((env, xs) => env => StructureRuntime.Combinators.merge(env, xs)),
+    Symbol(MolQL.structure.combinator.distanceCluster)((env, v) => env => StructureRuntime.Combinators.distanceCluster(env, v.matrix, v.selections)),
 
     // ============= ATOM SETS ================
     Symbol(MolQL.structure.atomSet.atomCount)((env, v) => StructureRuntime.AtomSet.atomCount(env)),
-    Symbol(MolQL.structure.atomSet.countQuery)((env, v) => StructureRuntime.AtomSet.countQuery(env, v.query)),
+    Symbol(MolQL.structure.atomSet.countQuery)((env, v) => StructureRuntime.AtomSet.countQuery(env, v.query(env))),
     Symbol(MolQL.structure.atomSet.reduce.accumulator)((env, v) => StructureRuntime.AtomSet.accumulateAtomSet(env, v.initial, v.value)),
     Symbol(MolQL.structure.atomSet.reduce.value)((env, v) => env.context.atomSetReducer.value),
 

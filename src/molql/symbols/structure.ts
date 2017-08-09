@@ -8,10 +8,12 @@ import { Arguments, Argument } from '../../mini-lisp/symbol'
 import { symbol } from './helpers'
 
 export namespace Types {
-    export const ElementSymbol = Type('Structure', 'ElementSymbol', Type.Any);
-    export const ResidueId = Type('Structure', 'ResidueId', Type.Any);
-    export const AtomSet = Type('Structure', 'AtomSet', Type.Any);
-    export const AtomSelection = Type('Structure', 'AtomSelection', Type.Any);
+    export const ElementSymbol = Type.Value('Structure', 'ElementSymbol', Type.AnyValue);
+    export const ResidueId = Type.Value('Structure', 'ResidueId', Type.AnyValue);
+    export const AtomSet = Type.Value('Structure', 'AtomSet', Type.AnyValue);
+    export const AtomSelection = Type.Value('Structure', 'AtomSelection', Type.AnyValue);
+
+    export const AtomSelectionQuery = Core.Types.Fn(AtomSelection);
 }
 
 const type = {
@@ -38,85 +40,85 @@ const generator = {
         'residue-test': Argument(Type.Bool, { isOptional: true, defaultValue: true }),
         'atom-test': Argument(Type.Bool, { isOptional: true, defaultValue: true }),
         'group-by': Argument(Type.Any, { isOptional: true, defaultValue: `atom-key` }),
-    }), Types.AtomSelection),
+    }), Types.AtomSelectionQuery),
 
     queryInSelection: symbol(Arguments.Dictionary({
-        selection: Argument(Types.AtomSelection),
-        query: Argument(Types.AtomSelection),
+        selection: Argument(Types.AtomSelectionQuery),
+        query: Argument(Types.AtomSelectionQuery),
         'in-complement': Argument(Type.Bool, { isOptional: true, defaultValue: false })
-    }), Types.AtomSelection, 'Executes query only on atoms that are in the source selection.')
+    }), Types.AtomSelectionQuery, 'Executes query only on atoms that are in the source selection.')
 }
 
 const modifier = {
     '@header': 'Selection Modifications',
 
     queryEach: symbol(Arguments.Dictionary({
-        selection: Argument(Types.AtomSelection),
-        query: Argument(Types.AtomSelection)
-    }), Types.AtomSelection),
+        selection: Argument(Types.AtomSelectionQuery),
+        query: Argument(Types.AtomSelectionQuery)
+    }), Types.AtomSelectionQuery),
 
     intersectBy: symbol(Arguments.Dictionary({
-        selection: Argument(Types.AtomSelection),
-        by: Argument(Types.AtomSelection)
-    }), Types.AtomSelection, 'Intersect each atom set from the first sequence from atoms in the second one.'),
+        selection: Argument(Types.AtomSelectionQuery),
+        by: Argument(Types.AtomSelectionQuery)
+    }), Types.AtomSelectionQuery, 'Intersect each atom set from the first sequence from atoms in the second one.'),
 
     exceptBy: symbol(Arguments.Dictionary({
-        selection: Argument(Types.AtomSelection),
-        by: Argument(Types.AtomSelection)
-    }), Types.AtomSelection, `Remove all atoms from 'selection' that occur in 'by'.`),
+        selection: Argument(Types.AtomSelectionQuery),
+        by: Argument(Types.AtomSelectionQuery)
+    }), Types.AtomSelectionQuery, `Remove all atoms from 'selection' that occur in 'by'.`),
 
     unionBy: symbol(Arguments.Dictionary({
-        selection: Argument(Types.AtomSelection),
-        by: Argument(Types.AtomSelection)
-    }), Types.AtomSelection, 'For each atom set A in the orginal sequence, combine all atoms sets in the target selection that intersect with A.'),
+        selection: Argument(Types.AtomSelectionQuery),
+        by: Argument(Types.AtomSelectionQuery)
+    }), Types.AtomSelectionQuery, 'For each atom set A in the orginal sequence, combine all atoms sets in the target selection that intersect with A.'),
 
     union: symbol(Arguments.Dictionary({
-        selection: Argument(Types.AtomSelection)
-    }), Types.AtomSelection, 'Collects all atom sets in the sequence into a single atom set.'),
+        selection: Argument(Types.AtomSelectionQuery)
+    }), Types.AtomSelectionQuery, 'Collects all atom sets in the sequence into a single atom set.'),
 
     cluster: symbol(Arguments.Dictionary({
-        selection: Argument(Types.AtomSelection),
+        selection: Argument(Types.AtomSelectionQuery),
         'min-distance': Argument(Type.Num, { isOptional: true, defaultValue: 0 }),
         'max-distance': Argument(Type.Num),
         'min-size': Argument(Type.Num, { description: 'Minimal number of sets to merge, must be at least 2', isOptional: true, defaultValue: 2 }),
         'max-size': Argument(Type.Num, { description: 'Maximal number of sets to merge, if not set, no limit', isOptional: true }),
-    }), Types.AtomSelection, 'Combines atom sets that have mutual distance in the interval [min-radius, max-radius]. Minimum/maximum size determines how many atom sets can be combined.'),
+    }), Types.AtomSelectionQuery, 'Combines atom sets that have mutual distance in the interval [min-radius, max-radius]. Minimum/maximum size determines how many atom sets can be combined.'),
 
     includeSurroundings: symbol(Arguments.Dictionary({
-        selection: Argument(Types.AtomSelection),
+        selection: Argument(Types.AtomSelectionQuery),
         radius: Argument(Type.Num),
         'as-whole-residues': Argument(Type.Bool, { isOptional: true })
-    }), Types.AtomSelection)
+    }), Types.AtomSelectionQuery)
 }
 
 const filter = {
     '@header': 'Selection Filters',
     pick: symbol(Arguments.Dictionary({
-        selection: Argument(Types.AtomSelection),
+        selection: Argument(Types.AtomSelectionQuery),
         test: Argument(Type.Bool)
-    }), Types.AtomSelection, 'Pick all atom sets that satisfy the test'),
+    }), Types.AtomSelectionQuery, 'Pick all atom sets that satisfy the test'),
 
     withSameProperties: symbol(Arguments.Dictionary({
-        selection: Argument(Types.AtomSelection),
-        source: Argument(Types.AtomSelection),
+        selection: Argument(Types.AtomSelectionQuery),
+        source: Argument(Types.AtomSelectionQuery),
         property: Argument(Type.Any)
-    }), Types.AtomSelection),
+    }), Types.AtomSelectionQuery),
 
     within: symbol(Arguments.Dictionary({
-        selection: Argument(Types.AtomSelection),
-        target: Argument(Types.AtomSelection),
+        selection: Argument(Types.AtomSelectionQuery),
+        target: Argument(Types.AtomSelectionQuery),
         radius: Argument(Type.Num)
-    }), Types.AtomSelection, 'All atom sets from section that are within the radius of any atom from target')
+    }), Types.AtomSelectionQuery, 'All atom sets from section that are within the radius of any atom from target')
 }
 
 const combinator = {
     '@header': 'Selection Combinators',
-    intersect: symbol(Arguments.List(Types.AtomSelection), Types.AtomSelection, 'Return all unique atom sets that appear in all of the source selections.'),
-    merge: symbol(Arguments.List(Types.AtomSelection), Types.AtomSelection, 'Merges multiple selections into a single one. Only unique atom sets are kept.'),
+    intersect: symbol(Arguments.List(Types.AtomSelectionQuery), Types.AtomSelectionQuery, 'Return all unique atom sets that appear in all of the source selections.'),
+    merge: symbol(Arguments.List(Types.AtomSelectionQuery), Types.AtomSelectionQuery, 'Merges multiple selections into a single one. Only unique atom sets are kept.'),
     distanceCluster: symbol(Arguments.Dictionary({
-        matrix: Argument(Core.Types.List, { description: 'Distance matrix, represented as list of rows (num[][])). Lower triangle is min distance, upper triange is max distance.' }),
-        selections: Argument(Core.Types.List, { description: 'A list of held selections.' })
-    }), Types.AtomSelection, 'Pick combinations of atom sets from the source sequences that are mutually within distances specified by a matrix.')
+        matrix: Argument(Core.Types.List(Core.Types.List(Type.Num)), { description: 'Distance matrix, represented as list of rows (num[][])). Lower triangle is min distance, upper triange is max distance.' }),
+        selections: Argument(Core.Types.List(Types.AtomSelectionQuery), { description: 'A list of held selections.' })
+    }), Types.AtomSelectionQuery, 'Pick combinations of atom sets from the source sequences that are mutually within distances specified by a matrix.')
 }
 
 const atomSet = {
@@ -125,7 +127,7 @@ const atomSet = {
     atomCount: symbol(Arguments.None, Type.Num),
 
     countQuery: symbol(Arguments.Dictionary({
-        query: Argument(Types.AtomSelection)
+        query: Argument(Types.AtomSelectionQuery)
     }), Type.Num, 'Counts the number of occurences of a specific query inside the current atom set.'),
 
     reduce: {

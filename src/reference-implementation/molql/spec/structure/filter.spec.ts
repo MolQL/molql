@@ -14,7 +14,7 @@ describe('filter', () => {
 
     it('pick with at least 6 atoms', function() {
         const q = B.struct.filter.pick({ selection: residues, test: B.core.rel.gr([B.struct.atomSet.atomCount(), 6 ]) });
-        const sel = Data.compile(q)(Data.ctx);
+        const sel = Data.compileQuery(q)(Data.ctx);
         expect(AtomSelection.atomSets(sel).length).toBeGreaterThan(0);
         const check = AtomSelection.atomSets(sel).every(s => AtomSet.count(s) > 6);
         expect(check).toBe(true);
@@ -26,7 +26,7 @@ describe('filter', () => {
             source: B.struct.generator.atomGroups({ 'residue-test': B.core.rel.eq([B.ammp('id'), 1]) }),
             property: B.ammp('auth_comp_id')
         });
-        const sel = Data.compile(q)(Data.ctx);
+        const sel = Data.compileQuery(q)(Data.ctx);
         expect(AtomSelection.atomSets(sel).length).toBeGreaterThan(0);
         const name = Data.model.data.atom_site.auth_comp_id.getString(Data.model.atoms.dataIndex[0]);
         const check = Data.checkAtomSelection(Data.model, sel, (i, cols) => cols.auth_comp_id.getString(i) === name);
@@ -38,8 +38,8 @@ describe('filter', () => {
 
         const q = B.struct.filter.within({ selection: residues, target: HEM, radius: 5 });
 
-        const pivotAtomSet = AtomSelection.atomSets(Data.compile(HEM)(Data.ctx) as AtomSelection)[0];
-        const sel = Data.compile(q)(Data.ctx) as AtomSelection;
+        const pivotAtomSet = AtomSelection.atomSets(Data.compileQuery(HEM)(Data.ctx) as AtomSelection)[0];
+        const sel = Data.compileQuery(q)(Data.ctx) as AtomSelection;
         expect(AtomSelection.atomSets(sel).length).toBeGreaterThan(0);
         const distanceCheck = AtomSelection.atomSets(sel).every(s => AtomSet.distance(Data.model, pivotAtomSet, s) <= 5);
         expect(distanceCheck).toBe(true);

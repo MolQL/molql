@@ -7,12 +7,11 @@ Language Reference
      * [Types](#types)
      * [Logic](#logic)
      * [Control Flow](#control-flow)
-     * [Math](#math)
      * [Relational](#relational)
+     * [Math](#math)
      * [Strings](#strings)
      * [Lists](#lists)
      * [Sets](#sets)
-     * [Maps](#maps)
    * [Structure Queries](#structure-queries)
      * [Types](#types)
      * [Generators](#generators)
@@ -35,23 +34,29 @@ Language Reference
 ### **bool**
 ```
 core.type.bool :: array [
-  Any
+  Value
 ] => Bool
 ```
+
+*Convert a value to boolean.*
 
 ### **num**
 ```
 core.type.num :: array [
-  Any
+  Value
 ] => Number
 ```
+
+*Convert a value to number.*
 
 ### **str**
 ```
 core.type.str :: array [
-  Any
+  Value
 ] => String
 ```
+
+*Convert a value to string.*
 
 ### **regex**
 ```
@@ -66,25 +71,16 @@ core.type.regex :: array [
 ### **list**
 ```
 core.type.list :: array [
-  Any*
-] => List
+  a*
+] => List[a]
 ```
 
 ### **set**
 ```
 core.type.set :: array [
-  Any*
-] => Set
+  a*
+] => Set[a]
 ```
-
-### **map**
-```
-core.type.map :: array [
-  Any*
-] => Map
-```
-
-*Create a map from a list of key value pairs, e.g. (map 1 "x" 2 "y").*
 
 ## Logic
 
@@ -115,14 +111,86 @@ core.logic.or :: array [
 
 -------------------
 
+### **hold**
+```
+core.ctrl.hold :: array [
+  a
+] => a
+```
+
+*Hold a value to be evaluated lazily.*
+
 ### **if**
 ```
 core.ctrl.if :: array [
   Bool (* Condition *), 
-  Any (* If true *), 
-  Any (* If false *)
-] => Any
+  a (* If true *), 
+  b (* If false *)
+] => a | b
 ```
+
+## Relational
+
+-------------------
+
+### **eq**
+```
+core.rel.eq :: array [
+  a<Value>, 
+  a<Value>
+] => Bool
+```
+
+### **neq**
+```
+core.rel.neq :: array [
+  a<Value>, 
+  a<Value>
+] => Bool
+```
+
+### **lt**
+```
+core.rel.lt :: array [
+  Number, 
+  Number
+] => Bool
+```
+
+### **lte**
+```
+core.rel.lte :: array [
+  Number, 
+  Number
+] => Bool
+```
+
+### **gr**
+```
+core.rel.gr :: array [
+  Number, 
+  Number
+] => Bool
+```
+
+### **gre**
+```
+core.rel.gre :: array [
+  Number, 
+  Number
+] => Bool
+```
+
+### **in-range**
+```
+core.rel.in-range :: array [
+  Number (* Value to test *), 
+  Number (* Minimum value *), 
+  Number (* Maximum value *)
+] => Bool
+```
+
+*Check if the value of the 1st argument is >= 2nd and <= 3rd.*
 
 ## Math
 
@@ -314,69 +382,6 @@ core.math.atan2 :: array [
 ] => Number
 ```
 
-## Relational
-
--------------------
-
-### **eq**
-```
-core.rel.eq :: array [
-  Any, 
-  Any
-] => Bool
-```
-
-### **neq**
-```
-core.rel.neq :: array [
-  Any, 
-  Any
-] => Bool
-```
-
-### **lt**
-```
-core.rel.lt :: array [
-  Number, 
-  Number
-] => Bool
-```
-
-### **lte**
-```
-core.rel.lte :: array [
-  Number, 
-  Number
-] => Bool
-```
-
-### **gr**
-```
-core.rel.gr :: array [
-  Number, 
-  Number
-] => Bool
-```
-
-### **gre**
-```
-core.rel.gre :: array [
-  Number, 
-  Number
-] => Bool
-```
-
-### **in-range**
-```
-core.rel.in-range :: array [
-  Number (* Value to test *), 
-  Number (* Minimum value *), 
-  Number (* Maximum value *)
-] => Bool
-```
-
-*Check if the value of the 1st argument is >= 2nd and <= 3rd.*
-
 ## Strings
 
 -------------------
@@ -403,9 +408,9 @@ core.str.match :: array [
 ### **get-at**
 ```
 core.list.get-at :: array [
-  List, 
+  List[a], 
   Number
-] => Any
+] => a
 ```
 
 ## Sets
@@ -415,30 +420,9 @@ core.list.get-at :: array [
 ### **has**
 ```
 core.set.has :: array [
-  Set, 
-  Any
+  Set[a], 
+  a
 ] => Bool
-```
-
-## Maps
-
--------------------
-
-### **has**
-```
-core.map.has :: array [
-  Map, 
-  Any
-] => Bool
-```
-
-### **get**
-```
-core.map.get :: array [
-  Map, 
-  Value (* Key *), 
-  Any (* Default value if key is not present *)
-] => Any
 ```
 
 # Structure Queries
@@ -633,6 +617,16 @@ structure.combinator.merge :: array [
 ```
 
 *Merges multiple selections into a single one. Only unique atom sets are kept.*
+
+### **distance-cluster**
+```
+structure.combinator.distance-cluster :: object {
+  matrix: List[List[Number]] (* Distance matrix, represented as list of rows (num[][])). Lower triangle is min distance, upper triange is max distance. *), 
+  selections: List[AtomSelection] (* A list of held selections. *)
+} => AtomSelection
+```
+
+*Pick combinations of atom sets from the source sequences that are mutually within distances specified by a matrix.*
 
 ## Atom Sets
 

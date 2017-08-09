@@ -45,7 +45,7 @@ const lang: Language = {
         name: 'Cluster 3 LYS residues within 5 ang',
         value: JSON.stringify(B.struct.combinator.distanceCluster({
             matrix: l([l([0, 5, 5]), l([0, 0, 5]), l([0, 0, 0])]),
-            selections: l([lys, lys, lys].map(B.hold))
+            selections: l([lys, lys, lys])
         }), null, 2)
     }, {
         name: 'Residues with max b-factor < 45',

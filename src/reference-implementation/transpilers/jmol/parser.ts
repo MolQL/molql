@@ -133,5 +133,5 @@ const lang = P.createLanguage({
     }
 })
 
-const transpiler: Transpiler = str => lang.Query.tryParse(str)
+const transpiler: Transpiler = str => B.evaluate(lang.Query.tryParse(str))
 export default transpiler

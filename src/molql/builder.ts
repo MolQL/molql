@@ -13,7 +13,8 @@ namespace Builder {
     export function es(s: string) { return struct.type.elementSymbol([s]); }
     export function list(...xs: Expression[]) { return core.type.list(xs); }
     export function set(...xs: Expression[]) { return core.type.set(xs); }
-    export function hold(x: Expression) { return core.ctrl.hold([x]); }
+    export function fn(x: Expression) { return core.ctrl.fn([x]); }
+    export function evaluate(x: Expression) { return core.ctrl.eval([x]); }
 
     const _acp = MolQL.structure.atomProperty.core, _ammp = MolQL.structure.atomProperty.macromolecular;
 

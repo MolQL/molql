@@ -4,6 +4,7 @@
 
 import * as fs from 'fs'
 
+import Expression from '../../../mini-lisp/expression'
 import * as mmCIF from '../../molecule/mmcif'
 import parseCIF from '../../molecule/parser'
 import { Model } from '../../molecule/data'
@@ -12,6 +13,7 @@ import Context from '../runtime/context'
 import Environtment from '../runtime/environment'
 import _compile from '../../molql/compiler'
 import AtomSelection from '../data/atom-selection'
+import B from '../../../molql/builder'
 
 export const set12 = AtomSet([1, 2])
 export const set34 = AtomSet([3, 4])
@@ -25,6 +27,8 @@ export const model = parseCIF(molData).models[0];
 export const ctx = Context.ofModel(model);
 export const env = Environtment(ctx);
 export const compile = _compile;
+
+export const compileQuery = (e: Expression) => compile(B.evaluate(e))
 
 export function areAtomSetEqual(a: AtomSet, b: AtomSet) {
     return AtomSet.areEqual(a, b);

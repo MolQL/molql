@@ -25,7 +25,7 @@ describe('atom-set', () => {
                 40
             ])
         });
-        const sel = Data.compile(q)(Data.ctx);
+        const sel = Data.compileQuery(q)(Data.ctx);
         const check = Data.checkAtomSelection(Data.model, sel, (i, cols) => cols.B_iso_or_equiv.getFloat(i) > 40);
         expect(check).toBe(true);
     });
@@ -44,7 +44,7 @@ describe('atom-set', () => {
                 ])
             ])
         });
-        const sel = Data.compile(q)(Data.ctx);
+        const sel = Data.compileQuery(q)(Data.ctx);
         expect(AtomSelection.atomSets(sel).length).toBeGreaterThan(0);
         const check = AtomSelection.atomSets(sel).every(s =>
             Data.countAtomSet(Data.model, s, (i, cols) => cols.type_symbol.getString(i) === 'C') >= 3
