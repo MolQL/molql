@@ -7,6 +7,7 @@ import Type from '../../mini-lisp/type'
 export default function format(type: Type): string {
     switch (type.kind) {
         case 'any': return 'Any';
+        case 'any-value': return 'Value';
         case 'value': return type.name;
         case 'variable': return type.type && type.type.kind !== 'any' ? `${type.name}<${format(type.type)}>` : type.name;
         case 'container': return `${type.name}[${format(type.child)}]`;

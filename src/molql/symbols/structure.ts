@@ -8,10 +8,10 @@ import { Arguments, Argument } from '../../mini-lisp/symbol'
 import { symbol } from './helpers'
 
 export namespace Types {
-    export const ElementSymbol = Type.Value('Structure', 'ElementSymbol', Type.AnyValue);
-    export const ResidueId = Type.Value('Structure', 'ResidueId', Type.AnyValue);
-    export const AtomSet = Type.Value('Structure', 'AtomSet', Type.AnyValue);
-    export const AtomSelection = Type.Value('Structure', 'AtomSelection', Type.AnyValue);
+    export const ElementSymbol = Type.Value('Structure', 'ElementSymbol');
+    export const ResidueId = Type.Value('Structure', 'ResidueId');
+    export const AtomSet = Type.Value('Structure', 'AtomSet');
+    export const AtomSelection = Type.Value('Structure', 'AtomSelection');
 
     export const AtomSelectionQuery = Core.Types.Fn(AtomSelection);
 }

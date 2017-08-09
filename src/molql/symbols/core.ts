@@ -11,10 +11,7 @@ export namespace Types {
     export type Set<T = any> = { has(e: T): boolean }
 
     export const A = Type.Variable('a');
-
-    //export const List = Type.Container<List>('Core', 'List', Type.Any);
-    //export const Set = Type.Container<Set>('Core', 'Set', Type.Variable('a'));
-    export const Regex = Type.Value<RegExp>('Core', 'Regex', Type.AnyValue);
+    export const Regex = Type.Value<RegExp>('Core', 'Regex');
 
     export const Set = <T extends Type>(t?: T) => Type.Container<Set<T['@type']>>('Core', 'Set', t || A);
     export const List = <T extends Type>(t?: T) => Type.Container<List<T['@type']>>('Core', 'List', t || A);
