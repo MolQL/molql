@@ -23,7 +23,7 @@ const list: MolQLLispSymbol[] = [
     Alias(MolQL.core.logic.and, 'and'),
     Alias(MolQL.core.logic.or, 'or'),
     Alias(MolQL.core.ctrl.if, 'if'),
-    Alias(MolQL.core.ctrl.lazy, 'lazy'),
+    Alias(MolQL.core.ctrl.hold, 'hold'),
     Alias(MolQL.core.math.add, 'add', '+'),
     Alias(MolQL.core.math.sub, 'sub', '-'),
     Alias(MolQL.core.math.mult, 'mult', '*'),

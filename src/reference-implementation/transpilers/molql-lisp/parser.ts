@@ -6,7 +6,6 @@ import * as P from 'parsimmon'
 
 import Transpiler from '../transpiler'
 import Expression from '../../../mini-lisp/expression'
-//import { SymbolMap } from '../../../molql/symbols'
 import { SymbolMap } from './symbols'
 
 const ws = P.regex(/[\n\r\s]*/)

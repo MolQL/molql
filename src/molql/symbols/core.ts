@@ -57,7 +57,7 @@ const logic = {
 
 const ctrl = {
     '@header': 'Control Flow',
-    lazy: symbol(Arguments.Dictionary({ 0: Argument(Type.Any) }), Type.Any, 'Hold a value to be evaluated lazily.'),
+    hold: symbol(Arguments.Dictionary({ 0: Argument(Type.Any) }), Type.Any, 'Hold a value to be evaluated lazily.'),
     if: symbol(Arguments.Dictionary({
         0: Argument(Type.Bool, { description: 'Condition' }),
         1: Argument(Type.Any, { description: 'If true' }),

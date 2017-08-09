@@ -7,7 +7,6 @@ import Transpilers from '../../reference-implementation/transpilers/all'
 import B from '../../molql/builder'
 
 const l = B.core.type.list;
-const lazy = <T>(e: T) =>  B.core.ctrl.lazy([e as any]);
 const lys = B.struct.generator.atomGroups({
     'residue-test': B.core.rel.eq([B.ammp('auth_comp_id'), 'LYS']),
     'group-by': B.ammp('residueKey')
@@ -46,7 +45,7 @@ const lang: Language = {
         name: 'Cluster 3 LYS residues within 5 ang',
         value: JSON.stringify(B.struct.combinator.distanceCluster({
             matrix: l([l([0, 5, 5]), l([0, 0, 5]), l([0, 0, 0])]),
-            selections: l([lazy(lys), lazy(lys), lazy(lys)])
+            selections: l([lys, lys, lys].map(B.hold))
         }), null, 2)
     }, {
         name: 'Residues with max b-factor < 45',

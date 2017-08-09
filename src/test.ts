@@ -71,10 +71,9 @@ function run(model: Model) {
     //     'max-distance': 5
     // });
     const l = B.core.type.list;
-    const lazy = <T>(e: T) =>  B.core.ctrl.lazy([e as any]);
     const query = B.struct.combinator.distanceCluster({
         matrix: l([l([0, 5, 5]), l([0, 0, 5]), l([0, 0, 0])]),
-        selections: l([lazy(lys), lazy(lys), lazy(lys)])
+        selections: l([lys, lys, lys].map(B.hold))
     });
 
     //console.log('check');

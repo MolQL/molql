@@ -115,7 +115,7 @@ const combinator = {
     merge: symbol(Arguments.List(Types.AtomSelection), Types.AtomSelection, 'Merges multiple selections into a single one. Only unique atom sets are kept.'),
     distanceCluster: symbol(Arguments.Dictionary({
         matrix: Argument(Core.Types.List, { description: 'Distance matrix, represented as list of rows (num[][])). Lower triangle is min distance, upper triange is max distance.' }),
-        selections: Argument(Core.Types.List, { description: 'A list of lazy selections.' })
+        selections: Argument(Core.Types.List, { description: 'A list of held selections.' })
     }), Types.AtomSelection, 'Pick combinations of atom sets from the source sequences that are mutually within distances specified by a matrix.')
 }
 

@@ -85,7 +85,7 @@ export const SymbolRuntime: Symbol.Info<Context>[] = [
 
     // ============= CONTROL FLOW ================
     Symbol(MolQL.core.ctrl.if, staticAttr)((env, v) => v[0](env) ? v[1](env) : v[2](env)),
-    Symbol(MolQL.core.ctrl.lazy)((env, v) => v[0]),
+    Symbol(MolQL.core.ctrl.hold)((env, v) => v[0]),
 
     // ============= ARITHMETIC ================
     Symbol(MolQL.core.math.add, staticAttr)((env, xs) => {

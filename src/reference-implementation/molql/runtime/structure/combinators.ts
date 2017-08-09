@@ -64,7 +64,7 @@ interface ClusterCtx {
     width: number
 }
 
-function _check(ctx: ClusterCtx, depth: number) {
+function clusterCheck(ctx: ClusterCtx, depth: number) {
     const { location, selections, model, matrix, width } = ctx;
     const toCheck = AtomSelection.atomSets(selections[depth])[location[depth]];
     for (let i = 0; i < depth; i++) {
@@ -77,7 +77,7 @@ function _check(ctx: ClusterCtx, depth: number) {
     return true;
 }
 
-function _clusterAround(ctx: ClusterCtx, depth: number) {
+function clusterAround(ctx: ClusterCtx, depth: number) {
     const { location, selections, width } = ctx;
     if (depth >= location.length) {
         let set = AtomSelection.atomSets(selections[0])[location[0]];
@@ -91,11 +91,11 @@ function _clusterAround(ctx: ClusterCtx, depth: number) {
     const candidates = ctx.candidates[depth];
     for (let i = 0, _i = candidates.length; i < _i; i++) {
         location[depth] = candidates[i];
-        if (_check(ctx, depth)) _clusterAround(ctx, depth + 1);
+        if (clusterCheck(ctx, depth)) clusterAround(ctx, depth + 1);
     }
 }
 
-function _cluster(env: Environment, matrix: Float64Array, selections: AtomSelection[]) {
+function cluster(env: Environment, matrix: Float64Array, selections: AtomSelection[]) {
     const ctx: ClusterCtx = {
         model: env.context.model,
         matrix,
@@ -123,7 +123,7 @@ function _cluster(env: Environment, matrix: Float64Array, selections: AtomSelect
             }
         }
         if (empty) continue;
-        _clusterAround(ctx, 1);
+        clusterAround(ctx, 1);
     }
     return ctx.builder.getSelection();
 }
@@ -148,5 +148,5 @@ export function distanceCluster(env: Environment,
             m[i * w + j] = row[j];
         }
     }
-    return _cluster(env, m, atomSelections);
+    return cluster(env, m, atomSelections);
 }
