@@ -3,6 +3,7 @@
  */
 
 import Type from '../../mini-lisp/type'
+import * as Core from './core'
 import { Arguments, Argument } from '../../mini-lisp/symbol'
 import { symbol } from './helpers'
 
@@ -112,10 +113,10 @@ const combinator = {
     '@header': 'Selection Combinators',
     intersect: symbol(Arguments.List(Types.AtomSelection), Types.AtomSelection, 'Return all unique atom sets that appear in all of the source selections.'),
     merge: symbol(Arguments.List(Types.AtomSelection), Types.AtomSelection, 'Merges multiple selections into a single one. Only unique atom sets are kept.'),
-    // near: symbol(Arguments.Dictionary({
-    //     0: Argument(Type.Num, { description: 'radius' }),
-    //     1: Argument(Types.AtomSelection, { isRest: true })
-    // }), Types.AtomSelection, 'Pick combinations of atom sets from the source sequences that are mutually no more than radius apart.')
+    distanceCluster: symbol(Arguments.Dictionary({
+        matrix: Argument(Core.Types.List, { description: 'Distance matrix, represented as list of rows (num[][])). Lower triangle is min distance, upper triange is max distance.' }),
+        selections: Argument(Core.Types.List, { description: 'A list of lazy selections.' })
+    }), Types.AtomSelection, 'Pick combinations of atom sets from the source sequences that are mutually within distances specified by a matrix.')
 }
 
 const atomSet = {

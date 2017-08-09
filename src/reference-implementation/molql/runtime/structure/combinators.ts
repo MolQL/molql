@@ -3,7 +3,9 @@
  */
 
 import Environment from '../environment'
+import Context from '../context'
 import Expression from '../expression'
+import AtomSet from '../../data/atom-set'
 import AtomSelection from '../../data/atom-selection'
 
 type VarArgs<T = any> = { [key: string]: Expression<T> }
@@ -50,4 +52,101 @@ export function merge(env: Environment, selections: VarArgs<AtomSelection>) {
         }
     }
     return ret;
+}
+
+interface ClusterCtx {
+    model: Context['model'],
+    matrix: Float64Array,
+    selections: AtomSelection[],
+    candidates: number[][],
+    location: number[],
+    builder: AtomSelection.Builder,
+    width: number
+}
+
+function _check(ctx: ClusterCtx, depth: number) {
+    const { location, selections, model, matrix, width } = ctx;
+    const toCheck = AtomSelection.atomSets(selections[depth])[location[depth]];
+    for (let i = 0; i < depth; i++) {
+        const atomSet = AtomSelection.atomSets(selections[i])[location[i]];
+        const dist = AtomSet.distance(model, toCheck, atomSet)
+        if (dist === 0 && AtomSet.areEqual(toCheck, atomSet)) return false;
+        const maxDist = matrix[i * width + depth], minDist = matrix[depth * width + i];
+        if (dist > maxDist || dist < minDist) return false;
+    }
+    return true;
+}
+
+function _clusterAround(ctx: ClusterCtx, depth: number) {
+    const { location, selections, width } = ctx;
+    if (depth >= location.length) {
+        let set = AtomSelection.atomSets(selections[0])[location[0]];
+        for (let i = 1; i < width; i++) {
+            set = AtomSet.union(set, AtomSelection.atomSets(selections[i])[location[i]]);
+        }
+        ctx.builder.add(set);
+        return;
+    }
+
+    const candidates = ctx.candidates[depth];
+    for (let i = 0, _i = candidates.length; i < _i; i++) {
+        location[depth] = candidates[i];
+        if (_check(ctx, depth)) _clusterAround(ctx, depth + 1);
+    }
+}
+
+function _cluster(env: Environment, matrix: Float64Array, selections: AtomSelection[]) {
+    const ctx: ClusterCtx = {
+        model: env.context.model,
+        matrix,
+        selections,
+        builder: AtomSelection.uniqueBuilder(),
+        candidates: [],
+        location: [],
+        width: selections.length
+    }
+    for (let i = 0; i < ctx.width; i++) {
+        ctx.location[i] = 0;
+        ctx.candidates[i] = [];
+    }
+    const lookups = selections.slice(1).map(s => AtomSelection.lookup3d(ctx.model, s));
+    const first = AtomSelection.atomSets(selections[0]);
+    for (let i = 0; i < first.length; i++) {
+        ctx.location[0] = i;
+        const set = first[i];
+        let empty = false;
+        for (let j = 1; j < ctx.width; j++) {
+            ctx.candidates[j] = lookups[j - 1].queryAtomSet(set, matrix[j]);
+            if (!ctx.candidates[j].length) {
+                empty = true;
+                break;
+            }
+        }
+        if (empty) continue;
+        _clusterAround(ctx, 1);
+    }
+    return ctx.builder.getSelection();
+}
+
+export function distanceCluster(env: Environment,
+        matrix: Expression<ArrayLike<ArrayLike<number>>>,
+        selections: Expression<ArrayLike<Expression<AtomSelection>>>): AtomSelection {
+
+    const atomSelections: AtomSelection[] = [];
+    const selList = selections(env);
+    for (let i = 0; i < selList.length; i++) {
+        const sel = selList[i](env);
+        if (!AtomSelection.atomSets(sel).length) return AtomSelection.empty;
+        atomSelections.push(sel);
+    }
+    const w = atomSelections.length;
+    const m = new Float64Array(w * w);
+    const rows = matrix(env);
+    for (let i = 0; i < w; i++) {
+        const row = rows[i];
+        for (let j = 0; j < w; j++) {
+            m[i * w + j] = row[j];
+        }
+    }
+    return _cluster(env, m, atomSelections);
 }

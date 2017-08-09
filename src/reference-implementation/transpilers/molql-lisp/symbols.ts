@@ -23,6 +23,7 @@ const list: MolQLLispSymbol[] = [
     Alias(MolQL.core.logic.and, 'and'),
     Alias(MolQL.core.logic.or, 'or'),
     Alias(MolQL.core.ctrl.if, 'if'),
+    Alias(MolQL.core.ctrl.lazy, 'lazy'),
     Alias(MolQL.core.math.add, 'add', '+'),
     Alias(MolQL.core.math.sub, 'sub', '-'),
     Alias(MolQL.core.math.mult, 'mult', '*'),
@@ -80,6 +81,7 @@ const list: MolQLLispSymbol[] = [
     Alias(MolQL.structure.filter.within, 'struct.within'),
     Alias(MolQL.structure.combinator.intersect, 'struct.intersect'),
     Alias(MolQL.structure.combinator.merge, 'struct.merge'),
+    Alias(MolQL.structure.combinator.distanceCluster, 'struct.dist-cluster'),
 
     Alias(MolQL.structure.atomSet.atomCount, 'atom-set.atom-count'),
     Alias(MolQL.structure.atomSet.countQuery, 'atom-set.count-query'),

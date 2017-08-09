@@ -7,7 +7,7 @@ import { Arguments, Argument } from '../../mini-lisp/symbol'
 import { symbol } from './helpers'
 
 export namespace Types {
-    export type List = { [index: string]: any, [index: number]: any, length: number }
+    export type List = ArrayLike<any>
     export type Set = { has(e: any): boolean }
     export type Map = { has(key: any): boolean, get(key: any): any }
     export const List = Type<List>('Core', 'List', Type.Any);
@@ -57,6 +57,7 @@ const logic = {
 
 const ctrl = {
     '@header': 'Control Flow',
+    lazy: symbol(Arguments.Dictionary({ 0: Argument(Type.Any) }), Type.Any, 'Hold a value to be evaluated lazily.'),
     if: symbol(Arguments.Dictionary({
         0: Argument(Type.Bool, { description: 'Condition' }),
         1: Argument(Type.Any, { description: 'If true' }),

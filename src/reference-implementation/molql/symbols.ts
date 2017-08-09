@@ -85,6 +85,7 @@ export const SymbolRuntime: Symbol.Info<Context>[] = [
 
     // ============= CONTROL FLOW ================
     Symbol(MolQL.core.ctrl.if, staticAttr)((env, v) => v[0](env) ? v[1](env) : v[2](env)),
+    Symbol(MolQL.core.ctrl.lazy)((env, v) => v[0]),
 
     // ============= ARITHMETIC ================
     Symbol(MolQL.core.math.add, staticAttr)((env, xs) => {
@@ -223,6 +224,7 @@ export const SymbolRuntime: Symbol.Info<Context>[] = [
     // ============= COMBINATORS ================
     Symbol(MolQL.structure.combinator.intersect)((env, v) => StructureRuntime.Combinators.intersect(env, v)),
     Symbol(MolQL.structure.combinator.merge)((env, v) => StructureRuntime.Combinators.merge(env, v)),
+    Symbol(MolQL.structure.combinator.distanceCluster)((env, v) => StructureRuntime.Combinators.distanceCluster(env, v.matrix, v.selections)),
 
     // ============= ATOM SETS ================
     Symbol(MolQL.structure.atomSet.atomCount)((env, v) => StructureRuntime.AtomSet.atomCount(env)),
