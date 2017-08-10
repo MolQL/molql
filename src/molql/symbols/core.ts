@@ -10,7 +10,7 @@ export namespace Types {
     export type List<T = any> = ArrayLike<T>
     export type Set<T = any> = { has(e: T): boolean }
 
-    export const A = Type.Variable('a');
+    export const A = Type.Variable('a', Type.Any);
     export const Regex = Type.Value<RegExp>('Core', 'Regex');
 
     export const Set = <T extends Type>(t?: T) => Type.Container<Set<T['@type']>>('Core', 'Set', t || A);
@@ -61,15 +61,15 @@ const ctrl = {
     fn: symbol(Arguments.Dictionary({ 0: Argument(Types.A) }), Types.Fn(Types.A), 'Wrap an expression to a "lazy" function.'),
     if: symbol(Arguments.Dictionary({
         0: Argument(Type.Bool, { description: 'Condition' }),
-        1: Argument(Type.Variable('a'), { description: 'If true' }),
-        2: Argument(Type.Variable('b'), { description: 'If false' })
-    }), Type.Union(Type.Variable('a'), Type.Variable('b')))
+        1: Argument(Type.Variable('a', Type.Any), { description: 'If true' }),
+        2: Argument(Type.Variable('b', Type.Any), { description: 'If false' })
+    }), Type.Union([Type.Variable('a', Type.Any), Type.Variable('b', Type.Any)]))
 };
 
 const rel = {
     '@header': 'Relational',
-    eq: binRel(Type.Variable('a', Type.AnyValue), Type.Bool),
-    neq: binRel(Type.Variable('a', Type.AnyValue), Type.Bool),
+    eq: binRel(Type.Variable('a', Type.AnyValue, true), Type.Bool),
+    neq: binRel(Type.Variable('a', Type.AnyValue, true), Type.Bool),
     lt: binRel(Type.Num, Type.Bool),
     lte: binRel(Type.Num, Type.Bool),
     gr: binRel(Type.Num, Type.Bool),
@@ -126,7 +126,7 @@ const list = {
 
 const set = {
     '@header': 'Sets',
-    has: symbol(Arguments.Dictionary({ 0: Argument(Types.Set()), 1: Argument(Types.A) }), Type.Bool)
+    has: symbol(Arguments.Dictionary({ 0: Argument(Types.Set(Type.Variable('a', Type.Any, true))), 1: Argument(Type.Variable('a', Type.Any, true)) }), Type.Bool)
 };
 
 export default {

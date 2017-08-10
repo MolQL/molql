@@ -4,120 +4,177 @@
 
 import Expression from '../../mini-lisp/expression'
 import Type from '../../mini-lisp/type'
-import { SymbolMap /*, Argument, Arguments */ } from '../../mini-lisp/symbol'
+import format from './type-formatter'
+import { SymbolMap, Argument, Arguments } from '../../mini-lisp/symbol'
+import { FastMap, UniqueArrayBuilder } from '../utils/collections'
 
 export default function typeCheck(symbols: SymbolMap, expr: Expression, type?: Type) {
-    //_typeCheck(symbols, expr, type || Type.Any, '');
+    _typeCheck(symbols, FastMap.create(), expr, type || Type.Any, '');
 }
 
-// function _typeCheck(symbols: SymbolMap, expr: Expression, type: Type, hint: string) {
-//     const t = getType(symbols, expr);
-//     if (!isTypeAssignable(t, type)) {
-//         throwError(`${hint}${!!hint ? ': ' : ''}expected ${type.name}, got ${t.name}.`);
-//     }
-//     if (Expression.isApply(expr) && Expression.isLiteral(expr.head)) {
-//         const symbol = getSymbol(symbols, expr.head);
-//         isAssignableTo(symbols, symbol.id, expr.args, symbol.args);
-//     }
-//     return t;
-// }
+type TypeContextEntry = { type: Type, seen: UniqueArrayBuilder<Type> }
+type TypeContext = FastMap<string, TypeContextEntry>
 
-// function getSymbol(symbols: SymbolMap, head: any) {
-//     const symbol = symbols[head as string];
-//     if (!symbol) throwError(`'${head}': symbol not found.`);
-//     return symbol!;
-// }
+function _typeCheck(symbols: SymbolMap, ctx: TypeContext, expr: Expression, type: Type, hint: string) {
+    if (Expression.isLiteral(expr)) {
+        const l = getLiteralType(expr);
+        if (!assignType(ctx, l, type)) notAssignable(ctx, hint, l, type);
+    } else if (Expression.isApply(expr) && Expression.isLiteral(expr.head)) {
+        const symbol = getSymbol(symbols, expr.head);
+        const argsCtx: TypeContext = FastMap.create();
+        assignArguments(symbols, argsCtx, symbol.id, expr.args, symbol.args);
+        const t = resolveType(argsCtx, symbol.type);
+        if (!assignType(ctx, t, type)) notAssignable(ctx, hint, t, type);
+    }
+}
 
-// function throwError(msg: string) {
-//     throw new Error(msg);
-// }
 
-// function isAssignableTo(symbols: SymbolMap, symbolId: string, exprArgs: Expression.Arguments | undefined, args: Arguments) {
-//     if (args.kind === 'list') {
-//         if (!exprArgs) {
-//             if (args.nonEmpty) throwError(`'${symbolId}': at least one argument required.`);
-//             return;
-//         }
-//         if (!Expression.isArgumentsArray(exprArgs)) {
-//             throwError(`'${symbolId}': accepts array arguments (got object).`);
-//             return;
-//         }
-//         if (args.nonEmpty && !exprArgs.length) throwError(`'${symbolId}': at least one argument required.`);
-//         let i = 0;
-//         for (const a of exprArgs) {
-//             _typeCheck(symbols, a, args.type, `'${symbolId}', arg ${i++}`);
-//         }
-//     } else {
-//         const keys = Object.keys(args.map);
-//         if (!exprArgs) {
-//             if (keys.length && !keys.every(k => ((args.map as any)[k] as Argument).isOptional)) throwError(`'${symbolId}': argument(s) required.`);
-//             return;
-//         }
-//         let isArrayLike = true, i = 0;
-//         for (const k of keys) {
-//             if (isNaN(k as any) || +k !== i) {
-//                 isArrayLike = false;
-//                 break;
-//             }
-//             i++;
-//         }
+function getSymbol(symbols: SymbolMap, head: any) {
+    const symbol = symbols[head as string];
+    if (!symbol) throwError(`'${head}': symbol not found.`);
+    return symbol!;
+}
 
-//         if (Expression.isArgumentsArray(exprArgs)) {
-//             if (!isArrayLike) {
-//                 throwError(`'${symbolId}': accepts object/named arguments (got object).`);
-//             }
-//             if (exprArgs.length < i) {
-//                 throwError(`'${symbolId}': more arguments required.`);
-//             }
-//         }
+function throwError(msg: string) {
+    throw new Error(msg);
+}
 
-//         const typeVariables: { [name: string]: Type } = Object.create(null);
-//         for (const k of keys) {
-//             const arg = (args.map as any)[k] as Argument;
-//             const e = (exprArgs as any)[k];
-//             if (e === void 0) {
-//                 if (!arg.isOptional) throwError(`'${symbolId}': arg ':${k}' is required.`);
-//                 continue;
-//             }
-//             const t = _typeCheck(symbols, e, arg.type, `'${symbolId}', arg ':${k}'`);
-//             if (arg.typeName) {
-//                 if (typeVariables[arg.typeName]) {
-//                     if (!isTypeAssignable(t, typeVariables[arg.typeName])) {
-//                         throwError(`'${symbolId}', arg ':${k}': exprected ${typeVariables[arg.typeName].name}, got ${t.name}.`);
-//                     }
-//                 } else {
-//                     typeVariables[arg.typeName] = t;
-//                 }
-//             }
-//         }
-//     }
-// }
+function notAssignable(ctx: TypeContext, hint: string, a: Type, b: Type) {
+    throwError(`${hint}${!!hint ? ': ' : ''}type '${format(resolveType(ctx, a))}' is not assignable to '${format(resolveType(ctx, b))}'.`);
+}
 
-// function getType(symbols: SymbolMap, expr: Expression) {
-//     if (Expression.isLiteral(expr)) {
-//         switch (typeof expr) {
-//             case 'number': return Type.Num;
-//             case 'string': return Type.Str;
-//             case 'boolean': return Type.Bool;
-//             default: return Type.Any;
-//         }
-//     }
-//     if (Expression.isLiteral(expr.head)) {
-//         const symbol = getSymbol(symbols, expr.head);
-//         if (!symbol) throwError(`'${expr.head}': symbol not found.`);
+function assignArguments(symbols: SymbolMap, ctx: TypeContext, symbolId: string, exprArgs: Expression.Arguments | undefined, args: Arguments): void {
+    if (args.kind === 'list') {
+        if (!exprArgs) {
+            if (args.nonEmpty) throwError(`'${symbolId}': at least one argument required.`);
+            return;
+        }
+        if (!Expression.isArgumentsArray(exprArgs)) {
+            throwError(`'${symbolId}': accepts array arguments (got object).`);
+            return;
+        }
+        if (args.nonEmpty && !exprArgs.length) throwError(`'${symbolId}': at least one argument required.`);
+        let i = 0;
+        for (const a of exprArgs) {
+            _typeCheck(symbols, ctx, a, args.type, `'${symbolId}', arg ${i++}`);
+        }
+    } else {
+        const keys = Object.keys(args.map);
+        let isArrayLike = true, i = 0;
+        let optionalCount = 0;
+        for (const k of keys) {
+            const arg = (args.map as any)[k] as Argument;
+            if (isNaN(k as any) || +k !== i) isArrayLike = false;
+            if (arg.isOptional) optionalCount++;
+            i++;
+        }
 
-//         return symbol.type;
-//     }
-//     return Type.Any;
-// }
+        if (!exprArgs) {
+            if (i - optionalCount > 0) throwError(`'${symbolId}': argument(s) required.`);
+            return;
+        }
 
-// function isTypeAssignable(a: Type, b: Type) {
-//     if (!a.parent) return true;
-//     let current: Type | undefined = a;
-//     while (current) {
-//         if (current.name === b.name && current.namespace === b.namespace) return true;
-//         current = current.parent;
-//     }
-//     return false;
-// }
+        if (Expression.isArgumentsArray(exprArgs)) {
+            if (!isArrayLike) {
+                throwError(`'${symbolId}': accepts object/named arguments (got object).`);
+            }
+            if (exprArgs.length < i - optionalCount) {
+                throwError(`'${symbolId}': more arguments required.`);
+            }
+        }
 
+        for (const k of keys) {
+            const arg = (args.map as any)[k] as Argument;
+            const e = (exprArgs as any)[k];
+            if (e === void 0) {
+                if (!arg.isOptional) throwError(`'${symbolId}': arg ':${k}' is required.`);
+                continue;
+            }
+            _typeCheck(symbols, ctx, e, arg.type, `'${symbolId}', arg ':${k}'`);
+        }
+    }
+}
+
+function hasVariables(type: Type): boolean {
+    switch (type.kind) {
+        case 'variable': return true;
+        case 'value':
+        case 'any':
+        case 'any-value': return false;
+        case 'container': return hasVariables(type.child);
+        case 'union': {
+            for (let t of type.types) {
+                if (hasVariables(t)) return true;
+            }
+            return false;
+        }
+    }
+}
+
+function getLiteralType(expr: Expression.Literal) {
+    switch (typeof expr) {
+        case 'number': return Type.Num;
+        case 'string': return Type.Str;
+        case 'boolean': return Type.Bool;
+        default: return Type.Any;
+    }
+}
+
+function assignType(ctx: TypeContext, a: Type, b: Type): boolean {
+    if (a.kind === 'variable') {
+        let t = a.type;
+        if (a.isConstraint) {
+            if (ctx.has(a.name)) t = ctx.get(a.name)!.type;
+            else return assignType(ctx, b, a);
+        }
+        return assignType(ctx, t, b);
+    }
+
+    switch (b.kind) {
+        case 'any': return true;
+        case 'any-value': return a.kind === 'value' || a.kind === 'any-value';
+        case 'value': return a.kind === 'value' && a.name === b.name && a.namespace === b.namespace;
+        case 'container': return a.kind === 'container' && a.name === b.name && a.namespace === b.namespace && assignType(ctx, a.child, b.child);
+        case 'union': {
+            if (a.kind === 'union') {
+                for (let t of a.types) {
+                    if (!assignType(ctx, t, b)) return false;
+                }
+                return true;
+            } else {
+                for (let t of b.types) {
+                    if (!assignType(ctx, a, t)) return true;
+                }
+                return false;
+            }
+        }
+        case 'variable': {
+            if (!assignType(ctx, a, b.type)) return false;
+            if (ctx.has(b.name)) {
+                const e = ctx.get(b.name)!;
+                if (b.isConstraint && !assignType(ctx, a, e.type)) return false;
+                if (UniqueArrayBuilder.add(e.seen, format(a), a)) e.type = Type.Union(e.seen.array);
+            } else {
+                const e: TypeContextEntry = { type: a, seen: UniqueArrayBuilder() };
+                UniqueArrayBuilder.add(e.seen, format(a), a);
+                ctx.set(b.name, e);
+            }
+            return true;
+        }
+    }
+}
+
+function _resolve(this: TypeContext, c: Type) { return resolveType(this, c) }
+function resolveType(ctx: TypeContext, t: Type): Type {
+    if (!hasVariables(t)) return t;
+
+    switch (t.kind) {
+        case 'variable': {
+            if (ctx.has(t.name)) return ctx.get(t.name)!.type;
+            return t;
+        }
+        case 'container': return Type.Container(t.namespace, t.name, resolveType(ctx, t.child));
+        case 'union': return Type.Union(t.types.map(_resolve, ctx));
+        default: return t;
+    }
+}

@@ -86,6 +86,7 @@ describe('types', () => {
     testFn(B.core.math.atan2, [1.4, 0.1], Math.atan2(1.4, 0.1));
 
     testFn(B.core.rel.eq, [1, 1], true);
+
     testFn(B.core.rel.neq, [1, 1], false);
     testFn(B.core.rel.lt, [1, 1], false);
     testFn(B.core.rel.lte, [1, 1], true);
@@ -95,8 +96,9 @@ describe('types', () => {
     testFn(B.core.rel.inRange, [1, 1.5, 2], false);
 
     testFn(B.core.str.concat, ['a', 'b', 'c'], 'abc');
-    testFn(B.core.str.match, [/abc/, 'abc'], true);
+    testFn(B.core.str.match, [B.core.type.regex(['abc']), 'abc'], true);
+    testFn(B.core.str.match, [B.core.type.regex(['abc', 'i']), 'aBc'], true);
 
-    testFn(B.core.list.getAt, [[1, 2, 3], 1], 2);
-    testFn(B.core.set.has, [new Set([1, 2, 3]), 2], true);
+    testFn(B.core.list.getAt, [B.list(1, 2, 3), 1], 2);
+    testFn(B.core.set.has, [B.set(1, 2, 3), 2], true);
 });

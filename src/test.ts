@@ -78,7 +78,16 @@ function run(model: Model) {
     }));
 
     //console.log('check');
-    typeCheck(SymbolMap, B.struct.type.elementSymbol(['C']));
+
+    const toTypeCheck = B.struct.atomSet.reduce.accumulator({
+        initial: B.ammp('B_iso_or_equiv'),
+        value: B.core.math.min([
+            B.struct.atomSet.reduce.value(),
+            B.ammp('B_iso_or_equiv')
+        ])
+    });
+
+    typeCheck(SymbolMap, toTypeCheck);
 
     //console.log(formatE(query));
 
