@@ -10,12 +10,15 @@ export namespace Types {
     export type List<T = any> = ArrayLike<T>
     export type Set<T = any> = { has(e: T): boolean }
 
-    export const A = Type.Variable('a', Type.Any);
+    export const AnyVar = Type.Variable('a', Type.Any);
+    export const AnyValueVar = Type.Variable('a', Type.Any);
+    export const ConstrainedVar = Type.Variable('a', Type.Any, true);
+
     export const Regex = Type.Value<RegExp>('Core', 'Regex');
 
-    export const Set = <T extends Type>(t?: T) => Type.Container<Set<T['@type']>>('Core', 'Set', t || A);
-    export const List = <T extends Type>(t?: T) => Type.Container<List<T['@type']>>('Core', 'List', t || A);
-    export const Fn = <T extends Type>(t?: T) => Type.Container<(env: any) => T['@type']>('Core', 'Fn', t || A);
+    export const Set = <T extends Type>(t?: T) => Type.Container<Set<T['@type']>>('Core', 'Set', t || AnyValueVar);
+    export const List = <T extends Type>(t?: T) => Type.Container<List<T['@type']>>('Core', 'List', t || AnyVar);
+    export const Fn = <T extends Type>(t?: T) => Type.Container<(env: any) => T['@type']>('Core', 'Fn', t || AnyVar);
 }
 
 function unaryOp<T extends Type>(type: T, description?: string) {
@@ -44,8 +47,8 @@ const type = {
             1: Argument(Type.Str, { isOptional: true, description: `Flags, e.g. 'i' for ignore case` })
         }), Types.Regex, 'Creates a regular expression from a string using the ECMAscript syntax.'),
 
-    list: symbol(Arguments.List(Types.A), Types.List()),
-    set: symbol(Arguments.List(Types.A), Types.Set())
+    list: symbol(Arguments.List(Types.AnyVar), Types.List()),
+    set: symbol(Arguments.List(Types.AnyValueVar), Types.Set())
 };
 
 const logic = {
@@ -57,8 +60,8 @@ const logic = {
 
 const ctrl = {
     '@header': 'Control',
-    eval: symbol(Arguments.Dictionary({ 0: Argument(Types.Fn(Types.A)) }), Types.A, 'Evaluate a function.'),
-    fn: symbol(Arguments.Dictionary({ 0: Argument(Types.A) }), Types.Fn(Types.A), 'Wrap an expression to a "lazy" function.'),
+    eval: symbol(Arguments.Dictionary({ 0: Argument(Types.Fn(Types.AnyVar)) }), Types.AnyVar, 'Evaluate a function.'),
+    fn: symbol(Arguments.Dictionary({ 0: Argument(Types.AnyVar) }), Types.Fn(Types.AnyVar), 'Wrap an expression to a "lazy" function.'),
     if: symbol(Arguments.Dictionary({
         0: Argument(Type.Bool, { description: 'Condition' }),
         1: Argument(Type.Variable('a', Type.Any), { description: 'If true' }),
@@ -121,12 +124,12 @@ const str = {
 
 const list = {
     '@header': 'Lists',
-    getAt: symbol(Arguments.Dictionary({ 0: Argument(Types.List()), 1: Argument(Type.Num) }), Types.A)
+    getAt: symbol(Arguments.Dictionary({ 0: Argument(Types.List()), 1: Argument(Type.Num) }), Types.AnyVar)
 };
 
 const set = {
     '@header': 'Sets',
-    has: symbol(Arguments.Dictionary({ 0: Argument(Types.Set(Type.Variable('a', Type.Any, true))), 1: Argument(Type.Variable('a', Type.Any, true)) }), Type.Bool)
+    has: symbol(Arguments.Dictionary({ 0: Argument(Types.Set(Types.ConstrainedVar)), 1: Argument(Types.ConstrainedVar) }), Type.Bool)
 };
 
 export default {
