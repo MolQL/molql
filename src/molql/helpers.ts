@@ -4,8 +4,8 @@
  * @author David Sehnal <david.sehnal@gmail.com>
  */
 
-import Type from '../type'
-import Symbol, { Arguments, isSymbol } from '../symbol'
+import Type from './type'
+import Symbol, { Arguments, isSymbol } from './symbol'
 
 export function symbol<A extends Arguments, T extends Type<S>, S>(args: A, type: T, description?: string) {
     return Symbol('', args, type, description);

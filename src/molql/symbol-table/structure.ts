@@ -7,7 +7,7 @@
 import Type from '../type'
 import * as Core from './core'
 import { Arguments, Argument } from '../symbol'
-import { symbol } from './helpers'
+import { symbol } from '../helpers'
 
 export namespace Types {
     export const ElementSymbol = Type.Value('Structure', 'ElementSymbol');

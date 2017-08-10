@@ -4,9 +4,9 @@
  * @author David Sehnal <david.sehnal@gmail.com>
  */
 
-import core from './symbols/core'
-import structure from './symbols/structure'
-import { normalizeTable, symbolList } from './symbols/helpers'
+import core from './symbol-table/core'
+import structure from './symbol-table/structure'
+import { normalizeTable, symbolList } from './helpers'
 import Symbol from './symbol'
 
 const table = { core, structure };

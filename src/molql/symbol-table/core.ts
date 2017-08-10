@@ -6,7 +6,7 @@
 
 import Type from '..//type'
 import { Arguments, Argument } from '..//symbol'
-import { symbol } from './helpers'
+import { symbol } from '../helpers'
 
 export namespace Types {
     export type List<T = any> = ArrayLike<T>
