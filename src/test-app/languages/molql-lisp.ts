@@ -8,7 +8,7 @@ import Language from './language'
 import Transpilers from '../../transpilers/all'
 
 const lang: Language = {
-    name: 'MolQL Lisp',
+    name: 'MolQL LISP',
     editorMode: 'molql-lisp',
     transpiler: Transpilers.molQLlisp,
     examples: [{

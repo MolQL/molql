@@ -37,7 +37,9 @@ export default class Root extends React.Component<{ state: State }, { }> {
                 <QueryHint {...this.props} />
             </div>
             <div className='layout-box' style={{ position: 'absolute', top: 0, left: col12, width: col3, height: heightTop, overflowX: 'hidden', overflowY: 'hidden' }}>
-                <div style={{ textAlign: 'center', fontSize: '30px', lineHeight: '60px', position: 'absolute', left: 0, right: 0, bottom: 20, top: 0, height: 60, color: 'rgb(250,250,250)' }}>Language Reference</div>
+                <div style={{ textAlign: 'right', fontSize: '30px', paddingRight: '30px', lineHeight: '60px', position: 'absolute', left: 0, right: 0, bottom: 20, top: 0, height: 60, color: 'rgb(250,250,250)' }}>
+                    Language Reference
+                </div>
                 <OffsetBox className='docs'><ReactMarkdown source={getDocs(false)} /></OffsetBox>
             </div>
             <div className='layout-box' style={{ position: 'absolute', top: heightTop, left: 0, width: col1, height: heightBottom, overflowX: 'hidden', overflowY: 'hidden' }}>
@@ -49,7 +51,9 @@ export default class Root extends React.Component<{ state: State }, { }> {
                 <OffsetBox><LiteMolPlugin {...this.props} isMain={false} /></OffsetBox>
             </div>
             <div className='layout-box' style={{ position: 'absolute', top: heightTop, left: col12, width: col3, height: heightBottom, overflowX: 'hidden', overflowY: 'hidden' }}>
-                <div style={{ textAlign: 'center', fontSize: '30px', lineHeight: '60px', position: 'absolute', left: 0, right: 0, bottom: 20, top: 0, height: 60, color: 'rgb(250,250,250)' }}>Query Result</div>
+                <div style={{ textAlign: 'right', fontSize: '30px', paddingRight: '30px', lineHeight: '60px', position: 'absolute', left: 0, right: 0, bottom: 20, top: 0, height: 60, color: 'rgb(250,250,250)' }}>
+                    Result
+                </div>
                 <OffsetBox><QueryResult {...this.props} /></OffsetBox>
             </div>
         </div>
