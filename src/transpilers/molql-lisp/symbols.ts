@@ -60,9 +60,9 @@ const list: MolQLLispSymbol[] = [
     Alias(MolQL.core.rel.gre, 'gre', '>='),
     Alias(MolQL.core.rel.inRange, 'in-range'),
     Alias(MolQL.core.str.concat, 'concat'),
-    Alias(MolQL.core.str.match, 'regex-match'),
-    Alias(MolQL.core.list.getAt, 'get-at'),
-    Alias(MolQL.core.set.has, 'set-has'),
+    Alias(MolQL.core.str.match, 'regex.match'),
+    Alias(MolQL.core.list.getAt, 'list.get'),
+    Alias(MolQL.core.set.has, 'set.has'),
 
     Alias(MolQL.structure.type.elementSymbol, 'atom.new.el'),
     Alias(MolQL.structure.type.authResidueId, 'atom.new.auth-resid'),

@@ -17,7 +17,7 @@ const lang: Language = {
   :residue-test (=
     (atom.auth_comp_id)
     ALA)
-  :atom-test (set-has
+  :atom-test (set.has
     (set (atom.new.el C) (atom.new.el N))
     (atom.el)))`
     }, {

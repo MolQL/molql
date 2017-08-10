@@ -19,10 +19,10 @@ function formatArgs(args: Arguments) {
     }
     const map = args.map;
     const keys = Object.keys(map);
+
+    if (!keys.length) return '()'
+
     const formatted: string[] = [];
-
-    if (!keys.length) return '()\n  '
-
     let isArgArray = true, argIndex = 0;
     for (const key of keys) {
         if (isNaN(key as any) || +key !== argIndex) {
