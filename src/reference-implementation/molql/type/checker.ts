@@ -10,14 +10,14 @@ import format from './formatter'
 import { SymbolMap, Argument, Arguments } from '../../../molql/symbol'
 import { FastMap, UniqueArrayBuilder } from '../../utils/collections'
 
-export default function typeCheck(symbols: SymbolMap, expr: Expression, type?: Type) {
-    _typeCheck(symbols, FastMap.create(), expr, type || Type.Any, '');
+export default function (symbols: SymbolMap, expr: Expression, type?: Type) {
+    typeCheck(symbols, FastMap.create(), expr, type || Type.Any, '');
 }
 
 type TypeContextEntry = { type: Type, seen: UniqueArrayBuilder<Type> }
 type TypeContext = FastMap<string, TypeContextEntry>
 
-function _typeCheck(symbols: SymbolMap, ctx: TypeContext, expr: Expression, type: Type, hint: string) {
+function typeCheck(symbols: SymbolMap, ctx: TypeContext, expr: Expression, type: Type, hint: string) {
     if (Expression.isLiteral(expr)) {
         const l = getLiteralType(expr);
         if (!assignType(ctx, l, type)) notAssignable(ctx, hint, l, type);
@@ -29,7 +29,6 @@ function _typeCheck(symbols: SymbolMap, ctx: TypeContext, expr: Expression, type
         if (!assignType(ctx, t, type)) notAssignable(ctx, hint, t, type);
     }
 }
-
 
 function getSymbol(symbols: SymbolMap, head: any) {
     const symbol = symbols[head as string];
@@ -58,7 +57,7 @@ function assignArguments(symbols: SymbolMap, ctx: TypeContext, symbolId: string,
         if (args.nonEmpty && !exprArgs.length) throwError(`'${symbolId}': at least one argument required.`);
         let i = 0;
         for (const a of exprArgs) {
-            _typeCheck(symbols, ctx, a, args.type, `'${symbolId}', arg ${i++}`);
+            typeCheck(symbols, ctx, a, args.type, `'${symbolId}', arg ${i++}`);
         }
     } else {
         const keys = Object.keys(args.map);
@@ -92,7 +91,7 @@ function assignArguments(symbols: SymbolMap, ctx: TypeContext, symbolId: string,
                 if (!arg.isOptional) throwError(`'${symbolId}': arg ':${k}' is required.`);
                 continue;
             }
-            _typeCheck(symbols, ctx, e, arg.type, `'${symbolId}', arg ':${k}'`);
+            typeCheck(symbols, ctx, e, arg.type, `'${symbolId}', arg ':${k}'`);
         }
     }
 }

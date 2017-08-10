@@ -35,8 +35,6 @@ class State {
     fullPlugin: LiteMol.Plugin.Controller;
     resultPlugin: LiteMol.Plugin.Controller;
 
-    // formattedQuery: Rx.Subject<string> = new Rx.BehaviorSubject('');
-
     query = new Rx.BehaviorSubject<Query>({ kind: 'error', message: 'Enter query' });
     compileTarget = new Rx.BehaviorSubject<'lisp' | 'json'>('lisp');
     currentLanguage = new Rx.BehaviorSubject<{ language: Language, example: Example | undefined }>({ language: Languages[0], example: Languages[0].examples[0] });

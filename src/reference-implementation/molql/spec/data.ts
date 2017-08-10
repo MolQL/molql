@@ -17,12 +17,6 @@ import _compile from '../../molql/compiler'
 import AtomSelection from '../data/atom-selection'
 import B from '../../../molql/builder'
 
-export const set12 = AtomSet([1, 2])
-export const set34 = AtomSet([3, 4])
-export const set23 = AtomSet([2, 3])
-export const set123 = AtomSet([1, 2, 3])
-export const set1234 = AtomSet([1, 2, 3, 4])
-
 const molData = fs.readFileSync('spec/1tqn_updated.cif', 'utf-8')
 export const model = parseCIF(molData).models[0];
 
