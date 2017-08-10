@@ -4,7 +4,7 @@
 
 import Expression from './expression'
 
-export type ExpressionArguments = { [name: string]: Expression | undefined } | { [index: number]: Expression, length: number }
+export type ExpressionArguments = { [name: string]: Expression | undefined } | ArrayLike<Expression>
 
 interface Symbol {
     (args: ExpressionArguments): Expression,
