@@ -3,8 +3,8 @@
  */
 
 import * as P from 'parsimmon'
-import B from '../../molql/builder'
-import Expression from '../../mini-lisp/expression'
+import B from '../molql/builder'
+import Expression from '../mini-lisp/expression'
 
 // TODO replace by type
 export interface AtomGroupArgs {

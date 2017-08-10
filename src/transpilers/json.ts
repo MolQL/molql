@@ -3,7 +3,7 @@
  */
 
 import Transpiler from './transpiler'
-import B from '../../molql/builder'
+import B from '../molql/builder'
 
 const transpiler: Transpiler = (s: string) => B.evaluate(JSON.parse(s))
 export default transpiler

@@ -2,9 +2,9 @@
  * Copyright (c) 2017 David Sehnal, licensed under MIT, See LICENSE file for more info.
  */
 
-import Symbol from '../../../molql/symbol'
-import MolQL from '../../../molql/symbol-table'
-import { UniqueArrayBuilder } from '../../utils/collections'
+import Symbol from '../../molql/symbol'
+import MolQL from '../../molql/symbol-table'
+import { UniqueArrayBuilder } from '../../reference-implementation/utils/collections'
 
 export type MolQLLispSymbol =
     | { kind: 'alias', aliases: string[], symbol: Symbol }

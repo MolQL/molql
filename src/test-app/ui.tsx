@@ -12,7 +12,7 @@ import Language, { Example } from './languages/language'
 import Languages from './languages'
 import * as ReactMarkdown from 'react-markdown'
 import QueryEditor from './query-editor'
-import * as MolQLLisp from '../reference-implementation/transpilers/molql-lisp/symbols'
+import * as MolQLLisp from '../transpilers/molql-lisp/symbols'
 
 import Rx = LiteMol.Core.Rx
 

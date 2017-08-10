@@ -3,7 +3,7 @@
  */
 
 import * as CodeMirror from 'codemirror'
-import * as MolQLLisp from '../../reference-implementation/transpilers/molql-lisp/symbols'
+import * as MolQLLisp from '../../transpilers/molql-lisp/symbols'
 
 /**
  * Adapted from the CodeMirror source code

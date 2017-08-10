@@ -3,7 +3,7 @@
  */
 
 import Language from './language'
-import Transpilers from '../../reference-implementation/transpilers/all'
+import Transpilers from '../../transpilers/all'
 
 const lang: Language = {
     name: 'MolQL Lisp',
