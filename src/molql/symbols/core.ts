@@ -1,5 +1,7 @@
 /*
- * Copyright (c) 2017 MolQL contributors. licensed under MIT, See LICENSE file for more info.
+ * Copyright (c) 2017 MolQL contributors, licensed under MIT, See LICENSE file for more info.
+ *
+ * @author David Sehnal <david.sehnal@gmail.com>
  */
 
 import Type from '..//type'
@@ -18,7 +20,7 @@ export namespace Types {
 
     export const Set = <T extends Type>(t?: T) => Type.Container<Set<T['@type']>>('Core', 'Set', t || AnyValueVar);
     export const List = <T extends Type>(t?: T) => Type.Container<List<T['@type']>>('Core', 'List', t || AnyVar);
-    export const Fn = <T extends Type>(t?: T) => Type.Container<(env: any) => T['@type']>('Core', 'Fn', t || AnyVar);
+    export const Fn = <T extends Type>(t?: T, alias?: string) => Type.Container<(env: any) => T['@type']>('Core', 'Fn', t || AnyVar, alias);
 }
 
 function unaryOp<T extends Type>(type: T, description?: string) {

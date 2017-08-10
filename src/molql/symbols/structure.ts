@@ -1,5 +1,7 @@
 /*
- * Copyright (c) 2017 MolQL contributors. licensed under MIT, See LICENSE file for more info.
+ * Copyright (c) 2017 MolQL contributors, licensed under MIT, See LICENSE file for more info.
+ *
+ * @author David Sehnal <david.sehnal@gmail.com>
  */
 
 import Type from '../type'
@@ -13,17 +15,17 @@ export namespace Types {
     export const AtomSet = Type.Value('Structure', 'AtomSet');
     export const AtomSelection = Type.Value('Structure', 'AtomSelection');
 
-    export const AtomSelectionQuery = Core.Types.Fn(AtomSelection);
+    export const AtomSelectionQuery = Core.Types.Fn(AtomSelection, 'AtomSelectionQuery');
 }
 
 const type = {
     '@header': 'Types',
-    elementSymbol: symbol(Arguments.Dictionary({ 0: Argument(Type.Str) }), Types.ElementSymbol),
+    elementSymbol: symbol(Arguments.Dictionary({ 0: Argument(Type.Str) }), Types.ElementSymbol, 'Create element symbol representation from a string value.'),
     authResidueId: symbol(Arguments.Dictionary({
         0: Argument(Type.Str, { description: 'auth_asym_id' }),
         1: Argument(Type.Num, { description: 'auth_seq_id' }),
         2: Argument(Type.Str, { description: 'pdbx_PDB_ins_code', isOptional: true })
-    }), Types.ResidueId, `Residue identifier based on "author" annotation.`),
+    }), Types.ResidueId, `Residue identifier based on "auth_" annotation.`),
     labelResidueId: symbol(Arguments.Dictionary({
         0: Argument(Type.Str, { description: 'label_entity_id' }),
         1: Argument(Type.Str, { description: 'label_asym_id' }),
@@ -35,12 +37,12 @@ const type = {
 const generator = {
     '@header': 'Generators',
     atomGroups: symbol(Arguments.Dictionary({
-        'entity-test': Argument(Type.Bool, { isOptional: true, defaultValue: true }),
-        'chain-test': Argument(Type.Bool, { isOptional: true, defaultValue: true }),
-        'residue-test': Argument(Type.Bool, { isOptional: true, defaultValue: true }),
+        'entity-test': Argument(Type.Bool, { isOptional: true, defaultValue: true, description: 'Test for the 1st atom of every entity' }),
+        'chain-test': Argument(Type.Bool, { isOptional: true, defaultValue: true, description: 'Test for the 1st atom of every chain'  }),
+        'residue-test': Argument(Type.Bool, { isOptional: true, defaultValue: true, description: 'Test for the 1st atom every residue'  }),
         'atom-test': Argument(Type.Bool, { isOptional: true, defaultValue: true }),
-        'group-by': Argument(Type.Any, { isOptional: true, defaultValue: `atom-key` }),
-    }), Types.AtomSelectionQuery),
+        'group-by': Argument(Type.Any, { isOptional: true, defaultValue: `atom-key`, description: 'Group atoms to sets based on this property. Default: each atom has its own set' }),
+    }), Types.AtomSelectionQuery, 'Return all atoms for which the tests are satisfied, grouped into sets.'),
 
     queryInSelection: symbol(Arguments.Dictionary({
         selection: Argument(Types.AtomSelectionQuery),
@@ -55,7 +57,7 @@ const modifier = {
     queryEach: symbol(Arguments.Dictionary({
         selection: Argument(Types.AtomSelectionQuery),
         query: Argument(Types.AtomSelectionQuery)
-    }), Types.AtomSelectionQuery),
+    }), Types.AtomSelectionQuery, 'Query every atom set in the input selection separately.'),
 
     intersectBy: symbol(Arguments.Dictionary({
         selection: Argument(Types.AtomSelectionQuery),
@@ -88,7 +90,7 @@ const modifier = {
         selection: Argument(Types.AtomSelectionQuery),
         radius: Argument(Type.Num),
         'as-whole-residues': Argument(Type.Bool, { isOptional: true })
-    }), Types.AtomSelectionQuery)
+    }), Types.AtomSelectionQuery, 'For each atom set in the selection, include all surrouding atoms/residues that are within the specified radius.')
 }
 
 const filter = {
@@ -96,19 +98,19 @@ const filter = {
     pick: symbol(Arguments.Dictionary({
         selection: Argument(Types.AtomSelectionQuery),
         test: Argument(Type.Bool)
-    }), Types.AtomSelectionQuery, 'Pick all atom sets that satisfy the test'),
+    }), Types.AtomSelectionQuery, 'Pick all atom sets that satisfy the test.'),
 
-    withSameProperties: symbol(Arguments.Dictionary({
+    withSameAtomProperties: symbol(Arguments.Dictionary({
         selection: Argument(Types.AtomSelectionQuery),
         source: Argument(Types.AtomSelectionQuery),
         property: Argument(Type.Any)
-    }), Types.AtomSelectionQuery),
+    }), Types.AtomSelectionQuery, 'Pick all atom sets for which the set of given atom properties is a subset of the source properties.'),
 
     within: symbol(Arguments.Dictionary({
         selection: Argument(Types.AtomSelectionQuery),
         target: Argument(Types.AtomSelectionQuery),
         radius: Argument(Type.Num)
-    }), Types.AtomSelectionQuery, 'All atom sets from section that are within the radius of any atom from target')
+    }), Types.AtomSelectionQuery, 'Pick all atom sets from section that are within the radius of any atom from target.')
 }
 
 const combinator = {
@@ -135,8 +137,8 @@ const atomSet = {
         accumulator: symbol(Arguments.Dictionary({
             initial: Argument(Type.Variable('a', Type.AnyValue, true), { description: 'Initial value. Current atom is set to the 1st atom of the current set for this.' }),
             value: Argument(Type.Variable('a', Type.AnyValue, true), { description: 'Expression executed for each atom in the set' })
-        }), Type.Variable('a', Type.AnyValue, true)),
-        value: prop(Type.Variable('a', Type.AnyValue, true), 'Current value of the reducer.'),
+        }), Type.Variable('a', Type.AnyValue, true), 'Execute the value expression for each atom in the current atom set and return the result.'),
+        value: prop(Type.Variable('a', Type.AnyValue, true), 'Current value of atom set accumulator.'),
     }
 }
 
@@ -167,7 +169,7 @@ const atomProperty = {
 
         isHet: prop(Type.Bool, 'Equivalent to atom_site.group_PDB !== ATOM'),
 
-        id: prop(Type.Num),
+        id: prop(Type.Num, '_atom_site.id'),
 
         label_atom_id: prop(Type.Str),
         label_alt_id: prop(Type.Str),

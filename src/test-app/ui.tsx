@@ -1,5 +1,7 @@
 /*
  * Copyright (c) 2017 MolQL contributors, licensed under MIT, See LICENSE file for more info.
+ *
+ * @author David Sehnal <david.sehnal@gmail.com>
  */
 
 import LiteMol from 'litemol'
@@ -35,7 +37,7 @@ export default class Root extends React.Component<{ state: State }, { }> {
                 <QueryHint {...this.props} />
             </div>
             <div className='layout-box' style={{ position: 'absolute', top: 0, left: col12, width: col3, height: heightTop, overflowX: 'hidden', overflowY: 'hidden' }}>
-                <div style={{ textAlign: 'center', fontSize: '30px', lineHeight: '60px', position: 'absolute', left: 0, right: 0, bottom: 20, top: 0, height: 60, color: 'rgb(250,250,250)' }}>MolQL Language Reference</div>
+                <div style={{ textAlign: 'center', fontSize: '30px', lineHeight: '60px', position: 'absolute', left: 0, right: 0, bottom: 20, top: 0, height: 60, color: 'rgb(250,250,250)' }}>Language Reference</div>
                 <OffsetBox className='docs'><ReactMarkdown source={getDocs(false)} /></OffsetBox>
             </div>
             <div className='layout-box' style={{ position: 'absolute', top: heightTop, left: 0, width: col1, height: heightBottom, overflowX: 'hidden', overflowY: 'hidden' }}>
@@ -168,7 +170,7 @@ class QueryExpression extends Observer<{ state: State }, { queryString: string }
         return <QueryEditor
             mode={this.props.state.currentLanguage.getValue().language.editorMode}
             value={this.state.queryString}
-            onEdit={v => this.props.state.queryString.onNext(v)}
+            onChange={v => this.props.state.queryString.onNext(v)}
             onSymbol={s => this.props.state.currentSymbol.onNext(s)}
             onActive={a => this.props.state.editorActive.onNext(a)}
             onExecute={() => this.props.state.execute()} />
@@ -189,9 +191,9 @@ class QueryHint extends Observer<{ state: State }, { isActive: boolean, descript
     }
     render() {
         if (!this.state.info || !this.state.isActive) return <div />;
-        return <div style={{ position: 'absolute', left: 0, right: 0, bottom: 0, background: 'white', margin: 0, padding: '10px', fontSize: 'smaller' }}>
-            <div style={{ backgroundColor: '#F1F1F1', border: '1px solid #E1E1E1', borderRadius: '4px', padding: '1rem 1.5rem' }}>
-                <div style={{ float: 'right', fontWeight: 'bold' }}>Symbol Info</div>
+        return <div style={{ position: 'absolute', left: 0, right: 0, bottom: 0, margin: 0, padding: '10px', fontSize: 'smaller' }}>
+            <div style={{ padding: '1rem 1.5rem' }} className='query-hint'>
+                <div style={{ float: 'right', fontWeight: 'bold', color: '#999999' }}>Symbol Info</div>
                 <pre style={{ whiteSpace: 'pre-wrap', wordWrap: 'break-word', margin: 0 }}>{this.state.info}</pre>
                 {!!this.state.description
                     ? <div style={{ fontStyle: 'italic', marginTop: '1rem' }}>{this.state.description}</div>

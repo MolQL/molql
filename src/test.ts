@@ -1,5 +1,7 @@
 /*
- * Copyright (c) 2017 David Sehnal, licensed under MIT, See LICENSE file for more info.
+ * Copyright (c) 2017 MolQL contributors, licensed under MIT, See LICENSE file for more info.
+ *
+ * @author David Sehnal <david.sehnal@gmail.com>
  */
 
 import * as fs from 'fs'
@@ -10,7 +12,7 @@ import parseCIF from './reference-implementation/molecule/parser'
 import compile from './reference-implementation/molql/compiler'
 import mmCIFwriter from './reference-implementation/molecule/writer'
 import Context from './reference-implementation/molql/runtime/context'
-import typeCheck from './reference-implementation/molql/type-checker'
+import typeCheck from './reference-implementation/molql/type/checker'
 //import formatE from './reference-implementation/mini-lisp/expression-formatter'
 import { SymbolMap } from './molql/symbol-table'
 import B from './molql/builder'

@@ -1,5 +1,7 @@
 /*
- * Copyright (c) 2017 MolQL contributors. licensed under MIT, See LICENSE file for more info.
+ * Copyright (c) 2017 MolQL contributors, licensed under MIT, See LICENSE file for more info.
+ *
+ * @author Alexander Rose <alexander.rose@weirdbyte.de>
  */
 
 import * as P from 'parsimmon'

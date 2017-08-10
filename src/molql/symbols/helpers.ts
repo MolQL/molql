@@ -1,5 +1,7 @@
 /*
- * Copyright (c) 2017 MolQL contributors. licensed under MIT, See LICENSE file for more info.
+ * Copyright (c) 2017 MolQL contributors, licensed under MIT, See LICENSE file for more info.
+ *
+ * @author David Sehnal <david.sehnal@gmail.com>
  */
 
 import Type from '../type'
@@ -20,7 +22,9 @@ export function symbolList(table: any): Symbol[] {
 }
 
 function formatKey(key: string) {
-    return key.replace(/([a-z])([A-Z])([a-z]|$)/g, (s, a, b, c) => `${a}-${b.toLocaleLowerCase()}${c}`);
+    const regex = /([a-z])([A-Z])([a-z]|$)/g;
+    // do this twice because 'xXxX'
+    return key.replace(regex, (s, a, b, c) => `${a}-${b.toLocaleLowerCase()}${c}`).replace(regex, (s, a, b, c) => `${a}-${b.toLocaleLowerCase()}${c}`);
 }
 
 function _normalizeTable(namespace: string, key: string, obj: any) {

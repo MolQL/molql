@@ -1,35 +1,34 @@
-
 MolQL
 =====
 
-MolQL (Molecular Query Language) is a declarative language for describing selections/substructures of molecular data. This language is
-not meant to be used direcly be the user but rather used as a compilation target for various "user facing" selection languages.
-Emphasis is on making the language extensible. Basically, the language is a weaker version of LISP.
+MolQL (Molecular Query Language) is a declarative language for describing selections/substructures of molecular data. 
+
+Goals of the language:
+
+* Provide a common set of functions that is straightforward to implement in different environments while being powerful enough to express a wide range of queries. MolQL could therefore serve as a compilation target for other selection languages, for example the ones used by PyMOL, Jmol, or VMD. For a list of available function, see 
+the [language reference](docs/language-reference.md).
+* Make it easy to serialize/deserialize the expressions. JSON is the default format.
+* Easily extensible. The language is essentially a stripped-down (Mini) LISP. New functionality is as easy as adding a new symbol.
 
 The language is based on work described in this [dissertation](https://is.muni.cz/th/140435/fi_d/thesis.pdf)
 that was implemented as part the [PattenQuery](http://webchem.ncbr.muni.cz/Platform/PatternQuery/Index) service ([publication](http://dx.doi.org/10.1093/nar/gkv561)), the [CoordinateServer](https://cs.litemol.org) ([@PDB](https://www.ebi.ac.uk/pdbe/coordinates/)) and [LiteMol](https://github.com/dsehnal/LiteMol).
 
-[Language Reference](docs/language-reference.md)
-
-Roadmap
-=======
-
-1. Tune the specification: decide which symbols should be included and how to name them.
-2. Do some more stuff:
-    * Implement the specification in multiple programming languages.
-    * Implement transpilers from different selection languages such as PyMOL, VMD, or Chimera.
-    * Design a test suite for individual queries to test different implementations.
-3. Move the reference implementation into a separate repository once the specification is stable.
-4. ????
-5. Profit.
-
-Examples
+Project Structure
 ========
 
-TODO.
+* [Mini LISP "specification"](src/mini-lisp) A simple language that could easily be serialized as JSON.
+* [MolQL "specification"](src/molql) Definition of symbols and types that form the MolQL language.
+* [Reference implementation](src/reference-implementation)
+    * [Mini LISP](src/reference-implementation/mini-lisp) Compiler for the Mini LISP language.
+    * [MolQL](src/reference-implementation/molql) Implementation of the MolQL runtime.
+    * [Molecule Representation](src/reference-implementation/molecule) Representations of molecules based on the mmCIF format.
+* [Transpilers](src/transpilers)
+    * [MolQL Lisp](src/transpilers/molql-lisp) A LISP dialect that defines aliases to the somewhat verbose MolQL functions.
+    * [PyMol](src/transpilers/pymol)
+    * [Jmol](src/transpilers/jmol)
+* ["Test-app"](src/test-app) An application that showcases the language. Ability to execute any query on any PDB entry and export the result as mmCIF + show it in context in [LiteMol](https://github.com/dsehnal/LiteMol).
 
-Building & Running
-========
+## Building & Running
 
 ### Build:
 
@@ -44,11 +43,7 @@ Building & Running
  
     npm run docs
 
-### To run the test app:
-
-    node build/app
-
-### Building "HTML" test app
+### Building Test app
 
     npm run testapp
 

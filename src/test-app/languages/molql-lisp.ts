@@ -1,5 +1,7 @@
 /*
- * Copyright (c) 2017 David Sehnal, licensed under MIT, See LICENSE file for more info.
+ * Copyright (c) 2017 MolQL contributors, licensed under MIT, See LICENSE file for more info.
+ *
+ * @author David Sehnal <david.sehnal@gmail.com>
  */
 
 import Language from './language'
@@ -11,41 +13,41 @@ const lang: Language = {
     transpiler: Transpilers.molQLlisp,
     examples: [{
         name: 'All C or N atoms in ALA residues',
-        value: `(struct.atom-groups
+        value: `(atom.sel.atom-groups
   :residue-test (=
     (atom.auth_comp_id)
     ALA)
   :atom-test (set-has
-    (set (struct.create-es C) (struct.create-es N))
-    (atom.es)))`
+    (set (atom.new.el C) (atom.new.el N))
+    (atom.el)))`
     }, {
         name: 'All residues within 5 ang from Fe atom',
-        value: `(struct.include-surroundings
-  :selection (struct.atom-groups
+        value: `(atom.sel.include-surroundings
+  :selection (atom.sel.atom-groups
     :atom-test (=
-      (atom.es)
-      (struct.create-es Fe)))
+      (atom.el)
+      (atom.new.el Fe)))
   :radius 5
   :as-whole-residues true)`
     }, {
         name: 'Cluster LYS residues within 5 ang',
-        value: `(struct.cluster
-  :selection (struct.atom-groups
+        value: `(atom.sel.cluster
+  :selection (atom.sel.atom-groups
     :residue-test (eq
       (atom.auth_comp_id)
       LYS)
-    :group-by (atom.residue-key))
+    :group-by (atom.key.res))
   :max-distance 5)`
     }, {
         name: 'Residues with max b-factor < 45',
-        value: `(struct.pick
-  :selection (struct.atom-groups
-    :group-by (atom.residue-key))
+        value: `(atom.sel.pick
+  :selection (atom.sel.atom-groups
+    :group-by (atom.key.res))
   :test (<
-    (atom-set.reduce
+    (atom.set.reduce
       :initial (atom.B_iso_or_equiv)
       :value (max
-        (atom-set.reduce.value)
+        (atom.set.reduce.value)
         (atom.B_iso_or_equiv)))
     35))`
     }]

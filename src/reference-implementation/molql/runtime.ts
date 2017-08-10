@@ -1,5 +1,7 @@
 /*
- * Copyright (c) 2017 David Sehnal, licensed under MIT, See LICENSE file for more info.
+ * Copyright (c) 2017 MolQL contributors, licensed under MIT, See LICENSE file for more info.
+ *
+ * @author David Sehnal <david.sehnal@gmail.com>
  */
 
 import MolQL from '../../molql/symbol-table'
@@ -200,7 +202,7 @@ export const SymbolRuntime: Symbol.Info[] = [
 
     // ============= FILTERS ================
     Symbol(MolQL.structure.filter.pick)((env, v) => env => StructureRuntime.Filters.pick(env, v.selection(env), v.test)),
-    Symbol(MolQL.structure.filter.withSameProperties)((env, v) => env => StructureRuntime.Filters.withSameProperties(env, v.selection(env), v.source(env), v.property)),
+    Symbol(MolQL.structure.filter.withSameAtomProperties)((env, v) => env => StructureRuntime.Filters.withSameAtomProperties(env, v.selection(env), v.source(env), v.property)),
     Symbol(MolQL.structure.filter.within)((env, v) => env => StructureRuntime.Filters.within(env, v.selection(env), v.target(env), v.radius)),
 
     // ============= COMBINATORS ================

@@ -1,5 +1,7 @@
 /*
- * Copyright (c) 2017 David Sehnal, licensed under MIT, See LICENSE file for more info.
+ * Copyright (c) 2017 MolQL contributors, licensed under MIT, See LICENSE file for more info.
+ *
+ * @author David Sehnal <david.sehnal@gmail.com>
  */
 
 import 'jasmine'
@@ -20,8 +22,8 @@ describe('filter', () => {
         expect(check).toBe(true);
     });
 
-    it('withSameProperties residue name as 1st atom', function() {
-        const q = B.struct.filter.withSameProperties({
+    it('withSameAtomProperties residue name as 1st atom', function() {
+        const q = B.struct.filter.withSameAtomProperties({
             selection: residues,
             source: B.struct.generator.atomGroups({ 'residue-test': B.core.rel.eq([B.ammp('id'), 1]) }),
             property: B.ammp('auth_comp_id')
