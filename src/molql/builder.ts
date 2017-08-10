@@ -3,8 +3,8 @@
  */
 
 import Expression from '../mini-lisp/expression'
-import Symbol from '../mini-lisp/symbol'
-import MolQL from './symbols'
+import Symbol from './symbol'
+import MolQL from './symbol-table'
 
 namespace Builder {
     export const core = MolQL.core;

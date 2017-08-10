@@ -2,8 +2,8 @@
  * Copyright (c) 2017 MolQL contributors. licensed under MIT, See LICENSE file for more info.
  */
 
-import Type from '../../mini-lisp/type'
-import Symbol, { Arguments, isSymbol } from '../../mini-lisp/symbol'
+import Type from '../type'
+import Symbol, { Arguments, isSymbol } from '../symbol'
 
 export function symbol<A extends Arguments, T extends Type<S>, S>(args: A, type: T, description?: string) {
     return Symbol('', args, type, description);

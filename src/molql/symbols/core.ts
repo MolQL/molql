@@ -2,8 +2,8 @@
  * Copyright (c) 2017 MolQL contributors. licensed under MIT, See LICENSE file for more info.
  */
 
-import Type from '../../mini-lisp/type'
-import { Arguments, Argument } from '../../mini-lisp/symbol'
+import Type from '..//type'
+import { Arguments, Argument } from '..//symbol'
 import { symbol } from './helpers'
 
 export namespace Types {

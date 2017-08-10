@@ -3,12 +3,12 @@
  */
 
 import Environment from '../../mini-lisp/environment'
-import SymbolTable from '../symbols'
+import Runtime from '../runtime'
 import Context from './context'
 
 type Env = Environment<Context>
 function Env(ctx: Context) {
-    return Environment(SymbolTable, ctx);
+    return Environment(Runtime, ctx);
 }
 
 export default Env

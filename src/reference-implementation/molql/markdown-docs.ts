@@ -2,10 +2,10 @@
  * Copyright (c) 2017 David Sehnal, licensed under MIT, See LICENSE file for more info.
  */
 
-import MolQL from '../../molql/symbols'
-import Type from '../../mini-lisp/type'
-import Symbol, { isSymbol, Arguments, Argument } from '../../mini-lisp/symbol'
-import typeFormatter from '../mini-lisp/type-formatter'
+import MolQL from '../../molql/symbol-table'
+import Type from '../../molql/type'
+import Symbol, { isSymbol, Arguments, Argument } from '../../molql/symbol'
+import typeFormatter from './type-formatter'
 
 /**
  * Generates markdown documentation from the language spec.

@@ -6,7 +6,7 @@ Language Reference
    * [Language Primitives](#language-primitives)
      * [Types](#types)
      * [Logic](#logic)
-     * [Control Flow](#control-flow)
+     * [Control](#control)
      * [Relational](#relational)
      * [Math](#math)
      * [Strings](#strings)
@@ -107,18 +107,27 @@ core.logic.or :: array [
 ] => Bool
 ```
 
-## Control Flow
+## Control
 
 -------------------
 
-### **hold**
+### **eval**
 ```
-core.ctrl.hold :: array [
-  a
+core.ctrl.eval :: array [
+  Fn[a]
 ] => a
 ```
 
-*Hold a value to be evaluated lazily.*
+*Evaluate a function.*
+
+### **fn**
+```
+core.ctrl.fn :: array [
+  a
+] => Fn[a]
+```
+
+*Wrap an expression to a "lazy" function.*
 
 ### **if**
 ```
@@ -475,16 +484,16 @@ structure.generator.atom-groups :: object {
   residue-test?: Bool = true, 
   atom-test?: Bool = true, 
   group-by?: Any = atom-key
-} => AtomSelection
+} => Fn[AtomSelection]
 ```
 
 ### **query-inSelection**
 ```
 structure.generator.query-inSelection :: object {
-  selection: AtomSelection, 
-  query: AtomSelection, 
+  selection: Fn[AtomSelection], 
+  query: Fn[AtomSelection], 
   in-complement?: Bool = false
-} => AtomSelection
+} => Fn[AtomSelection]
 ```
 
 *Executes query only on atoms that are in the source selection.*
@@ -496,17 +505,17 @@ structure.generator.query-inSelection :: object {
 ### **query-each**
 ```
 structure.modifier.query-each :: object {
-  selection: AtomSelection, 
-  query: AtomSelection
-} => AtomSelection
+  selection: Fn[AtomSelection], 
+  query: Fn[AtomSelection]
+} => Fn[AtomSelection]
 ```
 
 ### **intersect-by**
 ```
 structure.modifier.intersect-by :: object {
-  selection: AtomSelection, 
-  by: AtomSelection
-} => AtomSelection
+  selection: Fn[AtomSelection], 
+  by: Fn[AtomSelection]
+} => Fn[AtomSelection]
 ```
 
 *Intersect each atom set from the first sequence from atoms in the second one.*
@@ -514,9 +523,9 @@ structure.modifier.intersect-by :: object {
 ### **except-by**
 ```
 structure.modifier.except-by :: object {
-  selection: AtomSelection, 
-  by: AtomSelection
-} => AtomSelection
+  selection: Fn[AtomSelection], 
+  by: Fn[AtomSelection]
+} => Fn[AtomSelection]
 ```
 
 *Remove all atoms from 'selection' that occur in 'by'.*
@@ -524,9 +533,9 @@ structure.modifier.except-by :: object {
 ### **union-by**
 ```
 structure.modifier.union-by :: object {
-  selection: AtomSelection, 
-  by: AtomSelection
-} => AtomSelection
+  selection: Fn[AtomSelection], 
+  by: Fn[AtomSelection]
+} => Fn[AtomSelection]
 ```
 
 *For each atom set A in the orginal sequence, combine all atoms sets in the target selection that intersect with A.*
@@ -534,8 +543,8 @@ structure.modifier.union-by :: object {
 ### **union**
 ```
 structure.modifier.union :: object {
-  selection: AtomSelection
-} => AtomSelection
+  selection: Fn[AtomSelection]
+} => Fn[AtomSelection]
 ```
 
 *Collects all atom sets in the sequence into a single atom set.*
@@ -543,12 +552,12 @@ structure.modifier.union :: object {
 ### **cluster**
 ```
 structure.modifier.cluster :: object {
-  selection: AtomSelection, 
+  selection: Fn[AtomSelection], 
   min-distance?: Number = 0, 
   max-distance: Number, 
   min-size?: Number = 2 (* Minimal number of sets to merge, must be at least 2 *), 
   max-size?: Number (* Maximal number of sets to merge, if not set, no limit *)
-} => AtomSelection
+} => Fn[AtomSelection]
 ```
 
 *Combines atom sets that have mutual distance in the interval [min-radius, max-radius]. Minimum/maximum size determines how many atom sets can be combined.*
@@ -556,10 +565,10 @@ structure.modifier.cluster :: object {
 ### **include-surroundings**
 ```
 structure.modifier.include-surroundings :: object {
-  selection: AtomSelection, 
+  selection: Fn[AtomSelection], 
   radius: Number, 
   as-whole-residues?: Bool
-} => AtomSelection
+} => Fn[AtomSelection]
 ```
 
 ## Selection Filters
@@ -569,9 +578,9 @@ structure.modifier.include-surroundings :: object {
 ### **pick**
 ```
 structure.filter.pick :: object {
-  selection: AtomSelection, 
+  selection: Fn[AtomSelection], 
   test: Bool
-} => AtomSelection
+} => Fn[AtomSelection]
 ```
 
 *Pick all atom sets that satisfy the test*
@@ -579,19 +588,19 @@ structure.filter.pick :: object {
 ### **with-same-properties**
 ```
 structure.filter.with-same-properties :: object {
-  selection: AtomSelection, 
-  source: AtomSelection, 
+  selection: Fn[AtomSelection], 
+  source: Fn[AtomSelection], 
   property: Any
-} => AtomSelection
+} => Fn[AtomSelection]
 ```
 
 ### **within**
 ```
 structure.filter.within :: object {
-  selection: AtomSelection, 
-  target: AtomSelection, 
+  selection: Fn[AtomSelection], 
+  target: Fn[AtomSelection], 
   radius: Number
-} => AtomSelection
+} => Fn[AtomSelection]
 ```
 
 *All atom sets from section that are within the radius of any atom from target*
@@ -603,8 +612,8 @@ structure.filter.within :: object {
 ### **intersect**
 ```
 structure.combinator.intersect :: array [
-  AtomSelection*
-] => AtomSelection
+  Fn[AtomSelection]*
+] => Fn[AtomSelection]
 ```
 
 *Return all unique atom sets that appear in all of the source selections.*
@@ -612,8 +621,8 @@ structure.combinator.intersect :: array [
 ### **merge**
 ```
 structure.combinator.merge :: array [
-  AtomSelection*
-] => AtomSelection
+  Fn[AtomSelection]*
+] => Fn[AtomSelection]
 ```
 
 *Merges multiple selections into a single one. Only unique atom sets are kept.*
@@ -622,8 +631,8 @@ structure.combinator.merge :: array [
 ```
 structure.combinator.distance-cluster :: object {
   matrix: List[List[Number]] (* Distance matrix, represented as list of rows (num[][])). Lower triangle is min distance, upper triange is max distance. *), 
-  selections: List[AtomSelection] (* A list of held selections. *)
-} => AtomSelection
+  selections: List[Fn[AtomSelection]] (* A list of held selections. *)
+} => Fn[AtomSelection]
 ```
 
 *Pick combinations of atom sets from the source sequences that are mutually within distances specified by a matrix.*
@@ -641,7 +650,7 @@ structure.atom-set.atom-count :: ()
 ### **count-query**
 ```
 structure.atom-set.count-query :: object {
-  query: AtomSelection
+  query: Fn[AtomSelection]
 } => Number
 ```
 
@@ -654,15 +663,15 @@ structure.atom-set.count-query :: object {
 ### **accumulator**
 ```
 structure.atom-set.reduce.accumulator :: object {
-  initial: Any (* Initial value. Current atom is set to the 1st atom of the current set for this. *), 
-  value: Any (* Expression executed for each atom in the set *)
-} => Any
+  initial: a<Value> (* Initial value. Current atom is set to the 1st atom of the current set for this. *), 
+  value: a<Value> (* Expression executed for each atom in the set *)
+} => a<Value>
 ```
 
 ### **value**
 ```
 structure.atom-set.reduce.value :: ()
-   => Any
+   => a<Value>
 ```
 
 *Current value of the reducer.*
