@@ -48,15 +48,15 @@ const testStrings: {[index: string]: string[]} = {
   ],
   molQLlisp: [
     `
-    (struct.atom-groups
+    (atom.sel.atom-groups
       :residue-test (eq
         (atom.auth_comp_id)
         ALA)
-      :atom-test (set-has
+      :atom-test (set.has
         (set
-          (struct.create-es C)
-          (struct.create-es N))
-        (atom.es)))
+          (atom.new.el C)
+          (atom.new.el N))
+        (atom.el)))
     `
   ],
   pymol: [
@@ -148,11 +148,11 @@ function parse(lang: string, str: string) {
   return query
 }
 
-const [,,lang, str] = process.argv
+const [,,lang, str, doRun] = process.argv
 
 if (lang && str) {
   const q = parse(lang, str)
-  run(q)
+  if(doRun === 't') run(q)
 } else if (lang) {
   testStrings[lang].forEach(str => parse(lang, str))
 }

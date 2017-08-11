@@ -30,9 +30,11 @@ const lang = P.createLanguage({
       r.Number,
       r.String,
       r.QuotedString,
+      r.ListSymbol,
+      r.HoldSymbol,
       r.List
     )
-      .trim(ws)
+    .trim(ws)
   },
 
   ArgList: function (r) {
@@ -94,6 +96,18 @@ const lang = P.createLanguage({
       P.regexp(/true/i).result(true),
       P.regexp(/false/i).result(false)
     ).desc('boolean')
+  },
+
+  // [a, b, c] => core.list([a, b, c])
+  ListSymbol: function (r) {
+    return r.ArgList
+      .wrap(P.string('['), P.string(']'))
+      .map(B.core.type.list)
+  },
+
+  // '&e' => core.ctrl.hold(e)
+  HoldSymbol: function (r) {
+    return P.string('&').skip(ws).then(P.alt(r.Expression, r.ListSymbol)).map(B.core.ctrl.fn)
   },
 
   List: function (r) {
