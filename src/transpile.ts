@@ -1,7 +1,7 @@
 
 import Expression from './mini-lisp/expression'
-import Transpiler from './reference-implementation/transpilers/transpiler'
-import _transpiler from './reference-implementation/transpilers/all'
+import Transpiler from './transpilers/transpiler'
+import _transpiler from './transpilers/all'
 
 import * as fs from 'fs'
 // import { Model } from './reference-implementation/molecule/data'
@@ -92,7 +92,7 @@ const testStrings: {[index: string]: string[]} = {
     'segi A GAP 2',
     'segi A AROUND 2',
     'segi A EXPAND 2',
-    
+
     'segi A WITHIN 3.01 OF segi B',
     'segi A NEAR_TO 3.01 OF segi B',
     'segi A BEYOND 3.01 OF segi B',
@@ -115,7 +115,7 @@ const testStrings: {[index: string]: string[]} = {
 
 function run (query: Expression) {
     const compiled = compile(query);
-    
+
     fs.readFile('spec/1tqn_updated.cif', 'utf-8', (err, data) => {
         if (err) {
             console.error(err);

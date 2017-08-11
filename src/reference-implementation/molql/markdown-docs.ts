@@ -1,25 +1,28 @@
 /*
- * Copyright (c) 2017 David Sehnal, licensed under MIT, See LICENSE file for more info.
+ * Copyright (c) 2017 MolQL contributors, licensed under MIT, See LICENSE file for more info.
+ *
+ * @author David Sehnal <david.sehnal@gmail.com>
  */
 
-import MolQL from '../../molql/symbols'
-import Symbol, { isSymbol, Arguments, Argument } from '../../mini-lisp/symbol'
+import MolQL from '../../molql/symbol-table'
+import Type from '../../molql/type'
+import Symbol, { isSymbol, Arguments, Argument } from '../../molql/symbol'
+import typeFormatter from './type/formatter'
 
 /**
  * Generates markdown documentation from the language spec.
  */
 
-
 function formatArgs(args: Arguments) {
     if (args.kind === 'list') {
-        return `array [\n  ${args.type.name}${args.nonEmpty ? '+' : '*'}\n]`;
+        return `${typeFormatter(args.type)}${args.nonEmpty ? '+' : '*'}`;
     }
     const map = args.map;
     const keys = Object.keys(map);
+
+    if (!keys.length) return '()'
+
     const formatted: string[] = [];
-
-    if (!keys.length) return '()\n  '
-
     let isArgArray = true, argIndex = 0;
     for (const key of keys) {
         if (isNaN(key as any) || +key !== argIndex) {
@@ -29,30 +32,33 @@ function formatArgs(args: Arguments) {
         argIndex++;
     }
 
-    formatted.push(isArgArray ? 'array [\n' : 'object {\n');
-    argIndex = 0;
+    const isInline = isArgArray && keys.every(k => !((map as any)[k] as Argument<Type>).description);
 
+    formatted.push(isArgArray ? keys.length !== 1 ? '(' : '' : '{');
+    formatted.push(isInline ? '' : '\n');
+
+    argIndex = 0;
     for (const key of keys) {
-        const arg = (map as any)[key] as Argument<any>;
+        const arg = (map as any)[key] as Argument<Type>;
+        if (!isInline) formatted.push('  ');
         if (!isNaN(key as any)) {
-            formatted.push(`  ${arg.isOptional ? '?' : ''}${arg.type.name}${arg.isRest ? '*' : ''}`);
+            formatted.push(`${arg.isOptional ? '?' : ''}${typeFormatter(arg.type)}${arg.isRest ? '*' : ''}`);
         } else {
-            formatted.push(`  ${key}${arg.isOptional ? '?:' : ':'} ${arg.type.name}${arg.isRest ? '*' : ''}`);
+            formatted.push(`${key}${arg.isOptional ? '?:' : ':'} ${typeFormatter(arg.type)}${arg.isRest ? '*' : ''}`);
         }
         if (arg.defaultValue !== void 0) formatted.push(` = ${arg.defaultValue}`);
-        if (arg.description !== void 0) formatted.push(` (* ${arg.description} *)`);
         if (argIndex < keys.length - 1) formatted.push(', ')
-        formatted.push('\n');
+        if (arg.description !== void 0) formatted.push(`${argIndex === keys.length - 1 ? ' ' : ''}(* ${arg.description} *)`);
+        if (!isInline) formatted.push('\n');
         argIndex++;
     }
-    formatted.push(isArgArray ? ']' : '}')
+    formatted.push(isArgArray ? keys.length !== 1 ? ')' : '' : '}')
     return formatted.join('');
 }
 
 export function formatSymbol(symbol: Symbol, alias: string) {
-    return `${alias} :: ${formatArgs(symbol.args)} => ${symbol.type.name}`;
+    return `${alias} :: ${formatArgs(symbol.args)} => ${typeFormatter(symbol.type)}`;
 }
-
 
 function _getDocs(includeToC: boolean) {
     const ToC: string[] = [`
@@ -62,9 +68,9 @@ Language Reference
 `];
     const implemented: string[] = []
 
-    function formatSymbol(symbol: Symbol, lines: string[]) {
+    function formatSymbolSection(symbol: Symbol, lines: string[]) {
         const info = symbol.info;
-        const header = `${symbol.id} :: ${formatArgs(symbol.args)} => ${symbol.type.name}`
+        const header = formatSymbol(symbol, symbol.id);
         lines.push(`### **${symbol.info.name}**`);
         lines.push(`\`\`\`\n${header}\n\`\`\`\n`);
         if (info.description) {
@@ -74,7 +80,7 @@ Language Reference
 
     function format(depth: number, obj: any) {
         if (isSymbol(obj)) {
-            formatSymbol(obj, implemented);
+            formatSymbolSection(obj, implemented);
             return;
         }
         if (obj['@header']) {

@@ -1,15 +1,16 @@
 /*
- * Copyright (c) 2017 David Sehnal, licensed under MIT, See LICENSE file for more info.
+ * Copyright (c) 2017 MolQL contributors, licensed under MIT, See LICENSE file for more info.
+ *
+ * @author David Sehnal <david.sehnal@gmail.com>
  */
 
-import MolQL from '../../../../molql/symbols'
-import SymbolRuntime from '../../../mini-lisp/symbol'
-import Context from '../context'
+import MolQL from '../../../../molql/symbol-table'
+import SymbolRuntime from '../../symbol'
 import { ElementSymbol, ResidueIdentifier } from '../../../molecule/data'
 
-function prop(runtime: SymbolRuntime<Context>) { return runtime; }
+function prop(runtime: SymbolRuntime) { return runtime; }
 
-export const Core: { [P in keyof typeof MolQL.structure.atomProperty.core]?: SymbolRuntime<Context> } = {
+export const Core: { [P in keyof typeof MolQL.structure.atomProperty.core]?: SymbolRuntime } = {
     elementSymbol: prop((env, v) => ElementSymbol(env.context.atom_site.type_symbol.getString(env.context.element.value.dataIndex) || '')),
 
     x: prop((env, v) => env.context.model.positions.x[env.context.element.value.atom]),
@@ -19,7 +20,7 @@ export const Core: { [P in keyof typeof MolQL.structure.atomProperty.core]?: Sym
     atomKey: prop((env, v) => env.context.element.value.atom),
 }
 
-export const Macromolecular: { [P in keyof typeof MolQL.structure.atomProperty.macromolecular]?: SymbolRuntime<Context> } = {
+export const Macromolecular: { [P in keyof typeof MolQL.structure.atomProperty.macromolecular]?: SymbolRuntime } = {
     // ================= IDENTIFIERS =================
     labelResidueId: prop((env, v) => ResidueIdentifier.labelOfResidueIndex(env.context.model, env.context.element.value.residue)),
     authResidueId: prop((env, v) => ResidueIdentifier.authOfResidueIndex(env.context.model, env.context.element.value.residue)),

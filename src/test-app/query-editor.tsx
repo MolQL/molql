@@ -1,31 +1,25 @@
+/*
+ * Copyright (c) 2017 MolQL contributors, licensed under MIT, See LICENSE file for more info.
+ *
+ * @author David Sehnal <david.sehnal@gmail.com>
+ */
+
 import * as React from 'react';
 import * as CodeMirror from 'codemirror'
 
-// import { GraphQLSchema } from 'graphql';
-// import marked from 'marked';
-// import { normalizeWhitespace } from '../utility/normalizeWhitespace';
-// import onHasCompletion from '../utility/onHasCompletion';
-
 require('codemirror/addon/hint/show-hint');
-require('codemirror/addon/comment/comment');
 require('codemirror/addon/edit/matchbrackets');
 require('codemirror/mode/javascript/javascript');
 require('codemirror/addon/edit/closebrackets');
-require('codemirror/addon/fold/foldgutter');
 require('codemirror/addon/fold/brace-fold');
 require('codemirror/keymap/sublime');
 
 import './query-editor/molql-lisp'
 
-const AUTO_COMPLETE_AFTER_KEY = /^[a-zA-Z(:]$/;
-
-
 export interface QueryEditorProps {
     mode: string,
     value: string,
-    onEdit?: (v: string) => void,
-    onHintInformationRender?: (hint: any) => void,
-    onClickReference?: (ref: any) => void,
+    onChange?: (v: string) => void,
     onSymbol?: (symbol: string) => void,
     onActive?: (active: boolean) => void,
     onExecute?: () => void
@@ -34,7 +28,7 @@ export interface QueryEditorProps {
 export default class QueryEditor extends React.Component<QueryEditorProps, {}> {
     private cachedValue: string;
     private editor: CodeMirror.Editor = null as any;
-    private _node: HTMLDivElement | undefined;
+    private node: HTMLDivElement | undefined;
     private ignoreChangeEvent = false;
 
     constructor(props: QueryEditorProps) {
@@ -42,26 +36,32 @@ export default class QueryEditor extends React.Component<QueryEditorProps, {}> {
         this.cachedValue = props.value || '';
     }
 
-    _handleAutoCompletePick = (value: string) => {
+    handleAutoCompletePick = (value: string) => {
         if (this.props.onSymbol) {
             this.props.onSymbol(value);
         }
     }
 
-    private autoComplete = (editor: CodeMirror.Editor) => {
+    execute = () => {
+        if (this.props.onExecute) {
+            this.props.onExecute();
+        }
+    };
+
+    autoComplete = (editor: CodeMirror.Editor) => {
         if (this.props.mode !== 'molql-lisp') return;
 
         const hint = (CodeMirror as any).hint['molql-lisp'];
-        (this.editor as any).showHint({ hint, completeSingle: false, whatIsThis: 'test', closeCharacters: /[\s()\[\];]/ });
+        (this.editor as any).showHint({ hint, closeCharacters: /[\s()\[\];]/ });
 
         if (editor.state.completionActive && editor.state.completionActive.data) {
-            CodeMirror.on(editor.state.completionActive.data, 'select', this._handleAutoCompletePick);
-            CodeMirror.on(editor.state.completionActive.data, 'pick', this._handleAutoCompletePick);
+            CodeMirror.on(editor.state.completionActive.data, 'select', this.handleAutoCompletePick);
+            CodeMirror.on(editor.state.completionActive.data, 'pick', this.handleAutoCompletePick);
         }
     }
 
     componentDidMount() {
-        this.editor = CodeMirror(this._node! as any, {
+        this.editor = CodeMirror(this.node! as any, {
             value: this.props.value || '',
             lineNumbers: true,
             tabSize: 2,
@@ -71,24 +71,8 @@ export default class QueryEditor extends React.Component<QueryEditorProps, {}> {
             autoCloseBrackets: true,
             matchBrackets: true,
             showCursorWhenSelecting: true,
-            foldGutter: {
-                minFoldSize: 4
-            },
-            // hintOptions: {
-            //     schema: this.props.schema,
-            //     closeOnUnfocus: false,
-            //     completeSingle: false,
-            // },
-            // info: {
-            //     schema: this.props.schema,
-            //     renderDescription: text => marked(text, { sanitize: true }),
-            //     onClick: reference => this.props.onClickReference(reference),
-            // },
-            // jump: {
-            //     schema: this.props.schema,
-            //     onClick: reference => this.props.onClickReference(reference),
-            // },
-            gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter'],
+            hintOptions: { closeOnUnfocus: true, completeSingle: false, },
+            gutters: ['CodeMirror-linenumbers'],
             extraKeys: {
                 'Cmd-Space': this.autoComplete,
                 'Ctrl-Space': this.autoComplete,
@@ -96,31 +80,16 @@ export default class QueryEditor extends React.Component<QueryEditorProps, {}> {
                     this.autoComplete(editor);
                     return CodeMirror.Pass;
                 },
-
-                'Cmd-Enter': () => {
-                    if (this.props.onExecute) {
-                        this.props.onExecute();
-                    }
-                },
-                'Ctrl-Enter': () => {
-                    if (this.props.onExecute) {
-                        this.props.onExecute();
-                    }
-                },
-
-                // // Editor improvements
-                // 'Ctrl-Left': 'goSubwordLeft',
-                // 'Ctrl-Right': 'goSubwordRight',
-                // 'Alt-Left': 'goGroupLeft',
-                // 'Alt-Right': 'goGroupRight',
+                'Cmd-Enter': this.execute,
+                'Ctrl-Enter': this.execute
             }
         } as any);
 
-        this.editor.on('change', this._onEdit);
-        this.editor.on('keyup', this._onKeyUp);
-        this.editor.on('focus', this._onFocus);
-        this.editor.on('blur', this._onBlur);
-        this.editor.on('cursorActivity', this._onCursorActivity);
+        this.editor.on('change', this.onEdit);
+        this.editor.on('keyup', this.onKeyUp);
+        this.editor.on('focus', this.onFocus);
+        this.editor.on('blur', this.onBlur);
+        this.editor.on('cursorActivity', this.onCursorActivity);
     }
 
     componentDidUpdate(prevProps: QueryEditorProps) {
@@ -137,16 +106,16 @@ export default class QueryEditor extends React.Component<QueryEditorProps, {}> {
     }
 
     componentWillUnmount() {
-        this.editor.off('change', this._onEdit);
-        this.editor.off('keyup', this._onKeyUp);
-        this.editor.off('focus', this._onFocus);
-        this.editor.off('blur', this._onBlur);
-        this.editor.off('cursorActivity', this._onCursorActivity);
+        this.editor.off('change', this.onEdit);
+        this.editor.off('keyup', this.onKeyUp);
+        this.editor.off('focus', this.onFocus);
+        this.editor.off('blur', this.onBlur);
+        this.editor.off('cursorActivity', this.onCursorActivity);
         this.editor = null as any;
     }
 
     render() {
-        return <div style={{ position: 'absolute', top: 0, right: 0, left: 0, bottom: 0 }} ref={node => this._node = node!} />;
+        return <div style={{ position: 'absolute', top: 0, right: 0, left: 0, bottom: 0 }} ref={node => this.node = node!} />;
     }
 
     getCodeMirror() {
@@ -154,37 +123,38 @@ export default class QueryEditor extends React.Component<QueryEditorProps, {}> {
     }
 
     getClientHeight() {
-        return this._node && this._node.clientHeight;
+        return this.node && this.node.clientHeight;
     }
 
-    _onFocus = () => {
+    onFocus = () => {
         if (this.props.onActive) {
             this.props.onActive(true);
         }
     }
 
-    _onBlur = () => {
+    onBlur = () => {
         if (this.props.onActive) {
             this.props.onActive(false);
         }
     }
 
-    _onKeyUp = (cm: CodeMirror.Editor, event?: KeyboardEvent) => {
-        if (AUTO_COMPLETE_AFTER_KEY.test(event!.key)) {
+    private autocompleteAfter = /^[a-zA-Z(:]$/
+    onKeyUp = (cm: CodeMirror.Editor, event?: KeyboardEvent) => {
+        if (this.autocompleteAfter.test(event!.key)) {
             this.autoComplete(cm);
         }
     }
 
-    _onEdit = (editor: CodeMirror.Editor, change: CodeMirror.EditorChange) => {
+    onEdit = (editor: CodeMirror.Editor, change: CodeMirror.EditorChange) => {
         if (!this.ignoreChangeEvent) {
             this.cachedValue = this.editor.getValue();
-            if (this.props.onEdit) {
-                this.props.onEdit(this.cachedValue);
+            if (this.props.onChange) {
+                this.props.onChange(this.cachedValue);
             }
         }
     }
 
-    _onCursorActivity = (editor: CodeMirror.Editor) => {
+    onCursorActivity = (editor: CodeMirror.Editor) => {
         if (!editor.state.completionActive && this.props.onSymbol) {
             this.props.onSymbol(this.getCurrentSymbol(editor));
         }
@@ -197,11 +167,12 @@ export default class QueryEditor extends React.Component<QueryEditorProps, {}> {
         let start = pos.ch, end = pos.ch;
 
         const symbolChars = /[^\s'`,@()\[\]';]/;
+        if (start > 0 && symbolChars.test(line.charAt(start - 1))) { start--; end--; }
         if (!symbolChars.test(line.charAt(start))) return '';
         if (line) {
-            if ((end === line.length) && start) --start; else ++end;
-            while (start > 0 && symbolChars.test(line.charAt(start - 1))) --start;
-            while (end < line.length && symbolChars.test(line.charAt(end))) ++end;
+            if ((end === line.length) && start)--start; else ++end;
+            while (start > 0 && symbolChars.test(line.charAt(start - 1)))--start;
+            while (end < line.length && symbolChars.test(line.charAt(end)))++end;
         }
         return doc.getRange({ line: pos.line, ch: start }, { line: pos.line, ch: end });
     }

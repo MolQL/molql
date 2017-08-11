@@ -1,9 +1,11 @@
 /*
- * Copyright (c) 2017 David Sehnal, licensed under MIT, See LICENSE file for more info.
+ * Copyright (c) 2017 MolQL contributors, licensed under MIT, See LICENSE file for more info.
+ *
+ * @author David Sehnal <david.sehnal@gmail.com>
  */
 
 import Language from './language'
-import Transpilers from '../../reference-implementation/transpilers/all'
+import Transpilers from '../../transpilers/all'
 
 const lang: Language = {
     name: 'Jmol',

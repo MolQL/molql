@@ -1,29 +1,30 @@
 /*
- * Copyright (c) 2017 David Sehnal, licensed under MIT, See LICENSE file for more info.
+ * Copyright (c) 2017 MolQL contributors, licensed under MIT, See LICENSE file for more info.
+ *
+ * @author David Sehnal <david.sehnal@gmail.com>
  */
 
-import Symbol, { Arguments } from '../../mini-lisp/symbol'
+import Symbol from '../../mini-lisp/symbol'
 import Environment from './environment'
 import RuntimeExpression from './expression'
 
-export type RuntimeArguments<C = any, Args extends Arguments = Arguments> =
-    { length?: number } & { [P in keyof Args['@type']]: RuntimeExpression<C, Args['@type'][P]> }
+export type RuntimeArguments = ArrayLike<RuntimeExpression> | { [name: string]: RuntimeExpression | undefined }
 
-type SymbolRuntime<C = {}, A extends Arguments = Arguments, T = any> = (env: Environment<C>, args: RuntimeArguments<C, A>) => T
+type SymbolRuntime = (env: Environment, args: RuntimeArguments) => any
 
 namespace SymbolRuntime {
-    export interface Info<C = {}, A extends Arguments = Arguments, T = any> {
+    export interface Info {
         readonly symbol: Symbol,
-        readonly runtime: SymbolRuntime<C, A, T>,
+        readonly runtime: SymbolRuntime,
         readonly attributes: Attributes
     }
 
     export interface Attributes { isStatic: boolean }
 }
 
-function SymbolRuntime<S extends Symbol>(symbol: S, attributes: Partial<SymbolRuntime.Attributes> = {}) {
+function SymbolRuntime(symbol: Symbol, attributes: Partial<SymbolRuntime.Attributes> = {}) {
     const { isStatic = false } = attributes;
-    return <C>(runtime: SymbolRuntime<C, S['args'], S['type']['@type']>): SymbolRuntime.Info<C, S['args'], S['type']['@type']> => {
+    return (runtime: SymbolRuntime): SymbolRuntime.Info => {
         return ({ symbol, runtime, attributes: { isStatic } });
     };
 }

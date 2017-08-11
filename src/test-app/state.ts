@@ -1,5 +1,7 @@
 /*
- * Copyright (c) 2017 David Sehnal, licensed under MIT, See LICENSE file for more info.
+ * Copyright (c) 2017 MolQL contributors, licensed under MIT, See LICENSE file for more info.
+ *
+ * @author David Sehnal <david.sehnal@gmail.com>
  */
 
 import LiteMol from 'litemol'
@@ -32,8 +34,6 @@ class State {
 
     fullPlugin: LiteMol.Plugin.Controller;
     resultPlugin: LiteMol.Plugin.Controller;
-
-    // formattedQuery: Rx.Subject<string> = new Rx.BehaviorSubject('');
 
     query = new Rx.BehaviorSubject<Query>({ kind: 'error', message: 'Enter query' });
     compileTarget = new Rx.BehaviorSubject<'lisp' | 'json'>('lisp');

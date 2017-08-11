@@ -1,5 +1,7 @@
 /*
- * Copyright (c) 2017 David Sehnal, licensed under MIT, See LICENSE file for more info.
+ * Copyright (c) 2017 MolQL contributors, licensed under MIT, See LICENSE file for more info.
+ *
+ * @author David Sehnal <david.sehnal@gmail.com>
  */
 
 import { UniqueArrayBuilder, sortAsc } from '../../utils/collections'
@@ -46,7 +48,9 @@ namespace AtomSet {
     export function areEqual(a: AtomSet, b: AtomSet) {
         const xs = (a as AtomSetImpl).atomIndices, ys = (b as AtomSetImpl).atomIndices;
         if (xs.length !== ys.length) return false;
-        if (hashCode(a) !== hashCode(b)) return false;
+        if ((a as AtomSetImpl).hashCodeComputed && (b as AtomSetImpl).hashCodeComputed && hashCode(a) !== hashCode(b)) {
+            return false;
+        }
         for (let i = 0, _i = xs.length; i < _i; i++) {
             if (xs[i] !== ys[i]) return false;
         }

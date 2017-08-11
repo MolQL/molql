@@ -6,13 +6,12 @@ Language Reference
    * [Language Primitives](#language-primitives)
      * [Types](#types)
      * [Logic](#logic)
-     * [Control Flow](#control-flow)
-     * [Math](#math)
+     * [Control](#control)
      * [Relational](#relational)
+     * [Math](#math)
      * [Strings](#strings)
      * [Lists](#lists)
      * [Sets](#sets)
-     * [Maps](#maps)
    * [Structure Queries](#structure-queries)
      * [Types](#types)
      * [Generators](#generators)
@@ -34,57 +33,44 @@ Language Reference
 
 ### **bool**
 ```
-core.type.bool :: array [
-  Any
-] => Bool
+core.type.bool :: Value => Bool
 ```
+
+*Convert a value to boolean.*
 
 ### **num**
 ```
-core.type.num :: array [
-  Any
-] => Number
+core.type.num :: Value => Number
 ```
+
+*Convert a value to number.*
 
 ### **str**
 ```
-core.type.str :: array [
-  Any
-] => String
+core.type.str :: Value => String
 ```
+
+*Convert a value to string.*
 
 ### **regex**
 ```
-core.type.regex :: array [
-  String (* Expression *), 
+core.type.regex :: (
+  String, (* Expression *)
   ?String (* Flags, e.g. 'i' for ignore case *)
-] => Regex
+) => Regex
 ```
 
 *Creates a regular expression from a string using the ECMAscript syntax.*
 
 ### **list**
 ```
-core.type.list :: array [
-  Any*
-] => List
+core.type.list :: a* => List[a]
 ```
 
 ### **set**
 ```
-core.type.set :: array [
-  Any*
-] => Set
+core.type.set :: a* => Set[a]
 ```
-
-### **map**
-```
-core.type.map :: array [
-  Any*
-] => Map
-```
-
-*Create a map from a list of key value pairs, e.g. (map 1 "x" 2 "y").*
 
 ## Logic
 
@@ -92,226 +78,44 @@ core.type.map :: array [
 
 ### **not**
 ```
-core.logic.not :: array [
-  Bool
-] => Bool
+core.logic.not :: Bool => Bool
 ```
 
 ### **and**
 ```
-core.logic.and :: array [
-  Bool+
-] => Bool
+core.logic.and :: Bool+ => Bool
 ```
 
 ### **or**
 ```
-core.logic.or :: array [
-  Bool+
-] => Bool
+core.logic.or :: Bool+ => Bool
 ```
 
-## Control Flow
+## Control
 
 -------------------
+
+### **eval**
+```
+core.ctrl.eval :: Fn[a] => a
+```
+
+*Evaluate a function.*
+
+### **fn**
+```
+core.ctrl.fn :: a => Fn[a]
+```
+
+*Wrap an expression to a "lazy" function.*
 
 ### **if**
 ```
-core.ctrl.if :: array [
-  Bool (* Condition *), 
-  Any (* If true *), 
-  Any (* If false *)
-] => Any
-```
-
-## Math
-
--------------------
-
-### **add**
-```
-core.math.add :: array [
-  Number+
-] => Number
-```
-
-### **sub**
-```
-core.math.sub :: array [
-  Number+
-] => Number
-```
-
-### **mult**
-```
-core.math.mult :: array [
-  Number+
-] => Number
-```
-
-### **div**
-```
-core.math.div :: array [
-  Number, 
-  Number
-] => Number
-```
-
-### **pow**
-```
-core.math.pow :: array [
-  Number, 
-  Number
-] => Number
-```
-
-### **mod**
-```
-core.math.mod :: array [
-  Number, 
-  Number
-] => Number
-```
-
-### **min**
-```
-core.math.min :: array [
-  Number+
-] => Number
-```
-
-### **max**
-```
-core.math.max :: array [
-  Number+
-] => Number
-```
-
-### **floor**
-```
-core.math.floor :: array [
-  Number
-] => Number
-```
-
-### **ceil**
-```
-core.math.ceil :: array [
-  Number
-] => Number
-```
-
-### **round-int**
-```
-core.math.round-int :: array [
-  Number
-] => Number
-```
-
-### **abs**
-```
-core.math.abs :: array [
-  Number
-] => Number
-```
-
-### **sqrt**
-```
-core.math.sqrt :: array [
-  Number
-] => Number
-```
-
-### **sin**
-```
-core.math.sin :: array [
-  Number
-] => Number
-```
-
-### **cos**
-```
-core.math.cos :: array [
-  Number
-] => Number
-```
-
-### **tan**
-```
-core.math.tan :: array [
-  Number
-] => Number
-```
-
-### **asin**
-```
-core.math.asin :: array [
-  Number
-] => Number
-```
-
-### **acos**
-```
-core.math.acos :: array [
-  Number
-] => Number
-```
-
-### **atan**
-```
-core.math.atan :: array [
-  Number
-] => Number
-```
-
-### **sinh**
-```
-core.math.sinh :: array [
-  Number
-] => Number
-```
-
-### **cosh**
-```
-core.math.cosh :: array [
-  Number
-] => Number
-```
-
-### **tanh**
-```
-core.math.tanh :: array [
-  Number
-] => Number
-```
-
-### **exp**
-```
-core.math.exp :: array [
-  Number
-] => Number
-```
-
-### **log**
-```
-core.math.log :: array [
-  Number
-] => Number
-```
-
-### **log10**
-```
-core.math.log10 :: array [
-  Number
-] => Number
-```
-
-### **atan2**
-```
-core.math.atan2 :: array [
-  Number, 
-  Number
-] => Number
+core.ctrl.if :: (
+  Bool, (* Condition *)
+  a, (* If true *)
+  b (* If false *)
+) => a | b
 ```
 
 ## Relational
@@ -320,62 +124,178 @@ core.math.atan2 :: array [
 
 ### **eq**
 ```
-core.rel.eq :: array [
-  Any, 
-  Any
-] => Bool
+core.rel.eq :: (a: Value, a: Value) => Bool
 ```
 
 ### **neq**
 ```
-core.rel.neq :: array [
-  Any, 
-  Any
-] => Bool
+core.rel.neq :: (a: Value, a: Value) => Bool
 ```
 
 ### **lt**
 ```
-core.rel.lt :: array [
-  Number, 
-  Number
-] => Bool
+core.rel.lt :: (Number, Number) => Bool
 ```
 
 ### **lte**
 ```
-core.rel.lte :: array [
-  Number, 
-  Number
-] => Bool
+core.rel.lte :: (Number, Number) => Bool
 ```
 
 ### **gr**
 ```
-core.rel.gr :: array [
-  Number, 
-  Number
-] => Bool
+core.rel.gr :: (Number, Number) => Bool
 ```
 
 ### **gre**
 ```
-core.rel.gre :: array [
-  Number, 
-  Number
-] => Bool
+core.rel.gre :: (Number, Number) => Bool
 ```
 
 ### **in-range**
 ```
-core.rel.in-range :: array [
-  Number (* Value to test *), 
-  Number (* Minimum value *), 
+core.rel.in-range :: (
+  Number, (* Value to test *)
+  Number, (* Minimum value *)
   Number (* Maximum value *)
-] => Bool
+) => Bool
 ```
 
 *Check if the value of the 1st argument is >= 2nd and <= 3rd.*
+
+## Math
+
+-------------------
+
+### **add**
+```
+core.math.add :: Number+ => Number
+```
+
+### **sub**
+```
+core.math.sub :: Number+ => Number
+```
+
+### **mult**
+```
+core.math.mult :: Number+ => Number
+```
+
+### **div**
+```
+core.math.div :: (Number, Number) => Number
+```
+
+### **pow**
+```
+core.math.pow :: (Number, Number) => Number
+```
+
+### **mod**
+```
+core.math.mod :: (Number, Number) => Number
+```
+
+### **min**
+```
+core.math.min :: Number+ => Number
+```
+
+### **max**
+```
+core.math.max :: Number+ => Number
+```
+
+### **floor**
+```
+core.math.floor :: Number => Number
+```
+
+### **ceil**
+```
+core.math.ceil :: Number => Number
+```
+
+### **round-int**
+```
+core.math.round-int :: Number => Number
+```
+
+### **abs**
+```
+core.math.abs :: Number => Number
+```
+
+### **sqrt**
+```
+core.math.sqrt :: Number => Number
+```
+
+### **sin**
+```
+core.math.sin :: Number => Number
+```
+
+### **cos**
+```
+core.math.cos :: Number => Number
+```
+
+### **tan**
+```
+core.math.tan :: Number => Number
+```
+
+### **asin**
+```
+core.math.asin :: Number => Number
+```
+
+### **acos**
+```
+core.math.acos :: Number => Number
+```
+
+### **atan**
+```
+core.math.atan :: Number => Number
+```
+
+### **sinh**
+```
+core.math.sinh :: Number => Number
+```
+
+### **cosh**
+```
+core.math.cosh :: Number => Number
+```
+
+### **tanh**
+```
+core.math.tanh :: Number => Number
+```
+
+### **exp**
+```
+core.math.exp :: Number => Number
+```
+
+### **log**
+```
+core.math.log :: Number => Number
+```
+
+### **log10**
+```
+core.math.log10 :: Number => Number
+```
+
+### **atan2**
+```
+core.math.atan2 :: (Number, Number) => Number
+```
 
 ## Strings
 
@@ -383,17 +303,12 @@ core.rel.in-range :: array [
 
 ### **concat**
 ```
-core.str.concat :: array [
-  String+
-] => String
+core.str.concat :: String+ => String
 ```
 
 ### **match**
 ```
-core.str.match :: array [
-  Regex, 
-  String
-] => Bool
+core.str.match :: (Regex, String) => Bool
 ```
 
 ## Lists
@@ -402,10 +317,7 @@ core.str.match :: array [
 
 ### **get-at**
 ```
-core.list.get-at :: array [
-  List, 
-  Number
-] => Any
+core.list.get-at :: (List[a], Number) => a
 ```
 
 ## Sets
@@ -414,31 +326,7 @@ core.list.get-at :: array [
 
 ### **has**
 ```
-core.set.has :: array [
-  Set, 
-  Any
-] => Bool
-```
-
-## Maps
-
--------------------
-
-### **has**
-```
-core.map.has :: array [
-  Map, 
-  Any
-] => Bool
-```
-
-### **get**
-```
-core.map.get :: array [
-  Map, 
-  Value (* Key *), 
-  Any (* Default value if key is not present *)
-] => Any
+core.set.has :: (Set[a], a) => Bool
 ```
 
 # Structure Queries
@@ -451,30 +339,30 @@ core.map.get :: array [
 
 ### **element-symbol**
 ```
-structure.type.element-symbol :: array [
-  String
-] => ElementSymbol
+structure.type.element-symbol :: String => ElementSymbol
 ```
+
+*Create element symbol representation from a string value.*
 
 ### **auth-residue-id**
 ```
-structure.type.auth-residue-id :: array [
-  String (* auth_asym_id *), 
-  Number (* auth_seq_id *), 
+structure.type.auth-residue-id :: (
+  String, (* auth_asym_id *)
+  Number, (* auth_seq_id *)
   ?String (* pdbx_PDB_ins_code *)
-] => ResidueId
+) => ResidueId
 ```
 
-*Residue identifier based on "author" annotation.*
+*Residue identifier based on "auth_" annotation.*
 
 ### **label-residue-id**
 ```
-structure.type.label-residue-id :: array [
-  String (* label_entity_id *), 
-  String (* label_asym_id *), 
-  Number (* label_auth_seq_id *), 
+structure.type.label-residue-id :: (
+  String, (* label_entity_id *)
+  String, (* label_asym_id *)
+  Number, (* label_auth_seq_id *)
   ?String (* pdbx_PDB_ins_code *)
-] => ResidueId
+) => ResidueId
 ```
 
 *Residue identifier based on mmCIF's "label_" annotation.*
@@ -485,22 +373,24 @@ structure.type.label-residue-id :: array [
 
 ### **atom-groups**
 ```
-structure.generator.atom-groups :: object {
-  entity-test?: Bool = true, 
-  chain-test?: Bool = true, 
-  residue-test?: Bool = true, 
+structure.generator.atom-groups :: {
+  entity-test?: Bool = true, (* Test for the 1st atom of every entity *)
+  chain-test?: Bool = true, (* Test for the 1st atom of every chain *)
+  residue-test?: Bool = true, (* Test for the 1st atom every residue *)
   atom-test?: Bool = true, 
-  group-by?: Any = atom-key
-} => AtomSelection
+  group-by?: Any = atom-key (* Group atoms to sets based on this property. Default: each atom has its own set *)
+} => AtomSelectionQuery
 ```
 
-### **query-inSelection**
+*Return all atoms for which the tests are satisfied, grouped into sets.*
+
+### **query-in-selection**
 ```
-structure.generator.query-inSelection :: object {
-  selection: AtomSelection, 
-  query: AtomSelection, 
+structure.generator.query-in-selection :: {
+  selection: AtomSelectionQuery, 
+  query: AtomSelectionQuery, 
   in-complement?: Bool = false
-} => AtomSelection
+} => AtomSelectionQuery
 ```
 
 *Executes query only on atoms that are in the source selection.*
@@ -511,72 +401,76 @@ structure.generator.query-inSelection :: object {
 
 ### **query-each**
 ```
-structure.modifier.query-each :: object {
-  selection: AtomSelection, 
-  query: AtomSelection
-} => AtomSelection
+structure.modifier.query-each :: {
+  selection: AtomSelectionQuery, 
+  query: AtomSelectionQuery
+} => AtomSelectionQuery
 ```
+
+*Query every atom set in the input selection separately.*
 
 ### **intersect-by**
 ```
-structure.modifier.intersect-by :: object {
-  selection: AtomSelection, 
-  by: AtomSelection
-} => AtomSelection
+structure.modifier.intersect-by :: {
+  selection: AtomSelectionQuery, 
+  by: AtomSelectionQuery
+} => AtomSelectionQuery
 ```
 
 *Intersect each atom set from the first sequence from atoms in the second one.*
 
 ### **except-by**
 ```
-structure.modifier.except-by :: object {
-  selection: AtomSelection, 
-  by: AtomSelection
-} => AtomSelection
+structure.modifier.except-by :: {
+  selection: AtomSelectionQuery, 
+  by: AtomSelectionQuery
+} => AtomSelectionQuery
 ```
 
 *Remove all atoms from 'selection' that occur in 'by'.*
 
 ### **union-by**
 ```
-structure.modifier.union-by :: object {
-  selection: AtomSelection, 
-  by: AtomSelection
-} => AtomSelection
+structure.modifier.union-by :: {
+  selection: AtomSelectionQuery, 
+  by: AtomSelectionQuery
+} => AtomSelectionQuery
 ```
 
 *For each atom set A in the orginal sequence, combine all atoms sets in the target selection that intersect with A.*
 
 ### **union**
 ```
-structure.modifier.union :: object {
-  selection: AtomSelection
-} => AtomSelection
+structure.modifier.union :: {
+  selection: AtomSelectionQuery
+} => AtomSelectionQuery
 ```
 
 *Collects all atom sets in the sequence into a single atom set.*
 
 ### **cluster**
 ```
-structure.modifier.cluster :: object {
-  selection: AtomSelection, 
+structure.modifier.cluster :: {
+  selection: AtomSelectionQuery, 
   min-distance?: Number = 0, 
   max-distance: Number, 
-  min-size?: Number = 2 (* Minimal number of sets to merge, must be at least 2 *), 
+  min-size?: Number = 2, (* Minimal number of sets to merge, must be at least 2 *)
   max-size?: Number (* Maximal number of sets to merge, if not set, no limit *)
-} => AtomSelection
+} => AtomSelectionQuery
 ```
 
 *Combines atom sets that have mutual distance in the interval [min-radius, max-radius]. Minimum/maximum size determines how many atom sets can be combined.*
 
 ### **include-surroundings**
 ```
-structure.modifier.include-surroundings :: object {
-  selection: AtomSelection, 
+structure.modifier.include-surroundings :: {
+  selection: AtomSelectionQuery, 
   radius: Number, 
   as-whole-residues?: Bool
-} => AtomSelection
+} => AtomSelectionQuery
 ```
+
+*For each atom set in the selection, include all surrouding atoms/residues that are within the specified radius.*
 
 ## Selection Filters
 
@@ -584,33 +478,35 @@ structure.modifier.include-surroundings :: object {
 
 ### **pick**
 ```
-structure.filter.pick :: object {
-  selection: AtomSelection, 
+structure.filter.pick :: {
+  selection: AtomSelectionQuery, 
   test: Bool
-} => AtomSelection
+} => AtomSelectionQuery
 ```
 
-*Pick all atom sets that satisfy the test*
+*Pick all atom sets that satisfy the test.*
 
-### **with-same-properties**
+### **with-same-atom-properties**
 ```
-structure.filter.with-same-properties :: object {
-  selection: AtomSelection, 
-  source: AtomSelection, 
+structure.filter.with-same-atom-properties :: {
+  selection: AtomSelectionQuery, 
+  source: AtomSelectionQuery, 
   property: Any
-} => AtomSelection
+} => AtomSelectionQuery
 ```
+
+*Pick all atom sets for which the set of given atom properties is a subset of the source properties.*
 
 ### **within**
 ```
-structure.filter.within :: object {
-  selection: AtomSelection, 
-  target: AtomSelection, 
+structure.filter.within :: {
+  selection: AtomSelectionQuery, 
+  target: AtomSelectionQuery, 
   radius: Number
-} => AtomSelection
+} => AtomSelectionQuery
 ```
 
-*All atom sets from section that are within the radius of any atom from target*
+*Pick all atom sets from section that are within the radius of any atom from target.*
 
 ## Selection Combinators
 
@@ -618,21 +514,27 @@ structure.filter.within :: object {
 
 ### **intersect**
 ```
-structure.combinator.intersect :: array [
-  AtomSelection*
-] => AtomSelection
+structure.combinator.intersect :: AtomSelectionQuery* => AtomSelectionQuery
 ```
 
 *Return all unique atom sets that appear in all of the source selections.*
 
 ### **merge**
 ```
-structure.combinator.merge :: array [
-  AtomSelection*
-] => AtomSelection
+structure.combinator.merge :: AtomSelectionQuery* => AtomSelectionQuery
 ```
 
 *Merges multiple selections into a single one. Only unique atom sets are kept.*
+
+### **distance-cluster**
+```
+structure.combinator.distance-cluster :: {
+  matrix: List[List[Number]], (* Distance matrix, represented as list of rows (num[][])). Lower triangle is min distance, upper triange is max distance. *)
+  selections: List[AtomSelectionQuery] (* A list of held selections. *)
+} => AtomSelectionQuery
+```
+
+*Pick combinations of atom sets from the source sequences that are mutually within distances specified by a matrix.*
 
 ## Atom Sets
 
@@ -646,8 +548,8 @@ structure.atom-set.atom-count :: ()
 
 ### **count-query**
 ```
-structure.atom-set.count-query :: object {
-  query: AtomSelection
+structure.atom-set.count-query :: {
+  query: AtomSelectionQuery
 } => Number
 ```
 
@@ -659,19 +561,21 @@ structure.atom-set.count-query :: object {
 
 ### **accumulator**
 ```
-structure.atom-set.reduce.accumulator :: object {
-  initial: Any (* Initial value. Current atom is set to the 1st atom of the current set for this. *), 
-  value: Any (* Expression executed for each atom in the set *)
-} => Any
+structure.atom-set.reduce.accumulator :: {
+  initial: a: Value, (* Initial value. Current atom is set to the 1st atom of the current set for this. *)
+  value: a: Value (* Expression executed for each atom in the set *)
+} => a: Value
 ```
+
+*Execute the value expression for each atom in the current atom set and return the result.*
 
 ### **value**
 ```
 structure.atom-set.reduce.value :: ()
-   => Any
+   => a: Value
 ```
 
-*Current value of the reducer.*
+*Current value of atom set accumulator.*
 
 ## Atom Properties
 
@@ -776,6 +680,8 @@ structure.atom-property.macromolecular.is-het :: ()
 structure.atom-property.macromolecular.id :: ()
    => Number
 ```
+
+*_atom_site.id*
 
 ### **label_atom_id**
 ```

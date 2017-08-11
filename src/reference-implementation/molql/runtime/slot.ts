@@ -1,5 +1,7 @@
 /*
- * Copyright (c) 2017 David Sehnal, licensed under MIT, See LICENSE file for more info.
+ * Copyright (c) 2017 MolQL contributors, licensed under MIT, See LICENSE file for more info.
+ *
+ * @author David Sehnal <david.sehnal@gmail.com>
  */
 
 interface Slot<T = any> { value?: T, '@stack': T[] }
@@ -10,7 +12,7 @@ namespace Slot {
     export function depth(slot: Slot) {
         return slot['@stack'].length;
     }
-    
+
     export function push<T>(slot: Slot<T>, value?: T): Slot<T> {
         if (slot.value !== void 0) slot['@stack'].push(slot.value);
         slot.value = value;

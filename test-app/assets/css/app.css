@@ -43,3 +43,14 @@
 }
 
 .CodeMirror { height: 100%; }
+
+.query-hint {
+    background: rgb(33,33,33);
+    color: rgb(250,250,250);
+    border: 1px solid #E1E1E1;
+    border-radius: 4px;
+}
+
+.query-hint pre {
+    color: #33C3F0;
+}

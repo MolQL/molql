@@ -1,8 +1,10 @@
 /*
- * Copyright (c) 2017 David Sehnal, licensed under MIT, See LICENSE file for more info.
+ * Copyright (c) 2017 MolQL contributors, licensed under MIT, See LICENSE file for more info.
+ *
+ * @author David Sehnal <david.sehnal@gmail.com>
  */
 
-import Transpiler from '../../reference-implementation/transpilers/transpiler'
+import Transpiler from '../../transpilers/transpiler'
 
 export type Example = { name: string, value: string }
 

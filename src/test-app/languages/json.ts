@@ -1,10 +1,18 @@
 /*
- * Copyright (c) 2017 David Sehnal, licensed under MIT, See LICENSE file for more info.
+ * Copyright (c) 2017 MolQL contributors, licensed under MIT, See LICENSE file for more info.
+ *
+ * @author David Sehnal <david.sehnal@gmail.com>
  */
 
 import Language from './language'
-import Transpilers from '../../reference-implementation/transpilers/all'
+import Transpilers from '../../transpilers/all'
 import B from '../../molql/builder'
+
+const l = B.core.type.list;
+const lys = B.struct.generator.atomGroups({
+    'residue-test': B.core.rel.eq([B.ammp('auth_comp_id'), 'LYS']),
+    'group-by': B.ammp('residueKey')
+});
 
 const lang: Language = {
     name: 'JSON',
@@ -32,11 +40,14 @@ const lang: Language = {
     }, {
         name: 'Cluster LYS residues within 5 ang',
         value: JSON.stringify(B.struct.modifier.cluster({
-            'selection': B.struct.generator.atomGroups({
-                'residue-test': B.core.rel.eq([B.ammp('auth_comp_id'), 'LYS']),
-                'group-by': B.ammp('residueKey')
-            }),
+            'selection': lys,
             'max-distance': 5
+        }), null, 2)
+    }, {
+        name: 'Cluster 3 LYS residues within 5 ang',
+        value: JSON.stringify(B.struct.combinator.distanceCluster({
+            matrix: l([l([0, 5, 5]), l([0, 0, 5]), l([0, 0, 0])]),
+            selections: l([lys, lys, lys])
         }), null, 2)
     }, {
         name: 'Residues with max b-factor < 45',

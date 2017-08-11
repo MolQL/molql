@@ -1,9 +1,11 @@
 /*
- * Copyright (c) 2017 David Sehnal, licensed under MIT, See LICENSE file for more info.
+ * Copyright (c) 2017 MolQL contributors, licensed under MIT, See LICENSE file for more info.
+ *
+ * @author David Sehnal <david.sehnal@gmail.com>
  */
 
 import * as CodeMirror from 'codemirror'
-import * as MolQLLisp from '../../reference-implementation/transpilers/molql-lisp/symbols'
+import * as MolQLLisp from '../../transpilers/molql-lisp/symbols'
 
 /**
  * Adapted from the CodeMirror source code

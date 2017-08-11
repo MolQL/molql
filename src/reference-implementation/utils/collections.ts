@@ -1,15 +1,18 @@
 /*
- * Copyright (c) 2017 David Sehnal, licensed under MIT, See LICENSE file for more info.
+ * Copyright (c) 2017 MolQL contributors, licensed under MIT, See LICENSE file for more info.
+ *
+ * @author David Sehnal <david.sehnal@gmail.com>
  */
 
 export interface UniqueArrayBuilder<T> { _keys: any, array: T[] }
 export function UniqueArrayBuilder<T>(): UniqueArrayBuilder<T> { return { _keys: Object.create(null), array: [] } }
 
 export namespace UniqueArrayBuilder {
-    export function add<T>(builder: UniqueArrayBuilder<T>, key: string | number, value: any) {
-        if (builder._keys[key] === 1) return;
-        builder._keys[key] = 1;
-        builder.array.push(value)
+    export function add<T>({ _keys, array }: UniqueArrayBuilder<T>, key: string | number, value: any) {
+        if (_keys[key] === 1) return false;
+        _keys[key] = 1;
+        array.push(value);
+        return true;
     }
 }
 

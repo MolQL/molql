@@ -1,5 +1,7 @@
 /*
- * Copyright (c) 2017 David Sehnal, licensed under MIT, See LICENSE file for more info.
+ * Copyright (c) 2017 MolQL contributors, licensed under MIT, See LICENSE file for more info.
+ *
+ * @author David Sehnal <david.sehnal@gmail.com>
  */
 
 import 'jasmine'
@@ -12,7 +14,7 @@ import * as mmCif from '../../../molecule/mmcif'
 function testPropEq(symbol: any, value: any, category: mmCif.AtomSite) {
     it(`${category}`, function() {
         const q = B.struct.generator.atomGroups({ 'atom-test': B.core.rel.eq([symbol(), value]) })
-        const sel = Data.compile(q)(Data.ctx);
+        const sel = Data.compileQuery(q)(Data.ctx);
         expect(AtomSelection.atomSets(sel).length).toBeGreaterThan(0);
         const check = Data.checkAtomSelection(Data.model, sel, (i, cols) => (cols as any)[category].getString(i) == value);
         expect(check).toBe(true);
@@ -22,7 +24,7 @@ function testPropEq(symbol: any, value: any, category: mmCif.AtomSite) {
 function testPropLt(symbol: any, value: any, category: mmCif.AtomSite) {
     it(`${category}`, function() {
         const q = B.struct.generator.atomGroups({ 'atom-test': B.core.rel.lt([symbol(), value]) })
-        const sel = Data.compile(q)(Data.ctx);
+        const sel = Data.compileQuery(q)(Data.ctx);
         expect(AtomSelection.atomSets(sel).length).toBeGreaterThan(0);
         const check = Data.checkAtomSelection(Data.model, sel, (i, cols) => (cols as any)[category].getFloat(i) < value);
         expect(check).toBe(true);
@@ -32,7 +34,7 @@ function testPropLt(symbol: any, value: any, category: mmCif.AtomSite) {
 describe('generator', () => {
     it(`type_symbol`, function() {
         const q = B.struct.generator.atomGroups({ 'atom-test': B.core.rel.eq([B.struct.atomProperty.core.elementSymbol(), B.es('C')]) })
-        const sel = Data.compile(q)(Data.ctx);
+        const sel = Data.compileQuery(q)(Data.ctx);
         expect(AtomSelection.atomSets(sel).length).toBeGreaterThan(0);
         const check = Data.checkAtomSelection(Data.model, sel, (i, cols) => cols.type_symbol.getString(i) === 'C');
         expect(check).toBe(true);
@@ -44,7 +46,7 @@ describe('generator', () => {
 
     it(`is-het`, function() {
         const q = B.struct.generator.atomGroups({ 'atom-test': B.core.logic.not([B.ammp('isHet')]) })
-        const sel = Data.compile(q)(Data.ctx);
+        const sel = Data.compileQuery(q)(Data.ctx);
         expect(AtomSelection.atomSets(sel).length).toBeGreaterThan(0);
         const check = Data.checkAtomSelection(Data.model, sel, (i, cols) => cols.group_PDB.stringEquals(i, 'ATOM'));
         expect(check).toBe(true);
@@ -62,7 +64,7 @@ describe('generator', () => {
     testPropEq(B.struct.atomProperty.macromolecular.label_entity_id, '2', 'label_entity_id');
     it(`label_alt_id`, function() {
         const q = B.struct.generator.atomGroups({ 'atom-test': B.core.rel.eq([B.ammp('label_alt_id'), '']) })
-        const sel = Data.compile(q)(Data.ctx);
+        const sel = Data.compileQuery(q)(Data.ctx);
         expect(AtomSelection.atomSets(sel).length).toBeGreaterThan(0);
         const check = Data.checkAtomSelection(Data.model, sel, (i, cols) => cols.label_alt_id.getString(i) === null);
         expect(check).toBe(true);
@@ -73,7 +75,7 @@ describe('generator', () => {
 
     it(`entityType`, function() {
         const q = B.struct.generator.atomGroups({ 'atom-test': B.core.rel.eq([B.ammp('entityType'), 'water']) })
-        const sel = Data.compile(q)(Data.ctx);
+        const sel = Data.compileQuery(q)(Data.ctx);
         expect(AtomSelection.atomSets(sel).length).toBeGreaterThan(0);
         const check = Data.checkAtomSelection(Data.model, sel, (i, cols) => cols.type_symbol.getString(i) === 'O');
         expect(check).toBe(true);
@@ -87,7 +89,7 @@ describe('generator', () => {
             'residue-test': B.core.set.has([resSet, B.ammp('authResidueId')]),
             'group-by': B.ammp('residueKey')
         })
-        const sel = Data.compile(q)(Data.ctx);
+        const sel = Data.compileQuery(q)(Data.ctx);
         expect(AtomSelection.atomSets(sel).length).toBe(2);
         const check = Data.checkAtomSelection(Data.model, sel, (i, cols) => cols.label_comp_id.getString(i) === 'HIS');
         expect(check).toBe(true);
@@ -101,7 +103,7 @@ describe('generator', () => {
             'residue-test': B.core.set.has([resSet, B.ammp('labelResidueId')]),
             'group-by': B.ammp('residueKey')
         })
-        const sel = Data.compile(q)(Data.ctx);
+        const sel = Data.compileQuery(q)(Data.ctx);
         expect(AtomSelection.atomSets(sel).length).toBe(2);
         const check = Data.checkAtomSelection(Data.model, sel, (i, cols) => cols.label_comp_id.getString(i) === 'HIS');
         expect(check).toBe(true);
@@ -111,7 +113,7 @@ describe('generator', () => {
         const q = B.struct.generator.atomGroups({
             'group-by': B.ammp('residueKey')
         })
-        const sel = Data.compile(q)(Data.ctx);
+        const sel = Data.compileQuery(q)(Data.ctx);
         expect(AtomSelection.atomSets(sel).length).toBe(Data.model.residues.count);
     });
 
@@ -119,7 +121,7 @@ describe('generator', () => {
         const q = B.struct.generator.atomGroups({
             'group-by': B.ammp('chainKey')
         })
-        const sel = Data.compile(q)(Data.ctx);
+        const sel = Data.compileQuery(q)(Data.ctx);
         expect(AtomSelection.atomSets(sel).length).toBe(Data.model.chains.count);
     });
 
@@ -127,7 +129,7 @@ describe('generator', () => {
         const q = B.struct.generator.atomGroups({
             'group-by': B.ammp('entityKey')
         })
-        const sel = Data.compile(q)(Data.ctx);
+        const sel = Data.compileQuery(q)(Data.ctx);
         expect(AtomSelection.atomSets(sel).length).toBe(Data.model.entities.count);
     });
 
@@ -136,7 +138,7 @@ describe('generator', () => {
             selection: B.struct.generator.atomGroups({ 'residue-test': B.core.rel.eq([B.ammp('auth_comp_id'), 'ALA']) }),
             query: B.struct.generator.atomGroups({ 'atom-test': B.core.rel.eq([B.acp('elementSymbol'), B.es('C')]) })
         });
-        const sel = Data.compile(q)(Data.ctx);
+        const sel = Data.compileQuery(q)(Data.ctx);
         expect(AtomSelection.atomSets(sel).length).toBeGreaterThan(0);
         const check = Data.checkAtomSelection(Data.model, sel, (i, cols) => cols.auth_comp_id.stringEquals(i, 'ALA') && cols.type_symbol.stringEquals(i, 'C'));
         expect(check).toBe(true);
@@ -148,7 +150,7 @@ describe('generator', () => {
             query: B.struct.generator.atomGroups({ 'atom-test': B.core.rel.eq([B.acp('elementSymbol'), B.es('C')]) }),
             'in-complement': true
         });
-        const sel = Data.compile(q)(Data.ctx);
+        const sel = Data.compileQuery(q)(Data.ctx);
         expect(AtomSelection.atomSets(sel).length).toBeGreaterThan(0);
         const check = Data.checkAtomSelection(Data.model, sel, (i, cols) => !cols.auth_comp_id.stringEquals(i, 'ALA') && cols.type_symbol.stringEquals(i, 'C'));
         expect(check).toBe(true);
