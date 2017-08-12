@@ -63,7 +63,7 @@ const lang = P.createLanguage({
   },
 
   Symbol: function () {
-    return P.regexp(/[^\s'`,@()\[\]';]+/)  // /[a-zA-Z_-][a-zA-Z0-9_.-]+/)
+    return P.regexp(/[^\s'`,@()\[\]{}';:]+/)  // /[a-zA-Z_-][a-zA-Z0-9_.-]+/)
       .map(x => {
         const s = getSymbol(x)
         if (!s) {
@@ -99,23 +99,28 @@ const lang = P.createLanguage({
     ).desc('boolean')
   },
 
-  // [a, b, c] => core.list([a, b, c])
+  // '[a, b, c]' => core.list([a, b, c])
   ListSymbol: function (r) {
     return r.ArgList
       .wrap(P.string('['), P.string(']'))
       .map(B.core.type.list)
+      .desc('list-symbol')
   },
 
-  // [a, b, c] => core.set([a, b, c])
+  // '{a, b, c}' => core.set([a, b, c])
   SetSymbol: function (r) {
     return r.ArgList
       .wrap(P.string('{'), P.string('}'))
       .map(B.core.type.set)
+      .desc('set-symbol')
   },
 
   // '&e' => core.ctrl.fn(e)
   FnSymbol: function (r) {
-    return P.string('&').skip(ws).then(P.alt(r.Expression, r.ListSymbol, r.SetSymbol)).map(B.core.ctrl.fn)
+    return P.string('&').skip(ws)
+      .then(P.alt(r.Expression, r.ListSymbol, r.SetSymbol))
+      .map(B.core.ctrl.fn)
+      .desc('fn-symbol')
   },
 
   List: function (r) {
@@ -128,6 +133,7 @@ const lang = P.createLanguage({
           return Expression.Apply(x[0])
         }
       })
+      .desc('list')
   },
 
   Query: function (r) {
@@ -135,5 +141,7 @@ const lang = P.createLanguage({
   }
 })
 
-const transpiler: Transpiler = str => B.evaluate(lang.Query.tryParse(str))
+const reComment = /;;[^\n\r]*[\n\r]/
+
+const transpiler: Transpiler = str => B.evaluate(lang.Query.tryParse(str.replace(reComment, '\n')))
 export default transpiler
