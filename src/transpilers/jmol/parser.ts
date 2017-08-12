@@ -30,7 +30,7 @@ function atomExpressionQuery (x: any[]) {
   if (atomname) atomProps.push(B.core.rel.eq([ B.ammp('auth_atom_id'), atomname ]))
   if (altloc) atomProps.push(B.core.rel.eq([ B.ammp('label_alt_id'), altloc ]))
   if (atomProps.length) tests['atom-test'] = Q.and(atomProps)
-  
+
   return B.struct.generator.atomGroups(tests)
 }
 
@@ -38,23 +38,23 @@ const _ = P.optWhitespace
 const __ = P.whitespace
 
 const opList = [
-  { 
+  {
     // Selects atoms that are not included in s1.
-    type: h.prefix, 
-    rule: P.alt(P.regex(/NOT/i).skip(__), P.string('!').skip(_)), 
-    map: Q.invert 
+    type: h.prefix,
+    rule: P.alt(P.regex(/NOT/i).skip(__), P.string('!').skip(_)),
+    map: Q.invert
   },
   {
     // Selects atoms included in both s1 and s2.
-    type: h.binaryLeft, 
-    rule: h.infixOp(/AND|&/i), 
+    type: h.binaryLeft,
+    rule: h.infixOp(/AND|&/i),
     map: Q.intersect
   },
-  { 
+  {
     // Selects atoms included in either s1 or s2.
     type: h.binaryLeft,
     rule: h.infixOp(/OR|\|/i),
-    map: Q.merge 
+    map: Q.merge
   }
 ]
 
@@ -74,6 +74,7 @@ const lang = P.createLanguage({
       r.Element.map((x: string) => B.struct.generator.atomGroups({
         'atom-test': B.core.rel.eq([ B.acp('elementSymbol'), B.struct.type.elementSymbol(x) ])
       })),
+
       r.Resname.map((x: string) => B.struct.generator.atomGroups({
         'residue-test': B.core.rel.eq([ B.ammp('label_comp_id'), x ])
       })),

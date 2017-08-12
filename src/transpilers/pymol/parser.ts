@@ -326,9 +326,9 @@ function atomSelectionQuery(x: any) {
   const tests: h.AtomGroupArgs = {}
   const props: {[k: string]: any[]} = {}
 
-  for(let k in x){
+  for (let k in x) {
     const ps = propertiesSpec[k]
-    if (!ps){
+    if (!ps) {
       console.warn(`property '${k}' not supported, value '${x[k]}'`)
       continue
     }
@@ -337,7 +337,7 @@ function atomSelectionQuery(x: any) {
     props[ps.level].push(x[k])
   }
 
-  for(let p in props){
+  for (let p in props) {
     tests[p] = Q.and(props[p])
   }
 

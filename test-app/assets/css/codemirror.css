@@ -14,48 +14,58 @@
 .cm-s-neat .CodeMirror-matchingbracket { outline:1px solid grey; color:black !important; }
 
 .CodeMirror-hints {
+  background: white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
+  font-family: 'Consolas', 'Inconsolata', 'Droid Sans Mono', 'Monaco', monospace;
+  font-size: 13px;
+  list-style: none;
+  margin-left: -6px;
+  margin: 0;
+  max-height: 14.5em;
+  overflow: hidden;
+  overflow-y: auto;
+  padding: 0;
   position: absolute;
   z-index: 10;
-  overflow: hidden;
-  list-style: none;
-
-  margin: 0;
-  padding: 2px;
-
-  -webkit-box-shadow: 2px 3px 5px rgba(0,0,0,.2);
-  -moz-box-shadow: 2px 3px 5px rgba(0,0,0,.2);
-  box-shadow: 2px 3px 5px rgba(0,0,0,.2);
-  border-radius: 3px;
-  border: 1px solid silver;
-
-  background: white;
-  font-size: 90%;
-  font-family: monospace;
-
-  max-height: 20em;
-  overflow-y: auto;
 }
 
 .CodeMirror-hint {
-  margin: 0;
-  padding: 0 4px;
-  border-radius: 2px;
-  white-space: pre;
-  color: black;
+  border-top: solid 1px #f7f7f7;
+  color: #141823;
   cursor: pointer;
+  margin: 0;
+  max-width: 300px;
+  overflow-x: hidden;
+  padding: 2px 6px;
+  white-space: pre;
 }
 
 li.CodeMirror-hint-active {
-  background: #08f;
+  background-color: #33C3F0;
+  border-top-color: white;
   color: white;
 }
 
+.CodeMirror-hint-information {
+  border-top: solid 1px #c0c0c0;
+  max-width: 300px;
+  padding: 4px 6px;
+  position: relative;
+  z-index: 1;
+}
+
+.CodeMirror-hint-information:first-child {
+  border-bottom: solid 1px #c0c0c0;
+  border-top: none;
+  margin-bottom: -1px;
+}
 
 /* BASICS */
 
 .CodeMirror {
   /* Set height, width, borders, and global font properties here */
-  font-family: monospace;
+  font-family: 'Consolas', 'Inconsolata', 'Droid Sans Mono', 'Monaco', monospace;
+  font-size: 10pt;
   height: 300px;
   color: black;
 }

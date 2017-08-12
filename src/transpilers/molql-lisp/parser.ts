@@ -31,7 +31,8 @@ const lang = P.createLanguage({
       r.String,
       r.QuotedString,
       r.ListSymbol,
-      r.HoldSymbol,
+      r.SetSymbol,
+      r.FnSymbol,
       r.List
     )
     .trim(ws)
@@ -105,9 +106,16 @@ const lang = P.createLanguage({
       .map(B.core.type.list)
   },
 
-  // '&e' => core.ctrl.hold(e)
-  HoldSymbol: function (r) {
-    return P.string('&').skip(ws).then(P.alt(r.Expression, r.ListSymbol)).map(B.core.ctrl.fn)
+  // [a, b, c] => core.set([a, b, c])
+  SetSymbol: function (r) {
+    return r.ArgList
+      .wrap(P.string('{'), P.string('}'))
+      .map(B.core.type.set)
+  },
+
+  // '&e' => core.ctrl.fn(e)
+  FnSymbol: function (r) {
+    return P.string('&').skip(ws).then(P.alt(r.Expression, r.ListSymbol, r.SetSymbol)).map(B.core.ctrl.fn)
   },
 
   List: function (r) {
