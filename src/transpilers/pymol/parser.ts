@@ -4,6 +4,39 @@
  * @author Alexander Rose <alexander.rose@weirdbyte.de>
  */
 
+
+/*
+  fragment: ???
+  segment: label_asym_id
+  chain: auth_asym_id
+
+  selection algebra
+  - see https://pymolwiki.org/index.php/Selection_Algebra
+  - supported
+    - not, and, or
+    - around, expand
+    - within, near_to, beyond
+    - bysegment, byres
+  - unsupported
+    - todo
+      - like, in
+    - gap: needs vdW radius
+    - bymolecule: everything connected by bonds
+    - byfragment:
+    - byobject:
+    - bycell,
+    - byring, neighbour, bound_to, extend
+  selection macros
+  - see https://pymolwiki.org/index.php/Selection_Macros
+  - object-id is ignored
+  property selectors
+  - see https://pymolwiki.org/index.php/Property_Selectors
+  - todo
+    - support ''+A syntax for empty list elements
+  single word selectors
+  - see https://pymolwiki.org/index.php/Single-word_Selectors
+*/
+
 import * as P from 'parsimmon'
 import * as h from '../helper'
 
@@ -253,7 +286,18 @@ const opList = [
     // BYRES s1
     type: h.prefix,
     rule: h.prefixOp(/BYRES|br\./i),
-    map: (op: string, selection: Expression) => [op, selection]
+    map: (op: string, selection: Expression) => {
+      return B.struct.filter.withSameAtomProperties({
+        selection: B.struct.generator.atomGroups(),
+        source: selection,
+        property: B.struct.type.labelResidueId([
+          B.ammp('label_entity_id'),
+          B.ammp('label_asym_id'),
+          B.ammp('label_seq_id'),
+          B.ammp('pdbx_PDB_ins_code')
+        ])
+      })
+    }
   },
   {
     // Expands selection to complete molecules.
@@ -272,9 +316,23 @@ const opList = [
   {
     // Expands selection to complete segments.
     // BYSEGMENT s1
+    // (atom.sel.with-same-atom-properties
+    //   :selection (atom.sel.atom-groups)
+    //   :source (atom.sel.atom-groups
+    //     :residue-test (and
+    //       (= (atom.auth_seq_id) 50)
+    //       (= (atom.label_asym_id) A)
+    //     ))
+    //   :property (atom.label_asym_id))
     type: h.prefix,
     rule: h.prefixOp(/BYSEGMENT|bs\./i),
-    map: (op: string, selection: Expression) => [op, selection]
+    map: (op: string, selection: Expression) => {
+      return B.struct.filter.withSameAtomProperties({
+        selection: B.struct.generator.atomGroups(),
+        source: selection,
+        property: B.ammp('label_asym_id')
+      })
+    }
   },
   {
     // Expands selection to complete objects.
