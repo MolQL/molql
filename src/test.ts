@@ -81,10 +81,10 @@ function run(model: Model) {
 
     //console.log('check');
 
-    const toTypeCheck = B.struct.atomSet.reduce.accumulator({
+    const toTypeCheck =  B.struct.atomSet.reduce({
         initial: B.ammp('B_iso_or_equiv'),
-        value: B.core.math.min([
-            B.struct.atomSet.reduce.value(),
+        value: B.core.math.max([
+            B.struct.slot.atomSetReduce(),
             B.ammp('B_iso_or_equiv')
         ])
     });

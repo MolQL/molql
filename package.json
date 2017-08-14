@@ -8,7 +8,8 @@
     "watch": "./node_modules/.bin/tsc -watch",
     "docs": "node ./build/reference-implementation/molql/markdown-docs.js -print > ./docs/language-reference.md",
     "test": "jasmine",
-    "testapp": "node_modules/.bin/webpack build/test-app/index.js test-app/index.js"
+    "app": "node_modules/.bin/webpack build/molql-explorer/index.js molql-explorer/index.js",
+    "appmin": "./node_modules/.bin/uglifyjs molql-explorer/index.js > molql-explorer/index.min.js"
   },
   "author": "",
   "license": "MIT",
@@ -19,8 +20,10 @@
     "@types/parsimmon": "^1.3.0",
     "@types/react": "^16.0.0",
     "@types/react-dom": "^15.5.1",
+    "@types/semver": "^5.3.33",
     "jasmine": "^2.7.0",
     "typescript": "^2.4.2",
+    "uglifyjs": "^2.4.11",
     "webpack": "^3.4.1"
   },
   "dependencies": {
@@ -30,6 +33,7 @@
     "parsimmon": "^1.6.2",
     "react": "^15.6.1",
     "react-dom": "^15.6.1",
-    "react-markdown": "^2.5.0"
+    "react-markdown": "^2.5.0",
+    "semver": "^5.4.1"
   }
 }

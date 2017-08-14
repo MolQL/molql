@@ -8,14 +8,14 @@ import Expression from '../../mini-lisp/expression'
 import { SymbolMap } from '../../mini-lisp/symbol'
 import Environment from './environment'
 import RuntimeExpression from './expression'
-import SymbolRuntime, { SymbolRuntimeTable, RuntimeArguments } from './symbol'
+import SymbolRuntime, { RuntimeArguments } from './symbol'
 
 export type CompiledExpression<C, T> = (ctx: C) => T
 
 type Compiler<C> = <T>(expression: Expression) => CompiledExpression<C, T>
-function Compiler<C>(symbolMap: SymbolMap, symbolRuntimeTable: SymbolRuntimeTable): Compiler<C> {
-    const env = Environment(symbolRuntimeTable, void 0);
-    return expression => wrap(symbolRuntimeTable, compile(env, expression).runtime);
+function Compiler<C>(symbolMap: SymbolMap, envProvider: (ctx?: C) => Environment): Compiler<C> {
+    const env = envProvider(void 0);
+    return expression => wrap(envProvider, compile(env, expression).runtime);
 }
 
 type CompileResult = { isConst: boolean, runtime: RuntimeExpression }
@@ -25,8 +25,8 @@ namespace CompileResult {
     export function Dynamic(runtime: RuntimeExpression): CompileResult { return { isConst: false, runtime } }
 }
 
-function wrap<C, T>(symbolRuntimeTable: SymbolRuntimeTable, runtime: RuntimeExpression<C, T>) {
-    return (ctx: C) => runtime(Environment(symbolRuntimeTable, ctx));
+function wrap<C, T>(envProvider: (ctx?: C) => Environment, runtime: RuntimeExpression<C, T>) {
+    return (ctx: C) => runtime(envProvider(ctx));
 }
 
 function noRuntimeFor(symbol: string) {

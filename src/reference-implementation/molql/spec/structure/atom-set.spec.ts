@@ -17,10 +17,10 @@ describe('atom-set', () => {
         const q = B.struct.filter.pick({
             selection: residues,
             test: B.core.rel.gr([
-                B.struct.atomSet.reduce.accumulator({
+                B.struct.atomSet.reduce({
                     initial: B.ammp('B_iso_or_equiv'),
                     value: B.core.math.min([
-                        B.struct.atomSet.reduce.value(),
+                        B.struct.slot.atomSetReduce(),
                         B.ammp('B_iso_or_equiv')
                     ])
                 }),

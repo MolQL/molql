@@ -6,13 +6,13 @@
 
 import Compiler, { CompiledExpression } from '../mini-lisp/compiler'
 import Context from './runtime/context'
-import Runtime from './runtime'
 import Expression from '../../mini-lisp/expression'
 import { SymbolMap } from '../../molql/symbol-table'
 import typeChecker from './type/checker'
+import Environment from './runtime/environment'
 
 export type Compiled<T = any> = CompiledExpression<Context, T>
-const _compile = Compiler<Context>(SymbolMap, Runtime)
+const _compile = Compiler<Context>(SymbolMap, Environment);
 
 export default function compile<T = any>(e: Expression) {
     typeChecker(SymbolMap, e);

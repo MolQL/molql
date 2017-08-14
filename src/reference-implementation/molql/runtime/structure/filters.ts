@@ -6,8 +6,6 @@
 
 import Environment from '../environment'
 import Expression from '../expression'
-import Context from '../context'
-import Iterator from '../iterator'
 import AtomSet from '../../data/atom-set'
 import ElementAddress from '../../data/element-address'
 import AtomSelection from '../../data/atom-selection'
@@ -19,12 +17,14 @@ type Selection = Expression<AtomSelection>
 export function pick(env: Environment, selection: Selection, pred: Expression<boolean>) {
     const sel = selection(env);
     const ret = AtomSelection.linearBuilder();
-    const iterarator = Iterator.begin(env.context.atomSet);
+
+    Environment.lockSlot(env, 'atomSet');
+    const { slots } = env;
     for (const atomSet of AtomSelection.atomSets(sel)) {
-        iterarator.value = atomSet;
+        slots.atomSet = atomSet;
         if (pred(env)) ret.add(atomSet);
     }
-    Iterator.end(iterarator);
+    Environment.unlockSlot(env, 'atomSet');
     return ret.getSelection();
 }
 
@@ -39,24 +39,26 @@ function isSubset(a: FastSet<any>, b: FastSet<any>) {
 
 function getAtomSetProperties(env: Environment, atomSet: AtomSet, prop: Expression, set: FastSet<any>) {
     const { model } = env.context;
-    const element = Context.beginIterateElemement(env.context);
+    Environment.lockSlot(env, 'element');
+    const element = env.slots.element;
     for (const i of AtomSet.atomIndices(atomSet)) {
         ElementAddress.setAtom(model, element, i);
         const p = prop(env);
         if (p !== void 0) set.add(p);
     }
-    Context.endIterateElement(env.context);
+    Environment.unlockSlot(env, 'element');
     return set;
 }
 
 function getAtomSelectionProperties(env: Environment, selection: Selection, prop: Expression) {
     const set = FastSet.create<any>();
-    const iterator = Iterator.begin(env.context.atomSet);
+    Environment.lockSlot(env, 'atomSet');
+    const { slots } = env;
     for (const atomSet of AtomSelection.atomSets(selection(env))) {
-        iterator.value = atomSet;
+        slots.atomSet = atomSet;
         getAtomSetProperties(env, atomSet, prop, set);
     }
-    Iterator.end(iterator);
+    Environment.unlockSlot(env, 'atomSet');
     return set;
 }
 
@@ -64,13 +66,14 @@ export function withSameAtomProperties(env: Environment, selection: Selection, s
     const sel = selection(env);
     const propSet = getAtomSelectionProperties(env, source, prop);
     const ret = AtomSelection.linearBuilder();
-    const iterator = Iterator.begin(env.context.atomSet);
+    Environment.lockSlot(env, 'atomSet');
+    const { slots } = env;
     for (const atomSet of AtomSelection.atomSets(sel)) {
-        iterator.value = atomSet;
+        slots.atomSet = atomSet;
         const props = getAtomSetProperties(env, atomSet, prop, FastSet.create());
         if (isSubset(props, propSet)) ret.add(atomSet);
     }
-    Iterator.end(iterator);
+    Environment.unlockSlot(env, 'atomSet');
     return ret.getSelection();
 }
 

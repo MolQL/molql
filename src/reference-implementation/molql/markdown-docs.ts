@@ -33,8 +33,7 @@ function formatArgs(args: Arguments) {
     }
 
     const isInline = isArgArray && keys.every(k => !((map as any)[k] as Argument<Type>).description);
-
-    formatted.push(isArgArray ? keys.length !== 1 ? '(' : '' : '{');
+    formatted.push(isArgArray ? '(' : '{');
     formatted.push(isInline ? '' : '\n');
 
     argIndex = 0;
@@ -52,7 +51,7 @@ function formatArgs(args: Arguments) {
         if (!isInline) formatted.push('\n');
         argIndex++;
     }
-    formatted.push(isArgArray ? keys.length !== 1 ? ')' : '' : '}')
+    formatted.push(isArgArray ? ')' : '}')
     return formatted.join('');
 }
 

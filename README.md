@@ -1,7 +1,6 @@
-MolQL
-=====
+![Logo](docs/logo.png)
 
-MolQL (Molecular Query Language) is a declarative language for describing selections/substructures of molecular data. 
+**MolQL** (Molecular Query Language) is a declarative language for describing selections/substructures of molecular data. 
 
 Goals of the language:
 

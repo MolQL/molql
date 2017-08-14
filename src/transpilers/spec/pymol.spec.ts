@@ -11,6 +11,6 @@ describe('pymol', () => {
   it('resn ALA', function() {
     const q = B.evaluate(B.struct.generator.atomGroups({ 'residue-test': B.core.rel.eq([B.ammp('label_comp_id'), 'ALA']) }));
     const tq = transpiler('resn ALA');
-    expect(tq).toBe(q);
+    expect(tq).toEqual(q); // "toEqual" seems to use structural equivalence, "toBe" reference once.
   });
 });

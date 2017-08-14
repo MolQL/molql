@@ -180,6 +180,10 @@ export const SymbolRuntime: Symbol.Info[] = [
     Symbol(MolQL.structure.type.authResidueId, staticAttr)((env, v) => ResidueIdentifier.auth(v[0](env), v[1](env), v[2] && v[2](env))),
     Symbol(MolQL.structure.type.labelResidueId, staticAttr)((env, v) => ResidueIdentifier.label(v[0](env), v[1](env), v[2](env), v[3] && v[3](env))),
 
+    // ============= SLOTS ================
+    Symbol(MolQL.structure.slot.atom)((env, v) => env.slots.element),
+    Symbol(MolQL.structure.slot.atomSetReduce)((env, v) => env.slots.atomSetReducer),
+
     // ============= GENERATORS ================
     Symbol(MolQL.structure.generator.atomGroups)((env, v) =>
         (env) => StructureRuntime.Generators.atomGroupsGenerator(env, { entityTest: v['entity-test'], chainTest: v['chain-test'], residueTest: v['residue-test'], atomTest: v['atom-test'], groupBy: v['group-by'] })),
@@ -213,8 +217,7 @@ export const SymbolRuntime: Symbol.Info[] = [
     // ============= ATOM SETS ================
     Symbol(MolQL.structure.atomSet.atomCount)((env, v) => StructureRuntime.AtomSet.atomCount(env)),
     Symbol(MolQL.structure.atomSet.countQuery)((env, v) => StructureRuntime.AtomSet.countQuery(env, v.query(env))),
-    Symbol(MolQL.structure.atomSet.reduce.accumulator)((env, v) => StructureRuntime.AtomSet.accumulateAtomSet(env, v.initial, v.value)),
-    Symbol(MolQL.structure.atomSet.reduce.value)((env, v) => env.context.atomSetReducer.value),
+    Symbol(MolQL.structure.atomSet.reduce)((env, v) => StructureRuntime.AtomSet.accumulateAtomSet(env, v.initial, v.value)),
 
     // ============= ATOM PROPERTIES ================
     ...atomProps(MolQL.structure.atomProperty.core, StructureRuntime.AtomProperties.Core),

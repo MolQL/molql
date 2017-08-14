@@ -68,6 +68,9 @@ const list: MolQLLispSymbol[] = [
     Alias(MolQL.structure.type.authResidueId, 'atom.new.auth-resid'),
     Alias(MolQL.structure.type.labelResidueId, 'atom.new.label-resid'),
 
+    Alias(MolQL.structure.slot.atom, 'atom.current'),
+    Alias(MolQL.structure.slot.atomSetReduce, 'atom.set.reduce.value'),
+
     Alias(MolQL.structure.generator.atomGroups, 'atom.sel.atom-groups'),
     Alias(MolQL.structure.generator.queryInSelection, 'atom.sel.query-in-selection'),
     Alias(MolQL.structure.modifier.queryEach, 'atom.sel.query-each'),
@@ -86,8 +89,7 @@ const list: MolQLLispSymbol[] = [
 
     Alias(MolQL.structure.atomSet.atomCount, 'atom.set.atom-count'),
     Alias(MolQL.structure.atomSet.countQuery, 'atom.set.count-query'),
-    Alias(MolQL.structure.atomSet.reduce.accumulator, 'atom.set.reduce'),
-    Alias(MolQL.structure.atomSet.reduce.value, 'atom.set.reduce.value'),
+    Alias(MolQL.structure.atomSet.reduce, 'atom.set.reduce'),
 
     Alias(MolQL.structure.atomProperty.core.elementSymbol, 'atom.el'),
     Alias(MolQL.structure.atomProperty.core.x, 'atom.x'),
