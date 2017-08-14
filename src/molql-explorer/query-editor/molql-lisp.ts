@@ -47,7 +47,7 @@ CodeMirror.defineMode('molql-lisp', (config) => {
         if (ch === '`') return (state.tokenize = inString)(stream, state);
         else if (ch === '(') { type = 'open'; return 'bracket'; }
         else if (ch === ')' || ch === ']') { type = 'close'; return 'bracket'; }
-        else if (ch === ';' && stream.peek() === ';') { stream.skipToEnd(); type = 'ws'; return 'comment'; }
+        else if (ch === ';') { stream.skipToEnd(); type = 'ws'; return 'comment'; }
         //else if (/['`,@]/.test(ch)) return null;
         /*else if (ch === '|') {
             if (stream.skipTo('|')) { stream.next(); return 'symbol'; }
