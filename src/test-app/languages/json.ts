@@ -54,10 +54,10 @@ const lang: Language = {
         value: JSON.stringify(B.struct.filter.pick({
             selection: B.struct.generator.atomGroups({ 'group-by': B.ammp('residueKey') }),
             test: B.core.rel.lt([
-                B.struct.atomSet.reduce.accumulator({
+                B.struct.atomSet.reduce({
                     initial: B.ammp('B_iso_or_equiv'),
                     value: B.core.math.max([
-                        B.struct.atomSet.reduce.value(),
+                        B.struct.slot.atomSetReduce(),
                         B.ammp('B_iso_or_equiv')
                     ])
                 }),

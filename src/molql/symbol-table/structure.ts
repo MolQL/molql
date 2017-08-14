@@ -15,6 +15,8 @@ export namespace Types {
     export const AtomSet = Type.Value('Structure', 'AtomSet');
     export const AtomSelection = Type.Value('Structure', 'AtomSelection');
 
+    export const AtomReference = Type.Value('Structure', 'AtomReference');
+
     export const AtomSelectionQuery = Core.Types.Fn(AtomSelection, 'AtomSelectionQuery');
 }
 
@@ -33,6 +35,12 @@ const type = {
         3: Argument(Type.Str, { description: 'pdbx_PDB_ins_code', isOptional: true })
     }), Types.ResidueId, `Residue identifier based on mmCIF's "label_" annotation.`)
 };
+
+const slot = {
+    '@header': 'Iteration Slots',
+    atom: symbol(Arguments.None, Types.AtomReference, 'A reference to the current atom.'),
+    atomSetReduce: symbol(Arguments.None, Type.Variable('a', Type.AnyValue, true), 'Current value of the atom set reducer.')
+}
 
 const generator = {
     '@header': 'Generators',
@@ -132,14 +140,10 @@ const atomSet = {
         query: Argument(Types.AtomSelectionQuery)
     }), Type.Num, 'Counts the number of occurences of a specific query inside the current atom set.'),
 
-    reduce: {
-        '@header': 'Atom Set Reducer',
-        accumulator: symbol(Arguments.Dictionary({
-            initial: Argument(Type.Variable('a', Type.AnyValue, true), { description: 'Initial value. Current atom is set to the 1st atom of the current set for this.' }),
-            value: Argument(Type.Variable('a', Type.AnyValue, true), { description: 'Expression executed for each atom in the set' })
-        }), Type.Variable('a', Type.AnyValue, true), 'Execute the value expression for each atom in the current atom set and return the result.'),
-        value: prop(Type.Variable('a', Type.AnyValue, true), 'Current value of atom set accumulator.'),
-    }
+    reduce: symbol(Arguments.Dictionary({
+        initial: Argument(Type.Variable('a', Type.AnyValue, true), { description: 'Initial value assigned to slot.atom-set-reduce. Current atom is set to the 1st atom of the current set for this.' }),
+        value: Argument(Type.Variable('a', Type.AnyValue, true), { description: 'Expression executed for each atom in the set' })
+    }), Type.Variable('a', Type.AnyValue, true), 'Execute the value expression for each atom in the current atom set and return the result.')
 }
 
 const atomProperty = {
@@ -194,12 +198,13 @@ const atomProperty = {
 }
 
 function prop(type: Type, description?: string) {
-    return symbol(Arguments.None, type, description);
+    return symbol(Arguments.Dictionary({ 0: Argument(Types.AtomReference, { isOptional: true, defaultValue: 'slot.current-atom' }) }), type, description);
 }
 
 export default {
     '@header': 'Structure Queries',
     type,
+    slot,
     generator,
     modifier,
     filter,

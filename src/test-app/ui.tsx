@@ -23,7 +23,9 @@ export default class Root extends React.Component<{ state: State }, { }> {
         const col1 = '37%', col2 = '37%', col12 = '74%', col3 = '26%', heightTop = '50%', heightBottom = '50%';
         return <div style={{ position: 'absolute', top: 0, right: 0, left: 0, bottom: 0, overflow: 'hidden' }}>
             <div className='layout-box' style={{position: 'absolute', top: 0, left: 0, width: col1, height: heightTop, overflowX: 'hidden', overflowY: 'hidden' }}>
-                <LanguageSelection {...this.props} />
+                <div className='molql-logo'>
+                    <LanguageSelection {...this.props} />
+                </div>
                 <OffsetBox>
                     <QueryExpression {...this.props} />
                 </OffsetBox>
