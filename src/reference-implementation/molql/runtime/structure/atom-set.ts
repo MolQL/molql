@@ -10,35 +10,33 @@ import Context from '../context'
 import AtomSet from '../../data/atom-set'
 import AtomSelection from '../../data/atom-selection'
 import ElementAddress from '../../data/element-address'
-import Slot from '../slot'
 
 export function atomCount(env: Environment) {
-    return AtomSet.count(env.context.atomSet.value);
+    return AtomSet.count(env.slots.atomSet);
 }
 
 export function countQuery(env: Environment, query: Expression<AtomSelection>) {
-    const sel = query(Environment(Context.ofAtomSet(env.context, env.context.atomSet.value)))
+    const sel = query(Environment(Context.ofAtomSet(env.context, env.slots.atomSet)))
     return AtomSelection.atomSets(sel).length;
 }
 
-function noNestedAccumulators() {
-    throw new Error('atom-set accumulators cannot be nested.');
-}
-
 export function accumulateAtomSet(env: Environment, initial: Expression<any>, value: Expression<any>) {
-    const ctx = env.context;
-    const slot = ctx.atomSetReducer;
-    if (Slot.depth(slot) > 0) noNestedAccumulators();
+    const { context, slots } = env;
+    Environment.lockSlot(env, 'atomSetReducer');
+    Environment.lockSlot(env, 'element');
 
-    const atoms = AtomSet.atomIndices(ctx.atomSet.value);
-    const element = Context.beginIterateElemement(ctx);
-    ElementAddress.setAtom(ctx.model, element, atoms[0]);
-    Slot.push(ctx.atomSetReducer, initial(env));
+    const atoms = AtomSet.atomIndices(slots.atomSet);
+    const element = env.slots.element;
+
+    ElementAddress.setAtom(context.model, element, atoms[0]);
+    slots.atomSetReducer = initial(env);
 
     for (const a of atoms) {
-        ElementAddress.setAtom(ctx.model, element, a);
-        slot.value = value(env);
+        ElementAddress.setAtom(context.model, element, a);
+        slots.atomSetReducer = value(env);
     }
-    Context.endIterateElement(ctx);
-    return Slot.pop(slot);
+    const ret = slots.atomSetReducer;
+    Environment.unlockSlot(env, 'element');
+    Environment.unlockSlot(env, 'atomSetReducer');
+    return ret;
 }

@@ -37,7 +37,8 @@ function atomGroupsIterator(env: Environment, { entityTest, chainTest, residueTe
     const { residueStartIndex, residueEndIndex } = model.chains;
     const { atomStartIndex, atomEndIndex } = model.residues;
 
-    const element = Context.beginIterateElemement(ctx);
+    Environment.lockSlot(env, 'element');
+    const element = env.slots.element;
     for (let eI = 0; eI < entityCount; eI++) {
         ElementAddress.setEntityLayer(model, element, eI);
         if (!entityTest(env)) continue;
@@ -61,7 +62,7 @@ function atomGroupsIterator(env: Environment, { entityTest, chainTest, residueTe
             }
         }
     }
-    Context.endIterateElement(ctx);
+    Environment.unlockSlot(env, 'element');
 }
 
 function groupAtom({ env, groupBy, groups, selection }: GroupCtx, i: number) {
@@ -79,14 +80,15 @@ function groupAtom({ env, groupBy, groups, selection }: GroupCtx, i: number) {
 }
 
 function alwaysTrue(env: Environment) { return true; }
-function groupByAtom(env: Environment) { return env.context.element.value.atom; }
+function groupByAtom(env: Environment) { return env.slots.element.atom; }
 
 function groupAtomsSingleton(env: Environment, atomTest: Pred) {
     const ctx = env.context;
     const { model, mask } = ctx;
 
     const result = AtomSelection.linearBuilder();
-    const element = Context.beginIterateElemement(ctx);
+    Environment.lockSlot(env, 'element');
+    const element = env.slots.element;
     for (let i = 0, _i = model.atoms.count; i < _i; i++) {
         if (!mask.has(i)) continue;
         if (atomTest === alwaysTrue) {
@@ -96,7 +98,7 @@ function groupAtomsSingleton(env: Environment, atomTest: Pred) {
             if (atomTest(env)) result.add(AtomSet([i]));
         }
     }
-    Context.endIterateElement(ctx);
+    Environment.unlockSlot(env, 'element');
     return result.getSelection();
 }
 

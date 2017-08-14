@@ -4,13 +4,42 @@
  * @author David Sehnal <david.sehnal@gmail.com>
  */
 
-import Environment from '../../mini-lisp/environment'
+import _Environment from '../../mini-lisp/environment'
+import ElementAddress from '../data/element-address'
+import AtomSet from '../data/atom-set'
 import Runtime from '../runtime'
 import Context from './context'
 
-type Env = Environment<Context>
-function Env(ctx: Context) {
-    return Environment(Runtime, ctx);
+export interface Slots {
+    element: ElementAddress,
+    atomSet: AtomSet,
+    atomSetReducer: any
 }
 
-export default Env
+interface Environment extends _Environment<Context> {
+    slots: Slots
+    slotLocks: { [S in keyof Slots]: boolean }
+}
+
+function Environment(context: Context): Environment {
+    return {
+        symbolTable: Runtime,
+        context,
+        slots: { element: ElementAddress(), atomSet: AtomSet([]), atomSetReducer: void 0 },
+        slotLocks: { element: false, atomSet: false, atomSetReducer: false }
+    };
+}
+
+namespace Environment {
+    export function lockSlot({ slotLocks }: Environment, slot: keyof Slots) {
+        if (slotLocks[slot]) throw new Error(`Slot '${slot}' is already locked.`);
+        slotLocks[slot] = true;
+    }
+
+    export function unlockSlot({ slotLocks }: Environment, slot: keyof Slots) {
+        if (!slotLocks[slot]) throw new Error(`Slot '${slot}' is not locked.`);
+        slotLocks[slot] = false;
+    }
+}
+
+export default Environment

@@ -214,7 +214,7 @@ export const SymbolRuntime: Symbol.Info[] = [
     Symbol(MolQL.structure.atomSet.atomCount)((env, v) => StructureRuntime.AtomSet.atomCount(env)),
     Symbol(MolQL.structure.atomSet.countQuery)((env, v) => StructureRuntime.AtomSet.countQuery(env, v.query(env))),
     Symbol(MolQL.structure.atomSet.reduce.accumulator)((env, v) => StructureRuntime.AtomSet.accumulateAtomSet(env, v.initial, v.value)),
-    Symbol(MolQL.structure.atomSet.reduce.value)((env, v) => env.context.atomSetReducer.value),
+    Symbol(MolQL.structure.atomSet.reduce.value)((env, v) => env.slots.atomSetReducer.value),
 
     // ============= ATOM PROPERTIES ================
     ...atomProps(MolQL.structure.atomProperty.core, StructureRuntime.AtomProperties.Core),

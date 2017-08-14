@@ -11,8 +11,8 @@ interface Environment<T = any> {
     readonly context: T
 }
 
-function Environment<T>(symbolTable: SymbolRuntimeTable, context: T): Environment<T> {
-    return { symbolTable, context };
-}
+// function Environment<T>(symbolTable: SymbolRuntimeTable, context: T): Environment<T> {
+//     return { symbolTable, context };
+// }
 
 export default Environment
