@@ -5,6 +5,7 @@
  */
 
 import Language from './language'
+import Container from '../../reference-implementation/molql/container'
 import Transpilers from '../../transpilers/all'
 import B from '../../molql/builder'
 
@@ -20,38 +21,38 @@ const lang: Language = {
     transpiler: Transpilers.json,
     examples: [{
         name: 'All C or N atoms in ALA residues',
-        value: JSON.stringify(
+        value: Container.serialize(
             B.struct.generator.atomGroups({
                 'residue-test': B.core.rel.eq([B.ammp('auth_comp_id'), 'ALA']),
                 'atom-test': B.core.set.has([
                     B.core.type.set([B.es('C'), B.es('N')]),
                     B.acp('elementSymbol')
                 ])
-            }), null, 2)
+            }), { source: 'test-app', pretty: true })
     }, {
         name: 'All residues within 5 ang from Fe atom',
-        value: JSON.stringify(B.struct.modifier.includeSurroundings({
+        value: Container.serialize(B.struct.modifier.includeSurroundings({
             'selection': B.struct.generator.atomGroups({
                 'atom-test': B.core.rel.eq([B.acp('elementSymbol'), B.es('Fe')]),
             }),
             'radius': 5,
             'as-whole-residues': true
-        }), null, 2)
+        }), { source: 'test-app', pretty: true })
     }, {
         name: 'Cluster LYS residues within 5 ang',
-        value: JSON.stringify(B.struct.modifier.cluster({
+        value: Container.serialize(B.struct.modifier.cluster({
             'selection': lys,
             'max-distance': 5
-        }), null, 2)
+        }), { source: 'test-app', pretty: true })
     }, {
         name: 'Cluster 3 LYS residues within 5 ang',
-        value: JSON.stringify(B.struct.combinator.distanceCluster({
+        value: Container.serialize(B.struct.combinator.distanceCluster({
             matrix: l([l([0, 5, 5]), l([0, 0, 5]), l([0, 0, 0])]),
             selections: l([lys, lys, lys])
-        }), null, 2)
+        }), { source: 'test-app', pretty: true })
     }, {
         name: 'Residues with max b-factor < 45',
-        value: JSON.stringify(B.struct.filter.pick({
+        value: Container.serialize(B.struct.filter.pick({
             selection: B.struct.generator.atomGroups({ 'group-by': B.ammp('residueKey') }),
             test: B.core.rel.lt([
                 B.struct.atomSet.reduce({
@@ -63,7 +64,7 @@ const lang: Language = {
                 }),
                 35
             ])
-        }), null, 2)
+        }), { source: 'test-app', pretty: true })
     }]
 }
 
