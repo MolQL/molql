@@ -14,12 +14,12 @@ Language Reference
      * [Sets](#sets)
    * [Structure Queries](#structure-queries)
      * [Types](#types)
+     * [Iteration Slots](#iteration-slots)
      * [Generators](#generators)
      * [Selection Modifications](#selection-modifications)
      * [Selection Filters](#selection-filters)
      * [Selection Combinators](#selection-combinators)
      * [Atom Sets](#atom-sets)
-       * [Atom Set Reducer](#atom-set-reducer)
      * [Atom Properties](#atom-properties)
        * [Core Properties](#core-properties)
        * [Macromolecular Properties (derived from the mmCIF format)](#macromolecular-properties-(derived-from-the-mmcif-format))
@@ -367,6 +367,24 @@ structure.type.label-residue-id :: (
 
 *Residue identifier based on mmCIF's "label_" annotation.*
 
+## Iteration Slots
+
+-------------------
+
+### **atom**
+```
+structure.slot.atom :: () => AtomReference
+```
+
+*A reference to the current atom.*
+
+### **atom-set-reduce**
+```
+structure.slot.atom-set-reduce :: () => a: Value
+```
+
+*Current value of the atom set reducer.*
+
 ## Generators
 
 -------------------
@@ -542,8 +560,7 @@ structure.combinator.distance-cluster :: {
 
 ### **atom-count**
 ```
-structure.atom-set.atom-count :: ()
-   => Number
+structure.atom-set.atom-count :: () => Number
 ```
 
 ### **count-query**
@@ -555,27 +572,15 @@ structure.atom-set.count-query :: {
 
 *Counts the number of occurences of a specific query inside the current atom set.*
 
-## Atom Set Reducer
-
--------------------
-
-### **accumulator**
+### **reduce**
 ```
-structure.atom-set.reduce.accumulator :: {
-  initial: a: Value, (* Initial value. Current atom is set to the 1st atom of the current set for this. *)
+structure.atom-set.reduce :: {
+  initial: a: Value, (* Initial value assigned to slot.atom-set-reduce. Current atom is set to the 1st atom of the current set for this. *)
   value: a: Value (* Expression executed for each atom in the set *)
 } => a: Value
 ```
 
 *Execute the value expression for each atom in the current atom set and return the result.*
-
-### **value**
-```
-structure.atom-set.reduce.value :: ()
-   => a: Value
-```
-
-*Current value of atom set accumulator.*
 
 ## Atom Properties
 
@@ -587,38 +592,33 @@ structure.atom-set.reduce.value :: ()
 
 ### **element-symbol**
 ```
-structure.atom-property.core.element-symbol :: ()
-   => ElementSymbol
+structure.atom-property.core.element-symbol :: ?AtomReference = slot.current-atom => ElementSymbol
 ```
 
 ### **x**
 ```
-structure.atom-property.core.x :: ()
-   => Number
+structure.atom-property.core.x :: ?AtomReference = slot.current-atom => Number
 ```
 
 *Cartesian X coordinate*
 
 ### **y**
 ```
-structure.atom-property.core.y :: ()
-   => Number
+structure.atom-property.core.y :: ?AtomReference = slot.current-atom => Number
 ```
 
 *Cartesian Y coordinate*
 
 ### **z**
 ```
-structure.atom-property.core.z :: ()
-   => Number
+structure.atom-property.core.z :: ?AtomReference = slot.current-atom => Number
 ```
 
 *Cartesian Z coordinate*
 
 ### **atom-key**
 ```
-structure.atom-property.core.atom-key :: ()
-   => Any
+structure.atom-property.core.atom-key :: ?AtomReference = slot.current-atom => Any
 ```
 
 *Unique value for each atom. Main use case is grouping of atoms.*
@@ -629,148 +629,126 @@ structure.atom-property.core.atom-key :: ()
 
 ### **auth-residue-id**
 ```
-structure.atom-property.macromolecular.auth-residue-id :: ()
-   => ResidueId
+structure.atom-property.macromolecular.auth-residue-id :: ?AtomReference = slot.current-atom => ResidueId
 ```
 
 *type.auth-residue-id symbol executed on current atom's residue*
 
 ### **label-residue-id**
 ```
-structure.atom-property.macromolecular.label-residue-id :: ()
-   => ResidueId
+structure.atom-property.macromolecular.label-residue-id :: ?AtomReference = slot.current-atom => ResidueId
 ```
 
 *type.label-residue-id symbol executed on current atom's residue*
 
 ### **residue-key**
 ```
-structure.atom-property.macromolecular.residue-key :: ()
-   => Any
+structure.atom-property.macromolecular.residue-key :: ?AtomReference = slot.current-atom => Any
 ```
 
 *Unique value for each tuple ``(label_entity_id,auth_asym_id,auth_seq_id,pdbx_PDB_ins_code)``, main use case is grouping of atoms*
 
 ### **chain-key**
 ```
-structure.atom-property.macromolecular.chain-key :: ()
-   => Any
+structure.atom-property.macromolecular.chain-key :: ?AtomReference = slot.current-atom => Any
 ```
 
 *Unique value for each tuple ``(label_entity_id,auth_asym_id)``, main use case is grouping of atoms*
 
 ### **entity-key**
 ```
-structure.atom-property.macromolecular.entity-key :: ()
-   => Any
+structure.atom-property.macromolecular.entity-key :: ?AtomReference = slot.current-atom => Any
 ```
 
 *Unique value for each tuple ``label_entity_id``, main use case is grouping of atoms*
 
 ### **is-het**
 ```
-structure.atom-property.macromolecular.is-het :: ()
-   => Bool
+structure.atom-property.macromolecular.is-het :: ?AtomReference = slot.current-atom => Bool
 ```
 
 *Equivalent to atom_site.group_PDB !== ATOM*
 
 ### **id**
 ```
-structure.atom-property.macromolecular.id :: ()
-   => Number
+structure.atom-property.macromolecular.id :: ?AtomReference = slot.current-atom => Number
 ```
 
 *_atom_site.id*
 
 ### **label_atom_id**
 ```
-structure.atom-property.macromolecular.label_atom_id :: ()
-   => String
+structure.atom-property.macromolecular.label_atom_id :: ?AtomReference = slot.current-atom => String
 ```
 
 ### **label_alt_id**
 ```
-structure.atom-property.macromolecular.label_alt_id :: ()
-   => String
+structure.atom-property.macromolecular.label_alt_id :: ?AtomReference = slot.current-atom => String
 ```
 
 ### **label_comp_id**
 ```
-structure.atom-property.macromolecular.label_comp_id :: ()
-   => String
+structure.atom-property.macromolecular.label_comp_id :: ?AtomReference = slot.current-atom => String
 ```
 
 ### **label_asym_id**
 ```
-structure.atom-property.macromolecular.label_asym_id :: ()
-   => String
+structure.atom-property.macromolecular.label_asym_id :: ?AtomReference = slot.current-atom => String
 ```
 
 ### **label_entity_id**
 ```
-structure.atom-property.macromolecular.label_entity_id :: ()
-   => String
+structure.atom-property.macromolecular.label_entity_id :: ?AtomReference = slot.current-atom => String
 ```
 
 ### **label_seq_id**
 ```
-structure.atom-property.macromolecular.label_seq_id :: ()
-   => Number
+structure.atom-property.macromolecular.label_seq_id :: ?AtomReference = slot.current-atom => Number
 ```
 
 ### **auth_atom_id**
 ```
-structure.atom-property.macromolecular.auth_atom_id :: ()
-   => String
+structure.atom-property.macromolecular.auth_atom_id :: ?AtomReference = slot.current-atom => String
 ```
 
 ### **auth_comp_id**
 ```
-structure.atom-property.macromolecular.auth_comp_id :: ()
-   => String
+structure.atom-property.macromolecular.auth_comp_id :: ?AtomReference = slot.current-atom => String
 ```
 
 ### **auth_asym_id**
 ```
-structure.atom-property.macromolecular.auth_asym_id :: ()
-   => String
+structure.atom-property.macromolecular.auth_asym_id :: ?AtomReference = slot.current-atom => String
 ```
 
 ### **auth_seq_id**
 ```
-structure.atom-property.macromolecular.auth_seq_id :: ()
-   => Number
+structure.atom-property.macromolecular.auth_seq_id :: ?AtomReference = slot.current-atom => Number
 ```
 
 ### **pdbx_PDB_ins_code**
 ```
-structure.atom-property.macromolecular.pdbx_PDB_ins_code :: ()
-   => String
+structure.atom-property.macromolecular.pdbx_PDB_ins_code :: ?AtomReference = slot.current-atom => String
 ```
 
 ### **pdbx_formal_charge**
 ```
-structure.atom-property.macromolecular.pdbx_formal_charge :: ()
-   => Number
+structure.atom-property.macromolecular.pdbx_formal_charge :: ?AtomReference = slot.current-atom => Number
 ```
 
 ### **occupancy**
 ```
-structure.atom-property.macromolecular.occupancy :: ()
-   => Number
+structure.atom-property.macromolecular.occupancy :: ?AtomReference = slot.current-atom => Number
 ```
 
 ### **B_iso_or_equiv**
 ```
-structure.atom-property.macromolecular.B_iso_or_equiv :: ()
-   => Number
+structure.atom-property.macromolecular.B_iso_or_equiv :: ?AtomReference = slot.current-atom => Number
 ```
 
 ### **entity-type**
 ```
-structure.atom-property.macromolecular.entity-type :: ()
-   => String
+structure.atom-property.macromolecular.entity-type :: ?AtomReference = slot.current-atom => String
 ```
 
 *Type of the entity as defined in mmCIF (polymer, non-polymer, water)*
