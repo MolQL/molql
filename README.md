@@ -25,7 +25,7 @@ Project Structure
     * [MolQL Lisp](src/transpilers/molql-lisp) A LISP dialect that defines aliases to the somewhat verbose MolQL functions.
     * [PyMol](src/transpilers/pymol)
     * [Jmol](src/transpilers/jmol)
-* ["Test-app"](src/test-app) An application that showcases the language. Ability to execute any query on any PDB entry and export the result as mmCIF + show it in context in [LiteMol](https://github.com/dsehnal/LiteMol).
+* [MolQL Explorer](src/molql-explorer) An application that showcases the language. Ability to execute any query on any PDB entry and export the result as mmCIF + show it in context of the whole structure using [LiteMol](https://github.com/dsehnal/LiteMol).
 
 ## Building & Running
 
@@ -42,11 +42,13 @@ Project Structure
  
     npm run docs
 
-### Building Test app
+### Building MolQL Explorer
 
-    npm run testapp
+    npm run app
 
-Then just open ``test-app/index.html``.
+Then just open ``molql-explorer/index-dev.html``.
+
+To build the minified version, also call ``npm run appmin``, then ``molql-explorer/index.html`` will work.
 
 # FAQ
 
