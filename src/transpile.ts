@@ -46,7 +46,7 @@ const testStrings: {[index: string]: string[]} = {
     '.CA and (2 or 3) and ^A',
     '!32 or :A and .CA'
   ],
-  molQLlisp: [
+  molQLscript: [
     `
     (atom.sel.atom-groups ;; comment
       :residue-test (eq

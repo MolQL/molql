@@ -5,12 +5,12 @@
  */
 
 import json from './languages/json'
-import lisp from './languages/molql-lisp'
+import molQLscript from './languages/molql-script'
 import pymol from './languages/pymol'
 import jmol from './languages/jmol'
 
 export default [
-    lisp,
+    molQLscript,
     pymol,
     jmol,
     json

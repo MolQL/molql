@@ -8,9 +8,9 @@ import Language from './language'
 import Transpilers from '../../transpilers/all'
 
 const lang: Language = {
-    name: 'MolQL LISP',
-    editorMode: 'molql-lisp',
-    transpiler: Transpilers.molQLlisp,
+    name: 'MolQL Script',
+    editorMode: 'molql-script',
+    transpiler: Transpilers.molQLscript,
     examples: [{
         name: 'All C or N atoms in ALA residues',
         value: `(atom.sel.atom-groups

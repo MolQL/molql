@@ -8,12 +8,12 @@ import Symbol from '../../molql/symbol'
 import MolQL from '../../molql/symbol-table'
 import { UniqueArrayBuilder } from '../../reference-implementation/utils/collections'
 
-export type MolQLLispSymbol =
+export type MolQLScriptSymbol =
     | { kind: 'alias', aliases: string[], symbol: Symbol }
 
-function Alias(symbol: Symbol, ...aliases: string[]): MolQLLispSymbol { return { kind: 'alias', aliases, symbol }; }
+function Alias(symbol: Symbol, ...aliases: string[]): MolQLScriptSymbol { return { kind: 'alias', aliases, symbol }; }
 
-const list: MolQLLispSymbol[] = [
+const list: MolQLScriptSymbol[] = [
     Alias(MolQL.core.type.bool, 'bool'),
     Alias(MolQL.core.type.num, 'num'),
     Alias(MolQL.core.type.str, 'str'),
@@ -73,6 +73,7 @@ const list: MolQLLispSymbol[] = [
 
     Alias(MolQL.structure.generator.atomGroups, 'atom.sel.atom-groups'),
     Alias(MolQL.structure.generator.queryInSelection, 'atom.sel.query-in-selection'),
+    Alias(MolQL.structure.generator.empty, 'atom.sel.empty'),
     Alias(MolQL.structure.modifier.queryEach, 'atom.sel.query-each'),
     Alias(MolQL.structure.modifier.intersectBy, 'atom.sel.intersect-by'),
     Alias(MolQL.structure.modifier.exceptBy, 'atom.sel.except-by'),
@@ -122,8 +123,8 @@ const list: MolQLLispSymbol[] = [
 ];
 
 const normalized = (function () {
-    const symbolList: [string, MolQLLispSymbol][] = [];
-    const symbolMap: { [id: string]: MolQLLispSymbol | undefined } = Object.create(null);
+    const symbolList: [string, MolQLScriptSymbol][] = [];
+    const symbolMap: { [id: string]: MolQLScriptSymbol | undefined } = Object.create(null);
     const namedArgs = UniqueArrayBuilder<string>();
 
     for (const s of list) {

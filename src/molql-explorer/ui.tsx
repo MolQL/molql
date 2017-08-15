@@ -15,7 +15,7 @@ import Language, { Example } from './languages/language'
 import Languages from './languages'
 import * as ReactMarkdown from 'react-markdown'
 import QueryEditor from './query-editor'
-import * as MolQLLisp from '../transpilers/molql-lisp/symbols'
+import * as MolQLScript from '../transpilers/molql-script/symbols'
 
 import Rx = LiteMol.Core.Rx
 
@@ -187,11 +187,11 @@ class QueryExpression extends Observer<{ state: State }, { queryString: string }
 class QueryHint extends Observer<{ state: State }, { isActive: boolean, description: string | undefined, info: string }> {
     state = { description: '', info: '', isActive: false }
     componentDidMount() {
-        this.subscribe(this.props.state.editorActive, isActive => this.setState({ isActive: isActive && this.props.state.currentLanguage.getValue().language.editorMode === 'molql-lisp' }));
-        this.subscribe(this.props.state.currentLanguage, lang => this.setState({ isActive: lang.language.editorMode === 'molql-lisp' && this.props.state.editorActive.getValue() }));
+        this.subscribe(this.props.state.editorActive, isActive => this.setState({ isActive: isActive && this.props.state.currentLanguage.getValue().language.editorMode === 'molql-script' }));
+        this.subscribe(this.props.state.currentLanguage, lang => this.setState({ isActive: lang.language.editorMode === 'molql-script' && this.props.state.editorActive.getValue() }));
         this.subscribe(this.props.state.currentSymbol.distinctUntilChanged(), symbol => {
             if (!this.state.isActive) return;
-            const _s = MolQLLisp.SymbolMap[symbol]
+            const _s = MolQLScript.SymbolMap[symbol]
             const symb = _s && _s.symbol;
             if (symb) this.setState({ description: symb.info.description, info: formatSymbol(symb, symbol) });
         });

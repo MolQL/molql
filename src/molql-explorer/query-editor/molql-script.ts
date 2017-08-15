@@ -5,7 +5,7 @@
  */
 
 import * as CodeMirror from 'codemirror'
-import * as MolQLLisp from '../../transpilers/molql-lisp/symbols'
+import * as MolQLScript from '../../transpilers/molql-script/symbols'
 
 /**
  * Adapted from the CodeMirror source code
@@ -14,14 +14,14 @@ import * as MolQLLisp from '../../transpilers/molql-lisp/symbols'
 
 const SymbolTest = /[^\s'`,@()\[\]';]/;
 
-const MolQLsymbols = MolQLLisp.SymbolList.map(s => s[0]).sort((a, b) => {
+const MolQLsymbols = MolQLScript.SymbolList.map(s => s[0]).sort((a, b) => {
     if (a.length === b.length) return (a < b) as any;
     return a.length - b.length;
 });
-const MolQLnamedArgs = MolQLLisp.NamedArgs.map(a => ':' + a);
+const MolQLnamedArgs = MolQLScript.NamedArgs.map(a => ':' + a);
 const MolQLfull = [...MolQLsymbols, ...MolQLnamedArgs];
 
-CodeMirror.defineMode('molql-lisp', (config) => {
+CodeMirror.defineMode('molql-script', (config) => {
     //const specialForm = /^(block|let*|return-from|catch|load-time-value|setq|eval-when|locally|symbol-macrolet|flet|macrolet|tagbody|function|multiple-value-call|the|go|multiple-value-prog1|throw|if|progn|unwind-protect|labels|progv|let|quote)$/;
     //const assumeBody = /^with|^def|^do|^prog|case$|^cond$|bind$|when$|unless$/;
     const symbols = Object.create(null);
@@ -132,7 +132,7 @@ CodeMirror.defineMode('molql-lisp', (config) => {
     };
 });
 
-CodeMirror.registerHelper('hint', 'molql-lisp', function (document: CodeMirror.Doc) {
+CodeMirror.registerHelper('hint', 'molql-script', function (document: CodeMirror.Doc) {
     const cur = document.getCursor(), curLine = document.getLine(cur.line);
     let end = cur.ch, start = end;
     while (start && SymbolTest.test(curLine.charAt(start - 1))) --start;
