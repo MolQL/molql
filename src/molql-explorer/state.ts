@@ -136,7 +136,7 @@ class State {
         try {
             const transpiler = this.currentLanguage.getValue().language.transpiler;
             const expression = transpiler(text);
-            const compiled = compile<AtomSelection>(expression);
+            const compiled = compile(expression, 'query');
             this.query.onNext({ kind: 'ok', sourceLanguage: 'json', text, expression, compiled });
         } catch (e) {
             this.query.onNext({ kind: 'error', message: '' + e });

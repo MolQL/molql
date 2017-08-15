@@ -114,7 +114,7 @@ const testStrings: {[index: string]: string[]} = {
 }
 
 function run (query: Expression) {
-    const compiled = compile(query);
+    const compiled = compile(query, 'query');
 
     fs.readFile('spec/1tqn_updated.cif', 'utf-8', (err, data) => {
         if (err) {

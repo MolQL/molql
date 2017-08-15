@@ -93,7 +93,7 @@ function run(model: Model) {
 
     //console.log(formatE(query));
 
-    const compiled = compile(query);
+    const compiled = compile(query, 'query');
     const ctx = Context.ofModel(model);
     const res = compiled(ctx);
     console.log('count', AtomSelection.atomSets(res).length);

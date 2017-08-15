@@ -47,3 +47,18 @@ Project Structure
     npm run testapp
 
 Then just open ``test-app/index.html``.
+
+# FAQ
+
+## How to add a new symbol to the language?
+
+1) Add the symbol definition to the appropriate place in ``src/symbol-table/``.
+2) Add implementation to an appropriate place in ``src/reference-implementation/molql/runtime/``.
+3) Map the symbol to implementation in ``src/reference-implementation/molql/runtime.ts``.
+    * If adding new atom properties and implementing them in ``src/reference-implementation/molql/runtime/structure/atom-propeties.ts``, this step could be skipped provided the same "key" is used for the symbol.
+4) Add alias for it to ``src/transpilers/molql-list/symbols``.
+5) If possible, add a unit test to ``src/reference-implementation/molql/spec/?``.
+
+## License?
+
+MIT.

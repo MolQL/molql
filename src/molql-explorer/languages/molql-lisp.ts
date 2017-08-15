@@ -18,6 +18,7 @@ const lang: Language = {
     (atom.auth_comp_id)
     ALA)
   :atom-test (set.has
+    ;; Element symbols must be "constructed" to be normalized, e.g. Fe vs FE
     (set (atom.new.el C) (atom.new.el N))
     (atom.el)))`
     }, {

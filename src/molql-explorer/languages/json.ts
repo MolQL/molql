@@ -21,14 +21,13 @@ const lang: Language = {
     transpiler: Transpilers.json,
     examples: [{
         name: 'All C or N atoms in ALA residues',
-        value: Container.serialize(
-            B.struct.generator.atomGroups({
-                'residue-test': B.core.rel.eq([B.ammp('auth_comp_id'), 'ALA']),
-                'atom-test': B.core.set.has([
-                    B.core.type.set([B.es('C'), B.es('N')]),
-                    B.acp('elementSymbol')
-                ])
-            }), { source: 'test-app', pretty: true })
+        value: Container.serialize(B.struct.generator.atomGroups({
+            'residue-test': B.core.rel.eq([B.ammp('auth_comp_id'), 'ALA']),
+            'atom-test': B.core.set.has([
+                B.core.type.set([B.es('C'), B.es('N')]),
+                B.acp('elementSymbol')
+            ])
+        }), { source: 'molql-explorer', pretty: true })
     }, {
         name: 'All residues within 5 ang from Fe atom',
         value: Container.serialize(B.struct.modifier.includeSurroundings({
@@ -37,19 +36,19 @@ const lang: Language = {
             }),
             'radius': 5,
             'as-whole-residues': true
-        }), { source: 'test-app', pretty: true })
+        }), { source: 'molql-explorer', pretty: true })
     }, {
         name: 'Cluster LYS residues within 5 ang',
         value: Container.serialize(B.struct.modifier.cluster({
             'selection': lys,
             'max-distance': 5
-        }), { source: 'test-app', pretty: true })
+        }), { source: 'molql-explorer', pretty: true })
     }, {
         name: 'Cluster 3 LYS residues within 5 ang',
         value: Container.serialize(B.struct.combinator.distanceCluster({
             matrix: l([l([0, 5, 5]), l([0, 0, 5]), l([0, 0, 0])]),
             selections: l([lys, lys, lys])
-        }), { source: 'test-app', pretty: true })
+        }), { source: 'molql-explorer', pretty: true })
     }, {
         name: 'Residues with max b-factor < 45',
         value: Container.serialize(B.struct.filter.pick({
@@ -64,7 +63,7 @@ const lang: Language = {
                 }),
                 35
             ])
-        }), { source: 'test-app', pretty: true })
+        }), { source: 'molql-explorer', pretty: true })
     }]
 }
 
