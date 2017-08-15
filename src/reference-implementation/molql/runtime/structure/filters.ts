@@ -77,19 +77,33 @@ export function withSameAtomProperties(env: Environment, selection: Selection, s
     return ret.getSelection();
 }
 
-export function within(env: Environment, selection: Selection, target: Selection, radius: Expression<number>) {
+export function within(env: Environment, selection: Selection, target: Selection, radius: Expression<number>, invert?: Expression<boolean>) {
     const sel = selection(env);
     const mask = AtomSelection.getMask(target(env));
     const checkWithin = Model.spatialLookup(env.context.model).check(mask);
     const r = radius(env);
     const { x, y, z } = env.context.model.positions;
+    const inverted = (!!invert && !!invert(env));
 
     const ret = AtomSelection.linearBuilder();
-    for (const atomSet of AtomSelection.atomSets(sel)) {
-        for (const a of AtomSet.atomIndices(atomSet)) {
-            if (checkWithin(x[a], y[a], z[a], r)) {
-                ret.add(atomSet);
-                break;
+    if (inverted) {
+        for (const atomSet of AtomSelection.atomSets(sel)) {
+            let include = true;
+            for (const a of AtomSet.atomIndices(atomSet)) {
+                if (checkWithin(x[a], y[a], z[a], r)) {
+                    include = false;
+                    break;
+                }
+            }
+            if (include) ret.add(atomSet);
+        }
+    } else {
+        for (const atomSet of AtomSelection.atomSets(sel)) {
+            for (const a of AtomSet.atomIndices(atomSet)) {
+                if (checkWithin(x[a], y[a], z[a], r)) {
+                    ret.add(atomSet);
+                    break;
+                }
             }
         }
     }
