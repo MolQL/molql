@@ -15,7 +15,6 @@ import Context from '../runtime/context'
 import Environtment from '../runtime/environment'
 import _compile from '../../molql/compiler'
 import AtomSelection from '../data/atom-selection'
-import B from '../../../molql/builder'
 
 const molData = fs.readFileSync('spec/1tqn_updated.cif', 'utf-8')
 export const model = parseCIF(molData).models[0];
@@ -24,7 +23,7 @@ export const ctx = Context.ofModel(model);
 export const env = Environtment(ctx);
 export const compile = _compile;
 
-export const compileQuery = (e: Expression) => compile(B.evaluate(e))
+export const compileQuery = (e: Expression) => compile(e, 'query')
 
 export function areAtomSetEqual(a: AtomSet, b: AtomSet) {
     return AtomSet.areEqual(a, b);

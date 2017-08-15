@@ -13,7 +13,6 @@ import parseCIF from '../reference-implementation/molecule/parser'
 import compile, { Compiled } from '../reference-implementation/molql/compiler'
 import mmCIFwriter from '../reference-implementation/molecule/writer'
 import Context from '../reference-implementation/molql/runtime/context'
-import B from '../molql/builder'
 
 import Language, { Example } from './languages/language'
 import Languages from './languages'
@@ -131,7 +130,7 @@ class State {
         try {
             const transpiler = this.currentLanguage.getValue().language.transpiler;
             const expression = transpiler(text);
-            const compiled = compile<AtomSelection>(B.evaluate(expression));
+            const compiled = compile(expression, 'query');
             this.query.onNext({ kind: 'ok', sourceLanguage: 'json', text, expression, compiled });
         } catch (e) {
             this.query.onNext({ kind: 'error', message: '' + e });

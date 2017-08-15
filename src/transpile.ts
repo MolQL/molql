@@ -10,7 +10,6 @@ import AtomSet from './reference-implementation/molql/data/atom-set'
 import parseCIF from './reference-implementation/molecule/parser'
 import compile from './reference-implementation/molql/compiler'
 import Context from './reference-implementation/molql/runtime/context'
-import B from './molql/builder'
 
 const transpiler: {[index: string]: Transpiler} = _transpiler
 
@@ -115,7 +114,7 @@ const testStrings: {[index: string]: string[]} = {
 }
 
 function run (query: Expression) {
-    const compiled = compile(B.evaluate(query));
+    const compiled = compile(query, 'query');
 
     fs.readFile('spec/1tqn_updated.cif', 'utf-8', (err, data) => {
         if (err) {
