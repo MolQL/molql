@@ -204,6 +204,7 @@ export const SymbolRuntime: Symbol.Info[] = [
         maxSize: v['max-size'],
     })),
     Symbol(MolQL.structure.modifier.includeSurroundings)((env, v) => env => StructureRuntime.Modifiers.includeSurroundings(env, v.selection(env), v.radius, v['as-whole-residues'])),
+    Symbol(MolQL.structure.modifier.expandProperty)((env, v) => env => StructureRuntime.Modifiers.expandProperty(env, v.selection(env), v.property)),
 
     // ============= FILTERS ================
     Symbol(MolQL.structure.filter.pick)((env, v) => env => StructureRuntime.Filters.pick(env, v.selection(env), v.test)),

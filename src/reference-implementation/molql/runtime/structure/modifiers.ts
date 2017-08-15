@@ -9,8 +9,9 @@ import Expression from '../expression'
 import Context from '../context'
 import AtomSet from '../../data/atom-set'
 import AtomSelection from '../../data/atom-selection'
-import { UniqueArrayBuilder, sortAsc, FastSet } from '../../../utils/collections'
+import { UniqueArrayBuilder, sortAsc, FastSet, FastMap } from '../../../utils/collections'
 import { Model } from '../../../molecule/data'
+import ElementAddress from '../../data/element-address'
 
 type Selection = Expression<AtomSelection>
 
@@ -239,5 +240,45 @@ export function includeSurroundings(env: Environment, selection: Selection, radi
         builder.add(AtomSet(sortAsc(atoms.array)));
     }
 
+    return builder.getSelection();
+}
+
+export function expandProperty(env: Environment, selection: Selection, property: Expression<any>): AtomSelection {
+    const { context } = env;
+
+    const src = selection(env);
+    const propertyToSetMap: FastMap<any, number[]> = FastMap.create();
+
+    Environment.lockSlot(env, 'element');
+    const element = env.slots.element;
+
+    let index = 0;
+    const sets: number[][] = [];
+    for (const atomSet of AtomSelection.atomSets(src)) {
+        for (const a of AtomSet.atomIndices(atomSet)) {
+            ElementAddress.setAtom(context.model, element, a);
+            const p = property(env);
+            if (propertyToSetMap.has(p)) propertyToSetMap.get(p)!.push(index);
+            else propertyToSetMap.set(p, [index]);
+        }
+        sets[index] = [];
+        index++;
+    }
+
+    const { mask } = context;
+
+    for (let i = 0, _i = context.model.atoms.count; i < _i; i++) {
+        if (!mask.has(i)) continue;
+
+        ElementAddress.setAtom(context.model, element, i);
+        const p = property(env);
+        if (!propertyToSetMap.has(p)) continue;
+        for (const setIndex of propertyToSetMap.get(p)!) sets[setIndex].push(i);
+    }
+    Environment.unlockSlot(env, 'element');
+
+    const builder = AtomSelection.uniqueBuilder();
+
+    for (const set of sets) builder.add(AtomSet(set));
     return builder.getSelection();
 }

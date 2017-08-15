@@ -94,4 +94,22 @@ describe('modifier', () => {
         const distanceCheck = AtomSelection.atomSets(atomsInSel).every(s => AtomSet.distance(Data.model, pivotAtomSet, s) <= 5);
         expect(distanceCheck).toBe(true);
     });
+
+    it('expandProperty C on ALA to whole residues', function() {
+
+        //const ALAs = B.struct.generator.atomGroups({ 'residue-test': B.core.rel.eq([B.ammp('auth_comp_id'), 'ALA']) })
+        const query = B.struct.modifier.expandProperty({
+            selection: B.struct.generator.atomGroups({
+                'residue-test': B.core.rel.eq([B.ammp('auth_comp_id'), 'ALA']),
+                'atom-test': B.core.rel.eq([B.acp('elementSymbol'), B.es('C')])
+            }),
+            property: B.ammp('residueKey')
+        });
+        const check = B.struct.generator.atomGroups({ 'residue-test': B.core.rel.eq([B.ammp('auth_comp_id'), 'ALA']), 'group-by': B.ammp('residueKey') });
+
+        const result = Data.compileQuery(query)(Data.ctx);
+        const alas = Data.compileQuery(check)(Data.ctx);
+
+        expect(Data.checkAtomSelsEqual(result, alas)).toBe(true);
+    });
 })

@@ -42,3 +42,15 @@ export function countAtomSet(model: Model, atomSet: AtomSet, f: (i: number, cols
 export function checkAtomSelection(model: Model, atomSel: AtomSelection, f: (i: number, cols: mmCIF.Category<mmCIF.AtomSite>) => boolean) {
     return AtomSelection.atomSets(atomSel).every(s => checkAtomSet(model, s, f));
 }
+
+export function checkAtomSelsEqual(a: AtomSelection, b: AtomSelection) {
+    const xs = AtomSelection.atomSets(a), ys = AtomSelection.atomSets(b);
+    if (xs.length !== ys.length) return false;
+
+    const set = new AtomSelection.Set();
+    for (const x of xs) set.add(x);
+    for (const y of ys) {
+        if (!set.has(y)) return false;
+    }
+    return true;
+}

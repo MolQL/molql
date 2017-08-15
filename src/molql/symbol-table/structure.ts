@@ -100,7 +100,12 @@ const modifier = {
         selection: Argument(Types.AtomSelectionQuery),
         radius: Argument(Type.Num),
         'as-whole-residues': Argument(Type.Bool, { isOptional: true })
-    }), Types.AtomSelectionQuery, 'For each atom set in the selection, include all surrouding atoms/residues that are within the specified radius.')
+    }), Types.AtomSelectionQuery, 'For each atom set in the selection, include all surrouding atoms/residues that are within the specified radius.'),
+
+    expandProperty: symbol(Arguments.Dictionary({
+        selection: Argument(Types.AtomSelectionQuery),
+        property: Argument(Type.AnyValue)
+    }), Types.AtomSelectionQuery, 'To each atom set in the selection, add all atoms that have the same property value that was already present in the set.')
 }
 
 const filter = {
@@ -160,7 +165,7 @@ const atomProperty = {
         y: prop(Type.Num, 'Cartesian Y coordinate'),
         z: prop(Type.Num, 'Cartesian Z coordinate'),
 
-        atomKey: prop(Type.Any, 'Unique value for each atom. Main use case is grouping of atoms.')
+        atomKey: prop(Type.AnyValue, 'Unique value for each atom. Main use case is grouping of atoms.')
     },
 
     macromolecular: {
@@ -169,9 +174,9 @@ const atomProperty = {
         authResidueId: prop(Types.ResidueId, `type.auth-residue-id symbol executed on current atom's residue`),
         labelResidueId: prop(Types.ResidueId, `type.label-residue-id symbol executed on current atom's residue`),
 
-        residueKey: prop(Type.Any, 'Unique value for each tuple ``(label_entity_id,auth_asym_id,auth_seq_id,pdbx_PDB_ins_code)``, main use case is grouping of atoms'),
-        chainKey: prop(Type.Any, 'Unique value for each tuple ``(label_entity_id,auth_asym_id)``, main use case is grouping of atoms'),
-        entityKey: prop(Type.Any, 'Unique value for each tuple ``label_entity_id``, main use case is grouping of atoms'),
+        residueKey: prop(Type.AnyValue, 'Unique value for each tuple ``(label_entity_id,auth_asym_id,auth_seq_id,pdbx_PDB_ins_code)``, main use case is grouping of atoms'),
+        chainKey: prop(Type.AnyValue, 'Unique value for each tuple ``(label_entity_id,auth_asym_id)``, main use case is grouping of atoms'),
+        entityKey: prop(Type.AnyValue, 'Unique value for each tuple ``label_entity_id``, main use case is grouping of atoms'),
 
         isHet: prop(Type.Bool, 'Equivalent to atom_site.group_PDB !== ATOM'),
 
