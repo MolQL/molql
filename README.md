@@ -22,9 +22,9 @@ Project Structure
     * [MolQL](src/reference-implementation/molql) Implementation of the MolQL runtime.
     * [Molecule Representation](src/reference-implementation/molecule) Representations of molecules based on the mmCIF format.
 * [Transpilers](src/transpilers)
-    * [MolQL Lisp](src/transpilers/molql-lisp) A LISP dialect that defines aliases to the somewhat verbose MolQL functions.
-    * [PyMol](src/transpilers/pymol)
-    * [Jmol](src/transpilers/jmol)
+    * [MolQL Script](src/transpilers/molql-script) A LISP inspired language that defines aliases to the somewhat verbose MolQL functions.
+    * [PyMol](src/transpilers/pymol) Allows to compile a subset of PyMol selections to MolQL.
+    * [Jmol](src/transpilers/jmol) Allows to compile a subset of Jmol selections to MolQL.
 * [MolQL Explorer](src/molql-explorer) An application that showcases the language. Ability to execute any query on any PDB entry and export the result as mmCIF + show it in context of the whole structure using [LiteMol](https://github.com/dsehnal/LiteMol).
 
 ## Building & Running
