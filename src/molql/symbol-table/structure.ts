@@ -56,7 +56,9 @@ const generator = {
         selection: Argument(Types.AtomSelectionQuery),
         query: Argument(Types.AtomSelectionQuery),
         'in-complement': Argument(Type.Bool, { isOptional: true, defaultValue: false })
-    }), Types.AtomSelectionQuery, 'Executes query only on atoms that are in the source selection.')
+    }), Types.AtomSelectionQuery, 'Executes query only on atoms that are in the source selection.'),
+
+    empty: symbol(Arguments.None, Types.AtomSelectionQuery),
 }
 
 const modifier = {

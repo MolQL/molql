@@ -113,24 +113,31 @@ export function binaryLeft(operatorsParser: P.Parser<any>, nextParser: P.Parser<
  */
 export function combineOperators (opList: any[], rule: P.Parser<any>) {
   const x = opList.reduce(
-    (acc, level) => level.type(level.rule, acc, level.map),
+    (acc, level) => {
+      const map = level.isUnsupported ? makeError(`operator '${level.name}' not supported`) : level.map
+      return level.type(level.rule, acc, map)
+    },
     rule
   )
   return x
 }
 
-const __ = P.whitespace
-
 export function infixOp (re: RegExp, group: number = 0) {
-  return __.then(P.regex(re, group).skip(__))
+  return P.whitespace.then(P.regex(re, group).skip(P.whitespace))
 }
 
 export function prefixOp (re: RegExp, group: number = 0) {
-  return P.regex(re, group).skip(__)
+  return P.regex(re, group).skip(P.whitespace)
 }
 
 export function postfixOp (re: RegExp, group: number = 0) {
-  return __.then(P.regex(re, group))
+  return P.whitespace.then(P.regex(re, group))
+}
+
+export function makeError (msg: string) {
+  return function() {
+    throw new Error(msg)
+  }
 }
 
 export namespace QueryBuilder {
