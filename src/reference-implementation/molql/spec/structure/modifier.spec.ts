@@ -96,8 +96,6 @@ describe('modifier', () => {
     });
 
     it('expandProperty C on ALA to whole residues', function() {
-
-        //const ALAs = B.struct.generator.atomGroups({ 'residue-test': B.core.rel.eq([B.ammp('auth_comp_id'), 'ALA']) })
         const query = B.struct.modifier.expandProperty({
             selection: B.struct.generator.atomGroups({
                 'residue-test': B.core.rel.eq([B.ammp('auth_comp_id'), 'ALA']),
