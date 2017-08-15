@@ -31,7 +31,7 @@ const type = {
     labelResidueId: symbol(Arguments.Dictionary({
         0: Argument(Type.Str, { description: 'label_entity_id' }),
         1: Argument(Type.Str, { description: 'label_asym_id' }),
-        2: Argument(Type.Num, { description: 'label_auth_seq_id' }),
+        2: Argument(Type.Num, { description: 'label_seq_id' }),
         3: Argument(Type.Str, { description: 'pdbx_PDB_ins_code', isOptional: true })
     }), Types.ResidueId, `Residue identifier based on mmCIF's "label_" annotation.`)
 };
@@ -56,7 +56,9 @@ const generator = {
         selection: Argument(Types.AtomSelectionQuery),
         query: Argument(Types.AtomSelectionQuery),
         'in-complement': Argument(Type.Bool, { isOptional: true, defaultValue: false })
-    }), Types.AtomSelectionQuery, 'Executes query only on atoms that are in the source selection.')
+    }), Types.AtomSelectionQuery, 'Executes query only on atoms that are in the source selection.'),
+
+    empty: symbol(Arguments.None, Types.AtomSelectionQuery),
 }
 
 const modifier = {

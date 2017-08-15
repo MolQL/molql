@@ -48,7 +48,7 @@ const testStrings: {[index: string]: string[]} = {
   ],
   molQLlisp: [
     `
-    (atom.sel.atom-groups
+    (atom.sel.atom-groups ;; comment
       :residue-test (eq
         (atom.auth_comp_id)
         ALA)

@@ -133,3 +133,5 @@ export function querySelection(env: Environment, selection: Expression<AtomSelec
         return query(Environment(Context.ofAtomSelection(env.context.model, selection(env))))
     }
 }
+
+export function empty() { return AtomSelection.empty }
