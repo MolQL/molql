@@ -9,6 +9,7 @@ import State from './state'
 import * as React from 'react'
 import Expression from '../mini-lisp/expression'
 import lispFormat from '../reference-implementation/mini-lisp/expression-formatter'
+import Container from '../reference-implementation/molql/container'
 import getDocs, { formatSymbol } from '../reference-implementation/molql/markdown-docs'
 import Language, { Example } from './languages/language'
 import Languages from './languages'
@@ -228,7 +229,8 @@ class CompiledQuery extends Observer<{ state: State }, { error?: string, express
             content = '' + this.state.error;
         } else {
             content = this.state.expression
-                ? this.state.target === 'lisp' ? lispFormat(this.state.expression!) : JSON.stringify(this.state.expression, null, 2)
+                ? this.state.target === 'lisp'
+                ? lispFormat(this.state.expression!) : Container.serialize(this.state.expression!, { source: 'molql-explorer', pretty: true })
                 : 'Enter query...';
         }
 

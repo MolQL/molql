@@ -6,7 +6,6 @@
 
 import Transpiler from './transpiler'
 import Container from '../reference-implementation/molql/container'
-import B from '../molql/builder'
 
-const transpiler: Transpiler = (s: string) => B.evaluate(Container.deserialize(s).expression)
+const transpiler: Transpiler = (s: string) => Container.deserialize(s).expression
 export default transpiler

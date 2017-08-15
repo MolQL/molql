@@ -143,5 +143,5 @@ const lang = P.createLanguage({
 
 const reComment = /;[^\n\r]*[\n\r]/g
 
-const transpiler: Transpiler = str => B.evaluate(lang.Query.tryParse(str.replace(reComment, '\n')))
+const transpiler: Transpiler = str => lang.Query.tryParse(str.replace(reComment, '\n'))
 export default transpiler
