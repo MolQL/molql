@@ -5,7 +5,9 @@
  */
 
 import * as P from 'parsimmon'
+
 import * as h from '../helper'
+import { AtomGroupArgs } from '../types'
 
 import properties from './properties'
 import operators from './operators'
@@ -15,7 +17,6 @@ import Transpiler from '../transpiler'
 import B from '../../molql/builder'
 
 const propertiesDict = h.getPropertyRules(properties)
-const namedPropertiesList = h.getNamedPropertyRules(properties)
 
 const slash = P.string('/')
 
@@ -24,7 +25,7 @@ function orNull(rule: P.Parser<any>) {
 }
 
 function atomSelectionQuery(x: any) {
-  const tests: h.AtomGroupArgs = {}
+  const tests: AtomGroupArgs = {}
   const props: {[k: string]: any[]} = {}
 
   for (let k in x) {
@@ -118,7 +119,7 @@ const lang = P.createLanguage({
   },
 
   NamedAtomProperties: function() {
-    return P.alt(...namedPropertiesList)
+    return P.alt(...h.getNamedPropertyRules(properties))
   },
 
   Keywords: () => P.alt(...h.getKeywordRules(keywords)),

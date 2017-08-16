@@ -4,6 +4,15 @@ import * as P from 'parsimmon'
 import Expression from '../mini-lisp/expression'
 // import Symbol from '../mini-lisp/symbol'
 
+export interface AtomGroupArgs {
+  [index: string]: any
+  'entity-test'?: Expression
+  'chain-test'?: Expression
+  'residue-test'?: Expression
+  'atom-test'?: Expression
+  'groupBy'?: Expression
+}
+
 export interface Keyword {
   '@desc': string
   short?: string
@@ -17,7 +26,7 @@ export interface Property {
   '@examples': string[]
   isUnsupported?: boolean
   isNumeric?: boolean
-  short: string
+  short?: string
   regex: RegExp
   map: (s: string) => any
   level: 'atom-test' | 'residue-test' | 'chain-test' | 'entity-test'

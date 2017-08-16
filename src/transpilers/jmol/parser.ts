@@ -5,18 +5,20 @@
  */
 
 import * as P from 'parsimmon'
-import * as h from '../helper'
 
-// import properties from './properties'
+import * as h from '../helper'
+import { AtomGroupArgs } from '../types'
+
+import properties from './properties'
 import operators from './operators'
-// import keywords from './keywords'
+import keywords from './keywords'
 
 import Transpiler from '../transpiler'
 import B from '../../molql/builder'
 
 function atomExpressionQuery (x: any[]) {
   const [resno, inscode, chainname, atomname, altloc, ] = x[1]
-  const tests: h.AtomGroupArgs = {}
+  const tests: AtomGroupArgs = {}
 
   if (chainname) {
     // should be configurable, there is an option in Jmol to use auth or label
@@ -47,6 +49,9 @@ const lang = P.createLanguage({
 
   Expression: function(r) {
     return P.alt(
+      r.Keywords,
+      r.NamedAtomProperties,
+
       r.AtomExpression.map(atomExpressionQuery),
 
       r.Element.map((x: string) => B.struct.generator.atomGroups({
@@ -100,6 +105,12 @@ const lang = P.createLanguage({
   //   // 123-200
   //   // -12--3
   // },
+
+  NamedAtomProperties: function() {
+    return P.alt(...h.getNamedPropertyRules(properties))
+  },
+
+  Keywords: () => P.alt(...h.getKeywordRules(keywords)),
 
   Query: function(r) {
     return P.alt(

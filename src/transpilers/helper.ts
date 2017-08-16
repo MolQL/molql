@@ -10,16 +10,6 @@ import { KeywordDict, PropertyDict } from './types'
 import B from '../molql/builder'
 import Expression from '../mini-lisp/expression'
 
-// TODO replace by type
-export interface AtomGroupArgs {
-  [index: string]: any
-  'entity-test'?: Expression
-  'chain-test'?: Expression
-  'residue-test'?: Expression
-  'atom-test'?: Expression
-  'groupBy'?: Expression
-}
-
 export function escapeRegExp(s: String){
   return String(s).replace(/[\\^$*+?.()|[\]{}]/g, '\\$&')
 }
@@ -225,8 +215,8 @@ export function getNamedPropertyRules(properties: PropertyDict) {
       if (ps.isUnsupported) errorFn()
       return testExpr(ps.property, ps.map(x))
     })
-    const short = escapeRegExp(ps.short)
-    const nameRule = P.regex(RegExp(`${name}|${short}`, 'i')).trim(P.optWhitespace)
+    const reStr = ps.short ? `${name}|${escapeRegExp(ps.short)}` : `${name}`
+    const nameRule = P.regex(RegExp(reStr, 'i')).trim(P.optWhitespace)
     const groupMap = (x: any) => B.struct.generator.atomGroups({[ps.level]: x})
 
     if (ps.isNumeric) {

@@ -15,7 +15,6 @@ const keywords: KeywordDict = {
   },
   none: {
     '@desc': 'No atoms (empty selection)',
-    short: 'none',
     map: () => B.struct.generator.empty()
   },
   hydro: {
