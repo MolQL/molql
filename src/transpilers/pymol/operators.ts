@@ -158,15 +158,12 @@ const operators: OperatorList = [
     type: h.prefix,
     rule: h.prefixOp(/BYRES|br\./i),
     map: (op: string, selection: Expression) => {
-      return B.struct.filter.withSameAtomProperties({
-        selection: B.struct.generator.atomGroups(),
-        source: selection,
-        property: B.struct.type.labelResidueId([
-          B.ammp('label_entity_id'),
-          B.ammp('label_asym_id'),
-          B.ammp('label_seq_id'),
-          B.ammp('pdbx_PDB_ins_code')
-        ])
+      return B.struct.generator.queryInSelection({
+        selection: B.struct.modifier.expandProperty({
+          selection: B.struct.modifier.union({ selection }),
+          property: B.ammp('residueKey')
+        }),
+        query: B.struct.generator.atomGroups()
       })
     }
   },
@@ -195,10 +192,12 @@ const operators: OperatorList = [
     type: h.prefix,
     rule: h.prefixOp(/BYSEGMENT|bs\./i),
     map: (op: string, selection: Expression) => {
-      return B.struct.filter.withSameAtomProperties({
-        selection: B.struct.generator.atomGroups(),
-        source: selection,
-        property: B.ammp('label_asym_id')
+      return B.struct.generator.queryInSelection({
+        selection: B.struct.modifier.expandProperty({
+          selection: B.struct.modifier.union({ selection }),
+          property: B.ammp('chainKey')
+        }),
+        query: B.struct.generator.atomGroups()
       })
     }
   },
