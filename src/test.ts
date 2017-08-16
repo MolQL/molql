@@ -74,16 +74,23 @@ function run(model: Model) {
     //     'max-distance': 5
     // }));
     //const l = B.core.type.list;
-    const query = B.struct.filter.isConnectedTo({
+    // const query = B.struct.filter.isConnectedTo({
+    //     selection: B.struct.generator.atomGroups({
+    //         //'residue-test': B.core.rel.eq([B.ammp('label_comp_id'), 'CYS']),
+    //         'atom-test': B.core.rel.eq([B.ammp('id'), 3810]),
+    //         'group-by': B.ammp('residueKey')
+    //     }),
+    //     target: B.struct.generator.atomGroups({
+    //         'residue-test': B.core.rel.eq([B.ammp('label_comp_id'), 'HEM']),
+    //         'group-by': B.ammp('residueKey')
+    //     }),
+    // });
+    const query = B.struct.modifier.includeConnected({
         selection: B.struct.generator.atomGroups({
-            //'residue-test': B.core.rel.eq([B.ammp('label_comp_id'), 'CYS']),
-            'atom-test': B.core.rel.eq([B.ammp('id'), 3810]),
-            'group-by': B.ammp('residueKey')
-        }),
-        target: B.struct.generator.atomGroups({
             'residue-test': B.core.rel.eq([B.ammp('label_comp_id'), 'HEM']),
             'group-by': B.ammp('residueKey')
         }),
+        'layer-count': 3
     });
 
     // const query = B.struct.generator.atomGroups({

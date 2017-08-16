@@ -102,6 +102,12 @@ const modifier = {
         'as-whole-residues': Argument(Type.Bool, { isOptional: true })
     }), Types.AtomSelectionQuery, 'For each atom set in the selection, include all surrouding atoms/residues that are within the specified radius.'),
 
+    includeConnected: symbol(Arguments.Dictionary({
+        selection: Argument(Types.AtomSelectionQuery),
+        'layer-count': Argument(Type.Num, { isOptional: true, defaultValue: 1, description: 'Number of bonded layers to include.' }),
+        'as-whole-residues': Argument(Type.Bool, { isOptional: true })
+    }), Types.AtomSelectionQuery, 'Pick all atom sets that are connected to the target.'),
+
     expandProperty: symbol(Arguments.Dictionary({
         selection: Argument(Types.AtomSelectionQuery),
         property: Argument(Type.AnyValue)

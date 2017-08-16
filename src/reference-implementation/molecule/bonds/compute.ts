@@ -77,15 +77,19 @@ function computePerAtomBonds(atomA: number[], atomB: number[], type: BondType[],
 
     const bondsByAtom = new Int32Array(offset) as any as number[];
     const typesByAtom = new Int8Array(offset) as any as number[];
+
     for (let i = 0, _i = atomA.length; i < _i; i++) {
         const a = atomA[i], b = atomB[i], t = type[i];
+
         const oa = bucketOffsets[a] + bucketFill[a];
         const ob = bucketOffsets[b] + bucketFill[b];
+
         bondsByAtom[oa] = b;
-        bondsByAtom[ob] = a;
         typesByAtom[oa] = t;
-        typesByAtom[ob] = t;
         bucketFill[a]++;
+
+        bondsByAtom[ob] = a;
+        typesByAtom[ob] = t;
         bucketFill[b]++;
     }
 
@@ -111,7 +115,7 @@ function _computeBonds(model: Model, params: BondComputationParameters): Bonds {
     const type: BondType[] = [];
 
     let lastResidue = -1;
-    let componentPairs: FastMap<string, BondType> | undefined = void 0;
+    let componentMap: FastMap<string, FastMap<string, BondType>> | undefined = void 0;
 
     for (let aI = 0; aI < atomCount; aI++) {
         const raI = residueIndex[aI];
@@ -120,13 +124,14 @@ function _computeBonds(model: Model, params: BondComputationParameters): Bonds {
         if (!params.forceCompute && raI !== lastResidue) {
             const resn = label_comp_id.getString(rowA)!;
             if (!!component && component.entries.has(resn)) {
-                const map = component.entries.get(resn)!.map;
-                componentPairs = map.get(label_atom_id.getString(rowA)!);
+                componentMap = component.entries.get(resn)!.map;
             } else {
-                componentPairs = void 0;
+                componentMap = void 0;
             }
         }
         lastResidue = raI;
+
+        const componentPairs = componentMap ? componentMap.get(label_atom_id.getString(rowA)!) : void 0;
 
         const aeI = idx(type_symbol.getString(rowA)!);
 

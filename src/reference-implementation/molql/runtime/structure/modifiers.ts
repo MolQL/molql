@@ -10,7 +10,8 @@ import Context from '../context'
 import AtomSet from '../../data/atom-set'
 import AtomSelection from '../../data/atom-selection'
 import { UniqueArrayBuilder, sortAsc, FastSet, FastMap } from '../../../utils/collections'
-import { Model } from '../../../molecule/data'
+import Mask from '../../../utils/mask'
+import { Model, Bonds } from '../../../molecule/data'
 import ElementAddress from '../../data/element-address'
 
 type Selection = Expression<AtomSelection>
@@ -210,7 +211,7 @@ export function includeSurroundings(env: Environment, selection: Selection, radi
     const { model, mask } = env.context;
     const findWithin = Model.spatialLookup(model).find(mask);
     const r = radius(env);
-    const asResidues = wholeResidues && !!wholeResidues(env);
+    const asResidues = !!wholeResidues && !!wholeResidues(env);
     const { x, y, z } = model.positions;
     const { residueIndex } = model.atoms;
     const { atomStartIndex, atomEndIndex } = model.residues;
@@ -238,6 +239,51 @@ export function includeSurroundings(env: Environment, selection: Selection, radi
             }
         }
         builder.add(AtomSet(sortAsc(atoms.array)));
+    }
+
+    return builder.getSelection();
+}
+
+function _expandFrontierAtoms(bonds: Bonds, mask: Mask, frontier: number[], atoms: UniqueArrayBuilder<number>) {
+    const newFrontier: number[] = [];
+    const { atomBondOffsets, bondsByAtom } = bonds;
+    for (const a of frontier) {
+        const start = atomBondOffsets[a], end = atomBondOffsets[a + 1];
+        for (let i = start; i < end; i++) {
+            const b = bondsByAtom[i];
+            if (mask.has(b) && UniqueArrayBuilder.add(atoms, b, b)) newFrontier[newFrontier.length] = b;
+        }
+    }
+    return newFrontier;
+}
+
+function _expandAtoms(bonds: Bonds, mask: Mask, atomSet: AtomSet, numLayers: number) {
+    if (!numLayers) return atomSet;
+
+    const result = UniqueArrayBuilder<number>();
+    let frontier = AtomSet.atomIndices(atomSet) as number[];
+
+    for (const a of frontier) UniqueArrayBuilder.add(result, a, a);
+
+    for (let i = 0; i < numLayers; i++) {
+        frontier = _expandFrontierAtoms(bonds, mask, frontier, result);
+    }
+    sortAsc(result.array);
+    return AtomSet(result.array);
+}
+
+export function includeConnected(env: Environment, selection: Selection, layerCount?: Expression<number>, wholeResidues?: Expression<boolean>): AtomSelection {
+    const src = selection(env);
+    const { model, mask } = env.context;
+    const bonds = Model.bonds(model);
+    const numLayers = Math.max(0, layerCount ? layerCount(env) : 1);
+    const asResidues = !!wholeResidues && !!wholeResidues(env);
+
+    const builder = AtomSelection.uniqueBuilder();
+
+    for (const atomSet of AtomSelection.atomSets(src)) {
+        if (asResidues) {}
+        else builder.add(_expandAtoms(bonds, mask, atomSet, numLayers));
     }
 
     return builder.getSelection();

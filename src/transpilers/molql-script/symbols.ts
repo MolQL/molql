@@ -82,6 +82,7 @@ const list: MolQLScriptSymbol[] = [
     Alias(MolQL.structure.modifier.union, 'atom.sel.union'),
     Alias(MolQL.structure.modifier.cluster, 'atom.sel.cluster'),
     Alias(MolQL.structure.modifier.includeSurroundings, 'atom.sel.include-surroundings'),
+    Alias(MolQL.structure.modifier.includeConnected, 'atom.sel.include-connected'),
     Alias(MolQL.structure.modifier.expandProperty, 'atom.sel.expand-property'),
 
     Alias(MolQL.structure.filter.pick, 'atom.sel.pick'),
