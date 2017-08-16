@@ -46,4 +46,16 @@ describe('filter', () => {
         const distanceCheck = AtomSelection.atomSets(sel).every(s => AtomSet.distance(Data.model, pivotAtomSet, s) <= 5);
         expect(distanceCheck).toBe(true);
     });
+
+    it('within(inverted) residues 5 ang from HEM', function() {
+        const HEM = B.struct.generator.atomGroups({ 'residue-test': B.core.rel.eq([B.ammp('auth_comp_id'), 'HEM']), 'group-by': B.ammp('residueKey') });
+
+        const q = B.struct.filter.within({ selection: residues, target: HEM, radius: 5, invert: true });
+
+        const pivotAtomSet = AtomSelection.atomSets(Data.compileQuery(HEM)(Data.ctx) as AtomSelection)[0];
+        const sel = Data.compileQuery(q)(Data.ctx) as AtomSelection;
+        expect(AtomSelection.atomSets(sel).length).toBeGreaterThan(0);
+        const distanceCheck = AtomSelection.atomSets(sel).every(s => AtomSet.distance(Data.model, pivotAtomSet, s) > 5);
+        expect(distanceCheck).toBe(true);
+    });
 });
