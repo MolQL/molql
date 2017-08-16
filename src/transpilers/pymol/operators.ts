@@ -141,13 +141,9 @@ const operators: OperatorList = [
     type: h.binaryLeft,
     rule: h.ofOp('BEYOND', 'be.'),
     map: (radius: number, selection: Expression, target: Expression) => {
-      return B.struct.modifier.intersectBy({
-        selection,
-        by: B.struct.generator.queryInSelection({
-          selection: B.struct.modifier.includeSurroundings({ selection: target, radius }),
-          query: B.struct.generator.atomGroups(),
-          'in-complement': true
-        })
+      return B.struct.modifier.exceptBy({
+        selection: B.struct.filter.within({ selection, target, radius, invert: true }),
+        by: target
       })
     }
   },
