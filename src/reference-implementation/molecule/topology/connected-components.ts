@@ -35,6 +35,5 @@ export default function findComponents(model: Model) {
         labelComponent(bonds, labels, index.head, index, label);
         label++;
     }
-    //console.log(labels.slice(1800, 2200));
     return labels;
 }

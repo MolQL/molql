@@ -12,7 +12,7 @@ interface LinkedIndex {
 
 function LinkedIndex(size: number): LinkedIndex {
     const ret: LinkedIndex = {
-        head: 0,
+        head: size > 0 ? 0 : -1,
         prev: new Int32Array(size) as any as number[],
         next: new Int32Array(size) as any as number[],
     };
