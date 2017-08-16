@@ -104,6 +104,8 @@ const list: MolQLScriptSymbol[] = [
     Alias(MolQL.structure.atomProperty.core.z, 'atom.z'),
     Alias(MolQL.structure.atomProperty.core.atomKey, 'atom.key'),
 
+    Alias(MolQL.structure.atomProperty.topology.componentKey, 'atom.key.component'),
+
     Alias(MolQL.structure.atomProperty.macromolecular.authResidueId, 'atom.auth-resid'),
     Alias(MolQL.structure.atomProperty.macromolecular.labelResidueId, 'atom.label-resid'),
     Alias(MolQL.structure.atomProperty.macromolecular.residueKey, 'atom.key.res'),

@@ -6,7 +6,8 @@
 
 import * as mmCIF from './mmcif'
 import SpatialLookup from '../utils/spatial-lookup'
-import computeBonds from './bonds/compute'
+import computeBonds from './topology/bonds-compute'
+import computeConnectedComponents from './topology/connected-components'
 
 export const enum SecondaryStructureType {
     None = 0,
@@ -99,7 +100,9 @@ export interface Model {
     residues: Residues,
     chains: Chains,
     entities: Entities,
+
     '@spatialLookup': SpatialLookup | undefined,
+    '@connectedComponentKey': number[] | undefined,
     '@bonds': Bonds | undefined
 }
 
@@ -161,6 +164,13 @@ export namespace Model {
         const bonds = computeBonds(model);
         model['@bonds'] = bonds;
         return bonds;
+    }
+
+    export function connectedComponentKey(model: Model): number[] {
+        if (model['@connectedComponentKey']) return model['@connectedComponentKey']!;
+        const key = computeConnectedComponents(model);
+        model['@connectedComponentKey'] = key;
+        return key;
     }
 
     export function findResidueIndexByLabel(model: Model, asymId: string, seqNumber: number, insCode: string | null) {

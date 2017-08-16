@@ -6,7 +6,7 @@
 
 import { FastSet, FastMap } from '../../utils/collections'
 import Mask from '../../utils/mask'
-import { ComponentBondInfo, StructConn } from './utils'
+import { ComponentBondInfo, StructConn } from './bonds-utils'
 import { Model, BondType, Bonds } from '../data'
 
 export interface BondComputationParameters {

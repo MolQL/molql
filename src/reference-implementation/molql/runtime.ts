@@ -230,6 +230,7 @@ export const SymbolRuntime: Symbol.Info[] = [
 
     // ============= ATOM PROPERTIES ================
     ...atomProps(MolQL.structure.atomProperty.core, StructureRuntime.AtomProperties.Core),
+    ...atomProps(MolQL.structure.atomProperty.topology, StructureRuntime.AtomProperties.Topology),
     ...atomProps(MolQL.structure.atomProperty.macromolecular, StructureRuntime.AtomProperties.Macromolecular)
 ]
 

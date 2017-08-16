@@ -85,13 +85,20 @@ function run(model: Model) {
     //         'group-by': B.ammp('residueKey')
     //     }),
     // });
-    const query = B.struct.modifier.includeConnected({
+    // const query = B.struct.modifier.includeConnected({
+    //     selection: B.struct.generator.atomGroups({
+    //         'residue-test': B.core.rel.eq([B.ammp('label_comp_id'), 'HEM']),
+    //         'group-by': B.ammp('residueKey')
+    //     }),
+    //     'layer-count': 1,
+    //     'as-whole-residues': true
+    // });
+    const query = B.struct.modifier.expandProperty({
         selection: B.struct.generator.atomGroups({
             'residue-test': B.core.rel.eq([B.ammp('label_comp_id'), 'HEM']),
             'group-by': B.ammp('residueKey')
         }),
-        'layer-count': 1,
-        'as-whole-residues': true
+        property: B.atp('componentKey')
     });
 
     // const query = B.struct.generator.atomGroups({
@@ -122,6 +129,7 @@ function run(model: Model) {
     const ctx = Context.ofModel(model);
     const res = compiled(ctx);
     console.log('count', AtomSelection.atomSets(res).length);
+    if (AtomSelection.atomSets(res).length) console.log('ac', AtomSet.count(AtomSelection.atomSets(res)[0]));
     const cif = mmCIFwriter(model, AtomSet.atomIndices(AtomSelection.toAtomSet(res)));
 
     console.log(cif.substr(0, 450));

@@ -9,7 +9,7 @@ import SymbolRuntime from '../../symbol'
 import Environment from '../environment'
 import RuntimeExpression from '../expression'
 import ElementAddress from '../../data/element-address'
-import { ElementSymbol, ResidueIdentifier } from '../../../molecule/data'
+import { Model, ElementSymbol, ResidueIdentifier } from '../../../molecule/data'
 
 function prop(runtime: SymbolRuntime) { return runtime; }
 
@@ -25,6 +25,10 @@ export const Core: { [P in keyof typeof MolQL.structure.atomProperty.core]?: Sym
     z: prop((env, v) => env.context.model.positions.z[getAddress(env, v).atom]),
 
     atomKey: prop((env, v) => getAddress(env, v).atom),
+}
+
+export const Topology: { [P in keyof typeof MolQL.structure.atomProperty.topology]?: SymbolRuntime } = {
+    componentKey: prop((env, v) => Model.connectedComponentKey(env.context.model)[getAddress(env, v).atom]),
 }
 
 export const Macromolecular: { [P in keyof typeof MolQL.structure.atomProperty.macromolecular]?: SymbolRuntime } = {

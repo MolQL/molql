@@ -346,7 +346,7 @@ export function expandProperty(env: Environment, selection: Selection, property:
     const { context } = env;
 
     const src = selection(env);
-    const propertyToSetMap: FastMap<any, number[]> = FastMap.create();
+    const propertyToSetMap: FastMap<any, UniqueArrayBuilder<number>> = FastMap.create();
 
     Environment.lockSlot(env, 'element');
     const element = env.slots.element;
@@ -357,8 +357,12 @@ export function expandProperty(env: Environment, selection: Selection, property:
         for (const a of AtomSet.atomIndices(atomSet)) {
             ElementAddress.setAtom(context.model, element, a);
             const p = property(env);
-            if (propertyToSetMap.has(p)) propertyToSetMap.get(p)!.push(index);
-            else propertyToSetMap.set(p, [index]);
+            if (propertyToSetMap.has(p)) UniqueArrayBuilder.add(propertyToSetMap.get(p)!, index, index);
+            else {
+                const ub = UniqueArrayBuilder<number>();
+                UniqueArrayBuilder.add(ub, index, index);
+                propertyToSetMap.set(p, ub);
+            }
         }
         sets[index] = [];
         index++;
@@ -372,12 +376,11 @@ export function expandProperty(env: Environment, selection: Selection, property:
         ElementAddress.setAtom(context.model, element, i);
         const p = property(env);
         if (!propertyToSetMap.has(p)) continue;
-        for (const setIndex of propertyToSetMap.get(p)!) sets[setIndex].push(i);
+        for (const setIndex of propertyToSetMap.get(p)!.array) sets[setIndex].push(i);
     }
     Environment.unlockSlot(env, 'element');
 
     const builder = AtomSelection.uniqueBuilder();
-
     for (const set of sets) builder.add(AtomSet(set));
     return builder.getSelection();
 }

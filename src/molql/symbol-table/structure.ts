@@ -182,6 +182,10 @@ const atomProperty = {
         atomKey: prop(Type.AnyValue, 'Unique value for each atom. Main use case is grouping of atoms.')
     },
 
+    topology: {
+        componentKey: prop(Type.AnyValue, 'Unique value for each connected component.')
+    },
+
     macromolecular: {
         '@header': 'Macromolecular Properties (derived from the mmCIF format)',
 
