@@ -61,6 +61,14 @@ const lang: Language = {
     :residue-test (= (atom.label_comp_id) HEM)
     :group-by (atom.key.res))
   :disjunct true)`
+    }, {
+      name: 'HEM and 2 layers of connected residues',
+      value: `(atom.sel.include-connected
+  :selection (atom.sel.atom-groups
+    :residue-test (= (atom.label_comp_id) HEM)
+    :group-by (atom.key.res))
+  :layer-count 2
+  :as-whole-residues true)`
     }]
 }
 

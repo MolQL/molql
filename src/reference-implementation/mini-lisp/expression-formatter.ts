@@ -27,6 +27,7 @@ class Writer {
 
     newline() {
         this.value.push(`\n${this._prefix}${this.localPrefix}`);
+        this.currentLineLength = 0;
     }
 
     push() {
