@@ -183,7 +183,7 @@ const atomProperty = {
     },
 
     topology: {
-        componentKey: prop(Type.AnyValue, 'Unique value for each connected component.')
+        connectedComponentKey: prop(Type.AnyValue, 'Unique value for each connected component.')
     },
 
     macromolecular: {

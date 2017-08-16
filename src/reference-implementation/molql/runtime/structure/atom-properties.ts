@@ -28,7 +28,7 @@ export const Core: { [P in keyof typeof MolQL.structure.atomProperty.core]?: Sym
 }
 
 export const Topology: { [P in keyof typeof MolQL.structure.atomProperty.topology]?: SymbolRuntime } = {
-    componentKey: prop((env, v) => Model.connectedComponentKey(env.context.model)[getAddress(env, v).atom]),
+    connectedComponentKey: prop((env, v) => Model.connectedComponentKey(env.context.model)[getAddress(env, v).atom]),
 }
 
 export const Macromolecular: { [P in keyof typeof MolQL.structure.atomProperty.macromolecular]?: SymbolRuntime } = {

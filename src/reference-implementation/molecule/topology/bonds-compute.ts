@@ -7,7 +7,7 @@
 import { FastSet, FastMap } from '../../utils/collections'
 import Mask from '../../utils/mask'
 import { ComponentBondInfo, StructConn } from './bonds-utils'
-import { Model, BondType, Bonds } from '../data'
+import { Model, BondAnnotation, Bonds } from '../data'
 
 export interface BondComputationParameters {
     maxHbondLength: number,
@@ -60,7 +60,7 @@ function isHydrogen(i: number) {
     return i === H_ID;
 }
 
-function computePerAtomBonds(atomA: number[], atomB: number[], type: BondType[], atomCount: number) {
+function computePerAtomBonds(atomA: number[], atomB: number[], annotation: BondAnnotation[], atomCount: number) {
     const bucketSizes = new Int32Array(atomCount);
     const bucketOffsets = new Int32Array(atomCount + 1) as any as number[];
     const bucketFill = new Int32Array(atomCount);
@@ -76,27 +76,27 @@ function computePerAtomBonds(atomA: number[], atomB: number[], type: BondType[],
     bucketOffsets[atomCount] = offset;
 
     const bondsByAtom = new Int32Array(offset) as any as number[];
-    const typesByAtom = new Int8Array(offset) as any as number[];
+    const annotationByAtom = new Int8Array(offset) as any as number[];
 
     for (let i = 0, _i = atomA.length; i < _i; i++) {
-        const a = atomA[i], b = atomB[i], t = type[i];
+        const a = atomA[i], b = atomB[i], t = annotation[i];
 
         const oa = bucketOffsets[a] + bucketFill[a];
         const ob = bucketOffsets[b] + bucketFill[b];
 
         bondsByAtom[oa] = b;
-        typesByAtom[oa] = t;
+        annotationByAtom[oa] = t;
         bucketFill[a]++;
 
         bondsByAtom[ob] = a;
-        typesByAtom[ob] = t;
+        annotationByAtom[ob] = t;
         bucketFill[b]++;
     }
 
     return {
         atomBondOffsets: bucketOffsets,
         bondsByAtom,
-        typesByAtom
+        annotationByAtom
     };
 }
 
@@ -112,10 +112,10 @@ function _computeBonds(model: Model, params: BondComputationParameters): Bonds {
 
     const atomA: number[] = [];
     const atomB: number[] = [];
-    const type: BondType[] = [];
+    const annotation: BondAnnotation[] = [];
 
     let lastResidue = -1;
-    let componentMap: FastMap<string, FastMap<string, BondType>> | undefined = void 0;
+    let componentMap: FastMap<string, FastMap<string, BondAnnotation>> | undefined = void 0;
 
     for (let aI = 0; aI < atomCount; aI++) {
         const raI = residueIndex[aI];
@@ -161,7 +161,7 @@ function _computeBonds(model: Model, params: BondComputationParameters): Bonds {
                 if (order) {
                     atomA[atomA.length] = aI;
                     atomB[atomB.length] = bI;
-                    type[type.length] = isMetal ? BondType.Metallic : order;
+                    annotation[annotation.length] = isMetal ? BondAnnotation.Metallic : order;
                 }
                 continue;
             }
@@ -180,7 +180,7 @@ function _computeBonds(model: Model, params: BondComputationParameters): Bonds {
                         if (p.atomIndex === bI) {
                             atomA[atomA.length] = aI;
                             atomB[atomB.length] = bI;
-                            type[type.length] = se.bondType;
+                            annotation[annotation.length] = se.bondType;
                             added = true;
                             break;
                         }
@@ -194,7 +194,7 @@ function _computeBonds(model: Model, params: BondComputationParameters): Bonds {
                 if (dist < params.maxHbondLength) {
                     atomA[atomA.length] = aI;
                     atomB[atomB.length] = bI;
-                    type[type.length] = BondType.Order1;
+                    annotation[annotation.length] = BondAnnotation.Covalent1;
                 }
                 continue;
             }
@@ -208,19 +208,19 @@ function _computeBonds(model: Model, params: BondComputationParameters): Bonds {
             if (dist <= pairingThreshold) {
                 atomA[atomA.length] = aI;
                 atomB[atomB.length] = bI;
-                type[type.length] =  isMetal ? BondType.Metallic : BondType.Order1;
+                annotation[annotation.length] =  isMetal ? BondAnnotation.Metallic : BondAnnotation.Covalent1;
             }
         }
     }
 
-    const { atomBondOffsets, bondsByAtom, typesByAtom } = computePerAtomBonds(atomA, atomB, type, atomCount);
+    const { atomBondOffsets, bondsByAtom, annotationByAtom } = computePerAtomBonds(atomA, atomB, annotation, atomCount);
     return {
         atomBondOffsets,
         bondsByAtom,
-        typesByAtom,
+        annotationByAtom,
         atomA,
         atomB,
-        type,
+        annotation,
         count: atomA.length
     };
 }

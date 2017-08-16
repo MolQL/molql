@@ -98,7 +98,7 @@ function run(model: Model) {
             'residue-test': B.core.rel.eq([B.ammp('label_comp_id'), 'HEM']),
             'group-by': B.ammp('residueKey')
         }),
-        property: B.atp('componentKey')
+        property: B.atp('connectedComponentKey')
     });
 
     // const query = B.struct.generator.atomGroups({

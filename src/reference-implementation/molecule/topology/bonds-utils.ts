@@ -5,7 +5,7 @@
  */
 
 import { FastMap } from '../../utils/collections'
-import { Model, BondType } from '../data'
+import { Model, BondAnnotation } from '../data'
 import CIF from 'ciftools.js'
 
 export class StructConn {
@@ -70,7 +70,7 @@ export class StructConn {
 export namespace StructConn {
     export interface Entry {
         distance: number,
-        bondType: BondType,
+        bondType: BondAnnotation,
         partners: { residueIndex: number, atomIndex: number, symmetry: string }[]
     }
 
@@ -129,21 +129,21 @@ export namespace StructConn {
 
             const type = conn_type_id.getString(i)! as StructConnType;
             const orderType = (pdbx_value_order.getString(i) || '').toLowerCase();
-            let bondType = BondType.Unknown;
+            let bondType = BondAnnotation.Unknown;
 
             switch (orderType) {
-                case 'sing': bondType = BondType.Order1; break;
-                case 'doub': bondType = BondType.Order2; break;
-                case 'trip': bondType = BondType.Order3; break;
-                case 'quad': bondType = BondType.Order4; break;
+                case 'sing': bondType = BondAnnotation.Covalent1; break;
+                case 'doub': bondType = BondAnnotation.Covalent2; break;
+                case 'trip': bondType = BondAnnotation.Covalent3; break;
+                case 'quad': bondType = BondAnnotation.Covalent4; break;
             }
 
             switch (type) {
-                case 'disulf': bondType = BondType.DisulfideBridge; break;
-                case 'hydrog': bondType = BondType.Hydrogen; break;
-                case 'metalc': bondType = BondType.Metallic; break;
+                case 'disulf': bondType = BondAnnotation.DisulfideBridge; break;
+                case 'hydrog': bondType = BondAnnotation.Hydrogen; break;
+                case 'metalc': bondType = BondAnnotation.Metallic; break;
                 // case 'mismat': bondType = BondType.Single; break; 
-                case 'saltbr': bondType = BondType.Ion; break;
+                case 'saltbr': bondType = BondAnnotation.Ion; break;
             }
 
             entries.push({ bondType, distance: pdbx_dist_value.getFloat(i), partners });
@@ -165,9 +165,9 @@ export class ComponentBondInfo {
 
 export namespace ComponentBondInfo {
     export class Entry {
-        map: FastMap<string, FastMap<string, BondType>> = FastMap.create<string, FastMap<string, BondType>>();
+        map: FastMap<string, FastMap<string, BondAnnotation>> = FastMap.create<string, FastMap<string, BondAnnotation>>();
 
-        add(a: string, b: string, order: BondType, swap = true) {
+        add(a: string, b: string, order: BondAnnotation, swap = true) {
             let e = this.map.get(a);
             if (e !== void 0) {
                 let f = e.get(b);
@@ -175,7 +175,7 @@ export namespace ComponentBondInfo {
                     e.set(b, order);
                 }
             } else {
-                let map = FastMap.create<string, BondType>();
+                let map = FastMap.create<string, BondAnnotation>();
                 map.set(b, order);
                 this.map.set(a, map);
             }
@@ -208,16 +208,16 @@ export namespace ComponentBondInfo {
                 entry = info.newEntry(id);
             }
 
-            let t: BondType;
+            let t: BondAnnotation;
             switch (order.toLowerCase()) {
-                case 'sing': t = BondType.Order1; break;
+                case 'sing': t = BondAnnotation.Covalent1; break;
                 case 'doub':
                 case 'delo':
-                    t = BondType.Order2;
+                    t = BondAnnotation.Covalent2;
                     break;
-                case 'trip': t = BondType.Order3; break;
-                case 'quad': t = BondType.Order4; break;
-                default: t = BondType.Unknown; break;
+                case 'trip': t = BondAnnotation.Covalent3; break;
+                case 'quad': t = BondAnnotation.Covalent4; break;
+                default: t = BondAnnotation.Unknown; break;
             }
 
             entry.add(nameA, nameB, t);

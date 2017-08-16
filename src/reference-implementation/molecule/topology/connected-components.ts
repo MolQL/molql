@@ -10,7 +10,7 @@ import { Model, Bonds } from '../data'
 function labelComponent(bonds: Bonds, labels: number[], head: number, index: LinkedIndex, label: number) {
     const stack = [head];
     LinkedIndex.remove(index, head);
-    const { atomBondOffsets, bondsByAtom } = bonds;
+    const { atomBondOffsets, bondsByAtom, annotationByAtom } = bonds;
 
     while (stack.length) {
         const a = stack.pop()!;
@@ -18,7 +18,7 @@ function labelComponent(bonds: Bonds, labels: number[], head: number, index: Lin
         const start = atomBondOffsets[a], end = atomBondOffsets[a + 1];
         for (let i = start; i < end; i++) {
             const b = bondsByAtom[i];
-            if (!LinkedIndex.has(index, b)) continue;
+            if (!LinkedIndex.has(index, b) || !Bonds.isCovalent(annotationByAtom[i])) continue;
 
             stack.push(b);
             LinkedIndex.remove(index, b);
