@@ -114,45 +114,51 @@ const testStrings: {[index: string]: string[]} = {
 }
 
 function run (query: Expression) {
-    const compiled = compile(query, 'query');
+  const compiled = compile(query, 'query');
 
-    fs.readFile('spec/1tqn_updated.cif', 'utf-8', (err, data) => {
-        if (err) {
-            console.error(err);
-            return;
-        }
+  fs.readFile('spec/1tqn_updated.cif', 'utf-8', (err, data) => {
+    if (err) {
+      console.error(err);
+      return;
+    }
 
-        try {
-            const mol = parseCIF(data);
-            const ctx = Context.ofModel(mol.models[0]);
-            const res = compiled(ctx);
-            console.log('count', AtomSelection.atomSets(res).length);
-            // const cif = mmCIFwriter(model, AtomSet.atomIndices(AtomSelection.toAtomSet(res)));
+    try {
+      const mol = parseCIF(data);
+      const ctx = Context.ofModel(mol.models[0]);
+      const res = compiled(ctx);
+      console.log('count', AtomSelection.atomSets(res).length);
+      // const cif = mmCIFwriter(model, AtomSet.atomIndices(AtomSelection.toAtomSet(res)));
 
-            // console.log(cif.substr(0, 100));
-            console.log(AtomSet.atomIndices(AtomSelection.toAtomSet(res)));
-            //console.log(model.entities);
-            //console.log(model.chains);
-        } catch (e) {
-            console.error(e);
-            return;
-        }
-    })
+      // console.log(cif.substr(0, 100));
+      console.log(AtomSet.atomIndices(AtomSelection.toAtomSet(res)));
+      //console.log(model.entities);
+      //console.log(model.chains);
+    } catch (e) {
+      console.error(e);
+      return;
+    }
+  })
 }
 
 function parse(lang: string, str: string) {
-  const query = transpiler[lang](str)
-  console.log(str)
-  console.log(util.inspect(query, {depth: 20, color: true}))
-  console.log('\n')
-  return query
+  try {
+    const query = transpiler[lang](str)
+    console.log(str)
+    console.log(util.inspect(query, {depth: 20, color: true}))
+    console.log('\n')
+    return query
+  } catch (e) {
+    console.log(str)
+    console.log(e.message)
+    console.log('\n')
+  }
 }
 
 const [,,lang, str, doRun] = process.argv
 
 if (lang && str) {
   const q = parse(lang, str)
-  if(doRun === 't') run(q)
+  if(doRun === 't' && q) run(q)
 } else if (lang) {
   testStrings[lang].forEach(str => parse(lang, str))
 }

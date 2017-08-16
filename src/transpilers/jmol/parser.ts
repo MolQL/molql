@@ -7,10 +7,12 @@
 import * as P from 'parsimmon'
 import * as h from '../helper'
 
+// import properties from './properties'
+import operators from './operators'
+// import keywords from './keywords'
+
 import Transpiler from '../transpiler'
 import B from '../../molql/builder'
-
-const Q = h.QueryBuilder
 
 function atomExpressionQuery (x: any[]) {
   const [resno, inscode, chainname, atomname, altloc, ] = x[1]
@@ -24,39 +26,15 @@ function atomExpressionQuery (x: any[]) {
   const resProps = []
   if (resno) resProps.push(B.core.rel.eq([ B.ammp('auth_seq_id'), resno ]))
   if (inscode) resProps.push(B.core.rel.eq([ B.ammp('pdbx_PDB_ins_code'), inscode ]))
-  if (resProps.length) tests['residue-test'] = Q.and(resProps)
+  if (resProps.length) tests['residue-test'] = h.andExpr(resProps)
 
   const atomProps = []
   if (atomname) atomProps.push(B.core.rel.eq([ B.ammp('auth_atom_id'), atomname ]))
   if (altloc) atomProps.push(B.core.rel.eq([ B.ammp('label_alt_id'), altloc ]))
-  if (atomProps.length) tests['atom-test'] = Q.and(atomProps)
+  if (atomProps.length) tests['atom-test'] = h.andExpr(atomProps)
 
   return B.struct.generator.atomGroups(tests)
 }
-
-const _ = P.optWhitespace
-const __ = P.whitespace
-
-const opList = [
-  {
-    // Selects atoms that are not included in s1.
-    type: h.prefix,
-    rule: P.alt(P.regex(/NOT/i).skip(__), P.string('!').skip(_)),
-    map: Q.invert
-  },
-  {
-    // Selects atoms included in both s1 and s2.
-    type: h.binaryLeft,
-    rule: h.infixOp(/AND|&/i),
-    map: Q.intersect
-  },
-  {
-    // Selects atoms included in either s1 or s2.
-    type: h.binaryLeft,
-    rule: h.infixOp(/OR|\|/i),
-    map: Q.merge
-  }
-]
 
 const lang = P.createLanguage({
   Integer: () => P.regexp(/-?[0-9]+/).map(Number).desc('integer'),
@@ -81,21 +59,8 @@ const lang = P.createLanguage({
     )
   },
 
-  Not: () => {
-    return P.alt(
-      P.regex(/NOT/i).skip(__),
-      P.string('!').skip(_)
-    )
-  },
-  And: () => {
-    return __.then(P.regex(/AND/i).skip(__))
-  },
-  Or: () => {
-    return __.then(P.regex(/OR/i).skip(__))
-  },
-
   Operator: function(r) {
-    return h.combineOperators(opList, P.alt(r.Parens, r.Expression))
+    return h.combineOperators(operators, P.alt(r.Parens, r.Expression))
   },
 
   AtomExpression: function(r) {
@@ -141,7 +106,7 @@ const lang = P.createLanguage({
       r.Operator,
       r.Parens,
       r.Expression
-    ).trim(_)
+    ).trim(P.optWhitespace)
   }
 })
 

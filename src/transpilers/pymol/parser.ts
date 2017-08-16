@@ -4,50 +4,18 @@
  * @author Alexander Rose <alexander.rose@weirdbyte.de>
  */
 
-
-/*
-  fragment: ???
-  segment: label_asym_id
-  chain: auth_asym_id
-
-  selection algebra
-  - see https://pymolwiki.org/index.php/Selection_Algebra
-  - supported
-    - not, and, or
-    - around, expand
-    - within, near_to, beyond
-    - bysegment, byres
-  - unsupported
-    - todo
-      - like, in
-    - gap: needs vdW radius
-    - bymolecule: everything connected by bonds
-    - byfragment:
-    - byobject:
-    - bycell,
-    - byring, neighbour, bound_to, extend
-  selection macros
-  - see https://pymolwiki.org/index.php/Selection_Macros
-  - object-id is ignored
-  property selectors
-  - see https://pymolwiki.org/index.php/Property_Selectors
-  - todo
-    - support ''+A syntax for empty list elements
-  single word selectors
-  - see https://pymolwiki.org/index.php/Single-word_Selectors
-*/
-
 import * as P from 'parsimmon'
 import * as h from '../helper'
 
-import { properties as p, namedPropertiesList, propertiesSpec } from './properties'
-import { opList } from './operators'
-import { keywordsList } from './keywords'
+import properties from './properties'
+import operators from './operators'
+import keywords from './keywords'
 
 import Transpiler from '../transpiler'
 import B from '../../molql/builder'
 
-const Q = h.QueryBuilder
+const propertiesDict = h.getPropertyRules(properties)
+const namedPropertiesList = h.getNamedPropertyRules(properties)
 
 const slash = P.string('/')
 
@@ -60,7 +28,7 @@ function atomSelectionQuery(x: any) {
   const props: {[k: string]: any[]} = {}
 
   for (let k in x) {
-    const ps = propertiesSpec[k]
+    const ps = properties[k]
     if (!ps) {
       throw new Error(`property '${k}' not supported, value '${x[k]}'`)
     }
@@ -70,7 +38,7 @@ function atomSelectionQuery(x: any) {
   }
 
   for (let p in props) {
-    tests[p] = Q.and(props[p])
+    tests[p] = h.andExpr(props[p])
   }
 
   return B.struct.generator.atomGroups(tests)
@@ -98,25 +66,25 @@ const lang = P.createLanguage({
       slash.then(P.alt(
         P.seq(
           orNull(r.Object).skip(slash),
-          orNull(p.segi).skip(slash),
-          orNull(p.chain).skip(slash),
-          orNull(p.resi).skip(slash),
-          orNull(p.name)
+          orNull(propertiesDict.segi).skip(slash),
+          orNull(propertiesDict.chain).skip(slash),
+          orNull(propertiesDict.resi).skip(slash),
+          orNull(propertiesDict.name)
         ).map(x => {return {object: x[0], segi: x[1], chain: x[2], resi: x[3], name: x[4]}}),
         P.seq(
           orNull(r.Object).skip(slash),
-          orNull(p.segi).skip(slash),
-          orNull(p.chain).skip(slash),
-          orNull(p.resi)
+          orNull(propertiesDict.segi).skip(slash),
+          orNull(propertiesDict.chain).skip(slash),
+          orNull(propertiesDict.resi)
         ).map(x => {return {object: x[0], segi: x[1], chain: x[2], resi: x[3]}}),
         P.seq(
           orNull(r.Object).skip(slash),
-          orNull(p.segi).skip(slash),
-          orNull(p.chain)
+          orNull(propertiesDict.segi).skip(slash),
+          orNull(propertiesDict.chain)
         ).map(x => {return {object: x[0], segi: x[1], chain: x[2]}}),
         P.seq(
           orNull(r.Object).skip(slash),
-          orNull(p.segi)
+          orNull(propertiesDict.segi)
         ).map(x => {return {object: x[0], segi: x[1]}}),
         P.seq(
           orNull(r.Object)
@@ -125,25 +93,25 @@ const lang = P.createLanguage({
       P.alt(
         P.seq(
           orNull(r.Object).skip(slash),
-          orNull(p.segi).skip(slash),
-          orNull(p.chain).skip(slash),
-          orNull(p.resi).skip(slash),
-          orNull(p.name)
+          orNull(propertiesDict.segi).skip(slash),
+          orNull(propertiesDict.chain).skip(slash),
+          orNull(propertiesDict.resi).skip(slash),
+          orNull(propertiesDict.name)
         ).map(x => {return {object: x[0], segi: x[1], chain: x[2], resi: x[3], name: x[4]}}),
         P.seq(
-          orNull(p.segi).skip(slash),
-          orNull(p.chain).skip(slash),
-          orNull(p.resi).skip(slash),
-          orNull(p.name)
+          orNull(propertiesDict.segi).skip(slash),
+          orNull(propertiesDict.chain).skip(slash),
+          orNull(propertiesDict.resi).skip(slash),
+          orNull(propertiesDict.name)
         ).map(x => {return {segi: x[0], chain: x[1], resi: x[2], name: x[3]}}),
         P.seq(
-          orNull(p.chain).skip(slash),
-          orNull(p.resi).skip(slash),
-          orNull(p.name)
+          orNull(propertiesDict.chain).skip(slash),
+          orNull(propertiesDict.resi).skip(slash),
+          orNull(propertiesDict.name)
         ).map(x => {return {chain: x[0], resi: x[1], name: x[2]}}),
         P.seq(
-          orNull(p.resi).skip(slash),
-          orNull(p.name)
+          orNull(propertiesDict.resi).skip(slash),
+          orNull(propertiesDict.name)
         ).map(x => {return {resi: x[0], name: x[1]}}),
       )
     )
@@ -153,7 +121,7 @@ const lang = P.createLanguage({
     return P.alt(...namedPropertiesList)
   },
 
-  Keywords: () => P.alt(...keywordsList),
+  Keywords: () => P.alt(...h.getKeywordRules(keywords)),
 
   Object: () => P.regex(/[a-zA-Z0-9+]+/),
 
@@ -162,18 +130,18 @@ const lang = P.createLanguage({
   // PEPSEQ seq
   Pepseq: () => {
     return P.regex(/(PEPSEQ|ps\.)\s+([a-z]+)/i, 2)
-      .map(h.makeError('PEPSEQ operator unsupported'))
+      .map(h.makeError(`operator 'pepseq' not supported`))
   },
 
   // Selects atoms which show representation rep.
   // REP rep
   Rep: () => {
     return P.regex(/REP\s+(lines|spheres|mesh|ribbon|cartoon|sticks|dots|surface|labels|extent|nonbonded|nb_spheres|slice|extent|slice|dashes|angles|dihedrals|cgo|cell|callback|everything)/i, 1)
-      .map(h.makeError('REP operator unsupported'))
+      .map(h.makeError(`operator 'rep' not supported`))
   },
 
   Operator: function(r) {
-    return h.combineOperators(opList, P.alt(r.Parens, r.Expression))
+    return h.combineOperators(operators, P.alt(r.Parens, r.Expression))
   },
 
   Query: function(r) {
