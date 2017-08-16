@@ -272,6 +272,59 @@ function _expandAtoms(bonds: Bonds, mask: Mask, atomSet: AtomSet, numLayers: num
     return AtomSet(result.array);
 }
 
+function _expandFrontierResidues(model: Model, bonds: Bonds, mask: Mask, frontier: number[], residues: UniqueArrayBuilder<number>) {
+    const newFrontier: number[] = [];
+    const { atomBondOffsets, bondsByAtom } = bonds;
+
+    const { atomStartIndex, atomEndIndex } = model.residues;
+    const { residueIndex } = model.atoms;
+
+    for (const rI of frontier) {
+        for (let a = atomStartIndex[rI], _a = atomEndIndex[rI]; a < _a; a++) {
+            if (!mask.has(a)) continue;
+
+            const start = atomBondOffsets[a], end = atomBondOffsets[a + 1];
+            for (let i = start; i < end; i++) {
+                const b = bondsByAtom[i];
+                if (!mask.has(b)) continue;
+
+                const r = residueIndex[b];
+                if (UniqueArrayBuilder.add(residues, r, r)) newFrontier[newFrontier.length] = r;
+            }
+        }
+    }
+    return newFrontier;
+}
+
+function _expandResidues(model: Model, bonds: Bonds, mask: Mask, atomSet: AtomSet, numLayers: number) {
+    if (!numLayers) return atomSet;
+
+    const { atomStartIndex, atomEndIndex } = model.residues;
+    const { residueIndex } = model.atoms;
+
+    const residues = UniqueArrayBuilder<number>();
+    let frontier: number[] = [];
+
+    for (const a of AtomSet.atomIndices(atomSet)) {
+        const rI = residueIndex[a];
+        if (UniqueArrayBuilder.add(residues, rI, rI)) frontier[frontier.length] = rI;
+    }
+
+    for (let i = 0; i < numLayers; i++) {
+        frontier = _expandFrontierResidues(model, bonds, mask, frontier, residues);
+    }
+
+    sortAsc(residues.array);
+    const atoms: number[] = [];
+    for (let rI of residues.array) {
+        for (let a = atomStartIndex[rI], _a = atomEndIndex[rI]; a < _a; a++) {
+            if (mask.has(a)) atoms[atoms.length] = a;
+        }
+    }
+
+    return AtomSet(atoms);
+}
+
 export function includeConnected(env: Environment, selection: Selection, layerCount?: Expression<number>, wholeResidues?: Expression<boolean>): AtomSelection {
     const src = selection(env);
     const { model, mask } = env.context;
@@ -282,7 +335,7 @@ export function includeConnected(env: Environment, selection: Selection, layerCo
     const builder = AtomSelection.uniqueBuilder();
 
     for (const atomSet of AtomSelection.atomSets(src)) {
-        if (asResidues) {}
+        if (asResidues) builder.add(_expandResidues(model, bonds, mask, atomSet, numLayers));
         else builder.add(_expandAtoms(bonds, mask, atomSet, numLayers));
     }
 

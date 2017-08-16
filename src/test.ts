@@ -90,7 +90,8 @@ function run(model: Model) {
             'residue-test': B.core.rel.eq([B.ammp('label_comp_id'), 'HEM']),
             'group-by': B.ammp('residueKey')
         }),
-        'layer-count': 3
+        'layer-count': 1,
+        'as-whole-residues': true
     });
 
     // const query = B.struct.generator.atomGroups({
