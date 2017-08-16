@@ -20,16 +20,18 @@ export const enum BondType {
 
     Unknown = 0,
 
-    Single = 1,
-    Double = 2,
-    Triple = 3,
-    Aromatic = 4,
+    Order1 = 1,
+    Order2 = 2,
+    Order3 = 3,
+    Order4 = 4,
+    Order5 = 5,
+    Order6 = 6,
 
-    DisulfideBridge = 5,
+    DisulfideBridge = 7,
 
-    Metallic = 6,
-    Ion = 7,
-    Hydrogen = 8
+    Metallic = 20,
+    Hydrogen = 21,
+    Ion = 22
 }
 
 export interface Atoms {

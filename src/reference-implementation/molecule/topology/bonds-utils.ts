@@ -132,10 +132,10 @@ export namespace StructConn {
             let bondType = BondType.Unknown;
 
             switch (orderType) {
-                case 'sing': bondType = BondType.Single; break;
-                case 'doub': bondType = BondType.Double; break;
-                case 'trip': bondType = BondType.Triple; break;
-                case 'quad': bondType = BondType.Aromatic; break;
+                case 'sing': bondType = BondType.Order1; break;
+                case 'doub': bondType = BondType.Order2; break;
+                case 'trip': bondType = BondType.Order3; break;
+                case 'quad': bondType = BondType.Order4; break;
             }
 
             switch (type) {
@@ -210,13 +210,13 @@ export namespace ComponentBondInfo {
 
             let t: BondType;
             switch (order.toLowerCase()) {
-                case 'sing': t = BondType.Single; break;
+                case 'sing': t = BondType.Order1; break;
                 case 'doub':
                 case 'delo':
-                    t = BondType.Double;
+                    t = BondType.Order2;
                     break;
-                case 'trip': t = BondType.Triple; break;
-                case 'quad': t = BondType.Aromatic; break;
+                case 'trip': t = BondType.Order3; break;
+                case 'quad': t = BondType.Order4; break;
                 default: t = BondType.Unknown; break;
             }
 

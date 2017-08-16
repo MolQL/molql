@@ -194,7 +194,7 @@ function _computeBonds(model: Model, params: BondComputationParameters): Bonds {
                 if (dist < params.maxHbondLength) {
                     atomA[atomA.length] = aI;
                     atomB[atomB.length] = bI;
-                    type[type.length] = BondType.Single;
+                    type[type.length] = BondType.Order1;
                 }
                 continue;
             }
@@ -208,7 +208,7 @@ function _computeBonds(model: Model, params: BondComputationParameters): Bonds {
             if (dist <= pairingThreshold) {
                 atomA[atomA.length] = aI;
                 atomB[atomB.length] = bI;
-                type[type.length] =  isMetal ? BondType.Metallic : BondType.Single;
+                type[type.length] =  isMetal ? BondType.Metallic : BondType.Order1;
             }
         }
     }
