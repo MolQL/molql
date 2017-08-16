@@ -210,6 +210,12 @@ export const SymbolRuntime: Symbol.Info[] = [
     Symbol(MolQL.structure.filter.pick)((env, v) => env => StructureRuntime.Filters.pick(env, v.selection(env), v.test)),
     Symbol(MolQL.structure.filter.withSameAtomProperties)((env, v) => env => StructureRuntime.Filters.withSameAtomProperties(env, v.selection(env), v.source(env), v.property)),
     Symbol(MolQL.structure.filter.within)((env, v) => env => StructureRuntime.Filters.within(env, v.selection(env), v.target(env), v.radius, v.invert)),
+    Symbol(MolQL.structure.filter.isConnectedTo)((env, v) => env => StructureRuntime.Filters.isConnectedTo(env, {
+        selection: v.selection(env),
+        target: v.target(env),
+        invert: v.invert,
+        disjunct: v.disjunct
+    })),
 
     // ============= COMBINATORS ================
     Symbol(MolQL.structure.combinator.intersect)((env, xs) => env => StructureRuntime.Combinators.intersect(env, xs)),

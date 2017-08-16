@@ -60,6 +60,42 @@ function isHydrogen(i: number) {
     return i === H_ID;
 }
 
+function computePerAtomBonds(atomA: number[], atomB: number[], type: BondType[], atomCount: number) {
+    const bucketSizes = new Int32Array(atomCount);
+    const bucketOffsets = new Int32Array(atomCount + 1) as any as number[];
+    const bucketFill = new Int32Array(atomCount);
+
+    for (const i of atomA) bucketSizes[i]++;
+    for (const i of atomB) bucketSizes[i]++;
+
+    let offset = 0;
+    for (let i = 0; i < atomCount; i++) {
+        bucketOffsets[i] = offset;
+        offset += bucketSizes[i];
+    }
+    bucketOffsets[atomCount] = offset;
+
+    const bondsByAtom = new Int32Array(offset) as any as number[];
+    const typesByAtom = new Int8Array(offset) as any as number[];
+    for (let i = 0, _i = atomA.length; i < _i; i++) {
+        const a = atomA[i], b = atomB[i], t = type[i];
+        const oa = bucketOffsets[a] + bucketFill[a];
+        const ob = bucketOffsets[b] + bucketFill[b];
+        bondsByAtom[oa] = b;
+        bondsByAtom[ob] = a;
+        typesByAtom[oa] = t;
+        typesByAtom[ob] = t;
+        bucketFill[a]++;
+        bucketFill[b]++;
+    }
+
+    return {
+        atomBondOffsets: bucketOffsets,
+        bondsByAtom,
+        typesByAtom
+    };
+}
+
 function _computeBonds(model: Model, params: BondComputationParameters): Bonds {
     const MAX_RADIUS = 3;
 
@@ -70,7 +106,6 @@ function _computeBonds(model: Model, params: BondComputationParameters): Bonds {
 
     const structConn = StructConn.create(model), component = ComponentBondInfo.create(model);
 
-    const atomRanges = new Int32Array(2 * atomCount);
     const atomA: number[] = [];
     const atomB: number[] = [];
     const type: BondType[] = [];
@@ -102,7 +137,6 @@ function _computeBonds(model: Model, params: BondComputationParameters): Bonds {
         const metalA = MetalsSet.has(aeI);
         const structConnEntries = params.forceCompute ? void 0 : structConn && structConn.getAtomEntries(aI);
 
-        const startCount = atomA.length;
         for (let ni = 0; ni < count; ni++) {
             const bI = indices[ni];
             if (bI <= aI) continue;
@@ -134,7 +168,7 @@ function _computeBonds(model: Model, params: BondComputationParameters): Bonds {
             if (dist === 0) continue;
 
             // handle "struct conn" bonds.
-            if (structConnEntries) {
+            if (structConnEntries && structConnEntries.length) {
                 let added = false;
                 for (const se of structConnEntries) {
                     for (const p of se.partners) {
@@ -172,11 +206,13 @@ function _computeBonds(model: Model, params: BondComputationParameters): Bonds {
                 type[type.length] =  isMetal ? BondType.Metallic : BondType.Single;
             }
         }
-        atomRanges[2 * aI] = startCount;
-        atomRanges[2 * aI + 1] = atomA.length;
     }
+
+    const { atomBondOffsets, bondsByAtom, typesByAtom } = computePerAtomBonds(atomA, atomB, type, atomCount);
     return {
-        atomRanges: atomRanges as any as number[],
+        atomBondOffsets,
+        bondsByAtom,
+        typesByAtom,
         atomA,
         atomB,
         type,

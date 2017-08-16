@@ -74,6 +74,7 @@ const list: MolQLScriptSymbol[] = [
     Alias(MolQL.structure.generator.atomGroups, 'atom.sel.atom-groups'),
     Alias(MolQL.structure.generator.queryInSelection, 'atom.sel.query-in-selection'),
     Alias(MolQL.structure.generator.empty, 'atom.sel.empty'),
+
     Alias(MolQL.structure.modifier.queryEach, 'atom.sel.query-each'),
     Alias(MolQL.structure.modifier.intersectBy, 'atom.sel.intersect-by'),
     Alias(MolQL.structure.modifier.exceptBy, 'atom.sel.except-by'),
@@ -82,9 +83,12 @@ const list: MolQLScriptSymbol[] = [
     Alias(MolQL.structure.modifier.cluster, 'atom.sel.cluster'),
     Alias(MolQL.structure.modifier.includeSurroundings, 'atom.sel.include-surroundings'),
     Alias(MolQL.structure.modifier.expandProperty, 'atom.sel.expand-property'),
+
     Alias(MolQL.structure.filter.pick, 'atom.sel.pick'),
     Alias(MolQL.structure.filter.withSameAtomProperties, 'atom.sel.with-same-atom-properties'),
     Alias(MolQL.structure.filter.within, 'atom.sel.within'),
+    Alias(MolQL.structure.filter.isConnectedTo, 'atom.sel.is-connected-to'),
+
     Alias(MolQL.structure.combinator.intersect, 'atom.sel.intersect'),
     Alias(MolQL.structure.combinator.merge, 'atom.sel.merge'),
     Alias(MolQL.structure.combinator.distanceCluster, 'atom.sel.dist-cluster'),

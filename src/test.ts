@@ -60,10 +60,10 @@ function run(model: Model) {
     //     'atom-test': B.core.rel.eq([B.acp('elementSymbol'), B.es('Fe')]),
     // });
 
-    const lys = B.struct.generator.atomGroups({
-        'residue-test': B.core.rel.eq([B.ammp('auth_comp_id'), 'LYS']),
-        'group-by': B.ammp('residueKey')
-    })
+    // const lys = B.struct.generator.atomGroups({
+    //     'residue-test': B.core.rel.eq([B.ammp('auth_comp_id'), 'LYS']),
+    //     'group-by': B.ammp('residueKey')
+    // })
       //B.core.rel.eq([B.ammp('auth_comp_id'), 'LYS']);
 
     //const query = B.evaluate(B.struct.modifier.cluster({
@@ -73,11 +73,28 @@ function run(model: Model) {
     //     }),
     //     'max-distance': 5
     // }));
-    const l = B.core.type.list;
-    const query = B.evaluate(B.struct.combinator.distanceCluster({
-        matrix: l([l([0, 5, 5]), l([0, 0, 5]), l([0, 0, 0])]),
-        selections: l([lys, lys, lys])
-    }));
+    //const l = B.core.type.list;
+    const query = B.struct.filter.isConnectedTo({
+        selection: B.struct.generator.atomGroups({
+            //'residue-test': B.core.rel.eq([B.ammp('label_comp_id'), 'CYS']),
+            'atom-test': B.core.rel.eq([B.ammp('id'), 3810]),
+            'group-by': B.ammp('residueKey')
+        }),
+        target: B.struct.generator.atomGroups({
+            'residue-test': B.core.rel.eq([B.ammp('label_comp_id'), 'HEM']),
+            'group-by': B.ammp('residueKey')
+        }),
+    });
+
+    // const query = B.struct.generator.atomGroups({
+    //     'atom-test': B.core.rel.eq([B.ammp('id'), 3810]),
+    //     'group-by': B.ammp('residueKey')
+    // });
+    
+    // B.evaluate(B.struct.combinator.distanceCluster({
+    //     matrix: l([l([0, 5, 5]), l([0, 0, 5]), l([0, 0, 0])]),
+    //     selections: l([lys, lys, lys])
+    // }));
 
     //console.log('check');
 
@@ -99,7 +116,7 @@ function run(model: Model) {
     console.log('count', AtomSelection.atomSets(res).length);
     const cif = mmCIFwriter(model, AtomSet.atomIndices(AtomSelection.toAtomSet(res)));
 
-    console.log(cif.substr(0, 100));
+    console.log(cif.substr(0, 450));
     //console.log(AtomSet.atomIndices(AtomSelection.toAtomSet(res)));
     //console.log(model.entities);
     //console.log(model.chains);

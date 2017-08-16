@@ -10,6 +10,7 @@ import AtomSet from '../../data/atom-set'
 import ElementAddress from '../../data/element-address'
 import AtomSelection from '../../data/atom-selection'
 import { FastSet } from '../../../utils/collections'
+import Mask from '../../../utils/mask'
 import { Model } from '../../../molecule/data'
 
 type Selection = Expression<AtomSelection>
@@ -104,6 +105,59 @@ export function within(env: Environment, selection: Selection, target: Selection
                     ret.add(atomSet);
                     break;
                 }
+            }
+        }
+    }
+    return ret.getSelection();
+}
+
+export type IsConnectedToParams = {
+    selection: Selection,
+    target: Selection,
+    disjunct?: Expression<boolean>,
+    invert?: Expression<boolean>
+}
+
+export function isConnectedTo(env: Environment, { selection, target, disjunct, invert }: IsConnectedToParams) {
+    const { model } = env.context;
+
+    const sel = selection(env);
+    const { bondsByAtom, atomBondOffsets } = Model.bonds(model);
+    const targetMask = AtomSelection.getMask(target(env));
+    const disjuncted = disjunct ? !!disjunct(env) : false;
+    const inverted = (!!invert && !!invert(env));
+
+    const ret = AtomSelection.linearBuilder();
+    for (const atomSet of AtomSelection.atomSets(sel)) {
+        const setMask = disjuncted ? AtomSet.getMask(atomSet) : Mask.never;
+        let isConnected = false;
+        for (const a of AtomSet.atomIndices(atomSet)) {
+            const start = atomBondOffsets[a], end = atomBondOffsets[a + 1];
+            for (let t = start; t < end; t++) {
+                const b = bondsByAtom[t];
+                if (targetMask.has(b)) {
+                    if (!disjuncted || !setMask.has(b)) {
+                        isConnected = true;
+                        break;
+                    }
+                }
+            }
+            if (isConnected) break;
+        }
+        if (isConnected) {
+            if (!inverted) ret.add(atomSet);
+        } else if (inverted) {
+            if (disjuncted) {
+                let isFullSubset = true;
+                for (const a of AtomSet.atomIndices(atomSet)) {
+                    if (!targetMask.has(a)) {
+                        isFullSubset = false;
+                        break;
+                    }
+                }
+                if (!isFullSubset) ret.add(atomSet);
+            } else {
+                ret.add(atomSet);
             }
         }
     }

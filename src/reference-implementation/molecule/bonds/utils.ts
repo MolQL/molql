@@ -103,7 +103,6 @@ export namespace StructConn {
         const { conn_type_id, pdbx_dist_value, pdbx_value_order } = structConn;
         const p1 = _idCols(1);
         const p2 = _idCols(2);
-        const p3 = _idCols(3);
 
         const _p = (row: number, ps: typeof p1) => {
             if (ps.label_asym_id.getValuePresence(row) !== CIF.ValuePresence.Present) return void 0;
@@ -119,8 +118,6 @@ export namespace StructConn {
             let p = _p(row, p1);
             if (p) ret.push(p);
             p = _p(row, p2);
-            if (p) ret.push(p);
-            p = _p(row, p3);
             if (p) ret.push(p);
             return ret;
         }

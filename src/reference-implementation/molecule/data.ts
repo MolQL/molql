@@ -68,7 +68,10 @@ export interface Bonds {
      * Where bonds for atom A start and end.
      * Start at 2 * idx, end at 2 * idx + 1
      */
-    atomRanges: number[],
+    atomBondOffsets: number[],
+    bondsByAtom: number[],
+    typesByAtom: number[],
+
     /** Monotonous */
     atomA: number[],
     atomB: number[],
@@ -189,20 +192,5 @@ export namespace Model {
             if (label_atom_id.stringEquals(idx, atomName) && (!altLoc || label_alt_id.stringEquals(idx, altLoc))) return i;
         }
         return -1;
-    }
-}
-
-export namespace Bonds {
-    export function getType({ atomRanges, atomB, type }: Bonds, a: number, b: number): BondType {
-        if (a === b) return BondType.None
-        let i, j;
-        if (a > b) { i = b; j = a; }
-        else { i = a; b = b; }
-
-        const start = atomRanges[2 * i], end = atomRanges[2 * i + 1];
-        for (let t = start; t < end; t++) {
-            if (atomB[t] === j) return type[t];
-        }
-        return BondType.None;
     }
 }

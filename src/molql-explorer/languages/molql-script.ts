@@ -51,6 +51,16 @@ const lang: Language = {
         (atom.set.reduce.value)
         (atom.B_iso_or_equiv)))
     35))`
+    }, {
+      name: 'Residues connected to HEM',
+      value: `(atom.sel.is-connected-to
+  :selection (atom.sel.atom-groups
+    :residue-test true
+    :group-by (atom.key.res))
+  :target (atom.sel.atom-groups
+    :residue-test (= (atom.label_comp_id) HEM)
+    :group-by (atom.key.res))
+  :disjunct true)`
     }]
 }
 
