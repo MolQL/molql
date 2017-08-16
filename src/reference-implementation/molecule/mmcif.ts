@@ -98,3 +98,51 @@ export const StructSheetRange = {
     'end_auth_asym_id': '',
     'end_auth_seq_id': ''
 }
+
+export type StructConn = keyof typeof StructConn
+export const StructConn = {
+    'id': '',
+    'conn_type_id': '',
+    'pdbx_PDB_id': '',
+    'ptnr1_label_asym_id': '',
+    'ptnr1_label_comp_id': '',
+    'ptnr1_label_seq_id': '',
+    'ptnr1_label_atom_id': '',
+    'pdbx_ptnr1_label_alt_id': '',
+    'pdbx_ptnr1_PDB_ins_code': '',
+    'pdbx_ptnr1_standard_comp_id': '',
+    'ptnr1_symmetry': '',
+    'ptnr2_label_asym_id': '',
+    'ptnr2_label_comp_id': '',
+    'ptnr2_label_seq_id': '',
+    'ptnr2_label_atom_id': '',
+    'pdbx_ptnr2_label_alt_id': '',
+    'pdbx_ptnr2_PDB_ins_code': '',
+    'ptnr1_auth_asym_id': '',
+    'ptnr1_auth_comp_id': '',
+    'ptnr1_auth_seq_id': '',
+    'ptnr2_auth_asym_id': '',
+    'ptnr2_auth_comp_id': '',
+    'ptnr2_auth_seq_id': '',
+    'ptnr2_symmetry': '',
+    'pdbx_ptnr3_label_atom_id': '',
+    'pdbx_ptnr3_label_seq_id': '',
+    'pdbx_ptnr3_label_comp_id': '',
+    'pdbx_ptnr3_label_asym_id': '',
+    'pdbx_ptnr3_label_alt_id': '',
+    'pdbx_ptnr3_PDB_ins_code': '',
+    'details': '',
+    'pdbx_dist_value': '',
+    'pdbx_value_order': ''
+}
+
+export type ChemCompBond = keyof typeof ChemCompBond
+export const ChemCompBond = {
+    'comp_id': '',
+    'pdbx_stereo_config': '',
+    'pdbx_ordinal': '',
+    'pdbx_aromatic_flag': '',
+    'atom_id_1': '',
+    'atom_id_2': '',
+    'value_order': ''
+}

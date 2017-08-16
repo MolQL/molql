@@ -6,11 +6,29 @@
 
 import * as mmCIF from './mmcif'
 import SpatialLookup from '../utils/spatial-lookup'
+import computeBonds from './bonds/compute'
 
 export const enum SecondaryStructureType {
     None = 0,
     StructConf = 1,
     StructSheetRange = 2,
+}
+
+export const enum BondType {
+    None = -1,
+
+    Unknown = 0,
+
+    Single = 1,
+    Double = 2,
+    Triple = 3,
+    Aromatic = 4,
+
+    DisulfideBridge = 5,
+
+    Metallic = 6,
+    Ion = 7,
+    Hydrogen = 8
 }
 
 export interface Atoms {
@@ -45,12 +63,29 @@ export interface Entities {
     count: number
 }
 
+export interface Bonds {
+    /**
+     * Where bonds for atom A start and end.
+     * Start at 2 * idx, end at 2 * idx + 1
+     */
+    atomRanges: number[],
+    /** Monotonous */
+    atomA: number[],
+    atomB: number[],
+    type: BondType[],
+    count: number
+}
+
 export interface Model {
     moleculeId: string,
     id: number,
     data: {
         atom_site: mmCIF.Category<mmCIF.AtomSite>,
         entity: mmCIF.Category<mmCIF.Entity>,
+        bonds: {
+            structConn: mmCIF.Category<mmCIF.StructConn>,
+            chemCompBond: mmCIF.Category<mmCIF.ChemCompBond>
+        },
         secondaryStructure: {
             structConf: mmCIF.Category<mmCIF.StructConf>,
             sheetRange: mmCIF.Category<mmCIF.StructSheetRange>
@@ -62,6 +97,7 @@ export interface Model {
     chains: Chains,
     entities: Entities,
     '@spatialLookup': SpatialLookup | undefined,
+    '@bonds': Bonds | undefined
 }
 
 export interface Molecule {
@@ -115,5 +151,58 @@ export namespace Model {
         const lookup = SpatialLookup(model.positions);
         model['@spatialLookup'] = lookup;
         return lookup;
+    }
+
+    export function bonds(model: Model): Bonds {
+        if (model['@bonds']) return model['@bonds']!;
+        const bonds = computeBonds(model);
+        model['@bonds'] = bonds;
+        return bonds;
+    }
+
+    export function findResidueIndexByLabel(model: Model, asymId: string, seqNumber: number, insCode: string | null) {
+        const { residueStartIndex, residueEndIndex, count: cCount } = model.chains;
+        const { atomStartIndex } = model.residues;
+        const { dataIndex } = model.atoms;
+        const { label_asym_id, label_seq_id, pdbx_PDB_ins_code } = model.data.atom_site;
+
+        for (let cI = 0; cI < cCount; cI++) {
+            let idx = dataIndex[atomStartIndex[residueStartIndex[cI]]];
+            if (!label_asym_id.stringEquals(idx, asymId)) continue;
+            for (let rI = residueStartIndex[cI], _r = residueEndIndex[cI]; rI < _r; rI++) {
+                idx = dataIndex[atomStartIndex[rI]];
+                if (label_seq_id.getInteger(idx) === seqNumber && (!insCode || pdbx_PDB_ins_code.stringEquals(idx, insCode))) {
+                    return rI;
+                }
+            }
+        }
+        return -1;
+    }
+
+    export function findAtomIndexByLabelName(model: Model, residueIndex: number, atomName: string, altLoc: string | null) {
+        const { atomStartIndex, atomEndIndex } = model.residues;
+        const { dataIndex } = model.atoms;
+        const { label_atom_id, label_alt_id } = model.data.atom_site;
+
+        for (let i = atomStartIndex[residueIndex], _i = atomEndIndex[residueIndex]; i <= _i; i++) {
+            const idx = dataIndex[i];
+            if (label_atom_id.stringEquals(idx, atomName) && (!altLoc || label_alt_id.stringEquals(idx, altLoc))) return i;
+        }
+        return -1;
+    }
+}
+
+export namespace Bonds {
+    export function getType({ atomRanges, atomB, type }: Bonds, a: number, b: number): BondType {
+        if (a === b) return BondType.None
+        let i, j;
+        if (a > b) { i = b; j = a; }
+        else { i = a; b = b; }
+
+        const start = atomRanges[2 * i], end = atomRanges[2 * i + 1];
+        for (let t = start; t < end; t++) {
+            if (atomB[t] === j) return type[t];
+        }
+        return BondType.None;
     }
 }
