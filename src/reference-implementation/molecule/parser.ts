@@ -6,7 +6,7 @@
 
 import CIF from 'ciftools.js'
 import * as mmCIF from './mmcif'
-import { Molecule, Model, SecondaryStructureType } from './data'
+import { Structure, Model, SecondaryStructureType } from './data'
 import { FastMap } from '../utils/collections'
 
 type Data = Model['data']
@@ -258,7 +258,7 @@ function assignSecondaryStructure(model: Model) {
     }
 }
 
-export default function parseCIF(cifData: string): Molecule {
+export default function parseCIF(cifData: string): Structure {
     const file = CIF.Text.parse(cifData);
     if (file.isError) throw new Error(file.toString());
     const dataBlock = file.result.dataBlocks[0];

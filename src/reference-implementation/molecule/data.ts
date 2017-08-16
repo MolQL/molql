@@ -103,7 +103,7 @@ export interface Model {
     '@bonds': Bonds | undefined
 }
 
-export interface Molecule {
+export interface Structure {
     id: string,
     models: Model[]
 }
