@@ -131,7 +131,8 @@ const list = {
 
 const set = {
     '@header': 'Sets',
-    has: symbol(Arguments.Dictionary({ 0: Argument(Types.Set(Types.ConstrainedVar)), 1: Argument(Types.ConstrainedVar) }), Type.Bool)
+    has: symbol(Arguments.Dictionary({ 0: Argument(Types.Set(Types.ConstrainedVar)), 1: Argument(Types.ConstrainedVar) }), Type.Bool, 'Check if the the 1st argument includes the value of the 2nd.'),
+    isSubset: symbol(Arguments.Dictionary({ 0: Argument(Types.Set(Types.ConstrainedVar)), 1: Argument(Types.Set(Types.ConstrainedVar)) }), Type.Bool, 'Check if the the 1st argument is a subset of the 2nd.')
 };
 
 export default {

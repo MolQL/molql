@@ -168,7 +168,11 @@ const atomSet = {
     reduce: symbol(Arguments.Dictionary({
         initial: Argument(Type.Variable('a', Type.AnyValue, true), { description: 'Initial value assigned to slot.atom-set-reduce. Current atom is set to the 1st atom of the current set for this.' }),
         value: Argument(Type.Variable('a', Type.AnyValue, true), { description: 'Expression executed for each atom in the set' })
-    }), Type.Variable('a', Type.AnyValue, true), 'Execute the value expression for each atom in the current atom set and return the result.')
+    }), Type.Variable('a', Type.AnyValue, true), 'Execute the value expression for each atom in the current atom set and return the result.'),
+
+    propertySet: symbol(Arguments.Dictionary({
+        property: Argument(Core.Types.ConstrainedVar),
+    }), Core.Types.Set(Core.Types.ConstrainedVar), 'Returns a set with all values of the given property in the current atom set.'),
 }
 
 const atomProperty = {

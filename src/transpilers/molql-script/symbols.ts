@@ -63,6 +63,7 @@ const list: MolQLScriptSymbol[] = [
     Alias(MolQL.core.str.match, 'regex.match'),
     Alias(MolQL.core.list.getAt, 'list.get'),
     Alias(MolQL.core.set.has, 'set.has'),
+    Alias(MolQL.core.set.isSubset, 'set.subset'),
 
     Alias(MolQL.structure.type.elementSymbol, 'atom.new.el'),
     Alias(MolQL.structure.type.authResidueId, 'atom.new.auth-resid'),
@@ -97,6 +98,7 @@ const list: MolQLScriptSymbol[] = [
     Alias(MolQL.structure.atomSet.atomCount, 'atom.set.atom-count'),
     Alias(MolQL.structure.atomSet.countQuery, 'atom.set.count-query'),
     Alias(MolQL.structure.atomSet.reduce, 'atom.set.reduce'),
+    Alias(MolQL.structure.atomSet.propertySet, 'atom.set.property'),
 
     Alias(MolQL.structure.atomProperty.core.elementSymbol, 'atom.el'),
     Alias(MolQL.structure.atomProperty.core.x, 'atom.x'),

@@ -30,16 +30,7 @@ export function pick(env: Environment, selection: Selection, pred: Expression<bo
     return ret.getSelection();
 }
 
-function isSubset(a: FastSet<any>, b: FastSet<any>) {
-    const _ctx = { b, count: 0 };
-    a.forEach((e, ctx) => {
-        if (!ctx!.b.has(e)) return false;
-        ctx!.count++;
-    }, _ctx);
-    return _ctx.count === a.size;
-}
-
-function getAtomSetProperties(env: Environment, atomSet: AtomSet, prop: Expression, set: FastSet<any>) {
+export function getAtomSetProperties(env: Environment, atomSet: AtomSet, prop: Expression, set: FastSet<any>) {
     const { model } = env.context;
     Environment.lockSlot(env, 'element');
     const element = env.slots.element;
@@ -73,7 +64,7 @@ export function withSameAtomProperties(env: Environment, selection: Selection, s
     for (const atomSet of AtomSelection.atomSets(sel)) {
         slots.atomSet = atomSet;
         const props = getAtomSetProperties(env, atomSet, prop, FastSet.create());
-        if (isSubset(props, propSet)) ret.add(atomSet);
+        if (FastSet.isSubset(props, propSet)) ret.add(atomSet);
     }
     Environment.unlockSlot(env, 'atomSet');
     return ret.getSelection();
