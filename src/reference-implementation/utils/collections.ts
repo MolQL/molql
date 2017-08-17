@@ -157,7 +157,6 @@ export namespace FastSet {
         }
     }
 
-
     /**
      * Uses null for present values.
      */
@@ -205,5 +204,14 @@ export namespace FastSet {
             ret.add(xs[i]);
         }
         return ret;
+    }
+
+    export function isSubset<T extends string | number>(a: FastSet<T>, b: FastSet<T>) {
+        const _ctx = { b, count: 0 };
+        a.forEach((e, ctx) => {
+            if (!ctx!.b.has(e)) return false;
+            ctx!.count++;
+        }, _ctx);
+        return _ctx.count === a.size;
     }
 }

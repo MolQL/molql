@@ -10,6 +10,8 @@ import Context from '../context'
 import AtomSet from '../../data/atom-set'
 import AtomSelection from '../../data/atom-selection'
 import ElementAddress from '../../data/element-address'
+import { FastSet } from '../../../utils/collections'
+import { getAtomSetProperties } from './filters'
 
 export function atomCount(env: Environment) {
     return AtomSet.count(env.slots.atomSet);
@@ -39,4 +41,8 @@ export function accumulateAtomSet(env: Environment, initial: Expression<any>, va
     Environment.unlockSlot(env, 'element');
     Environment.unlockSlot(env, 'atomSetReducer');
     return ret;
+}
+
+export function propertySet(env: Environment, prop: Expression) {
+    return getAtomSetProperties(env, env.slots.atomSet, prop, FastSet.create<any>())
 }

@@ -171,6 +171,7 @@ export const SymbolRuntime: Symbol.Info[] = [
 
     // ============= SET ================
     Symbol(MolQL.core.set.has, staticAttr)((env, v) => v[0](env).has(v[1](env))),
+    Symbol(MolQL.core.set.isSubset, staticAttr)((env, v) => FastSet.isSubset(v[0](env) as FastSet<any>, v[1](env) as FastSet<any>)),
 
     ////////////////////////////////////
     // Structure
@@ -220,6 +221,7 @@ export const SymbolRuntime: Symbol.Info[] = [
     Symbol(MolQL.structure.atomSet.atomCount)((env, v) => StructureRuntime.AtomSet.atomCount(env)),
     Symbol(MolQL.structure.atomSet.countQuery)((env, v) => StructureRuntime.AtomSet.countQuery(env, v.query(env))),
     Symbol(MolQL.structure.atomSet.reduce)((env, v) => StructureRuntime.AtomSet.accumulateAtomSet(env, v.initial, v.value)),
+    Symbol(MolQL.structure.atomSet.propertySet)((env, v) => StructureRuntime.AtomSet.propertySet(env, v.property)),
 
     // ============= ATOM PROPERTIES ================
     ...atomProps(MolQL.structure.atomProperty.core, StructureRuntime.AtomProperties.Core),
