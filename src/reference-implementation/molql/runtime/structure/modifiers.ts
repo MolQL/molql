@@ -13,6 +13,8 @@ import { UniqueArrayBuilder, sortAsc, FastSet, FastMap } from '../../../utils/co
 import Mask from '../../../utils/mask'
 import { Model, Bonds } from '../../../molecule/data'
 import ElementAddress from '../../data/element-address'
+import BondAddress from '../../data/bond-address'
+import { defaultBondTest, testBond, BondTest } from './common'
 
 type Selection = Expression<AtomSelection>
 
@@ -244,20 +246,29 @@ export function includeSurroundings(env: Environment, selection: Selection, radi
     return builder.getSelection();
 }
 
-function _expandFrontierAtoms(bonds: Bonds, mask: Mask, frontier: number[], atoms: UniqueArrayBuilder<number>) {
+interface ExpandConnectedCtx {
+    env: Environment,
+    model: Model,
+    bonds: Bonds,
+    mask: Mask,
+    slot: BondAddress,
+    test: BondTest
+}
+
+function _expandFrontierAtoms({ env, mask, bonds, test, slot }: ExpandConnectedCtx, frontier: number[], atoms: UniqueArrayBuilder<number>) {
     const newFrontier: number[] = [];
-    const { atomBondOffsets, bondsByAtom } = bonds;
+    const { atomBondOffsets, bondsByAtom, annotationByAtom } = bonds;
     for (const a of frontier) {
         const start = atomBondOffsets[a], end = atomBondOffsets[a + 1];
         for (let i = start; i < end; i++) {
             const b = bondsByAtom[i];
-            if (mask.has(b) && UniqueArrayBuilder.add(atoms, b, b)) newFrontier[newFrontier.length] = b;
+            if (mask.has(b) && testBond(env, slot, a, b, annotationByAtom[i], test) && UniqueArrayBuilder.add(atoms, b, b)) newFrontier[newFrontier.length] = b;
         }
     }
     return newFrontier;
 }
 
-function _expandAtoms(bonds: Bonds, mask: Mask, atomSet: AtomSet, numLayers: number) {
+function _expandAtoms(ctx: ExpandConnectedCtx, atomSet: AtomSet, numLayers: number) {
     if (!numLayers) return atomSet;
 
     const result = UniqueArrayBuilder<number>();
@@ -266,15 +277,15 @@ function _expandAtoms(bonds: Bonds, mask: Mask, atomSet: AtomSet, numLayers: num
     for (const a of frontier) UniqueArrayBuilder.add(result, a, a);
 
     for (let i = 0; i < numLayers; i++) {
-        frontier = _expandFrontierAtoms(bonds, mask, frontier, result);
+        frontier = _expandFrontierAtoms(ctx, frontier, result);
     }
     sortAsc(result.array);
     return AtomSet(result.array);
 }
 
-function _expandFrontierResidues(model: Model, bonds: Bonds, mask: Mask, frontier: number[], residues: UniqueArrayBuilder<number>) {
+function _expandFrontierResidues({ env, model, mask, bonds, test, slot }: ExpandConnectedCtx, frontier: number[], residues: UniqueArrayBuilder<number>) {
     const newFrontier: number[] = [];
-    const { atomBondOffsets, bondsByAtom } = bonds;
+    const { atomBondOffsets, bondsByAtom, annotationByAtom } = bonds;
 
     const { atomStartIndex, atomEndIndex } = model.residues;
     const { residueIndex } = model.atoms;
@@ -289,18 +300,18 @@ function _expandFrontierResidues(model: Model, bonds: Bonds, mask: Mask, frontie
                 if (!mask.has(b)) continue;
 
                 const r = residueIndex[b];
-                if (UniqueArrayBuilder.add(residues, r, r)) newFrontier[newFrontier.length] = r;
+                if (testBond(env, slot, a, b, annotationByAtom[i], test) && UniqueArrayBuilder.add(residues, r, r)) newFrontier[newFrontier.length] = r;
             }
         }
     }
     return newFrontier;
 }
 
-function _expandResidues(model: Model, bonds: Bonds, mask: Mask, atomSet: AtomSet, numLayers: number) {
+function _expandResidues(ctx: ExpandConnectedCtx, atomSet: AtomSet, numLayers: number) {
     if (!numLayers) return atomSet;
 
-    const { atomStartIndex, atomEndIndex } = model.residues;
-    const { residueIndex } = model.atoms;
+    const { atomStartIndex, atomEndIndex } = ctx.model.residues;
+    const { residueIndex } = ctx.model.atoms;
 
     const residues = UniqueArrayBuilder<number>();
     let frontier: number[] = [];
@@ -311,9 +322,10 @@ function _expandResidues(model: Model, bonds: Bonds, mask: Mask, atomSet: AtomSe
     }
 
     for (let i = 0; i < numLayers; i++) {
-        frontier = _expandFrontierResidues(model, bonds, mask, frontier, residues);
+        frontier = _expandFrontierResidues(ctx, frontier, residues);
     }
 
+    const { mask } = ctx;
     sortAsc(residues.array);
     const atoms: number[] = [];
     for (let rI of residues.array) {
@@ -325,19 +337,39 @@ function _expandResidues(model: Model, bonds: Bonds, mask: Mask, atomSet: AtomSe
     return AtomSet(atoms);
 }
 
-export function includeConnected(env: Environment, selection: Selection, layerCount?: Expression<number>, wholeResidues?: Expression<boolean>): AtomSelection {
+export interface IncludeConnectedParams {
+    selection: Selection,
+    bondTest?: Expression<boolean>,
+    layerCount?: Expression<number>,
+    wholeResidues?: Expression<boolean>
+}
+
+export function includeConnected(env: Environment, { selection, layerCount, wholeResidues, bondTest }: IncludeConnectedParams): AtomSelection {
     const src = selection(env);
     const { model, mask } = env.context;
     const bonds = Model.bonds(model);
     const numLayers = Math.max(0, layerCount ? layerCount(env) : 1);
     const asResidues = !!wholeResidues && !!wholeResidues(env);
+    const test = bondTest || defaultBondTest;
 
     const builder = AtomSelection.uniqueBuilder();
 
+    Environment.lockSlot(env, 'bond');
+
+    const ctx: ExpandConnectedCtx = {
+        env,
+        bonds,
+        model,
+        mask,
+        slot: env.slots.bond,
+        test
+    };
+
     for (const atomSet of AtomSelection.atomSets(src)) {
-        if (asResidues) builder.add(_expandResidues(model, bonds, mask, atomSet, numLayers));
-        else builder.add(_expandAtoms(bonds, mask, atomSet, numLayers));
+        if (asResidues) builder.add(_expandResidues(ctx, atomSet, numLayers));
+        else builder.add(_expandAtoms(ctx, atomSet, numLayers));
     }
+    Environment.unlockSlot(env, 'bond');
 
     return builder.getSelection();
 }

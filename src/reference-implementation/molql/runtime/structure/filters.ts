@@ -12,6 +12,7 @@ import AtomSelection from '../../data/atom-selection'
 import { FastSet } from '../../../utils/collections'
 import Mask from '../../../utils/mask'
 import { Model } from '../../../molecule/data'
+import { defaultBondTest, testBond } from './common'
 
 type Selection = Expression<AtomSelection>
 
@@ -114,18 +115,23 @@ export function within(env: Environment, selection: Selection, target: Selection
 export type IsConnectedToParams = {
     selection: Selection,
     target: Selection,
+    bondTest?: Expression<boolean>,
     disjunct?: Expression<boolean>,
     invert?: Expression<boolean>
 }
 
-export function isConnectedTo(env: Environment, { selection, target, disjunct, invert }: IsConnectedToParams) {
+export function isConnectedTo(env: Environment, { selection, target, disjunct, invert, bondTest }: IsConnectedToParams) {
     const { model } = env.context;
 
     const sel = selection(env);
-    const { bondsByAtom, atomBondOffsets } = Model.bonds(model);
+    const { bondsByAtom, atomBondOffsets, annotationByAtom } = Model.bonds(model);
     const targetMask = AtomSelection.getMask(target(env));
     const disjuncted = disjunct ? !!disjunct(env) : false;
     const inverted = (!!invert && !!invert(env));
+    const test = bondTest || defaultBondTest;
+
+    Environment.lockSlot(env, 'bond');
+    const { bond } = env.slots;
 
     const ret = AtomSelection.linearBuilder();
     for (const atomSet of AtomSelection.atomSets(sel)) {
@@ -137,13 +143,16 @@ export function isConnectedTo(env: Environment, { selection, target, disjunct, i
                 const b = bondsByAtom[t];
                 if (targetMask.has(b)) {
                     if (!disjuncted || !setMask.has(b)) {
-                        isConnected = true;
-                        break;
+                        if (testBond(env, bond, a, b, annotationByAtom[t], test)) {
+                            isConnected = true;
+                            break;
+                        }
                     }
                 }
             }
             if (isConnected) break;
         }
+
         if (isConnected) {
             if (!inverted) ret.add(atomSet);
         } else if (inverted) {
@@ -161,5 +170,6 @@ export function isConnectedTo(env: Environment, { selection, target, disjunct, i
             }
         }
     }
+    Environment.unlockSlot(env, 'bond');
     return ret.getSelection();
 }

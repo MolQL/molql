@@ -18,8 +18,7 @@ export const enum SecondaryStructureType {
 export const enum BondAnnotation {
     None = -1,
 
-    Unknown = 0,
-
+    Covalent  = 0,
     Covalent1 = 1,
     Covalent2 = 2,
     Covalent3 = 3,
@@ -27,11 +26,11 @@ export const enum BondAnnotation {
     Covalent5 = 5,
     Covalent6 = 6,
 
-    DisulfideBridge = 7,
-
     Metallic = 20,
     Hydrogen = 21,
-    Ion = 22
+    Ion = 22,
+
+    Unknown = 50,
 }
 
 export interface Atoms {
@@ -75,10 +74,6 @@ export interface Bonds {
     bondsByAtom: number[],
     annotationByAtom: number[],
 
-    /** Monotonous */
-    atomA: number[],
-    atomB: number[],
-    annotation: BondAnnotation[],
     count: number
 }
 
@@ -209,6 +204,6 @@ export namespace Model {
 
 export namespace Bonds {
     export function isCovalent(a: BondAnnotation) {
-        return a >= BondAnnotation.Covalent1 && a <= BondAnnotation.DisulfideBridge;
+        return a >= BondAnnotation.Covalent && a <= BondAnnotation.Covalent6;
     }
 }

@@ -57,9 +57,11 @@ const lang: Language = {
   :selection (atom.sel.atom-groups
     :residue-test true
     :group-by (atom.key.res))
-  :target (atom.sel.atom-groups
-    :residue-test (= (atom.label_comp_id) HEM)
-    :group-by (atom.key.res))
+    :target (atom.sel.atom-groups
+      :residue-test (= (atom.label_comp_id) HEM)
+      :group-by (atom.key.res))
+  ;; default bond test allows only covalent bonds
+  :bond-test true
   :disjunct true)`
     }, {
       name: 'HEM and 2 layers of connected residues',
@@ -67,6 +69,9 @@ const lang: Language = {
   :selection (atom.sel.atom-groups
     :residue-test (= (atom.label_comp_id) HEM)
     :group-by (atom.key.res))
+  ;; default bond test allows only covalent bonds
+  ;; another option is say (= (bond.type) (bond.type.new metallic))
+  :bond-test true
   :layer-count 2
   :as-whole-residues true)`
     }]

@@ -139,7 +139,7 @@ export namespace StructConn {
             }
 
             switch (type) {
-                case 'disulf': bondType = BondAnnotation.DisulfideBridge; break;
+                case 'disulf': bondType = BondAnnotation.Covalent1; break;
                 case 'hydrog': bondType = BondAnnotation.Hydrogen; break;
                 case 'metalc': bondType = BondAnnotation.Metallic; break;
                 // case 'mismat': bondType = BondType.Single; break; 

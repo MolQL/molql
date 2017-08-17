@@ -19,7 +19,7 @@ const MolQLsymbols = MolQLScript.SymbolList.map(s => s[0]).sort((a, b) => {
     return a.length - b.length;
 });
 const MolQLnamedArgs = MolQLScript.NamedArgs.map(a => ':' + a);
-const MolQLfull = [...MolQLsymbols, ...MolQLnamedArgs];
+const MolQLfull = [...MolQLsymbols, ...MolQLnamedArgs, ...MolQLScript.Constants];
 
 CodeMirror.defineMode('molql-script', (config) => {
     //const specialForm = /^(block|let*|return-from|catch|load-time-value|setq|eval-when|locally|symbol-macrolet|flet|macrolet|tagbody|function|multiple-value-call|the|go|multiple-value-prog1|throw|if|progn|unwind-protect|labels|progv|let|quote)$/;

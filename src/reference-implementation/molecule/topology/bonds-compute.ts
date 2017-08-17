@@ -218,9 +218,6 @@ function _computeBonds(model: Model, params: BondComputationParameters): Bonds {
         atomBondOffsets,
         bondsByAtom,
         annotationByAtom,
-        atomA,
-        atomB,
-        annotation,
         count: atomA.length
     };
 }

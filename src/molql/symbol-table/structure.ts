@@ -11,10 +11,11 @@ import { symbol } from '../helpers'
 
 export namespace Types {
     export const ElementSymbol = Type.Value('Structure', 'ElementSymbol');
+    export const BondType = Type.Value('Structure', 'BondType');
     export const ResidueId = Type.Value('Structure', 'ResidueId');
+
     export const AtomSet = Type.Value('Structure', 'AtomSet');
     export const AtomSelection = Type.Value('Structure', 'AtomSelection');
-
     export const AtomReference = Type.Value('Structure', 'AtomReference');
 
     export const AtomSelectionQuery = Core.Types.Fn(AtomSelection, 'AtomSelectionQuery');
@@ -23,6 +24,7 @@ export namespace Types {
 const type = {
     '@header': 'Types',
     elementSymbol: symbol(Arguments.Dictionary({ 0: Argument(Type.Str) }), Types.ElementSymbol, 'Create element symbol representation from a string value.'),
+    bondType: symbol(Arguments.Dictionary({ 0: Argument(Type.Str) }), Types.BondType, 'Create bond type representation from a string value (covalent/metallic/ion/hydrogen/unknown).'),
     authResidueId: symbol(Arguments.Dictionary({
         0: Argument(Type.Str, { description: 'auth_asym_id' }),
         1: Argument(Type.Num, { description: 'auth_seq_id' }),
@@ -104,6 +106,7 @@ const modifier = {
 
     includeConnected: symbol(Arguments.Dictionary({
         selection: Argument(Types.AtomSelectionQuery),
+        'bond-test': Argument(Type.Bool, { isOptional: true, defaultValue: 'type == covalent' as any }),
         'layer-count': Argument(Type.Num, { isOptional: true, defaultValue: 1, description: 'Number of bonded layers to include.' }),
         'as-whole-residues': Argument(Type.Bool, { isOptional: true })
     }), Types.AtomSelectionQuery, 'Pick all atom sets that are connected to the target.'),
@@ -137,6 +140,7 @@ const filter = {
     isConnectedTo: symbol(Arguments.Dictionary({
         selection: Argument(Types.AtomSelectionQuery),
         target: Argument(Types.AtomSelectionQuery),
+        'bond-test': Argument(Type.Bool, { isOptional: true, defaultValue: 'type == covalent' as any }),
         disjunct: Argument(Type.Bool, { isOptional: true, defaultValue: true, description: 'If true, there must exist a bond to an atom that lies outside the given atom set to pass test.' }),
         invert: Argument(Type.Bool, { isOptional: true, defaultValue: false, description: 'If true, return atom sets that are not connected.' })
     }), Types.AtomSelectionQuery, 'Pick all atom sets that are connected to the target.'),
@@ -173,57 +177,68 @@ const atomProperty = {
     core: {
         '@header': 'Core Properties',
 
-        elementSymbol: prop(Types.ElementSymbol),
+        elementSymbol: atomProp(Types.ElementSymbol),
 
-        x: prop(Type.Num, 'Cartesian X coordinate'),
-        y: prop(Type.Num, 'Cartesian Y coordinate'),
-        z: prop(Type.Num, 'Cartesian Z coordinate'),
+        x: atomProp(Type.Num, 'Cartesian X coordinate'),
+        y: atomProp(Type.Num, 'Cartesian Y coordinate'),
+        z: atomProp(Type.Num, 'Cartesian Z coordinate'),
 
-        atomKey: prop(Type.AnyValue, 'Unique value for each atom. Main use case is grouping of atoms.')
+        atomKey: atomProp(Type.AnyValue, 'Unique value for each atom. Main use case is grouping of atoms.')
     },
 
     topology: {
-        connectedComponentKey: prop(Type.AnyValue, 'Unique value for each connected component.')
+        connectedComponentKey: atomProp(Type.AnyValue, 'Unique value for each connected component.')
     },
 
     macromolecular: {
         '@header': 'Macromolecular Properties (derived from the mmCIF format)',
 
-        authResidueId: prop(Types.ResidueId, `type.auth-residue-id symbol executed on current atom's residue`),
-        labelResidueId: prop(Types.ResidueId, `type.label-residue-id symbol executed on current atom's residue`),
+        authResidueId: atomProp(Types.ResidueId, `type.auth-residue-id symbol executed on current atom's residue`),
+        labelResidueId: atomProp(Types.ResidueId, `type.label-residue-id symbol executed on current atom's residue`),
 
-        residueKey: prop(Type.AnyValue, 'Unique value for each tuple ``(label_entity_id,auth_asym_id,auth_seq_id,pdbx_PDB_ins_code)``, main use case is grouping of atoms'),
-        chainKey: prop(Type.AnyValue, 'Unique value for each tuple ``(label_entity_id,auth_asym_id)``, main use case is grouping of atoms'),
-        entityKey: prop(Type.AnyValue, 'Unique value for each tuple ``label_entity_id``, main use case is grouping of atoms'),
+        residueKey: atomProp(Type.AnyValue, 'Unique value for each tuple ``(label_entity_id,auth_asym_id,auth_seq_id,pdbx_PDB_ins_code)``, main use case is grouping of atoms'),
+        chainKey: atomProp(Type.AnyValue, 'Unique value for each tuple ``(label_entity_id,auth_asym_id)``, main use case is grouping of atoms'),
+        entityKey: atomProp(Type.AnyValue, 'Unique value for each tuple ``label_entity_id``, main use case is grouping of atoms'),
 
-        isHet: prop(Type.Bool, 'Equivalent to atom_site.group_PDB !== ATOM'),
+        isHet: atomProp(Type.Bool, 'Equivalent to atom_site.group_PDB !== ATOM'),
 
-        id: prop(Type.Num, '_atom_site.id'),
+        id: atomProp(Type.Num, '_atom_site.id'),
 
-        label_atom_id: prop(Type.Str),
-        label_alt_id: prop(Type.Str),
-        label_comp_id: prop(Type.Str),
-        label_asym_id: prop(Type.Str),
-        label_entity_id: prop(Type.Str),
-        label_seq_id: prop(Type.Num),
+        label_atom_id: atomProp(Type.Str),
+        label_alt_id: atomProp(Type.Str),
+        label_comp_id: atomProp(Type.Str),
+        label_asym_id: atomProp(Type.Str),
+        label_entity_id: atomProp(Type.Str),
+        label_seq_id: atomProp(Type.Num),
 
-        auth_atom_id: prop(Type.Str),
-        auth_comp_id: prop(Type.Str),
-        auth_asym_id: prop(Type.Str),
-        auth_seq_id: prop(Type.Num),
+        auth_atom_id: atomProp(Type.Str),
+        auth_comp_id: atomProp(Type.Str),
+        auth_asym_id: atomProp(Type.Str),
+        auth_seq_id: atomProp(Type.Num),
 
-        pdbx_PDB_ins_code: prop(Type.Str),
-        pdbx_formal_charge: prop(Type.Num),
+        pdbx_PDB_ins_code: atomProp(Type.Str),
+        pdbx_formal_charge: atomProp(Type.Num),
 
-        occupancy: prop(Type.Num),
-        B_iso_or_equiv: prop(Type.Num),
+        occupancy: atomProp(Type.Num),
+        B_iso_or_equiv: atomProp(Type.Num),
 
-        entityType: prop(Type.Str, 'Type of the entity as defined in mmCIF (polymer, non-polymer, water)'),
+        entityType: atomProp(Type.Str, 'Type of the entity as defined in mmCIF (polymer, non-polymer, water)'),
     }
 }
 
-function prop(type: Type, description?: string) {
+const bondProperty = {
+    '@header': 'Bond Properties',
+
+    type: bondProp(Types.BondType),
+    order: bondProp(Type.Num)
+}
+
+function atomProp(type: Type, description?: string) {
     return symbol(Arguments.Dictionary({ 0: Argument(Types.AtomReference, { isOptional: true, defaultValue: 'slot.current-atom' }) }), type, description);
+}
+
+function bondProp(type: Type, description?: string) {
+    return symbol(Arguments.None, type, description);
 }
 
 export default {
@@ -235,5 +250,6 @@ export default {
     filter,
     combinator,
     atomSet,
-    atomProperty
+    atomProperty,
+    bondProperty
 }

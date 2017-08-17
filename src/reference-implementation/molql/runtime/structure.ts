@@ -10,6 +10,7 @@ import * as Filters from './structure/filters'
 import * as Combinators from './structure/combinators'
 import * as AtomSet from './structure/atom-set'
 import * as AtomProperties from './structure/atom-properties'
+import * as BondProperties from './structure/bond-properties'
 
 export default {
     Generators,
@@ -17,5 +18,6 @@ export default {
     Filters,
     Combinators,
     AtomSet,
-    AtomProperties
+    AtomProperties,
+    BondProperties
 }

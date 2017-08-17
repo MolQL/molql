@@ -177,6 +177,7 @@ export const SymbolRuntime: Symbol.Info[] = [
 
     // ============= TYPES ================
     Symbol(MolQL.structure.type.elementSymbol, staticAttr)((env, v) => ElementSymbol(v[0](env))),
+    Symbol(MolQL.structure.type.bondType, staticAttr)((env, v) => StructureRuntime.BondProperties.createType(v[0](env))),
     Symbol(MolQL.structure.type.authResidueId, staticAttr)((env, v) => ResidueIdentifier.auth(v[0](env), v[1](env), v[2] && v[2](env))),
     Symbol(MolQL.structure.type.labelResidueId, staticAttr)((env, v) => ResidueIdentifier.label(v[0](env), v[1](env), v[2](env), v[3] && v[3](env))),
 
@@ -204,7 +205,12 @@ export const SymbolRuntime: Symbol.Info[] = [
         maxSize: v['max-size'],
     })),
     Symbol(MolQL.structure.modifier.includeSurroundings)((env, v) => env => StructureRuntime.Modifiers.includeSurroundings(env, v.selection(env), v.radius, v['as-whole-residues'])),
-    Symbol(MolQL.structure.modifier.includeConnected)((env, v) => env => StructureRuntime.Modifiers.includeConnected(env, v.selection(env), v['layer-count'], v['as-whole-residues'])),
+    Symbol(MolQL.structure.modifier.includeConnected)((env, v) => env => StructureRuntime.Modifiers.includeConnected(env, {
+        selection: v.selection(env),
+        bondTest: v['bond-test'],
+        layerCount: v['layer-count'],
+        wholeResidues: v['as-whole-residues']
+    })),
     Symbol(MolQL.structure.modifier.expandProperty)((env, v) => env => StructureRuntime.Modifiers.expandProperty(env, v.selection(env), v.property)),
 
     // ============= FILTERS ================
@@ -214,6 +220,7 @@ export const SymbolRuntime: Symbol.Info[] = [
     Symbol(MolQL.structure.filter.isConnectedTo)((env, v) => env => StructureRuntime.Filters.isConnectedTo(env, {
         selection: v.selection(env),
         target: v.target(env),
+        bondTest: v['bond-test'],
         invert: v.invert,
         disjunct: v.disjunct
     })),
@@ -229,12 +236,15 @@ export const SymbolRuntime: Symbol.Info[] = [
     Symbol(MolQL.structure.atomSet.reduce)((env, v) => StructureRuntime.AtomSet.accumulateAtomSet(env, v.initial, v.value)),
 
     // ============= ATOM PROPERTIES ================
-    ...atomProps(MolQL.structure.atomProperty.core, StructureRuntime.AtomProperties.Core),
-    ...atomProps(MolQL.structure.atomProperty.topology, StructureRuntime.AtomProperties.Topology),
-    ...atomProps(MolQL.structure.atomProperty.macromolecular, StructureRuntime.AtomProperties.Macromolecular)
+    ...props(MolQL.structure.atomProperty.core, StructureRuntime.AtomProperties.Core),
+    ...props(MolQL.structure.atomProperty.topology, StructureRuntime.AtomProperties.Topology),
+    ...props(MolQL.structure.atomProperty.macromolecular, StructureRuntime.AtomProperties.Macromolecular),
+
+    // ============= BOND PROPERTIES ================
+    ...props(MolQL.structure.bondProperty, StructureRuntime.BondProperties.Properties),
 ]
 
-function atomProps<S>(symbols: S, implementation: { [P in keyof S]?: any }) {
+function props<S>(symbols: S, implementation: { [P in keyof S]?: any }) {
     return Object.keys(symbols)
         .filter(k => isSymbol((symbols as any)[k]) && !!(implementation)[k])
         .map(k => Symbol((symbols as any)[k])(implementation[k]));

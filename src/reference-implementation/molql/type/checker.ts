@@ -84,6 +84,10 @@ function assignArguments(symbols: SymbolMap, ctx: TypeContext, symbolId: string,
             }
         }
 
+        for (const k of Object.keys(exprArgs)) {
+            if (!(args.map as any)[k]) throwError(`'${symbolId}': unknown arg ':${k}'.`);
+        }
+
         for (const k of keys) {
             const arg = (args.map as any)[k] as Argument;
             const e = (exprArgs as any)[k];
