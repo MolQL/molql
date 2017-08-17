@@ -47,7 +47,7 @@ const operators: OperatorList = [
     rule: h.infixOp(/IN/i),
     map: (op: string, selection: Expression, source: Expression) => {
       return B.struct.filter.withSameAtomProperties({
-        selection,
+        0: selection,
         source,
         property: B.core.str.concat([
           B.ammp('label_atom_id'),
@@ -67,7 +67,7 @@ const operators: OperatorList = [
     rule: h.infixOp(/LIKE|l\./i),
     map: (op: string, selection: Expression, source: Expression) => {
       return B.struct.filter.withSameAtomProperties({
-        selection,
+        0: selection,
         source,
         property: B.core.str.concat([
           B.ammp('label_atom_id'),
@@ -84,7 +84,7 @@ const operators: OperatorList = [
     rule: h.postfixOp(/GAP\s+([-+]?[0-9]*\.?[0-9]+)/i, 1).map(parseFloat),
     map: (distance: number, target: Expression) => {
       return B.struct.filter.within({
-        selection: B.struct.generator.atomGroups(),
+        0: B.struct.generator.atomGroups(),
         target,
         radius: B.core.math.add([distance, 1.4]) // TODO replace by vdw
       })
@@ -98,7 +98,7 @@ const operators: OperatorList = [
     rule: h.postfixOp(/(AROUND|a\.)\s+([-+]?[0-9]*\.?[0-9]+)/i, 2).map(parseFloat),
     map: (radius: number, target: Expression) => {
       return B.struct.filter.within({
-        selection: B.struct.generator.atomGroups(), target, radius
+        0: B.struct.generator.atomGroups(), target, radius
       })
     }
   },
@@ -109,7 +109,7 @@ const operators: OperatorList = [
     type: h.postfix,
     rule: h.postfixOp(/(EXPAND|x\.)\s+([-+]?[0-9]*\.?[0-9]+)/i, 2).map(parseFloat),
     map: (radius: number, selection: Expression) => {
-      return B.struct.modifier.includeSurroundings({ selection, radius })
+      return B.struct.modifier.includeSurroundings({ 0: selection, radius })
     }
   },
   {
@@ -119,7 +119,7 @@ const operators: OperatorList = [
     type: h.binaryLeft,
     rule: h.ofOp('WITHIN', 'w.'),
     map: (radius: number, selection: Expression, target: Expression) => {
-      return B.struct.filter.within({ selection, target, radius })
+      return B.struct.filter.within({ 0: selection, target, radius })
     }
   },
   {
@@ -130,7 +130,7 @@ const operators: OperatorList = [
     rule: h.ofOp('NEAR_TO', 'nto.'),
     map: (radius: number, selection: Expression, target: Expression) => {
       return B.struct.modifier.exceptBy({
-        selection: B.struct.filter.within({ selection, target, radius }),
+        0: B.struct.filter.within({ 0: selection, target, radius }),
         by: target
       })
     }
@@ -143,7 +143,7 @@ const operators: OperatorList = [
     rule: h.ofOp('BEYOND', 'be.'),
     map: (radius: number, selection: Expression, target: Expression) => {
       return B.struct.modifier.exceptBy({
-        selection: B.struct.filter.within({ selection, target, radius, invert: true }),
+        0: B.struct.filter.within({ 0: selection, target, radius, invert: true }),
         by: target
       })
     }
@@ -156,8 +156,8 @@ const operators: OperatorList = [
     rule: h.prefixOp(/BYRES|br\./i),
     map: (op: string, selection: Expression) => {
       return B.struct.generator.queryInSelection({
-        selection: B.struct.modifier.expandProperty({
-          selection: B.struct.modifier.union({ selection }),
+        0: B.struct.modifier.expandProperty({
+          0: B.struct.modifier.union({ 0: selection }),
           property: B.ammp('residueKey')
         }),
         query: B.struct.generator.atomGroups()
@@ -190,8 +190,8 @@ const operators: OperatorList = [
     rule: h.prefixOp(/BYSEGMENT|bs\./i),
     map: (op: string, selection: Expression) => {
       return B.struct.generator.queryInSelection({
-        selection: B.struct.modifier.expandProperty({
-          selection: B.struct.modifier.union({ selection }),
+        0: B.struct.modifier.expandProperty({
+          0: B.struct.modifier.union({ 0: selection }),
           property: B.ammp('chainKey')
         }),
         query: B.struct.generator.atomGroups()

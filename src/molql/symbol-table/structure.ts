@@ -55,7 +55,7 @@ const generator = {
     }), Types.AtomSelectionQuery, 'Return all atoms for which the tests are satisfied, grouped into sets.'),
 
     queryInSelection: symbol(Arguments.Dictionary({
-        selection: Argument(Types.AtomSelectionQuery),
+        0: Argument(Types.AtomSelectionQuery),
         query: Argument(Types.AtomSelectionQuery),
         'in-complement': Argument(Type.Bool, { isOptional: true, defaultValue: false })
     }), Types.AtomSelectionQuery, 'Executes query only on atoms that are in the source selection.'),
@@ -67,31 +67,31 @@ const modifier = {
     '@header': 'Selection Modifications',
 
     queryEach: symbol(Arguments.Dictionary({
-        selection: Argument(Types.AtomSelectionQuery),
+        0: Argument(Types.AtomSelectionQuery),
         query: Argument(Types.AtomSelectionQuery)
     }), Types.AtomSelectionQuery, 'Query every atom set in the input selection separately.'),
 
     intersectBy: symbol(Arguments.Dictionary({
-        selection: Argument(Types.AtomSelectionQuery),
+        0: Argument(Types.AtomSelectionQuery),
         by: Argument(Types.AtomSelectionQuery)
     }), Types.AtomSelectionQuery, 'Intersect each atom set from the first sequence from atoms in the second one.'),
 
     exceptBy: symbol(Arguments.Dictionary({
-        selection: Argument(Types.AtomSelectionQuery),
+        0: Argument(Types.AtomSelectionQuery),
         by: Argument(Types.AtomSelectionQuery)
     }), Types.AtomSelectionQuery, `Remove all atoms from 'selection' that occur in 'by'.`),
 
     unionBy: symbol(Arguments.Dictionary({
-        selection: Argument(Types.AtomSelectionQuery),
+        0: Argument(Types.AtomSelectionQuery),
         by: Argument(Types.AtomSelectionQuery)
     }), Types.AtomSelectionQuery, 'For each atom set A in the orginal sequence, combine all atoms sets in the target selection that intersect with A.'),
 
     union: symbol(Arguments.Dictionary({
-        selection: Argument(Types.AtomSelectionQuery)
+        0: Argument(Types.AtomSelectionQuery)
     }), Types.AtomSelectionQuery, 'Collects all atom sets in the sequence into a single atom set.'),
 
     cluster: symbol(Arguments.Dictionary({
-        selection: Argument(Types.AtomSelectionQuery),
+        0: Argument(Types.AtomSelectionQuery),
         'min-distance': Argument(Type.Num, { isOptional: true, defaultValue: 0 }),
         'max-distance': Argument(Type.Num),
         'min-size': Argument(Type.Num, { description: 'Minimal number of sets to merge, must be at least 2', isOptional: true, defaultValue: 2 }),
@@ -99,20 +99,20 @@ const modifier = {
     }), Types.AtomSelectionQuery, 'Combines atom sets that have mutual distance in the interval [min-radius, max-radius]. Minimum/maximum size determines how many atom sets can be combined.'),
 
     includeSurroundings: symbol(Arguments.Dictionary({
-        selection: Argument(Types.AtomSelectionQuery),
+        0: Argument(Types.AtomSelectionQuery),
         radius: Argument(Type.Num),
         'as-whole-residues': Argument(Type.Bool, { isOptional: true })
     }), Types.AtomSelectionQuery, 'For each atom set in the selection, include all surrouding atoms/residues that are within the specified radius.'),
 
     includeConnected: symbol(Arguments.Dictionary({
-        selection: Argument(Types.AtomSelectionQuery),
+        0: Argument(Types.AtomSelectionQuery),
         'bond-test': Argument(Type.Bool, { isOptional: true, defaultValue: 'true for covalent bonds' as any }),
         'layer-count': Argument(Type.Num, { isOptional: true, defaultValue: 1, description: 'Number of bonded layers to include.' }),
         'as-whole-residues': Argument(Type.Bool, { isOptional: true })
     }), Types.AtomSelectionQuery, 'Pick all atom sets that are connected to the target.'),
 
     expandProperty: symbol(Arguments.Dictionary({
-        selection: Argument(Types.AtomSelectionQuery),
+        0: Argument(Types.AtomSelectionQuery),
         property: Argument(Type.AnyValue)
     }), Types.AtomSelectionQuery, 'To each atom set in the selection, add all atoms that have the same property value that was already present in the set.')
 }
@@ -120,25 +120,25 @@ const modifier = {
 const filter = {
     '@header': 'Selection Filters',
     pick: symbol(Arguments.Dictionary({
-        selection: Argument(Types.AtomSelectionQuery),
+        0: Argument(Types.AtomSelectionQuery),
         test: Argument(Type.Bool)
     }), Types.AtomSelectionQuery, 'Pick all atom sets that satisfy the test.'),
 
     withSameAtomProperties: symbol(Arguments.Dictionary({
-        selection: Argument(Types.AtomSelectionQuery),
+        0: Argument(Types.AtomSelectionQuery),
         source: Argument(Types.AtomSelectionQuery),
         property: Argument(Type.Any)
     }), Types.AtomSelectionQuery, 'Pick all atom sets for which the set of given atom properties is a subset of the source properties.'),
 
     within: symbol(Arguments.Dictionary({
-        selection: Argument(Types.AtomSelectionQuery),
+        0: Argument(Types.AtomSelectionQuery),
         target: Argument(Types.AtomSelectionQuery),
         radius: Argument(Type.Num),
         invert: Argument(Type.Bool, { isOptional: true, defaultValue: false, description: 'If true, pick only atom sets that are further than the specified radius.' }),
     }), Types.AtomSelectionQuery, 'Pick all atom sets from section that are within the radius of any atom from target.'),
 
     isConnectedTo: symbol(Arguments.Dictionary({
-        selection: Argument(Types.AtomSelectionQuery),
+        0: Argument(Types.AtomSelectionQuery),
         target: Argument(Types.AtomSelectionQuery),
         'bond-test': Argument(Type.Bool, { isOptional: true, defaultValue: 'true for covalent bonds' as any }),
         disjunct: Argument(Type.Bool, { isOptional: true, defaultValue: true, description: 'If true, there must exist a bond to an atom that lies outside the given atom set to pass test.' }),
@@ -162,7 +162,7 @@ const atomSet = {
     atomCount: symbol(Arguments.None, Type.Num),
 
     countQuery: symbol(Arguments.Dictionary({
-        query: Argument(Types.AtomSelectionQuery)
+        0: Argument(Types.AtomSelectionQuery)
     }), Type.Num, 'Counts the number of occurences of a specific query inside the current atom set.'),
 
     reduce: symbol(Arguments.Dictionary({
@@ -171,7 +171,7 @@ const atomSet = {
     }), Type.Variable('a', Type.AnyValue, true), 'Execute the value expression for each atom in the current atom set and return the result.'),
 
     propertySet: symbol(Arguments.Dictionary({
-        property: Argument(Core.Types.ConstrainedVar),
+        0: Argument(Core.Types.ConstrainedVar),
     }), Core.Types.Set(Core.Types.ConstrainedVar), 'Returns a set with all values of the given property in the current atom set.'),
 }
 

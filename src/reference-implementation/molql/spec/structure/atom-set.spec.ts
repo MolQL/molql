@@ -15,7 +15,7 @@ describe('atom-set', () => {
 
     it('all residues with min b-factor greater than 40', function () {
         const q = B.struct.filter.pick({
-            selection: residues,
+            0: residues,
             test: B.core.rel.gr([
                 B.struct.atomSet.reduce({
                     initial: B.ammp('B_iso_or_equiv'),
@@ -34,14 +34,14 @@ describe('atom-set', () => {
 
     it('All residues with at 3 C atoms and 1 S atoms.', function () {
         const q = B.struct.filter.pick({
-            selection: residues,
+            0: residues,
             test: B.core.logic.and([
                 B.core.rel.gre([
-                    B.struct.atomSet.countQuery({ query: B.struct.generator.atomGroups({ 'atom-test': B.core.rel.eq([B.acp('elementSymbol'), B.es('C')]) }) }),
+                    B.struct.atomSet.countQuery({ 0: B.struct.generator.atomGroups({ 'atom-test': B.core.rel.eq([B.acp('elementSymbol'), B.es('C')]) }) }),
                     3
                 ]),
                 B.core.rel.gre([
-                    B.struct.atomSet.countQuery({ query: B.struct.generator.atomGroups({ 'atom-test': B.core.rel.eq([B.acp('elementSymbol'), B.es('S')]) }) }),
+                    B.struct.atomSet.countQuery({ 0: B.struct.generator.atomGroups({ 'atom-test': B.core.rel.eq([B.acp('elementSymbol'), B.es('S')]) }) }),
                     1
                 ])
             ])

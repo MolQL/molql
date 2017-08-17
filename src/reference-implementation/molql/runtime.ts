@@ -189,37 +189,37 @@ export const SymbolRuntime: Symbol.Info[] = [
     // ============= GENERATORS ================
     Symbol(MolQL.structure.generator.atomGroups)((env, v) =>
         (env) => StructureRuntime.Generators.atomGroupsGenerator(env, { entityTest: v['entity-test'], chainTest: v['chain-test'], residueTest: v['residue-test'], atomTest: v['atom-test'], groupBy: v['group-by'] })),
-    Symbol(MolQL.structure.generator.queryInSelection)((env, v) => env => StructureRuntime.Generators.querySelection(env, v.selection(env), v.query(env), v['in-complement'])),
+    Symbol(MolQL.structure.generator.queryInSelection)((env, v) => env => StructureRuntime.Generators.querySelection(env, v[0](env), v.query(env), v['in-complement'])),
     Symbol(MolQL.structure.generator.empty)(() => StructureRuntime.Generators.empty),
 
     // ============= MODIFIERS ================
-    Symbol(MolQL.structure.modifier.queryEach)((env, v) => env => StructureRuntime.Modifiers.queryEach(env, v.selection(env), v.query(env))),
-    Symbol(MolQL.structure.modifier.intersectBy)((env, v) => env => StructureRuntime.Modifiers.intersectBy(env, v.selection(env), v.by(env))),
-    Symbol(MolQL.structure.modifier.exceptBy)((env, v) => env => StructureRuntime.Modifiers.exceptBy(env, v.selection(env), v.by(env))),
-    Symbol(MolQL.structure.modifier.unionBy)((env, v) => env => StructureRuntime.Modifiers.unionBy(env, v.selection(env), v.by(env))),
-    Symbol(MolQL.structure.modifier.union)((env, v) => env => StructureRuntime.Modifiers.union(env, v.selection(env))),
+    Symbol(MolQL.structure.modifier.queryEach)((env, v) => env => StructureRuntime.Modifiers.queryEach(env, v[0](env), v.query(env))),
+    Symbol(MolQL.structure.modifier.intersectBy)((env, v) => env => StructureRuntime.Modifiers.intersectBy(env, v[0](env), v.by(env))),
+    Symbol(MolQL.structure.modifier.exceptBy)((env, v) => env => StructureRuntime.Modifiers.exceptBy(env, v[0](env), v.by(env))),
+    Symbol(MolQL.structure.modifier.unionBy)((env, v) => env => StructureRuntime.Modifiers.unionBy(env, v[0](env), v.by(env))),
+    Symbol(MolQL.structure.modifier.union)((env, v) => env => StructureRuntime.Modifiers.union(env, v[0](env))),
     Symbol(MolQL.structure.modifier.cluster)((env, v) => env => StructureRuntime.Modifiers.cluster(env, {
-        selection: v.selection(env),
+        selection: v[0](env),
         minDist: v['min-distance'],
         maxDist: v['max-distance'],
         minSize: v['min-size'],
         maxSize: v['max-size'],
     })),
-    Symbol(MolQL.structure.modifier.includeSurroundings)((env, v) => env => StructureRuntime.Modifiers.includeSurroundings(env, v.selection(env), v.radius, v['as-whole-residues'])),
+    Symbol(MolQL.structure.modifier.includeSurroundings)((env, v) => env => StructureRuntime.Modifiers.includeSurroundings(env, v[0](env), v.radius, v['as-whole-residues'])),
     Symbol(MolQL.structure.modifier.includeConnected)((env, v) => env => StructureRuntime.Modifiers.includeConnected(env, {
-        selection: v.selection(env),
+        selection: v[0](env),
         bondTest: v['bond-test'],
         layerCount: v['layer-count'],
         wholeResidues: v['as-whole-residues']
     })),
-    Symbol(MolQL.structure.modifier.expandProperty)((env, v) => env => StructureRuntime.Modifiers.expandProperty(env, v.selection(env), v.property)),
+    Symbol(MolQL.structure.modifier.expandProperty)((env, v) => env => StructureRuntime.Modifiers.expandProperty(env, v[0](env), v.property)),
 
     // ============= FILTERS ================
-    Symbol(MolQL.structure.filter.pick)((env, v) => env => StructureRuntime.Filters.pick(env, v.selection(env), v.test)),
-    Symbol(MolQL.structure.filter.withSameAtomProperties)((env, v) => env => StructureRuntime.Filters.withSameAtomProperties(env, v.selection(env), v.source(env), v.property)),
-    Symbol(MolQL.structure.filter.within)((env, v) => env => StructureRuntime.Filters.within(env, v.selection(env), v.target(env), v.radius, v.invert)),
+    Symbol(MolQL.structure.filter.pick)((env, v) => env => StructureRuntime.Filters.pick(env, v[0](env), v.test)),
+    Symbol(MolQL.structure.filter.withSameAtomProperties)((env, v) => env => StructureRuntime.Filters.withSameAtomProperties(env, v[0](env), v.source(env), v.property)),
+    Symbol(MolQL.structure.filter.within)((env, v) => env => StructureRuntime.Filters.within(env, v[0](env), v.target(env), v.radius, v.invert)),
     Symbol(MolQL.structure.filter.isConnectedTo)((env, v) => env => StructureRuntime.Filters.isConnectedTo(env, {
-        selection: v.selection(env),
+        selection: v[0](env),
         target: v.target(env),
         bondTest: v['bond-test'],
         invert: v.invert,
@@ -233,9 +233,9 @@ export const SymbolRuntime: Symbol.Info[] = [
 
     // ============= ATOM SETS ================
     Symbol(MolQL.structure.atomSet.atomCount)((env, v) => StructureRuntime.AtomSet.atomCount(env)),
-    Symbol(MolQL.structure.atomSet.countQuery)((env, v) => StructureRuntime.AtomSet.countQuery(env, v.query(env))),
+    Symbol(MolQL.structure.atomSet.countQuery)((env, v) => StructureRuntime.AtomSet.countQuery(env, v[0](env))),
     Symbol(MolQL.structure.atomSet.reduce)((env, v) => StructureRuntime.AtomSet.accumulateAtomSet(env, v.initial, v.value)),
-    Symbol(MolQL.structure.atomSet.propertySet)((env, v) => StructureRuntime.AtomSet.propertySet(env, v.property)),
+    Symbol(MolQL.structure.atomSet.propertySet)((env, v) => StructureRuntime.AtomSet.propertySet(env, v[0])),
 
     // ============= ATOM PROPERTIES ================
     ...props(MolQL.structure.atomProperty.core, StructureRuntime.AtomProperties.Core),

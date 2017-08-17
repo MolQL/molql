@@ -10,13 +10,13 @@ import B from '../../molql/builder'
 
 function proteinExpr() {
   return B.struct.filter.pick({
-    selection: B.struct.generator.atomGroups({
+    0: B.struct.generator.atomGroups({
       'group-by': B.ammp('residueKey')
     }),
     test: B.core.set.isSubset([
       B.core.type.set([ 'C', 'N', 'CA', 'O' ]),
       B.struct.atomSet.propertySet({
-        property: B.ammp('label_atom_id')
+        0: B.ammp('label_atom_id')
       })
     ])
   })

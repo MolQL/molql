@@ -5,7 +5,6 @@
  */
 
 import Expression from '../../mini-lisp/expression'
-import { SymbolMap } from '../../mini-lisp/symbol'
 import Environment from './environment'
 import RuntimeExpression from './expression'
 import SymbolRuntime, { RuntimeArguments } from './symbol'
@@ -13,7 +12,7 @@ import SymbolRuntime, { RuntimeArguments } from './symbol'
 export type CompiledExpression<C, T> = (ctx: C) => T
 
 type Compiler<C> = <T>(expression: Expression) => CompiledExpression<C, T>
-function Compiler<C>(symbolMap: SymbolMap, envProvider: (ctx?: C) => Environment): Compiler<C> {
+function Compiler<C>(envProvider: (ctx?: C) => Environment): Compiler<C> {
     const env = envProvider(void 0);
     return expression => wrap(envProvider, compile(env, expression).runtime);
 }

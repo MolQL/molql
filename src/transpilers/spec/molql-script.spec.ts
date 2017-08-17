@@ -23,7 +23,7 @@ describe('molql-script', () => {
     }, {
         name: 'All residues within 5 ang from Fe atom',
         value: `(atom.sel.include-surroundings
-  :selection (atom.sel.atom-groups
+  (atom.sel.atom-groups
     :atom-test (=
       (atom.el)
       (atom.new.el Fe)))
@@ -32,7 +32,7 @@ describe('molql-script', () => {
     }, {
         name: 'Cluster LYS residues within 5 ang',
         value: `(atom.sel.cluster
-  :selection (atom.sel.atom-groups
+  (atom.sel.atom-groups
     :residue-test (eq
       (atom.auth_comp_id)
       LYS)
@@ -41,7 +41,7 @@ describe('molql-script', () => {
     }, {
         name: 'Residues with max b-factor < 45',
         value: `(atom.sel.pick
-  :selection (atom.sel.atom-groups
+  (atom.sel.atom-groups
     :group-by (atom.key.res))
   :test (<
     (atom.set.reduce
@@ -53,7 +53,7 @@ describe('molql-script', () => {
     }, {
       name: 'Residues connected to HEM',
       value: `(atom.sel.is-connected-to
-  :selection (atom.sel.atom-groups
+  (atom.sel.atom-groups
     :residue-test true
     :group-by (atom.key.res))
     :target (atom.sel.atom-groups
@@ -65,7 +65,7 @@ describe('molql-script', () => {
     }, {
       name: 'HEM and 2 layers of connected residues',
       value: `(atom.sel.include-connected
-  :selection (atom.sel.atom-groups
+  (atom.sel.atom-groups
     :residue-test (= (atom.label_comp_id) HEM)
     :group-by (atom.key.res))
   :bond-test (bond.has-flags (bond.flags metallic covalent))

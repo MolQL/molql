@@ -5,7 +5,6 @@
  */
 
 import Type from './type'
-import _Symbol from '../mini-lisp/symbol'
 import Expression from '../mini-lisp/expression'
 
 export type Argument<T extends Type = Type>  = {
@@ -51,7 +50,7 @@ export namespace Arguments {
 
 export type ExpressionArguments<T> = { [P in keyof T]?: Expression } | { [index: number]: Expression }
 
-interface Symbol<A extends Arguments = Arguments, T extends Type = Type> extends _Symbol {
+interface Symbol<A extends Arguments = Arguments, T extends Type = Type> {
     (args?: ExpressionArguments<A['@type']>): Expression,
     info: {
         namespace: string,
