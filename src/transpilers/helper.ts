@@ -171,18 +171,10 @@ export function testExpr (property: any, args: any) {
   }
 }
 
-export function invertExpr (op: string, selection: Expression) {
+export function invertExpr (selection: Expression) {
   return B.struct.generator.queryInSelection({
     selection, query: B.struct.generator.atomGroups(), 'in-complement': true
   })
-}
-
-export function mergeExpr (op: string, s1: Expression, s2: Expression) {
-  return B.struct.combinator.merge([s1, s2])
-}
-
-export function intersectExpr (op: string, selection: Expression, by: Expression) {
-  return B.struct.modifier.intersectBy({ selection, by })
 }
 
 export function getPropertyRules(properties: PropertyDict) {

@@ -22,6 +22,92 @@ function proteinExpr() {
   })
 }
 
+function nucleicExpr() {
+  return B.struct.filter.pick({
+    selection: B.struct.generator.atomGroups({
+      'group-by': B.ammp('residueKey')
+    }),
+    test: B.core.logic.and([
+      B.core.set.isSubset([
+        // B.core.type.set([ 'P', 'O1P', 'O2P' ]),
+        B.core.type.set([ 'P' ]),
+        B.struct.atomSet.propertySet({
+          property: B.ammp('label_atom_id')
+        })
+      ]),
+      B.core.logic.or([
+        B.core.set.isSubset([
+          B.core.type.set([ "O3'", "C3'", "C4'", "C5'", "O5'" ]),
+          B.struct.atomSet.propertySet({
+            property: B.ammp('label_atom_id')
+          })
+        ]),
+        B.core.set.isSubset([
+          B.core.type.set([ 'O3*', 'C3*', 'C4*', 'C5*', 'O5*' ]),
+          B.struct.atomSet.propertySet({
+            property: B.ammp('label_atom_id')
+          })
+        ])
+      ])
+    ])
+  })
+}
+
+function backboneExpr() {
+  return B.struct.combinator.merge([
+    B.struct.generator.queryInSelection({
+      selection: proteinExpr(),
+      query: B.struct.generator.atomGroups({
+        'atom-test': B.core.set.has([
+          B.core.type.set(Backbone.protein),
+          B.ammp('label_atom_id')
+        ])
+      })
+    }),
+    B.struct.generator.queryInSelection({
+      selection: nucleicExpr(),
+      query: B.struct.generator.atomGroups({
+        'atom-test': B.core.set.has([
+          B.core.type.set(Backbone.nucleic),
+          B.ammp('label_atom_id')
+        ])
+      })
+    })
+  ])
+}
+
+function resnameExpr(resnameList: string[]) {
+  return B.struct.generator.atomGroups({
+    'residue-test': B.core.set.has([
+      B.core.type.set(resnameList),
+      B.ammp('label_comp_id')
+    ])
+  })
+}
+
+const Backbone = {
+  nucleic: [ 'P', "O3'", "O5'", "C5'", "C4'", "C3'", 'OP1', 'OP2', 'O3*', 'O5*', 'C5*', 'C4*', 'C3*' ],
+  protein: [ 'C', 'N', 'CA', 'O' ]
+}
+
+const ResDict = {
+  acidic: ['ASP', 'GLU'],
+  aliphatic: ['ALA', 'GLY', 'ILE', 'LEU', 'VAL'],
+  aromatic: ['HIS', 'PHE', 'TRP', 'TYR'],
+  at: ['ADA', 'A', 'THY', 'T'],
+  basic: ['ARG', 'HIS', 'LYS'],
+  buried: ['ALA', 'LEU', 'VAL', 'ILE', 'PHE', 'CYS', 'MET', 'TRP'],
+  cg: ['CYT', 'C', 'GUA', 'G'],
+  cyclic: ['HIS', 'PHE', 'PRO', 'TRP', 'TYR'],
+  hydrophobic: ['ALA', 'LEU', 'VAL', 'ILE', 'PRO', 'PHE', 'MET', 'TRP'],
+  medium: ['VAL', 'THR', 'ASP', 'ASN', 'PRO', 'CYS', 'ASX', 'PCA', 'HYP'],
+  neutral: ['VAL', 'PHE', 'GLN', 'TYR', 'HIS', 'CYS', 'MET', 'TRP', 'ASX', 'GLX', 'PCA', 'HYP'],
+  purine: ['ADE', 'A', 'GUA', 'G'],
+  pyrimidine: ['CYT', 'C', 'THY', 'T', 'URI', 'U'],
+  small: ['ALA', 'GLY', 'SER'],
+  water: ['H2O', 'HH0', 'OHH', 'HOH', 'OH2', 'SOL', 'WAT', 'TIP', 'TIP2', 'TIP3', 'TIP4']
+}
+
 const keywords: KeywordDict = {
   all: {
     '@desc': 'everything',
@@ -33,92 +119,151 @@ const keywords: KeywordDict = {
   },
   protein: {
     '@desc': 'a residue with atoms named C, N, CA, and O',
-    map: proteinExpr
+    map: () => proteinExpr()
   },
   nucleic: {
-    '@desc': "a residue with atoms named P, O1P, O2P and either O3', C3', C4', C5', O5' or O3*, C3*, C4*, C5*, O5*. This definition assumes that the base is phosphorylated, an assumption which will be corrected in the future."
+    '@desc': "a residue with atoms named P, O1P, O2P and either O3', C3', C4', C5', O5' or O3*, C3*, C4*, C5*, O5*. This definition assumes that the base is phosphorylated, an assumption which will be corrected in the future.",
+    map: () => nucleicExpr()
   },
   backbone: {
-    '@desc': 'the C, N, CA, and O atoms of a protein and the equivalent atoms in a nucleic acid.'
+    '@desc': 'the C, N, CA, and O atoms of a protein and the equivalent atoms in a nucleic acid.',
+    map: () => backboneExpr()
   },
   sidechain: {
-    '@desc': 'non-backbone atoms and bonds'
+    '@desc': 'non-backbone atoms and bonds',  // TODO: what does 'bonds' mean here?
+    map: () => h.invertExpr(backboneExpr())
   },
   water: {
     '@desc': 'all atoms with the resname H2O, HH0, OHH, HOH, OH2, SOL, WAT, TIP, TIP2, TIP3 or TIP4',
-    short: 'waters'
+    short: 'waters',
+    map: () => resnameExpr(ResDict.water)
   },
   at: {
-    '@desc': 'residues named ADA A THY T'
+    '@desc': 'residues named ADA A THY T',
+    map: () => resnameExpr(ResDict.at)
   },
   acidic: {
-    '@desc': 'residues named ASP GLU'
+    '@desc': 'residues named ASP GLU',
+    map: () => resnameExpr(ResDict.acidic)
   },
   acyclic: {
-    '@desc': '`protein and not cyclic`'
+    '@desc': '`protein and not cyclic`',
+    map: () => B.struct.modifier.intersectBy({
+      selection: proteinExpr(),
+      by: h.invertExpr(resnameExpr(ResDict.cyclic))
+    })
   },
   aliphatic : {
-    '@desc': 'residues named ALA GLY ILE LEU VAL'
+    '@desc': 'residues named ALA GLY ILE LEU VAL',
+    map: () => resnameExpr(ResDict.aliphatic)
   },
   alpha: {
     '@desc': "atom's residue is an alpha helix"
   },
   amino: {
     '@desc': 'a residue with atoms named C, N, CA, and O',
-    map: proteinExpr
+    map: () => proteinExpr()
   },
   aromatic: {
-    '@desc': 'residues named HIS PHE TRP TYR'
+    '@desc': 'residues named HIS PHE TRP TYR',
+    map: () => resnameExpr(ResDict.aromatic)
   },
   basic: {
-    '@desc': 'residues named ARG HIS LYS'
+    '@desc': 'residues named ARG HIS LYS',
+    map: () => resnameExpr(ResDict.basic)
   },
   bonded: {
-    '@desc': 'atoms for which numbonds > 0'
+    '@desc': 'atoms for which numbonds > 0',
+    map: () => B.struct.filter.pick({
+      selection: B.struct.modifier.includeConnected({
+        selection: B.struct.generator.atomGroups(),
+        'bond-test': B.struct.bondProperty.hasFlags([
+          B.struct.type.bondFlags(['covalent', 'metallic', 'sulfide'])
+        ])
+      }),
+      test: B.core.rel.gr([
+        B.struct.atomSet.atomCount(), 1
+      ])
+    })
   },
   buried: {
-    '@desc': 'residues named ALA LEU VAL ILE PHE CYS MET TRP'
+    '@desc': 'residues named ALA LEU VAL ILE PHE CYS MET TRP',
+    map: () => resnameExpr(ResDict.buried)
   },
   cg: {
-    '@desc': 'residues named CYT C GUA G'
+    '@desc': 'residues named CYT C GUA G',
+    map: () => resnameExpr(ResDict.cg)
   },
   charged: {
-    '@desc': '`basic or acidic`'
+    '@desc': '`basic or acidic`',
+    map: () => resnameExpr(ResDict.basic.concat(ResDict.acidic))
   },
   cyclic: {
-    '@desc': 'residues named HIS PHE PRO TRP TYR'
+    '@desc': 'residues named HIS PHE PRO TRP TYR',
+    map: () => resnameExpr(ResDict.cyclic)
   },
 
   hetero: {
     '@desc': '`not (protein or nucleic)`',
-    map: () => h.invertExpr('todo', proteinExpr())
+    map: () => h.invertExpr(
+      B.struct.combinator.merge([proteinExpr(), nucleicExpr()])
+    )
   },
   hydrogen: {
-    '@desc': 'name "[0-9]?H.*"'
+    '@desc': 'name "[0-9]?H.*"',
+    map: () => B.struct.generator.atomGroups({
+      'atom-test': B.core.str.match([
+        B.core.type.regex('^[0-9]?H.*$'),
+        B.ammp('label_atom_id')
+      ])
+    })
   },
   large: {
-    '@desc': '`protein and not (small or medium)`'
+    '@desc': '`protein and not (small or medium)`',
+    map: () => B.struct.modifier.intersectBy({
+      selection: proteinExpr(),
+      by: h.invertExpr(
+        resnameExpr(ResDict.small.concat(ResDict.medium))
+      )
+    })
   },
   medium : {
-    '@desc': 'residues named VAL THR ASP ASN PRO CYS ASX PCA HYP'
+    '@desc': 'residues named VAL THR ASP ASN PRO CYS ASX PCA HYP',
+    map: () => resnameExpr(ResDict.medium)
   },
   neutral: {
-    '@desc': 'residues named VAL PHE GLN TYR HIS CYS MET TRP ASX GLX PCA HYP'
+    '@desc': 'residues named VAL PHE GLN TYR HIS CYS MET TRP ASX GLX PCA HYP',
+    map: () => resnameExpr(ResDict.neutral)
+  },
+  hydrophobic: {
+    '@desc': "hydrophobic resname ALA LEU VAL ILE PRO PHE MET TRP",
+    map: () => resnameExpr(ResDict.hydrophobic)
   },
   polar: {
-    '@desc': '`protein and not hydrophobic`'
+    '@desc': '`protein and not hydrophobic`',
+    map: () => B.struct.modifier.intersectBy({
+      selection: proteinExpr(),
+      by: h.invertExpr(resnameExpr(ResDict.hydrophobic))
+    })
   },
   purine: {
-    '@desc': 'residues named ADE A GUA G'
+    '@desc': 'residues named ADE A GUA G',
+    map: () => resnameExpr(ResDict.purine)
   },
   pyrimidine: {
-    '@desc': 'residues named CYT C THY T URI U'
+    '@desc': 'residues named CYT C THY T URI U',
+    map: () => resnameExpr(ResDict.pyrimidine)
   },
   small: {
-    '@desc': 'residues named ALA GLY SER'
+    '@desc': 'residues named ALA GLY SER',
+    map: () => resnameExpr(ResDict.small)
   },
   surface: {
-    '@desc': '`protein and not buried`'
+    '@desc': '`protein and not buried`',
+    map: () => B.struct.modifier.intersectBy({
+      selection: proteinExpr(),
+      by: h.invertExpr(resnameExpr(ResDict.buried))
+    })
   },
   alpha_helix: {
     '@desc': "atom's residue is in an alpha helix"

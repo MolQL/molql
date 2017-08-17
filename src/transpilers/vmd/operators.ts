@@ -8,7 +8,7 @@ import * as P from 'parsimmon'
 
 import * as h from '../helper'
 import { OperatorList } from '../types'
-// import B from '../../molql/builder'
+import B from '../../molql/builder'
 // import Expression from '../../mini-lisp/expression'
 
 const operators: OperatorList = [
@@ -18,7 +18,7 @@ const operators: OperatorList = [
     name: 'not',
     type: h.prefix,
     rule: P.alt(P.regex(/NOT/i).skip(P.whitespace), P.string('!').skip(P.optWhitespace)),
-    map: h.invertExpr
+    map: (op, selection) => h.invertExpr(selection),
   },
   {
     '@desc': 'Selects atoms included in both s1 and s2.',
@@ -26,7 +26,7 @@ const operators: OperatorList = [
     name: 'and',
     type: h.binaryLeft,
     rule: h.infixOp(/AND|&/i),
-    map: h.intersectExpr
+    map: (op, selection, by) => B.struct.modifier.intersectBy({ selection, by })
   },
   {
     '@desc': 'Selects atoms included in either s1 or s2.',
@@ -34,7 +34,7 @@ const operators: OperatorList = [
     name: 'or',
     type: h.binaryLeft,
     rule: h.infixOp(/OR|\|/i),
-    map: h.mergeExpr
+    map: (op, s1, s2) => B.struct.combinator.merge([s1, s2])
   }
 ]
 

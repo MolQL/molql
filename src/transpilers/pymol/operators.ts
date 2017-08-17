@@ -21,7 +21,7 @@ const operators: OperatorList = [
       P.regex(/NOT/i).skip(P.whitespace),
       P.string('!').skip(P.optWhitespace)
     ),
-    map: h.invertExpr
+    map: (op, selection) => h.invertExpr(selection),
   },
   {
     '@desc': 'Selects atoms included in both s1 and s2.',
@@ -29,7 +29,7 @@ const operators: OperatorList = [
     name: 'and',
     type: h.binaryLeft,
     rule: h.infixOp(/AND|&/i),
-    map: h.intersectExpr
+    map: (op, selection, by) => B.struct.modifier.intersectBy({ selection, by })
   },
   {
     '@desc': 'Selects atoms included in either s1 or s2.',
@@ -37,7 +37,7 @@ const operators: OperatorList = [
     name: 'or',
     type: h.binaryLeft,
     rule: h.infixOp(/OR|\|/i),
-    map: h.mergeExpr
+    map: (op, s1, s2) => B.struct.combinator.merge([s1, s2])
   },
   {
     '@desc': 'Selects atoms in s1 whose identifiers name, resi, resn, chain and segi all match atoms in s2.',
