@@ -4,7 +4,6 @@
  * @author David Sehnal <david.sehnal@gmail.com>
  */
 
-import Symbol from '../../mini-lisp/symbol'
 import Environment from './environment'
 import RuntimeExpression from './expression'
 
@@ -14,7 +13,6 @@ type SymbolRuntime = (env: Environment, args: RuntimeArguments) => any
 
 namespace SymbolRuntime {
     export interface Info {
-        readonly symbol: Symbol,
         readonly runtime: SymbolRuntime,
         readonly attributes: Attributes
     }
@@ -25,7 +23,7 @@ namespace SymbolRuntime {
 function SymbolRuntime(symbol: Symbol, attributes: Partial<SymbolRuntime.Attributes> = {}) {
     const { isStatic = false } = attributes;
     return (runtime: SymbolRuntime): SymbolRuntime.Info => {
-        return ({ symbol, runtime, attributes: { isStatic } });
+        return ({ runtime, attributes: { isStatic } });
     };
 }
 

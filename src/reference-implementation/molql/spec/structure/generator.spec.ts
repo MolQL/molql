@@ -135,7 +135,7 @@ describe('generator', () => {
 
     it(`querySelection`, function() {
         const q = B.struct.generator.queryInSelection({
-            selection: B.struct.generator.atomGroups({ 'residue-test': B.core.rel.eq([B.ammp('auth_comp_id'), 'ALA']) }),
+            0: B.struct.generator.atomGroups({ 'residue-test': B.core.rel.eq([B.ammp('auth_comp_id'), 'ALA']) }),
             query: B.struct.generator.atomGroups({ 'atom-test': B.core.rel.eq([B.acp('elementSymbol'), B.es('C')]) })
         });
         const sel = Data.compileQuery(q)(Data.ctx);
@@ -146,7 +146,7 @@ describe('generator', () => {
 
     it(`querySelection complement`, function() {
         const q = B.struct.generator.queryInSelection({
-            selection: B.struct.generator.atomGroups({ 'residue-test': B.core.rel.eq([B.ammp('auth_comp_id'), 'ALA']) }),
+            0: B.struct.generator.atomGroups({ 'residue-test': B.core.rel.eq([B.ammp('auth_comp_id'), 'ALA']) }),
             query: B.struct.generator.atomGroups({ 'atom-test': B.core.rel.eq([B.acp('elementSymbol'), B.es('C')]) }),
             'in-complement': true
         });

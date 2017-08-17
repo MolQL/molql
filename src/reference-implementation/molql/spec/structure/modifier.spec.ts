@@ -18,7 +18,7 @@ describe('modifier', () => {
     const chains = B.struct.generator.atomGroups({ 'group-by': B.ammp('chainKey') });
 
     it('queryEach ALAs by Cs', function() {
-        const q = B.struct.modifier.queryEach({ selection: ALAs, query: Cs });
+        const q = B.struct.modifier.queryEach({ 0: ALAs, query: Cs });
         const sel = Data.compileQuery(q)(Data.ctx);
         expect(AtomSelection.atomSets(sel).length).toBeGreaterThan(0);
         const check = Data.checkAtomSelection(Data.model, sel, (i, cols) => cols.type_symbol.getString(i) === 'C' && cols.auth_comp_id.getString(i) === 'ALA');
@@ -26,7 +26,7 @@ describe('modifier', () => {
     });
 
     it('intersect ALAs by Cs', function() {
-        const q = B.struct.modifier.intersectBy({ selection: ALAs, by: Cs });
+        const q = B.struct.modifier.intersectBy({ 0: ALAs, by: Cs });
         const sel = Data.compileQuery(q)(Data.ctx);
         expect(AtomSelection.atomSets(sel).length).toBeGreaterThan(0);
         const check = Data.checkAtomSelection(Data.model, sel, (i, cols) => cols.type_symbol.getString(i) === 'C');
@@ -34,7 +34,7 @@ describe('modifier', () => {
     });
 
     it('intersect Cs by ALAs', function() {
-        const q = B.struct.modifier.intersectBy({ selection: Cs, by: ALAs });
+        const q = B.struct.modifier.intersectBy({ 0: Cs, by: ALAs });
         const sel = Data.compileQuery(q)(Data.ctx);
         expect(AtomSelection.atomSets(sel).length).toBeGreaterThan(0);
         const check = Data.checkAtomSelection(Data.model, sel, (i, cols) => cols.auth_comp_id.getString(i) === 'ALA');
@@ -42,21 +42,21 @@ describe('modifier', () => {
     });
 
     it('exceptBy ALAs by Cs', function() {
-        const q = B.struct.modifier.exceptBy({ selection: ALAs, by: Cs });
+        const q = B.struct.modifier.exceptBy({ 0: ALAs, by: Cs });
         const sel = Data.compileQuery(q)(Data.ctx);
         const check = Data.checkAtomSelection(Data.model, sel, (i, cols) => cols.type_symbol.getString(i) !== 'C');
         expect(check).toBe(true);
     });
 
     it('exceptBy Cs by ALAs', function() {
-        const q = B.struct.modifier.exceptBy({ selection: ALAs, by: Cs });
+        const q = B.struct.modifier.exceptBy({ 0: ALAs, by: Cs });
         const sel = Data.compileQuery(q)(Data.ctx);
         const check = Data.checkAtomSelection(Data.model, sel, (i, cols) => cols.auth_comp_id.getString(i) === 'ALA' && cols.type_symbol.getString(i) !== 'C');
         expect(check).toBe(true);
     });
 
     it('unionBy residues chains', function() {
-        const q = B.struct.modifier.unionBy({ selection: residues, by: chains });
+        const q = B.struct.modifier.unionBy({ 0: residues, by: chains });
         const sel = Data.compileQuery(q)(Data.ctx) as AtomSelection;
         expect(AtomSelection.atomSets(sel).length).toBeGreaterThan(0);
         expect(AtomSelection.atomSets(sel).length).toBe(3);
@@ -64,7 +64,7 @@ describe('modifier', () => {
     });
 
     it('union ALAs', function() {
-        const q = B.struct.modifier.union({ selection: ALAs });
+        const q = B.struct.modifier.union({ 0: ALAs });
         const sel = Data.compileQuery(q)(Data.ctx) as AtomSelection;
         expect(AtomSelection.atomSets(sel).length).toBe(1);
         const check = Data.checkAtomSelection(Data.model, sel, (i, cols) => cols.auth_comp_id.getString(i) === 'ALA');
@@ -73,9 +73,9 @@ describe('modifier', () => {
 
     it('includeSurroundings HEM 5 ang', function() {
         const HEM = B.struct.generator.atomGroups({ 'residue-test': B.core.rel.eq([B.ammp('auth_comp_id'), 'HEM']), 'group-by': B.ammp('residueKey') });
-        const includeSurr = B.struct.modifier.includeSurroundings({ selection: HEM, radius: 5 });
+        const includeSurr = B.struct.modifier.includeSurroundings({ 0: HEM, radius: 5 });
 
-        const atomsInSurr = B.struct.generator.queryInSelection({ selection: includeSurr, query: B.struct.generator.atomGroups() });
+        const atomsInSurr = B.struct.generator.queryInSelection({ 0: includeSurr, query: B.struct.generator.atomGroups() });
         const pivotAtomSet = AtomSelection.atomSets(Data.compileQuery(HEM)(Data.ctx) as AtomSelection)[0];
         const atomsInSel = Data.compileQuery(atomsInSurr)(Data.ctx) as AtomSelection;
 
@@ -85,9 +85,9 @@ describe('modifier', () => {
 
     it('includeSurroundings HEM 5 ang (whole residues)', function() {
         const HEM = B.struct.generator.atomGroups({ 'residue-test': B.core.rel.eq([B.ammp('auth_comp_id'), 'HEM']), 'group-by': B.ammp('residueKey') });
-        const includeSurr = B.struct.modifier.includeSurroundings({ selection: HEM, radius: 5, 'as-whole-residues': true });
+        const includeSurr = B.struct.modifier.includeSurroundings({ 0: HEM, radius: 5, 'as-whole-residues': true });
 
-        const atomsInSurr = B.struct.generator.queryInSelection({ selection: includeSurr, query: residues });
+        const atomsInSurr = B.struct.generator.queryInSelection({ 0: includeSurr, query: residues });
         const pivotAtomSet = AtomSelection.atomSets(Data.compileQuery(HEM)(Data.ctx) as AtomSelection)[0];
         const atomsInSel = Data.compileQuery(atomsInSurr)(Data.ctx) as AtomSelection;
 
@@ -97,7 +97,7 @@ describe('modifier', () => {
 
     it('expandProperty C on ALA to whole residues', function() {
         const query = B.struct.modifier.expandProperty({
-            selection: B.struct.generator.atomGroups({
+            0: B.struct.generator.atomGroups({
                 'residue-test': B.core.rel.eq([B.ammp('auth_comp_id'), 'ALA']),
                 'atom-test': B.core.rel.eq([B.acp('elementSymbol'), B.es('C')])
             }),

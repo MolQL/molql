@@ -14,17 +14,12 @@ const lang: Language = {
     examples: [{
         name: 'All C or N atoms in ALA residues',
         value: `(atom.sel.atom-groups
-  :residue-test (=
-    (atom.auth_comp_id)
-    ALA)
-  :atom-test (set.has
-    ;; Element symbols must be "constructed" to be normalized, e.g. Fe vs FE
-    (set (atom.new.el C) (atom.new.el N))
-    (atom.el)))`
+  :residue-test (= atom.auth_comp_id ALA)
+  :atom-test (set.has (set _C _N) atom.el))`
     }, {
         name: 'All residues within 5 ang from Fe atom',
         value: `(atom.sel.include-surroundings
-  :selection (atom.sel.atom-groups
+  (atom.sel.atom-groups
     :atom-test (=
       (atom.el)
       (atom.new.el Fe)))
@@ -33,7 +28,7 @@ const lang: Language = {
     }, {
         name: 'Cluster LYS residues within 5 ang',
         value: `(atom.sel.cluster
-  :selection (atom.sel.atom-groups
+  (atom.sel.atom-groups
     :residue-test (eq
       (atom.auth_comp_id)
       LYS)
@@ -42,7 +37,7 @@ const lang: Language = {
     }, {
         name: 'Residues with max b-factor < 45',
         value: `(atom.sel.pick
-  :selection (atom.sel.atom-groups
+  (atom.sel.atom-groups
     :group-by (atom.key.res))
   :test (<
     (atom.set.reduce
@@ -54,19 +49,19 @@ const lang: Language = {
     }, {
       name: 'Residues connected to HEM',
       value: `(atom.sel.is-connected-to
-  :selection (atom.sel.atom-groups
+  (atom.sel.atom-groups
     :residue-test true
     :group-by (atom.key.res))
-    :target (atom.sel.atom-groups
-      :residue-test (= (atom.label_comp_id) HEM)
-      :group-by (atom.key.res))
+  :target (atom.sel.atom-groups
+    :residue-test (= (atom.label_comp_id) HEM)
+    :group-by (atom.key.res))
   ;; default bond test allows only covalent bonds
   :bond-test true
   :disjunct true)`
     }, {
       name: 'HEM and 2 layers of connected residues',
       value: `(atom.sel.include-connected
-  :selection (atom.sel.atom-groups
+  (atom.sel.atom-groups
     :residue-test (= (atom.label_comp_id) HEM)
     :group-by (atom.key.res))
   ;; default bond test allows only covalent bonds

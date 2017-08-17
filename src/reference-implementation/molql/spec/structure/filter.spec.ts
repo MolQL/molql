@@ -15,7 +15,7 @@ describe('filter', () => {
     const residues = B.struct.generator.atomGroups({ 'group-by': B.ammp('residueKey') });
 
     it('pick with at least 6 atoms', function() {
-        const q = B.struct.filter.pick({ selection: residues, test: B.core.rel.gr([B.struct.atomSet.atomCount(), 6 ]) });
+        const q = B.struct.filter.pick({ 0: residues, test: B.core.rel.gr([B.struct.atomSet.atomCount(), 6 ]) });
         const sel = Data.compileQuery(q)(Data.ctx);
         expect(AtomSelection.atomSets(sel).length).toBeGreaterThan(0);
         const check = AtomSelection.atomSets(sel).every(s => AtomSet.count(s) > 6);
@@ -24,7 +24,7 @@ describe('filter', () => {
 
     it('withSameAtomProperties residue name as 1st atom', function() {
         const q = B.struct.filter.withSameAtomProperties({
-            selection: residues,
+            0: residues,
             source: B.struct.generator.atomGroups({ 'residue-test': B.core.rel.eq([B.ammp('id'), 1]) }),
             property: B.ammp('auth_comp_id')
         });
@@ -38,7 +38,7 @@ describe('filter', () => {
     it('within residues 5 ang from HEM', function() {
         const HEM = B.struct.generator.atomGroups({ 'residue-test': B.core.rel.eq([B.ammp('auth_comp_id'), 'HEM']), 'group-by': B.ammp('residueKey') });
 
-        const q = B.struct.filter.within({ selection: residues, target: HEM, radius: 5 });
+        const q = B.struct.filter.within({ 0: residues, target: HEM, radius: 5 });
 
         const pivotAtomSet = AtomSelection.atomSets(Data.compileQuery(HEM)(Data.ctx) as AtomSelection)[0];
         const sel = Data.compileQuery(q)(Data.ctx) as AtomSelection;
@@ -50,7 +50,7 @@ describe('filter', () => {
     it('within(inverted) residues 5 ang from HEM', function() {
         const HEM = B.struct.generator.atomGroups({ 'residue-test': B.core.rel.eq([B.ammp('auth_comp_id'), 'HEM']), 'group-by': B.ammp('residueKey') });
 
-        const q = B.struct.filter.within({ selection: residues, target: HEM, radius: 5, invert: true });
+        const q = B.struct.filter.within({ 0: residues, target: HEM, radius: 5, invert: true });
 
         const pivotAtomSet = AtomSelection.atomSets(Data.compileQuery(HEM)(Data.ctx) as AtomSelection)[0];
         const sel = Data.compileQuery(q)(Data.ctx) as AtomSelection;

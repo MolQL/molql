@@ -15,7 +15,7 @@ import Environment from './runtime/environment'
 import AtomSelection from './data/atom-selection'
 
 export type Compiled<T = any> = CompiledExpression<Context, T>
-const _compile = Compiler<Context>(SymbolMap, Environment);
+const _compile = Compiler<Context>(Environment);
 
 function compile(e: Expression, kind?: 'query'): CompiledExpression<Context, AtomSelection>;
 function compile<T = any>(e: Expression, kind?: 'any'): CompiledExpression<Context, T>;

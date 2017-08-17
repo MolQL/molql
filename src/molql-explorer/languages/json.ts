@@ -31,7 +31,7 @@ const lang: Language = {
     }, {
         name: 'All residues within 5 ang from Fe atom',
         value: Container.serialize(B.struct.modifier.includeSurroundings({
-            'selection': B.struct.generator.atomGroups({
+            0: B.struct.generator.atomGroups({
                 'atom-test': B.core.rel.eq([B.acp('elementSymbol'), B.es('Fe')]),
             }),
             'radius': 5,
@@ -40,7 +40,7 @@ const lang: Language = {
     }, {
         name: 'Cluster LYS residues within 5 ang',
         value: Container.serialize(B.struct.modifier.cluster({
-            'selection': lys,
+            0: lys,
             'max-distance': 5
         }), { source: 'molql-explorer', pretty: true })
     }, {
@@ -52,7 +52,7 @@ const lang: Language = {
     }, {
         name: 'Residues with max b-factor < 45',
         value: Container.serialize(B.struct.filter.pick({
-            selection: B.struct.generator.atomGroups({ 'group-by': B.ammp('residueKey') }),
+            0: B.struct.generator.atomGroups({ 'group-by': B.ammp('residueKey') }),
             test: B.core.rel.lt([
                 B.struct.atomSet.reduce({
                     initial: B.ammp('B_iso_or_equiv'),

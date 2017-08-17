@@ -142,7 +142,12 @@ export const Constants = [
     'metallic',
     'ion',
     'hydrogen',
-    'unknown'
+    'sulfide',
+    'computed',
+    'aromatic',
+
+    'true',
+    'false'
 ];
 
 const normalized = (function () {
