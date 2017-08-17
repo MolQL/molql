@@ -6,7 +6,7 @@
 
 import CIF from 'ciftools.js'
 import * as mmCIF from './mmcif'
-import { Molecule, Model, SecondaryStructureType } from './data'
+import { Structure, Model, SecondaryStructureType } from './data'
 import { FastMap } from '../utils/collections'
 
 type Data = Model['data']
@@ -103,7 +103,9 @@ function createModel(moleculeId: string, data: Data, startRow: number, rowCount:
         entities: { chainStartIndex, chainEndIndex, count: entity, key: new Int32Array(residue) as any, dataIndex: new Int32Array(residue) as any },
         positions: { x, y, z },
         data,
-        '@spatialLookup': void 0
+        '@spatialLookup': void 0,
+        '@connectedComponentKey': void 0,
+        '@bonds': void 0
     };
 }
 
@@ -257,7 +259,7 @@ function assignSecondaryStructure(model: Model) {
     }
 }
 
-export default function parseCIF(cifData: string): Molecule {
+export default function parseCIF(cifData: string): Structure {
     const file = CIF.Text.parse(cifData);
     if (file.isError) throw new Error(file.toString());
     const dataBlock = file.result.dataBlocks[0];
@@ -266,6 +268,10 @@ export default function parseCIF(cifData: string): Molecule {
     const data: Model['data'] = {
         atom_site: mmCIF.Category(dataBlock.getCategory('_atom_site'), mmCIF.AtomSite),
         entity: mmCIF.Category(dataBlock.getCategory('_entity'), mmCIF.Entity),
+        bonds: {
+            chemCompBond: mmCIF.Category(dataBlock.getCategory('_chem_comp_bond'), mmCIF.ChemCompBond),
+            structConn: mmCIF.Category(dataBlock.getCategory('_struct_conn'), mmCIF.StructConn),
+        },
         secondaryStructure: {
             structConf: mmCIF.Category(dataBlock.getCategory('_struct_conf'), mmCIF.StructConf),
             sheetRange: mmCIF.Category(dataBlock.getCategory('_struct_sheet_range'), mmCIF.StructSheetRange)

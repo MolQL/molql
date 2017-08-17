@@ -18,10 +18,13 @@ namespace Builder {
     export function fn(x: Expression) { return core.ctrl.fn([x]); }
     export function evaluate(x: Expression) { return core.ctrl.eval([x]); }
 
-    const _acp = MolQL.structure.atomProperty.core, _ammp = MolQL.structure.atomProperty.macromolecular;
+    const _acp = MolQL.structure.atomProperty.core, _ammp = MolQL.structure.atomProperty.macromolecular, _atp = MolQL.structure.atomProperty.topology;
 
     // atom core property
     export function acp(p: keyof typeof _acp) { return (_acp[p] as Symbol)() };
+
+    // atom topology property
+    export function atp(p: keyof typeof _atp) { return (_atp[p] as Symbol)() };
 
     // atom macromolecular property
     export function ammp(p: keyof typeof _ammp) { return (_ammp[p] as Symbol)() };

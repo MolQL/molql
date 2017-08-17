@@ -6,11 +6,32 @@
 
 import * as mmCIF from './mmcif'
 import SpatialLookup from '../utils/spatial-lookup'
+import computeBonds from './topology/bonds-compute'
+import computeConnectedComponents from './topology/connected-components'
 
 export const enum SecondaryStructureType {
     None = 0,
     StructConf = 1,
     StructSheetRange = 2,
+}
+
+export const enum BondAnnotation {
+    None = -1,
+
+    Unknown = 0,
+
+    Covalent1 = 1,
+    Covalent2 = 2,
+    Covalent3 = 3,
+    Covalent4 = 4,
+    Covalent5 = 5,
+    Covalent6 = 6,
+
+    DisulfideBridge = 7,
+
+    Metallic = 20,
+    Hydrogen = 21,
+    Ion = 22
 }
 
 export interface Atoms {
@@ -45,12 +66,32 @@ export interface Entities {
     count: number
 }
 
+export interface Bonds {
+    /**
+     * Where bonds for atom A start and end.
+     * Start at 2 * idx, end at 2 * idx + 1
+     */
+    atomBondOffsets: number[],
+    bondsByAtom: number[],
+    annotationByAtom: number[],
+
+    /** Monotonous */
+    atomA: number[],
+    atomB: number[],
+    annotation: BondAnnotation[],
+    count: number
+}
+
 export interface Model {
     moleculeId: string,
     id: number,
     data: {
         atom_site: mmCIF.Category<mmCIF.AtomSite>,
         entity: mmCIF.Category<mmCIF.Entity>,
+        bonds: {
+            structConn: mmCIF.Category<mmCIF.StructConn>,
+            chemCompBond: mmCIF.Category<mmCIF.ChemCompBond>
+        },
         secondaryStructure: {
             structConf: mmCIF.Category<mmCIF.StructConf>,
             sheetRange: mmCIF.Category<mmCIF.StructSheetRange>
@@ -61,10 +102,13 @@ export interface Model {
     residues: Residues,
     chains: Chains,
     entities: Entities,
+
     '@spatialLookup': SpatialLookup | undefined,
+    '@connectedComponentKey': number[] | undefined,
+    '@bonds': Bonds | undefined
 }
 
-export interface Molecule {
+export interface Structure {
     id: string,
     models: Model[]
 }
@@ -115,5 +159,56 @@ export namespace Model {
         const lookup = SpatialLookup(model.positions);
         model['@spatialLookup'] = lookup;
         return lookup;
+    }
+
+    export function bonds(model: Model): Bonds {
+        if (model['@bonds']) return model['@bonds']!;
+        const bonds = computeBonds(model);
+        model['@bonds'] = bonds;
+        return bonds;
+    }
+
+    export function connectedComponentKey(model: Model): number[] {
+        if (model['@connectedComponentKey']) return model['@connectedComponentKey']!;
+        const key = computeConnectedComponents(model);
+        model['@connectedComponentKey'] = key;
+        return key;
+    }
+
+    export function findResidueIndexByLabel(model: Model, asymId: string, seqNumber: number, insCode: string | null) {
+        const { residueStartIndex, residueEndIndex, count: cCount } = model.chains;
+        const { atomStartIndex } = model.residues;
+        const { dataIndex } = model.atoms;
+        const { label_asym_id, label_seq_id, pdbx_PDB_ins_code } = model.data.atom_site;
+
+        for (let cI = 0; cI < cCount; cI++) {
+            let idx = dataIndex[atomStartIndex[residueStartIndex[cI]]];
+            if (!label_asym_id.stringEquals(idx, asymId)) continue;
+            for (let rI = residueStartIndex[cI], _r = residueEndIndex[cI]; rI < _r; rI++) {
+                idx = dataIndex[atomStartIndex[rI]];
+                if (label_seq_id.getInteger(idx) === seqNumber && (!insCode || pdbx_PDB_ins_code.stringEquals(idx, insCode))) {
+                    return rI;
+                }
+            }
+        }
+        return -1;
+    }
+
+    export function findAtomIndexByLabelName(model: Model, residueIndex: number, atomName: string, altLoc: string | null) {
+        const { atomStartIndex, atomEndIndex } = model.residues;
+        const { dataIndex } = model.atoms;
+        const { label_atom_id, label_alt_id } = model.data.atom_site;
+
+        for (let i = atomStartIndex[residueIndex], _i = atomEndIndex[residueIndex]; i <= _i; i++) {
+            const idx = dataIndex[i];
+            if (label_atom_id.stringEquals(idx, atomName) && (!altLoc || label_alt_id.stringEquals(idx, altLoc))) return i;
+        }
+        return -1;
+    }
+}
+
+export namespace Bonds {
+    export function isCovalent(a: BondAnnotation) {
+        return a >= BondAnnotation.Covalent1 && a <= BondAnnotation.DisulfideBridge;
     }
 }

@@ -10,7 +10,8 @@ import Context from '../context'
 import AtomSet from '../../data/atom-set'
 import AtomSelection from '../../data/atom-selection'
 import { UniqueArrayBuilder, sortAsc, FastSet, FastMap } from '../../../utils/collections'
-import { Model } from '../../../molecule/data'
+import Mask from '../../../utils/mask'
+import { Model, Bonds } from '../../../molecule/data'
 import ElementAddress from '../../data/element-address'
 
 type Selection = Expression<AtomSelection>
@@ -210,7 +211,7 @@ export function includeSurroundings(env: Environment, selection: Selection, radi
     const { model, mask } = env.context;
     const findWithin = Model.spatialLookup(model).find(mask);
     const r = radius(env);
-    const asResidues = wholeResidues && !!wholeResidues(env);
+    const asResidues = !!wholeResidues && !!wholeResidues(env);
     const { x, y, z } = model.positions;
     const { residueIndex } = model.atoms;
     const { atomStartIndex, atomEndIndex } = model.residues;
@@ -243,11 +244,109 @@ export function includeSurroundings(env: Environment, selection: Selection, radi
     return builder.getSelection();
 }
 
+function _expandFrontierAtoms(bonds: Bonds, mask: Mask, frontier: number[], atoms: UniqueArrayBuilder<number>) {
+    const newFrontier: number[] = [];
+    const { atomBondOffsets, bondsByAtom } = bonds;
+    for (const a of frontier) {
+        const start = atomBondOffsets[a], end = atomBondOffsets[a + 1];
+        for (let i = start; i < end; i++) {
+            const b = bondsByAtom[i];
+            if (mask.has(b) && UniqueArrayBuilder.add(atoms, b, b)) newFrontier[newFrontier.length] = b;
+        }
+    }
+    return newFrontier;
+}
+
+function _expandAtoms(bonds: Bonds, mask: Mask, atomSet: AtomSet, numLayers: number) {
+    if (!numLayers) return atomSet;
+
+    const result = UniqueArrayBuilder<number>();
+    let frontier = AtomSet.atomIndices(atomSet) as number[];
+
+    for (const a of frontier) UniqueArrayBuilder.add(result, a, a);
+
+    for (let i = 0; i < numLayers; i++) {
+        frontier = _expandFrontierAtoms(bonds, mask, frontier, result);
+    }
+    sortAsc(result.array);
+    return AtomSet(result.array);
+}
+
+function _expandFrontierResidues(model: Model, bonds: Bonds, mask: Mask, frontier: number[], residues: UniqueArrayBuilder<number>) {
+    const newFrontier: number[] = [];
+    const { atomBondOffsets, bondsByAtom } = bonds;
+
+    const { atomStartIndex, atomEndIndex } = model.residues;
+    const { residueIndex } = model.atoms;
+
+    for (const rI of frontier) {
+        for (let a = atomStartIndex[rI], _a = atomEndIndex[rI]; a < _a; a++) {
+            if (!mask.has(a)) continue;
+
+            const start = atomBondOffsets[a], end = atomBondOffsets[a + 1];
+            for (let i = start; i < end; i++) {
+                const b = bondsByAtom[i];
+                if (!mask.has(b)) continue;
+
+                const r = residueIndex[b];
+                if (UniqueArrayBuilder.add(residues, r, r)) newFrontier[newFrontier.length] = r;
+            }
+        }
+    }
+    return newFrontier;
+}
+
+function _expandResidues(model: Model, bonds: Bonds, mask: Mask, atomSet: AtomSet, numLayers: number) {
+    if (!numLayers) return atomSet;
+
+    const { atomStartIndex, atomEndIndex } = model.residues;
+    const { residueIndex } = model.atoms;
+
+    const residues = UniqueArrayBuilder<number>();
+    let frontier: number[] = [];
+
+    for (const a of AtomSet.atomIndices(atomSet)) {
+        const rI = residueIndex[a];
+        if (UniqueArrayBuilder.add(residues, rI, rI)) frontier[frontier.length] = rI;
+    }
+
+    for (let i = 0; i < numLayers; i++) {
+        frontier = _expandFrontierResidues(model, bonds, mask, frontier, residues);
+    }
+
+    sortAsc(residues.array);
+    const atoms: number[] = [];
+    for (let rI of residues.array) {
+        for (let a = atomStartIndex[rI], _a = atomEndIndex[rI]; a < _a; a++) {
+            if (mask.has(a)) atoms[atoms.length] = a;
+        }
+    }
+
+    return AtomSet(atoms);
+}
+
+export function includeConnected(env: Environment, selection: Selection, layerCount?: Expression<number>, wholeResidues?: Expression<boolean>): AtomSelection {
+    const src = selection(env);
+    const { model, mask } = env.context;
+    const bonds = Model.bonds(model);
+    const numLayers = Math.max(0, layerCount ? layerCount(env) : 1);
+    const asResidues = !!wholeResidues && !!wholeResidues(env);
+
+    const builder = AtomSelection.uniqueBuilder();
+
+    for (const atomSet of AtomSelection.atomSets(src)) {
+        if (asResidues) builder.add(_expandResidues(model, bonds, mask, atomSet, numLayers));
+        else builder.add(_expandAtoms(bonds, mask, atomSet, numLayers));
+    }
+
+    return builder.getSelection();
+}
+
 export function expandProperty(env: Environment, selection: Selection, property: Expression<any>): AtomSelection {
     const { context } = env;
 
     const src = selection(env);
-    const propertyToSetMap: FastMap<any, number[]> = FastMap.create();
+    const propertyToSetMap: FastMap<any, UniqueArrayBuilder<number>> = FastMap.create();
 
     Environment.lockSlot(env, 'element');
     const element = env.slots.element;
@@ -258,8 +357,12 @@ export function expandProperty(env: Environment, selection: Selection, property:
         for (const a of AtomSet.atomIndices(atomSet)) {
             ElementAddress.setAtom(context.model, element, a);
             const p = property(env);
-            if (propertyToSetMap.has(p)) propertyToSetMap.get(p)!.push(index);
-            else propertyToSetMap.set(p, [index]);
+            if (propertyToSetMap.has(p)) UniqueArrayBuilder.add(propertyToSetMap.get(p)!, index, index);
+            else {
+                const ub = UniqueArrayBuilder<number>();
+                UniqueArrayBuilder.add(ub, index, index);
+                propertyToSetMap.set(p, ub);
+            }
         }
         sets[index] = [];
         index++;
@@ -273,12 +376,11 @@ export function expandProperty(env: Environment, selection: Selection, property:
         ElementAddress.setAtom(context.model, element, i);
         const p = property(env);
         if (!propertyToSetMap.has(p)) continue;
-        for (const setIndex of propertyToSetMap.get(p)!) sets[setIndex].push(i);
+        for (const setIndex of propertyToSetMap.get(p)!.array) sets[setIndex].push(i);
     }
     Environment.unlockSlot(env, 'element');
 
     const builder = AtomSelection.uniqueBuilder();
-
     for (const set of sets) builder.add(AtomSet(set));
     return builder.getSelection();
 }

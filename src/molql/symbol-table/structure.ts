@@ -102,6 +102,12 @@ const modifier = {
         'as-whole-residues': Argument(Type.Bool, { isOptional: true })
     }), Types.AtomSelectionQuery, 'For each atom set in the selection, include all surrouding atoms/residues that are within the specified radius.'),
 
+    includeConnected: symbol(Arguments.Dictionary({
+        selection: Argument(Types.AtomSelectionQuery),
+        'layer-count': Argument(Type.Num, { isOptional: true, defaultValue: 1, description: 'Number of bonded layers to include.' }),
+        'as-whole-residues': Argument(Type.Bool, { isOptional: true })
+    }), Types.AtomSelectionQuery, 'Pick all atom sets that are connected to the target.'),
+
     expandProperty: symbol(Arguments.Dictionary({
         selection: Argument(Types.AtomSelectionQuery),
         property: Argument(Type.AnyValue)
@@ -126,7 +132,14 @@ const filter = {
         target: Argument(Types.AtomSelectionQuery),
         radius: Argument(Type.Num),
         invert: Argument(Type.Bool, { isOptional: true, defaultValue: false, description: 'If true, pick only atom sets that are further than the specified radius.' }),
-    }), Types.AtomSelectionQuery, 'Pick all atom sets from section that are within the radius of any atom from target.')
+    }), Types.AtomSelectionQuery, 'Pick all atom sets from section that are within the radius of any atom from target.'),
+
+    isConnectedTo: symbol(Arguments.Dictionary({
+        selection: Argument(Types.AtomSelectionQuery),
+        target: Argument(Types.AtomSelectionQuery),
+        disjunct: Argument(Type.Bool, { isOptional: true, defaultValue: true, description: 'If true, there must exist a bond to an atom that lies outside the given atom set to pass test.' }),
+        invert: Argument(Type.Bool, { isOptional: true, defaultValue: false, description: 'If true, return atom sets that are not connected.' })
+    }), Types.AtomSelectionQuery, 'Pick all atom sets that are connected to the target.'),
 }
 
 const combinator = {
@@ -171,6 +184,10 @@ const atomProperty = {
         z: prop(Type.Num, 'Cartesian Z coordinate'),
 
         atomKey: prop(Type.AnyValue, 'Unique value for each atom. Main use case is grouping of atoms.')
+    },
+
+    topology: {
+        connectedComponentKey: prop(Type.AnyValue, 'Unique value for each connected component.')
     },
 
     macromolecular: {

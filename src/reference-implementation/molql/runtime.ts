@@ -205,12 +205,19 @@ export const SymbolRuntime: Symbol.Info[] = [
         maxSize: v['max-size'],
     })),
     Symbol(MolQL.structure.modifier.includeSurroundings)((env, v) => env => StructureRuntime.Modifiers.includeSurroundings(env, v.selection(env), v.radius, v['as-whole-residues'])),
+    Symbol(MolQL.structure.modifier.includeConnected)((env, v) => env => StructureRuntime.Modifiers.includeConnected(env, v.selection(env), v['layer-count'], v['as-whole-residues'])),
     Symbol(MolQL.structure.modifier.expandProperty)((env, v) => env => StructureRuntime.Modifiers.expandProperty(env, v.selection(env), v.property)),
 
     // ============= FILTERS ================
     Symbol(MolQL.structure.filter.pick)((env, v) => env => StructureRuntime.Filters.pick(env, v.selection(env), v.test)),
     Symbol(MolQL.structure.filter.withSameAtomProperties)((env, v) => env => StructureRuntime.Filters.withSameAtomProperties(env, v.selection(env), v.source(env), v.property)),
     Symbol(MolQL.structure.filter.within)((env, v) => env => StructureRuntime.Filters.within(env, v.selection(env), v.target(env), v.radius, v.invert)),
+    Symbol(MolQL.structure.filter.isConnectedTo)((env, v) => env => StructureRuntime.Filters.isConnectedTo(env, {
+        selection: v.selection(env),
+        target: v.target(env),
+        invert: v.invert,
+        disjunct: v.disjunct
+    })),
 
     // ============= COMBINATORS ================
     Symbol(MolQL.structure.combinator.intersect)((env, xs) => env => StructureRuntime.Combinators.intersect(env, xs)),
@@ -225,6 +232,7 @@ export const SymbolRuntime: Symbol.Info[] = [
 
     // ============= ATOM PROPERTIES ================
     ...atomProps(MolQL.structure.atomProperty.core, StructureRuntime.AtomProperties.Core),
+    ...atomProps(MolQL.structure.atomProperty.topology, StructureRuntime.AtomProperties.Topology),
     ...atomProps(MolQL.structure.atomProperty.macromolecular, StructureRuntime.AtomProperties.Macromolecular)
 ]
 
