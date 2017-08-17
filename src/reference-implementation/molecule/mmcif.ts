@@ -9,7 +9,7 @@ import CIF from 'ciftools.js'
 export type Category<Columns extends string> = { readonly [name in Columns]: CIF.Column } & { rowCount: number }
 export function Category<T extends object>(category: CIF.Category | undefined, columns: T): Category<keyof T> {
     const ret = Object.create(null);
-    if (!category) for (const c of Object.keys(columns)) ret[c] = CIFTools.UndefinedColumn;
+    if (!category) for (const c of Object.keys(columns)) ret[c] = CIF.UndefinedColumn;
     else for (const c of Object.keys(columns)) ret[c] = category.getColumn(c);
     ret.rowCount = (category && category.rowCount) || 0;
     return ret;
