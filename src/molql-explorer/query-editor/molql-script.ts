@@ -65,7 +65,7 @@ CodeMirror.defineMode('molql-script', (config) => {
             const name = readSym(stream);
             if (name === '.') return null;
             type = 'symbol';
-            if (name === 'nil' || name === 't' || name.charAt(0) === ':') return 'atom';
+            if (name === 'true' || name === 'false' || name.charAt(0) === ':') return 'atom';
             if (state.lastType === 'open' && symbols[name]) return 'keyword';
             if (name.charAt(0) === '&') return 'variable-2';
             return 'variable';
