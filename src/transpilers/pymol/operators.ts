@@ -53,6 +53,7 @@ const operators: OperatorList = [
           B.ammp('label_atom_id'),
           B.core.type.str([B.ammp('label_seq_id')]),
           B.ammp('label_comp_id'),
+          B.ammp('auth_asym_id'),
           B.ammp('label_asym_id')
         ])
       })
