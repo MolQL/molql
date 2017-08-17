@@ -115,7 +115,7 @@ export function isConnectedTo(env: Environment, { selection, target, disjunct, i
     const { model } = env.context;
 
     const sel = selection(env);
-    const { bondsByAtom, atomBondOffsets, annotationByAtom } = Model.bonds(model);
+    const { neighbor, offset: bondAtomOffset, order, flags } = Model.bonds(model);
     const targetMask = AtomSelection.getMask(target(env));
     const disjuncted = disjunct ? !!disjunct(env) : false;
     const inverted = (!!invert && !!invert(env));
@@ -129,12 +129,12 @@ export function isConnectedTo(env: Environment, { selection, target, disjunct, i
         const setMask = disjuncted ? AtomSet.getMask(atomSet) : Mask.never;
         let isConnected = false;
         for (const a of AtomSet.atomIndices(atomSet)) {
-            const start = atomBondOffsets[a], end = atomBondOffsets[a + 1];
+            const start = bondAtomOffset[a], end = bondAtomOffset[a + 1];
             for (let t = start; t < end; t++) {
-                const b = bondsByAtom[t];
+                const b = neighbor[t];
                 if (targetMask.has(b)) {
                     if (!disjuncted || !setMask.has(b)) {
-                        if (testBond(env, bond, a, b, annotationByAtom[t], test)) {
+                        if (testBond(env, bond, a, b, order[t], flags[t], test)) {
                             isConnected = true;
                             break;
                         }

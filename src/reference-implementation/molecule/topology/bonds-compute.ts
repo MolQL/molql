@@ -7,7 +7,7 @@
 import { FastSet, FastMap } from '../../utils/collections'
 import Mask from '../../utils/mask'
 import { ComponentBondInfo, StructConn } from './bonds-utils'
-import { Model, BondAnnotation, Bonds } from '../data'
+import { Model, BondFlag, Bonds } from '../data'
 
 export interface BondComputationParameters {
     maxHbondLength: number,
@@ -60,7 +60,7 @@ function isHydrogen(i: number) {
     return i === H_ID;
 }
 
-function computePerAtomBonds(atomA: number[], atomB: number[], annotation: BondAnnotation[], atomCount: number) {
+function computePerAtomBonds(atomA: number[], atomB: number[], _order: number[], _flags: number[], atomCount: number) {
     const bucketSizes = new Int32Array(atomCount);
     const bucketOffsets = new Int32Array(atomCount + 1) as any as number[];
     const bucketFill = new Int32Array(atomCount);
@@ -75,28 +75,32 @@ function computePerAtomBonds(atomA: number[], atomB: number[], annotation: BondA
     }
     bucketOffsets[atomCount] = offset;
 
-    const bondsByAtom = new Int32Array(offset) as any as number[];
-    const annotationByAtom = new Int8Array(offset) as any as number[];
+    const neighbor = new Int32Array(offset) as any as number[];
+    const flags = new Uint16Array(offset) as any as number[];
+    const order = new Int8Array(offset) as any as number[];
 
     for (let i = 0, _i = atomA.length; i < _i; i++) {
-        const a = atomA[i], b = atomB[i], t = annotation[i];
+        const a = atomA[i], b = atomB[i], f = _flags[i], o = _order[i];
 
         const oa = bucketOffsets[a] + bucketFill[a];
         const ob = bucketOffsets[b] + bucketFill[b];
 
-        bondsByAtom[oa] = b;
-        annotationByAtom[oa] = t;
+        neighbor[oa] = b;
+        flags[oa] = f;
+        order[oa] = o;
         bucketFill[a]++;
 
-        bondsByAtom[ob] = a;
-        annotationByAtom[ob] = t;
+        neighbor[ob] = a;
+        flags[ob] = f;
+        order[ob] = o;
         bucketFill[b]++;
     }
 
     return {
-        atomBondOffsets: bucketOffsets,
-        bondsByAtom,
-        annotationByAtom
+        offsets: bucketOffsets,
+        neighbor,
+        flags,
+        order
     };
 }
 
@@ -112,10 +116,11 @@ function _computeBonds(model: Model, params: BondComputationParameters): Bonds {
 
     const atomA: number[] = [];
     const atomB: number[] = [];
-    const annotation: BondAnnotation[] = [];
+    const flags: number[] = [];
+    const order: number[] = [];
 
     let lastResidue = -1;
-    let componentMap: FastMap<string, FastMap<string, BondAnnotation>> | undefined = void 0;
+    let componentMap: FastMap<string, FastMap<string, { flags: number, order: number }>> | undefined = void 0;
 
     for (let aI = 0; aI < atomCount; aI++) {
         const raI = residueIndex[aI];
@@ -157,11 +162,17 @@ function _computeBonds(model: Model, params: BondComputationParameters): Bonds {
             const rbI = residueIndex[bI];
             // handle "component dictionary" bonds.
             if (raI === rbI && componentPairs) {
-                const order = componentPairs.get(label_atom_id.getString(rowB)!);
-                if (order) {
+                const e = componentPairs.get(label_atom_id.getString(rowB)!);
+                if (e) {
                     atomA[atomA.length] = aI;
                     atomB[atomB.length] = bI;
-                    annotation[annotation.length] = isMetal ? BondAnnotation.Metallic : order;
+                    order[order.length] = e.order;
+                    let flag = e.flags;
+                    if (isMetal) {
+                        if (flag | BondFlag.Covalent) flag ^= BondFlag.Covalent;
+                        flag |= BondFlag.MetallicCoordination;
+                    }
+                    flags[flags.length] = flag;
                 }
                 continue;
             }
@@ -180,7 +191,8 @@ function _computeBonds(model: Model, params: BondComputationParameters): Bonds {
                         if (p.atomIndex === bI) {
                             atomA[atomA.length] = aI;
                             atomB[atomB.length] = bI;
-                            annotation[annotation.length] = se.bondType;
+                            flags[flags.length] = se.flags;
+                            order[order.length] = se.order;
                             added = true;
                             break;
                         }
@@ -194,7 +206,8 @@ function _computeBonds(model: Model, params: BondComputationParameters): Bonds {
                 if (dist < params.maxHbondLength) {
                     atomA[atomA.length] = aI;
                     atomB[atomB.length] = bI;
-                    annotation[annotation.length] = BondAnnotation.Covalent1;
+                    order[order.length] = 1;
+                    flags[flags.length] = BondFlag.Covalent | BondFlag.Computed; // TODO: check if correct
                 }
                 continue;
             }
@@ -208,16 +221,18 @@ function _computeBonds(model: Model, params: BondComputationParameters): Bonds {
             if (dist <= pairingThreshold) {
                 atomA[atomA.length] = aI;
                 atomB[atomB.length] = bI;
-                annotation[annotation.length] =  isMetal ? BondAnnotation.Metallic : BondAnnotation.Covalent1;
+                order[order.length] = 1;
+                flags[flags.length] = (isMetal ? BondFlag.MetallicCoordination : BondFlag.Covalent) | BondFlag.Computed;
             }
         }
     }
 
-    const { atomBondOffsets, bondsByAtom, annotationByAtom } = computePerAtomBonds(atomA, atomB, annotation, atomCount);
+    const bonds = computePerAtomBonds(atomA, atomB, order, flags, atomCount);
     return {
-        atomBondOffsets,
-        bondsByAtom,
-        annotationByAtom,
+        offset: bonds.offsets,
+        neighbor: bonds.neighbor,
+        flags: bonds.flags,
+        order: bonds.order,
         count: atomA.length
     };
 }

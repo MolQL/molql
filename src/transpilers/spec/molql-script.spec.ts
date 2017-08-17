@@ -68,9 +68,7 @@ describe('molql-script', () => {
   :selection (atom.sel.atom-groups
     :residue-test (= (atom.label_comp_id) HEM)
     :group-by (atom.key.res))
-  ;; default bond test allows only covalent bonds
-  ;; another option is say (= (bond.type) (bond.type.new metallic))
-  :bond-test true
+  :bond-test (bond.has-flags (bond.flags metallic covalent))
   :layer-count 2
   :as-whole-residues true)`
     }];

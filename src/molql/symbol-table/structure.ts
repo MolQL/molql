@@ -11,7 +11,7 @@ import { symbol } from '../helpers'
 
 export namespace Types {
     export const ElementSymbol = Type.Value('Structure', 'ElementSymbol');
-    export const BondType = Type.Value('Structure', 'BondType');
+    export const BondFlags = Type.Value('Structure', 'BondFlags');
     export const ResidueId = Type.Value('Structure', 'ResidueId');
 
     export const AtomSet = Type.Value('Structure', 'AtomSet');
@@ -24,7 +24,7 @@ export namespace Types {
 const type = {
     '@header': 'Types',
     elementSymbol: symbol(Arguments.Dictionary({ 0: Argument(Type.Str) }), Types.ElementSymbol, 'Create element symbol representation from a string value.'),
-    bondType: symbol(Arguments.Dictionary({ 0: Argument(Type.Str) }), Types.BondType, 'Create bond type representation from a string value (covalent/metallic/ion/hydrogen/unknown).'),
+    bondFlags: symbol(Arguments.List(Type.Str), Types.BondFlags, 'Create bond flags representation from a list of strings. Allowed flags: covalent, metallic, ion, hydrogen, sulfide, computed, aromatic.'),
     authResidueId: symbol(Arguments.Dictionary({
         0: Argument(Type.Str, { description: 'auth_asym_id' }),
         1: Argument(Type.Num, { description: 'auth_seq_id' }),
@@ -106,7 +106,7 @@ const modifier = {
 
     includeConnected: symbol(Arguments.Dictionary({
         selection: Argument(Types.AtomSelectionQuery),
-        'bond-test': Argument(Type.Bool, { isOptional: true, defaultValue: 'type == covalent' as any }),
+        'bond-test': Argument(Type.Bool, { isOptional: true, defaultValue: 'true for covalent bonds' as any }),
         'layer-count': Argument(Type.Num, { isOptional: true, defaultValue: 1, description: 'Number of bonded layers to include.' }),
         'as-whole-residues': Argument(Type.Bool, { isOptional: true })
     }), Types.AtomSelectionQuery, 'Pick all atom sets that are connected to the target.'),
@@ -140,7 +140,7 @@ const filter = {
     isConnectedTo: symbol(Arguments.Dictionary({
         selection: Argument(Types.AtomSelectionQuery),
         target: Argument(Types.AtomSelectionQuery),
-        'bond-test': Argument(Type.Bool, { isOptional: true, defaultValue: 'type == covalent' as any }),
+        'bond-test': Argument(Type.Bool, { isOptional: true, defaultValue: 'true for covalent bonds' as any }),
         disjunct: Argument(Type.Bool, { isOptional: true, defaultValue: true, description: 'If true, there must exist a bond to an atom that lies outside the given atom set to pass test.' }),
         invert: Argument(Type.Bool, { isOptional: true, defaultValue: false, description: 'If true, return atom sets that are not connected.' })
     }), Types.AtomSelectionQuery, 'Pick all atom sets that are connected to the target.'),
@@ -233,7 +233,10 @@ const atomProperty = {
 const bondProperty = {
     '@header': 'Bond Properties',
 
-    type: bondProp(Types.BondType),
+    hasFlags: symbol(Arguments.Dictionary({
+        0: Argument(Types.BondFlags),
+        partial: Argument(Type.Bool, { isOptional: true, defaultValue: true, description: 'If false, all flags must be present.' }),
+    }), Type.Bool, 'Test if the current bond has at least one (or all if partial = false) of the specified flags.'),
     order: bondProp(Type.Num)
 }
 

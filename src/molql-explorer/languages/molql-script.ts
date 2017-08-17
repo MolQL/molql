@@ -70,8 +70,8 @@ const lang: Language = {
     :residue-test (= (atom.label_comp_id) HEM)
     :group-by (atom.key.res))
   ;; default bond test allows only covalent bonds
-  ;; another option is say (= (bond.type) (bond.type.new metallic))
-  :bond-test true
+  ;; another option is to use :bond-test true to allow any connection
+  :bond-test (bond.has-flags (bond.flags metallic covalent))
   :layer-count 2
   :as-whole-residues true)`
     }]

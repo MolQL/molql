@@ -76,9 +76,6 @@ function assignArguments(symbols: SymbolMap, ctx: TypeContext, symbolId: string,
         }
 
         if (Expression.isArgumentsArray(exprArgs)) {
-            if (!isArrayLike) {
-                throwError(`'${symbolId}': accepts object/named arguments (got object).`);
-            }
             if (exprArgs.length < i - optionalCount) {
                 throwError(`'${symbolId}': more arguments required.`);
             }

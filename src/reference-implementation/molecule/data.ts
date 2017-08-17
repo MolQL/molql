@@ -15,22 +15,17 @@ export const enum SecondaryStructureType {
     StructSheetRange = 2,
 }
 
-export const enum BondAnnotation {
-    None = -1,
-
-    Covalent  = 0,
-    Covalent1 = 1,
-    Covalent2 = 2,
-    Covalent3 = 3,
-    Covalent4 = 4,
-    Covalent5 = 5,
-    Covalent6 = 6,
-
-    Metallic = 20,
-    Hydrogen = 21,
-    Ion = 22,
-
-    Unknown = 50,
+export const enum BondFlag {
+    None                 = 0x0,
+    Covalent             = 0x1,
+    MetallicCoordination = 0x2,
+    Hydrogen             = 0x4,
+    Ion                  = 0x8,
+    Sulfide              = 0x10,
+    Aromatic             = 0x20,
+    Computed             = 0x40
+    // currently at most 16 flags are supported!!
+    // if nore flags needs to be added, _computeBonds in topology/bonds-compute.ts must be updated.
 }
 
 export interface Atoms {
@@ -70,9 +65,11 @@ export interface Bonds {
      * Where bonds for atom A start and end.
      * Start at 2 * idx, end at 2 * idx + 1
      */
-    atomBondOffsets: number[],
-    bondsByAtom: number[],
-    annotationByAtom: number[],
+    offset: number[],
+    neighbor: number[],
+
+    order: number[],
+    flags: number[],
 
     count: number
 }
@@ -203,7 +200,7 @@ export namespace Model {
 }
 
 export namespace Bonds {
-    export function isCovalent(a: BondAnnotation) {
-        return a >= BondAnnotation.Covalent && a <= BondAnnotation.Covalent6;
+    export function isCovalent(flags: number) {
+        return (flags & BondFlag.Covalent) !== 0;
     }
 }

@@ -5,7 +5,7 @@
  */
 
 import { FastMap } from '../../utils/collections'
-import { Model, BondAnnotation } from '../data'
+import { Model, BondFlag } from '../data'
 import CIF from 'ciftools.js'
 
 export class StructConn {
@@ -70,7 +70,8 @@ export class StructConn {
 export namespace StructConn {
     export interface Entry {
         distance: number,
-        bondType: BondAnnotation,
+        order: number,
+        flags: number,
         partners: { residueIndex: number, atomIndex: number, symmetry: string }[]
     }
 
@@ -129,24 +130,30 @@ export namespace StructConn {
 
             const type = conn_type_id.getString(i)! as StructConnType;
             const orderType = (pdbx_value_order.getString(i) || '').toLowerCase();
-            let bondType = BondAnnotation.Unknown;
+            let flags = BondFlag.None;
+            let order = 1;
 
             switch (orderType) {
-                case 'sing': bondType = BondAnnotation.Covalent1; break;
-                case 'doub': bondType = BondAnnotation.Covalent2; break;
-                case 'trip': bondType = BondAnnotation.Covalent3; break;
-                case 'quad': bondType = BondAnnotation.Covalent4; break;
+                case 'sing': order = 1; break;
+                case 'doub': order = 2; break;
+                case 'trip': order = 3; break;
+                case 'quad': order = 4; break;
             }
 
             switch (type) {
-                case 'disulf': bondType = BondAnnotation.Covalent1; break;
-                case 'hydrog': bondType = BondAnnotation.Hydrogen; break;
-                case 'metalc': bondType = BondAnnotation.Metallic; break;
-                // case 'mismat': bondType = BondType.Single; break; 
-                case 'saltbr': bondType = BondAnnotation.Ion; break;
+                case 'covale':
+                case 'covale_base':
+                case 'covale_phosphate':
+                case 'covale_sugar':
+                case 'modres':
+                    flags = BondFlag.Covalent;
+                case 'disulf': flags = BondFlag.Covalent | BondFlag.Sulfide; break;
+                case 'hydrog': flags = BondFlag.Hydrogen; break;
+                case 'metalc': flags = BondFlag.MetallicCoordination; break;
+                case 'saltbr': flags = BondFlag.Ion; break;
             }
 
-            entries.push({ bondType, distance: pdbx_dist_value.getFloat(i), partners });
+            entries.push({ flags, order, distance: pdbx_dist_value.getFloat(i), partners });
         }
 
         return new StructConn(entries);
@@ -165,22 +172,22 @@ export class ComponentBondInfo {
 
 export namespace ComponentBondInfo {
     export class Entry {
-        map: FastMap<string, FastMap<string, BondAnnotation>> = FastMap.create<string, FastMap<string, BondAnnotation>>();
+        map: FastMap<string, FastMap<string, { order: number, flags: number }>> = FastMap.create<string, FastMap<string, { order: number, flags: number }>>();
 
-        add(a: string, b: string, order: BondAnnotation, swap = true) {
+        add(a: string, b: string, order: number, flags: number, swap = true) {
             let e = this.map.get(a);
             if (e !== void 0) {
                 let f = e.get(b);
                 if (f === void 0) {
-                    e.set(b, order);
+                    e.set(b, { order, flags });
                 }
             } else {
-                let map = FastMap.create<string, BondAnnotation>();
-                map.set(b, order);
+                let map = FastMap.create<string, { order: number, flags: number }>();
+                map.set(b, { order, flags });
                 this.map.set(a, map);
             }
 
-            if (swap) this.add(b, a, order, false);
+            if (swap) this.add(b, a, order, flags, false);
         }
 
         constructor(public id: string) {
@@ -193,7 +200,7 @@ export namespace ComponentBondInfo {
 
         let info = new ComponentBondInfo();
 
-        const { comp_id, atom_id_1, atom_id_2, value_order, rowCount  } = chemCompBond;
+        const { comp_id, atom_id_1, atom_id_2, value_order, pdbx_aromatic_flag, rowCount } = chemCompBond;
 
         let entry = info.newEntry(comp_id.getString(0)!);
 
@@ -203,24 +210,25 @@ export namespace ComponentBondInfo {
             const nameA = atom_id_1.getString(i)!;
             const nameB = atom_id_2.getString(i)!;
             const order = value_order.getString(i)!;
+            const aromatic = pdbx_aromatic_flag.stringEquals(i, 'Y') || pdbx_aromatic_flag.stringEquals(i, 'y');
 
             if (entry.id !== id) {
                 entry = info.newEntry(id);
             }
 
-            let t: BondAnnotation;
+            let flags: number = BondFlag.Covalent;
+            let ord = 1;
+            if (aromatic) flags |= BondFlag.Aromatic;
             switch (order.toLowerCase()) {
-                case 'sing': t = BondAnnotation.Covalent1; break;
                 case 'doub':
                 case 'delo':
-                    t = BondAnnotation.Covalent2;
+                    ord = 2;
                     break;
-                case 'trip': t = BondAnnotation.Covalent3; break;
-                case 'quad': t = BondAnnotation.Covalent4; break;
-                default: t = BondAnnotation.Unknown; break;
+                case 'trip': ord = 3; break;
+                case 'quad': ord = 4; break;
             }
 
-            entry.add(nameA, nameB, t);
+            entry.add(nameA, nameB, ord, flags);
         }
 
         return info;

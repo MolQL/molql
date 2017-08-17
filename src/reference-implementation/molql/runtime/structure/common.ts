@@ -6,17 +6,18 @@
 
 import Environment from '../environment'
 import BondAddress from '../../data/bond-address'
-import { Bonds, BondAnnotation } from '../../../molecule/data'
+import { Bonds } from '../../../molecule/data'
 
 export type BondTest = (env: Environment) => boolean
 
 export function defaultBondTest(env: Environment) {
-    return Bonds.isCovalent(env.slots.bond.annotation);
+    return Bonds.isCovalent(env.slots.bond.flags);
 }
 
-export function testBond(env: Environment, slot: BondAddress, a: number, b: number, annotation: BondAnnotation, test: BondTest) {
+export function testBond(env: Environment, slot: BondAddress, a: number, b: number, order: number, flags: number, test: BondTest) {
     slot.atomA = a;
     slot.atomB = b;
-    slot.annotation = annotation;
+    slot.order = order;
+    slot.flags = flags;
     return test(env);
 }

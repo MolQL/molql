@@ -257,12 +257,12 @@ interface ExpandConnectedCtx {
 
 function _expandFrontierAtoms({ env, mask, bonds, test, slot }: ExpandConnectedCtx, frontier: number[], atoms: UniqueArrayBuilder<number>) {
     const newFrontier: number[] = [];
-    const { atomBondOffsets, bondsByAtom, annotationByAtom } = bonds;
+    const { neighbor, offset: bondAtomOffset, order, flags } = bonds;
     for (const a of frontier) {
-        const start = atomBondOffsets[a], end = atomBondOffsets[a + 1];
+        const start = bondAtomOffset[a], end = bondAtomOffset[a + 1];
         for (let i = start; i < end; i++) {
-            const b = bondsByAtom[i];
-            if (mask.has(b) && testBond(env, slot, a, b, annotationByAtom[i], test) && UniqueArrayBuilder.add(atoms, b, b)) newFrontier[newFrontier.length] = b;
+            const b = neighbor[i];
+            if (mask.has(b) && testBond(env, slot, a, b, order[i], flags[i], test) && UniqueArrayBuilder.add(atoms, b, b)) newFrontier[newFrontier.length] = b;
         }
     }
     return newFrontier;
@@ -285,7 +285,7 @@ function _expandAtoms(ctx: ExpandConnectedCtx, atomSet: AtomSet, numLayers: numb
 
 function _expandFrontierResidues({ env, model, mask, bonds, test, slot }: ExpandConnectedCtx, frontier: number[], residues: UniqueArrayBuilder<number>) {
     const newFrontier: number[] = [];
-    const { atomBondOffsets, bondsByAtom, annotationByAtom } = bonds;
+    const { neighbor, offset: bondAtomOffset, order, flags } = bonds;
 
     const { atomStartIndex, atomEndIndex } = model.residues;
     const { residueIndex } = model.atoms;
@@ -294,13 +294,13 @@ function _expandFrontierResidues({ env, model, mask, bonds, test, slot }: Expand
         for (let a = atomStartIndex[rI], _a = atomEndIndex[rI]; a < _a; a++) {
             if (!mask.has(a)) continue;
 
-            const start = atomBondOffsets[a], end = atomBondOffsets[a + 1];
+            const start = bondAtomOffset[a], end = bondAtomOffset[a + 1];
             for (let i = start; i < end; i++) {
-                const b = bondsByAtom[i];
+                const b = neighbor[i];
                 if (!mask.has(b)) continue;
 
                 const r = residueIndex[b];
-                if (testBond(env, slot, a, b, annotationByAtom[i], test) && UniqueArrayBuilder.add(residues, r, r)) newFrontier[newFrontier.length] = r;
+                if (testBond(env, slot, a, b, order[i], flags[i], test) && UniqueArrayBuilder.add(residues, r, r)) newFrontier[newFrontier.length] = r;
             }
         }
     }

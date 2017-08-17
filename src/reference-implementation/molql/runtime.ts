@@ -178,7 +178,7 @@ export const SymbolRuntime: Symbol.Info[] = [
 
     // ============= TYPES ================
     Symbol(MolQL.structure.type.elementSymbol, staticAttr)((env, v) => ElementSymbol(v[0](env))),
-    Symbol(MolQL.structure.type.bondType, staticAttr)((env, v) => StructureRuntime.BondProperties.createType(v[0](env))),
+    Symbol(MolQL.structure.type.bondFlags, staticAttr)((env, v) => StructureRuntime.BondProperties.createFlags(env, v as any)),
     Symbol(MolQL.structure.type.authResidueId, staticAttr)((env, v) => ResidueIdentifier.auth(v[0](env), v[1](env), v[2] && v[2](env))),
     Symbol(MolQL.structure.type.labelResidueId, staticAttr)((env, v) => ResidueIdentifier.label(v[0](env), v[1](env), v[2](env), v[3] && v[3](env))),
 
@@ -244,6 +244,7 @@ export const SymbolRuntime: Symbol.Info[] = [
 
     // ============= BOND PROPERTIES ================
     ...props(MolQL.structure.bondProperty, StructureRuntime.BondProperties.Properties),
+    Symbol(MolQL.structure.bondProperty.hasFlags)((env, v) => StructureRuntime.BondProperties.hasFlags(env, v[0] as any, v.partial))
 ]
 
 function props<S>(symbols: S, implementation: { [P in keyof S]?: any }) {

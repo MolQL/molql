@@ -10,15 +10,16 @@ import { Model, Bonds } from '../data'
 function labelComponent(bonds: Bonds, labels: number[], head: number, index: LinkedIndex, label: number) {
     const stack = [head];
     LinkedIndex.remove(index, head);
-    const { atomBondOffsets, bondsByAtom, annotationByAtom } = bonds;
+
+    const { neighbor, offset: bondAtomOffset, flags } = bonds;
 
     while (stack.length) {
         const a = stack.pop()!;
         labels[a] = label;
-        const start = atomBondOffsets[a], end = atomBondOffsets[a + 1];
+        const start = bondAtomOffset[a], end = bondAtomOffset[a + 1];
         for (let i = start; i < end; i++) {
-            const b = bondsByAtom[i];
-            if (!LinkedIndex.has(index, b) || !Bonds.isCovalent(annotationByAtom[i])) continue;
+            const b = neighbor[i];
+            if (!LinkedIndex.has(index, b) || !Bonds.isCovalent(flags[i])) continue;
 
             stack.push(b);
             LinkedIndex.remove(index, b);

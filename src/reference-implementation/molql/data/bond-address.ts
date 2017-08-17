@@ -4,9 +4,7 @@
  * @author David Sehnal <david.sehnal@gmail.com>
  */
 
-import { BondAnnotation } from '../../molecule/data'
-
-interface BondAddress { atomA: number, atomB: number, annotation: BondAnnotation }
-function BondAddress(): BondAddress { return { atomA: 0, atomB: 0, annotation: BondAnnotation.None }; }
+interface BondAddress { atomA: number, atomB: number, flags: number, order: number }
+function BondAddress(): BondAddress { return { atomA: 0, atomB: 0, flags: 0, order: 0 }; }
 
 export default BondAddress;
