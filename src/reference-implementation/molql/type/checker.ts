@@ -61,12 +61,13 @@ function assignArguments(symbols: SymbolMap, ctx: TypeContext, symbolId: string,
         }
     } else {
         const keys = Object.keys(args.map);
-        let isArrayLike = true, i = 0;
+        let isArrayLike = true, i = 0, isAnyRest = false;
         let optionalCount = 0;
         for (const k of keys) {
             const arg = (args.map as any)[k] as Argument;
             if (isNaN(k as any) || +k !== i) isArrayLike = false;
             if (arg.isOptional) optionalCount++;
+            if (arg.isRest) isAnyRest = true;
             i++;
         }
 
@@ -82,7 +83,9 @@ function assignArguments(symbols: SymbolMap, ctx: TypeContext, symbolId: string,
         }
 
         for (const k of Object.keys(exprArgs)) {
-            if (!(args.map as any)[k]) throwError(`'${symbolId}': unknown arg ':${k}'.`);
+            if (!(args.map as any)[k]) {
+                if (isNaN(k as any) || !isAnyRest) throwError(`'${symbolId}': unknown arg ':${k}'.`);
+            }
         }
 
         for (const k of keys) {

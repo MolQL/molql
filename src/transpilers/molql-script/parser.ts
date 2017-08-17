@@ -21,21 +21,23 @@ function getSymbol(name: string) {
 
 const lang = P.createLanguage({
   Expression: function (r) {
-    return P.seq(r.Symbol, P.alt(r.NamedArgList, r.ArgList))
+    return P.seq(r.Symbol, r.ArgList, r.NamedArgList)
   },
 
   Arg: function (r) {
-    return P.alt(
-      r.Boolean,
-      r.Number,
-      r.String,
-      r.QuotedString,
-      r.ListSymbol,
-      r.SetSymbol,
-      r.FnSymbol,
-      r.List
-    )
-    .trim(ws)
+    return P.seq(
+      P.lookahead(P.regex(/[^:]/)),
+      P.alt(
+        r.Boolean,
+        r.Number,
+        r.String,
+        r.QuotedString,
+        r.ListSymbol,
+        r.SetSymbol,
+        r.FnSymbol,
+        r.List
+      )
+    ).map((x: any) => x[1]).trim(ws)
   },
 
   ArgList: function (r) {
@@ -52,24 +54,22 @@ const lang = P.createLanguage({
   },
 
   NamedArgList: function (r) {
-    return P.seq(
-      P.lookahead(P.regex(/[\n\r\s]+:/)),
-      r.NamedArg.many()
-    ).map((x: any) => {
-      const namedArgs: { [key: string]: any } = {}
-      x[1].forEach((a: any) => { namedArgs[a[0]] = a[1] })
-      return namedArgs
-    })
+    return r.NamedArg.many()
+      .map((xs: any) => {
+        const namedArgs: { [key: string]: any } = {}
+        xs.forEach((a: any) => { namedArgs[a[0]] = a[1] })
+        return namedArgs
+      })
   },
 
   Symbol: function () {
     return P.regexp(/[^\s'`,@()\[\]{}';:]+/)  // /[a-zA-Z_-][a-zA-Z0-9_.-]+/)
       .map(x => {
-        const s = getSymbol(x)
+        const s = getSymbol(x);
         if (!s) {
-          throw new Error(`'${x}': unknown symbol.`)
+          throw new Error(`'${x}': unknown symbol.`);
         }
-        return getSymbol(x)
+        return s;
       })
       .desc('symbol')
   },
@@ -127,7 +127,15 @@ const lang = P.createLanguage({
     return r.Expression
       .wrap(P.string('('), P.string(')'))
       .map((x: any) => {
-        if (x[1] && (x[1].length || Object.keys(x[1]).length)) {
+        const array: any[] = x[1];
+        const named: any = x[2];
+
+        if (named && Object.keys(named).length) {
+          if (array) {
+            for (let i = 0; i < array.length; i++) named[i] = array[i];
+          }
+          return Expression.Apply(x[0], named);
+        } else if (array && array.length) {
           return Expression.Apply(x[0], x[1]);
         } else {
           return Expression.Apply(x[0])
@@ -144,4 +152,5 @@ const lang = P.createLanguage({
 const reComment = /;[^\n\r]*[\n\r]/g
 
 const transpiler: Transpiler = str => lang.Query.tryParse(str.replace(reComment, '\n'))
+
 export default transpiler
