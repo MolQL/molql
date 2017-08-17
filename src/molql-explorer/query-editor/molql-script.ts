@@ -26,7 +26,10 @@ CodeMirror.defineMode('molql-script', (config) => {
     //const assumeBody = /^with|^def|^do|^prog|case$|^cond$|bind$|when$|unless$/;
     const symbols = Object.create(null);
     for (const s of MolQLsymbols) symbols[s] = true;
+    const constants = Object.create(null);
+    for (const s of MolQLScript.Constants) constants[s] = true;
     const numLiteral = /^(?:[+\-]?(?:\d+|\d*\.\d+)(?:[efd][+\-]?\d+)?|[+\-]?\d+(?:\/[+\-]?\d+)?|#b[+\-]?[01]+|#o[+\-]?[0-7]+|#x[+\-]?[\da-f]+)/;
+    const elementSymbol = /^\_[0-9a-zA-Z]+/;
     let type: string | null = null;
 
     function readSym(stream: CodeMirror.StringStream) {
@@ -58,15 +61,16 @@ CodeMirror.defineMode('molql-script', (config) => {
             else if (/[+\-=\.']/.test(ch!)) return null;
             else if (/\d/.test(ch!) && stream.match(/^\d*#/)) return null;
             else if (ch === '|') return (state.tokenize = inComment)(stream, state);
-            else if (ch === ':') { readSym(stream); return 'meta'; }
+            //else if (ch === ':') { readSym(stream); return 'special'; }
             else if (ch === '\\') { stream.next(); readSym(stream); return 'string-2' }
             else return 'error';
         } else {
             const name = readSym(stream);
             if (name === '.') return null;
             type = 'symbol';
-            if (name === 'true' || name === 'false' || name.charAt(0) === ':') return 'atom';
-            if (state.lastType === 'open' && symbols[name]) return 'keyword';
+            if (constants[name] || elementSymbol.test(name)) return 'atom';
+            if (name.charAt(0) === ':') return 'special';
+            if (/*state.lastType === 'open' &&*/ symbols[name]) return 'keyword';
             if (name.charAt(0) === '&') return 'variable-2';
             return 'variable';
         }

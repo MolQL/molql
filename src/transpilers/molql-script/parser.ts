@@ -28,13 +28,14 @@ const lang = P.createLanguage({
     return P.seq(
       P.lookahead(P.regex(/[^:]/)),
       P.alt(
+        r.ElementSymbol,
+        r.FnSymbol,
         r.Boolean,
         r.Number,
         r.String,
         r.QuotedString,
         r.ListSymbol,
         r.SetSymbol,
-        r.FnSymbol,
         r.List
       )
     ).map((x: any) => x[1]).trim(ws)
@@ -76,7 +77,11 @@ const lang = P.createLanguage({
 
   String: function () {
     return P.regexp(/[a-zA-Z_-]+[a-zA-Z0-9_.-]*/)
-      .desc('string')
+      .map(x => {
+        const s = getSymbol(x);
+        if (s) return Expression.Apply(s);
+        return x;
+      }).desc('string')
   },
 
   QuotedString: function () {
@@ -115,6 +120,13 @@ const lang = P.createLanguage({
       .desc('set-symbol')
   },
 
+  // _XYZ -> type.elementSymbol XYZ
+  ElementSymbol: function (r) {
+    return P.seq(P.string('_'), P.regex(/[0-9a-zA-Z]+/))
+      .map(x => B.struct.type.elementSymbol([x[1]]))
+      .desc('element-symbol')
+  },
+
   // '&e' => core.ctrl.fn(e)
   FnSymbol: function (r) {
     return P.string('&').skip(ws)
@@ -126,7 +138,7 @@ const lang = P.createLanguage({
   List: function (r) {
     return r.Expression
       .wrap(P.string('('), P.string(')'))
-      .map((x: any) => {
+      .map(x => {
         const array: any[] = x[1];
         const named: any = x[2];
 

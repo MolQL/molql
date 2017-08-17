@@ -13,13 +13,8 @@ describe('molql-script', () => {
     const examples = [{
         name: 'All C or N atoms in ALA residues',
         value: `(atom.sel.atom-groups
-  :residue-test (=
-    (atom.auth_comp_id)
-    ALA)
-  :atom-test (set.has
-    ;; Element symbols must be "constructed" to be normalized, e.g. Fe vs FE
-    (set (atom.new.el C) (atom.new.el N))
-    (atom.el)))`
+  :residue-test (= atom.auth_comp_id ALA)
+  :atom-test (set.has { _C _N } (atom.el)))`
     }, {
         name: 'All residues within 5 ang from Fe atom',
         value: `(atom.sel.include-surroundings

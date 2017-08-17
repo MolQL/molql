@@ -14,13 +14,8 @@ const lang: Language = {
     examples: [{
         name: 'All C or N atoms in ALA residues',
         value: `(atom.sel.atom-groups
-  :residue-test (=
-    (atom.auth_comp_id)
-    ALA)
-  :atom-test (set.has
-    ;; Element symbols must be "constructed" to be normalized, e.g. Fe vs FE
-    (set (atom.new.el C) (atom.new.el N))
-    (atom.el)))`
+  :residue-test (= atom.auth_comp_id ALA)
+  :atom-test (set.has (set _C _N) atom.el))`
     }, {
         name: 'All residues within 5 ang from Fe atom',
         value: `(atom.sel.include-surroundings
@@ -57,9 +52,9 @@ const lang: Language = {
   (atom.sel.atom-groups
     :residue-test true
     :group-by (atom.key.res))
-    :target (atom.sel.atom-groups
-      :residue-test (= (atom.label_comp_id) HEM)
-      :group-by (atom.key.res))
+  :target (atom.sel.atom-groups
+    :residue-test (= (atom.label_comp_id) HEM)
+    :group-by (atom.key.res))
   ;; default bond test allows only covalent bonds
   :bond-test true
   :disjunct true)`

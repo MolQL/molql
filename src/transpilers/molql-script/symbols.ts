@@ -144,7 +144,10 @@ export const Constants = [
     'hydrogen',
     'sulfide',
     'computed',
-    'aromatic'
+    'aromatic',
+
+    'true',
+    'false'
 ];
 
 const normalized = (function () {
