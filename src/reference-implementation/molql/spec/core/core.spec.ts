@@ -103,4 +103,6 @@ describe('types', () => {
 
     testFn(B.core.list.getAt, [B.list(1, 2, 3), 1], 2);
     testFn(B.core.set.has, [B.set(1, 2, 3), 2], true);
+    testFn(B.core.set.isSubset, [B.set(1, 2, 3), B.set(1, 2, 3, 4)], true);
+    testFn(B.core.set.isSubset, [B.set(1, 2, 3, 6), B.set(1, 2, 3, 4)], false);
 });
