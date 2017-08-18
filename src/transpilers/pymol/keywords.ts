@@ -7,6 +7,12 @@
 import { KeywordDict } from '../types'
 import B from '../../molql/builder'
 
+const ResDict = {
+  nucleic: ['A', 'C', 'T', 'G', 'U', 'DA', 'DC', 'DT', 'DG', 'DU'],
+  protein: ['ALA', 'ARG', 'ASN', 'ASP', 'CYS', 'CYX', 'GLN', 'GLU', 'GLY', 'HIS', 'HID', 'HIE', 'HIP', 'ILE', 'LEU', 'LYS', 'MET', 'MSE', 'PHE', 'PRO', 'SER', 'THR', 'TRP', 'TYR', 'VAL'],
+  solvent: ['HOH', 'WAT', 'H20', 'TIP', 'SOL']
+}
+
 const keywords: KeywordDict = {
   all: {
     '@desc': 'All atoms currently loaded into PyMOL',
@@ -42,7 +48,10 @@ const keywords: KeywordDict = {
     '@desc': 'All atoms on the polymer (not het). Finds atoms with residue identifiers matching a known polymer, such a peptide and DNA.',
     abbr: ['pol.'],
     map: () => B.struct.generator.atomGroups({
-      'atom-test': B.core.rel.eq([B.ammp('isHet'), false])
+      'residue-test': B.core.set.has([
+        B.core.type.set(ResDict.nucleic.concat(ResDict.protein)),
+        B.ammp('label_comp_id')
+      ])
     })
   },
   backbone: {
@@ -76,6 +85,17 @@ const keywords: KeywordDict = {
   },
   bonded: {
     '@desc': 'All bonded atoms',
+    map: () => B.struct.filter.pick({
+      '0': B.struct.modifier.includeConnected({
+        '0': B.struct.generator.atomGroups(),
+        'bond-test': B.struct.bondProperty.hasFlags([
+          B.struct.type.bondFlags(['covalent', 'metallic', 'sulfide'])
+        ])
+      }),
+      test: B.core.rel.gr([
+        B.struct.atomSet.atomCount(), 1
+      ])
+    })
   },
   donors: {
     '@desc': 'All hydrogen bond donor atoms.',
@@ -96,23 +116,88 @@ const keywords: KeywordDict = {
   organic: {
     '@desc': 'All atoms in non-polymer organic compounds (e.g. ligands, buffers). Finds carbon-containing molecules that do not match known polymers.',
     abbr: ['org.'],
+    map: () => B.struct.modifier.expandProperty({
+      '0': B.struct.modifier.union([
+        B.struct.generator.queryInSelection({
+          '0': B.struct.generator.atomGroups({
+            'residue-test': B.core.logic.not([
+              B.core.set.has([
+                B.core.type.set(ResDict.nucleic.concat(ResDict.protein)),
+                B.ammp('label_comp_id')
+              ])
+            ])
+          }),
+          query: B.struct.generator.atomGroups({
+            'atom-test': B.core.rel.eq([
+              B.es('C'),
+              B.acp('elementSymbol')
+            ])
+          })
+        })
+      ]),
+      property: B.ammp('residueKey')
+    })
   },
   inorganic: {
     '@desc': 'All non-polymer inorganic atoms/ions. Finds atoms in molecules that do not contain carbon and do not match any known solvent residues.',
     abbr: ['ino.'],
+    map: () => B.struct.modifier.expandProperty({
+      '0': B.struct.modifier.union([
+        B.struct.filter.pick({
+          '0': B.struct.generator.atomGroups({
+            'residue-test': B.core.logic.not([
+              B.core.set.has([
+                B.core.type.set(ResDict.nucleic.concat(ResDict.protein).concat(ResDict.solvent)),
+                B.ammp('label_comp_id')
+              ])
+            ]),
+            'group-by': B.ammp('residueKey')
+          }),
+          test: B.core.logic.not([
+            B.core.set.has([
+              B.struct.atomSet.propertySet([ B.acp('elementSymbol') ]),
+              B.es('C')
+            ])
+          ])
+        })
+      ]),
+      property: B.ammp('residueKey')
+    })
   },
   solvent: {
     '@desc': 'All water molecules. The hardcoded solvent residue identifiers are currently: HOH, WAT, H20, TIP, SOL.',
     abbr: ['sol.'],
     map: () => B.struct.generator.atomGroups({
       'residue-test': B.core.set.has([
-        B.core.type.set(['HOH', 'SOL', 'WAT', 'H2O']),
+        B.core.type.set(ResDict.solvent),
         B.ammp('label_comp_id')
       ])
     })
   },
   guide: {
-    '@desc': 'All protein CA and nucleic acid C4*/C4'
+    '@desc': 'All protein CA and nucleic acid C4*/C4',
+    map: () => B.struct.combinator.merge([
+      B.struct.generator.atomGroups({
+        'atom-test': B.core.rel.eq([
+          'CA',
+          B.ammp('label_atom_id')
+        ]),
+        'residue-test': B.core.set.has([
+          B.core.type.set(ResDict.protein),
+          B.ammp('label_comp_id')
+        ])
+      }),
+      B.struct.generator.atomGroups({
+        'atom-test': B.core.set.has([
+          B.core.type.set(['C4*', 'C4']),
+          B.ammp('label_atom_id')
+        ]),
+        'residue-test': B.core.set.has([
+          B.core.type.set(ResDict.nucleic),
+          B.ammp('label_comp_id')
+        ])
+      })
+    ]),
   },
   metals: {
     '@desc': 'All metal atoms (new in PyMOL 1.6.1)'

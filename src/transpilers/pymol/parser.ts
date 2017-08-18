@@ -4,6 +4,8 @@
  * @author Alexander Rose <alexander.rose@weirdbyte.de>
  */
 
+// https://pymol.org/dokuwiki/doku.php?id=selection:alpha
+
 import * as P from 'parsimmon'
 
 import * as h from '../helper'

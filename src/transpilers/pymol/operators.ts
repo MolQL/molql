@@ -155,12 +155,30 @@ const operators: OperatorList = [
     type: h.prefix,
     rule: h.prefixOp(/BYRESIDUE|byresi|byres|br\./i),
     map: (op: string, selection: Expression) => {
+      return B.struct.modifier.expandProperty({
+        '0': B.struct.modifier.union({ 0: selection }),
+        property: B.ammp('residueKey')
+      })
+    }
+  },
+  {
+    '@desc': 'Completely selects all alpha carbons in all residues covered by a selection.',
+    '@examples': ['BYCALPHA s1'],
+    name: 'bycalpha',
+    type: h.prefix,
+    rule: h.prefixOp(/BYCALPHA|bca\./i),
+    map: (op: string, selection: Expression) => {
       return B.struct.generator.queryInSelection({
         '0': B.struct.modifier.expandProperty({
           '0': B.struct.modifier.union({ 0: selection }),
           property: B.ammp('residueKey')
         }),
-        query: B.struct.generator.atomGroups()
+        query: B.struct.generator.atomGroups({
+          'atom-test': B.core.rel.eq([
+            'CA',
+            B.ammp('label_atom_id')
+          ])
+        })
       })
     }
   },
@@ -168,10 +186,14 @@ const operators: OperatorList = [
     '@desc': 'Expands selection to complete molecules.',
     '@examples': ['BYMOLECULE s1'],
     name: 'bymolecule',
-    isUnsupported: true,
     type: h.prefix,
     rule: h.prefixOp(/BYMOLECULE|bymol|bm\./i),
-    map: (op: string, selection: Expression) => [op, selection]
+    map: (op: string, selection: Expression) => {
+      return B.struct.modifier.expandProperty({
+        '0': B.struct.modifier.union({ 0: selection }),
+        property: B.atp('connectedComponentKey')
+      })
+    }
   },
   {
     '@desc': 'Expands selection to complete fragments.',
@@ -189,12 +211,9 @@ const operators: OperatorList = [
     type: h.prefix,
     rule: h.prefixOp(/BYSEGMENT|bysegi|byseg|bs\./i),
     map: (op: string, selection: Expression) => {
-      return B.struct.generator.queryInSelection({
-        '0': B.struct.modifier.expandProperty({
-          '0': B.struct.modifier.union({ 0: selection }),
-          property: B.ammp('chainKey')
-        }),
-        query: B.struct.generator.atomGroups()
+      return B.struct.modifier.expandProperty({
+        '0': B.struct.modifier.union({ 0: selection }),
+        property: B.ammp('chainKey')
       })
     }
   },
@@ -229,28 +248,42 @@ const operators: OperatorList = [
     '@desc': 'Selects atoms directly bonded to s1, excludes s1.',
     '@examples': ['NEIGHBOUR s1'],
     name: 'neighbour',
-    isUnsupported: true,
     type: h.prefix,
     rule: h.prefixOp(/NEIGHBOUR|nbr\./i),
-    map: (op: string, selection: Expression) => [op, selection]
+    map: (op: string, selection: Expression) => {
+      return B.struct.modifier.exceptBy({
+        '0': B.struct.modifier.includeConnected({
+          '0': B.struct.modifier.union({ 0: selection }),
+          'bond-test': true
+        }),
+        by: B.struct.modifier.union({ 0: selection })
+      })
+    }
   },
   {
     '@desc': 'Selects atoms directly bonded to s1, may include s1.',
     '@examples': ['BOUND_TO s1'],
     name: 'bound_to',
-    isUnsupported: true,
     type: h.prefix,
     rule: h.prefixOp(/BOUND_TO|bto\./i),
-    map: (op: string, selection: Expression) => [op, selection]
+    map: (op: string, selection: Expression) => {
+      return B.struct.modifier.includeConnected({
+        '0': B.struct.modifier.union({ 0: selection })
+      })
+    }
   },
   {
     '@desc': 'Extends s1 by X bonds connected to atoms in s1.',
     '@examples': ['s1 EXTEND X'],
     name: 'extend',
-    isUnsupported: true,
     type: h.postfix,
-    rule: h.postfixOp(/(EXTEND|xt\.)\s+([0-9]+)/i, 2),
-    map: (op: string, selection: Expression) => [op, selection]
+    rule: h.postfixOp(/(EXTEND|xt\.)\s+([0-9]+)/i, 2).map(parseInt),
+    map: (count: number, selection: Expression) => {
+      return B.struct.modifier.includeConnected({
+        '0': B.struct.modifier.union({ 0: selection }),
+        'layer-count': count
+      })
+    }
   }
 ]
 

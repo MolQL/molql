@@ -38,13 +38,13 @@ const properties: PropertyDict = {
   resn: {
     '@desc': 'residue-name-list: list of 3-letter codes for amino acids or list of up to 2-letter codes for nucleic acids',
     '@examples': ['resn ASP+GLU+ASN+GLN', 'resn A+G'],
-    abbr: ['r.'], regex: /[a-zA-Z0-9+]+/, map: listMap,
+    abbr: ['resname', 'r.'], regex: /[a-zA-Z0-9+]+/, map: listMap,
     level: 'residue-test', property: B.ammp('label_comp_id')
   },
   resi: {
     '@desc': 'residue-identifier-list list of up to 4-digit residue numbers or residue-identifier-range',
     '@examples': ['resi 1+10+100+1000', 'resi 1-10'],
-    abbr: ['i.'], regex: /[0-9+-]+/, map: listOrRangeMap,
+    abbr: ['resident', 'residue', 'resid', 'i.'], regex: /[0-9+-]+/, map: listOrRangeMap,
     level: 'residue-test', property: B.ammp('auth_seq_id')
   },
   alt: {
@@ -62,7 +62,7 @@ const properties: PropertyDict = {
   segi: {
     '@desc': 'segment-identifier-list list of up to 4 letter identifiers',
     '@examples': ['segi lig'],
-    abbr: ['s.'], regex: /[a-zA-Z0-9+]+/, map: listMap,
+    abbr: ['segid', 's.'], regex: /[a-zA-Z0-9+]+/, map: listMap,
     level: 'chain-test', property: B.ammp('label_asym_id')
   },
   flag: {
