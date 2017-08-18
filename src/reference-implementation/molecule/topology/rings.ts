@@ -152,8 +152,6 @@ function findRings(state: State, from: number) {
         const a = startVertex + top;
         const start = offset[a], end = offset[a + 1];
 
-        //const _depth = visited[top];
-
         for (let i = start; i < end; i++) {
             const b = neighbor[i];
             if (b < startVertex || b >= endVertex || !Bonds.isCovalent(bondFlags[i])) continue;
