@@ -46,16 +46,14 @@ export interface Residues {
 }
 
 export interface Chains {
-    residueStartIndex: number[],
-    residueEndIndex: number[],
+    residueOffset: number[],
     entityIndex: number[],
     key: number[],
     count: number
 }
 
 export interface Entities {
-    chainStartIndex: number[],
-    chainEndIndex: number[],
+    chainOffset: number[],
     dataIndex: number[],
     key: number[],
     count: number
@@ -182,15 +180,15 @@ export namespace Model {
     }
 
     export function findResidueIndexByLabel(model: Model, asymId: string, seqNumber: number, insCode: string | null) {
-        const { residueStartIndex, residueEndIndex, count: cCount } = model.chains;
+        const { residueOffset, count: cCount } = model.chains;
         const { atomOffset } = model.residues;
         const { dataIndex } = model.atoms;
         const { label_asym_id, label_seq_id, pdbx_PDB_ins_code } = model.data.atom_site;
 
         for (let cI = 0; cI < cCount; cI++) {
-            let idx = dataIndex[atomOffset[residueStartIndex[cI]]];
+            let idx = dataIndex[atomOffset[residueOffset[cI]]];
             if (!label_asym_id.stringEquals(idx, asymId)) continue;
-            for (let rI = residueStartIndex[cI], _r = residueEndIndex[cI]; rI < _r; rI++) {
+            for (let rI = residueOffset[cI], _r = residueOffset[cI + 1]; rI < _r; rI++) {
                 idx = dataIndex[atomOffset[rI]];
                 if (label_seq_id.getInteger(idx) === seqNumber && (!insCode || pdbx_PDB_ins_code.stringEquals(idx, insCode))) {
                     return rI;

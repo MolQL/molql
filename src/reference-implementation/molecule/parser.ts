@@ -15,8 +15,8 @@ function createModel(moleculeId: string, data: Data, startRow: number, rowCount:
     const dataIndex: number[] = [], residueIndex: number[] = [];
     const atomOffset: number[] = [0], chainIndex: number[] = [];
     const x: number[] = [], y: number[] = [], z: number[] = [];
-    const residueStartIndex: number[] = [], residueEndIndex: number[] = [], entityIndex: number[] = [];
-    const chainStartIndex: number[] = [], chainEndIndex: number[] = [];
+    const residueOffset: number[] = [0], entityIndex: number[] = [];
+    const chainOffset: number[] = [0];
 
     const { auth_asym_id, auth_seq_id, pdbx_PDB_ins_code, pdbx_PDB_model_num, label_entity_id, Cartn_x, Cartn_y, Cartn_z } = data.atom_site;
 
@@ -46,8 +46,7 @@ function createModel(moleculeId: string, data: Data, startRow: number, rowCount:
         }
 
         if (newChain) {
-            residueStartIndex.push(chainStartResidue);
-            residueEndIndex.push(residue);
+            residueOffset.push(residue);
             entityIndex.push(entity);
             currentChainRow = i;
             chainStartResidue = residue;
@@ -55,8 +54,7 @@ function createModel(moleculeId: string, data: Data, startRow: number, rowCount:
         }
 
         if (newEntity) {
-            chainStartIndex.push(entityStartChain);
-            chainEndIndex.push(chain);
+            chainOffset.push(chain);
             currentEntityRow = i;
             entityStartChain = chain;
             entity++;
@@ -77,13 +75,11 @@ function createModel(moleculeId: string, data: Data, startRow: number, rowCount:
     chainIndex.push(chain);
 
     // finish chain
-    residueStartIndex.push(chainStartResidue);
-    residueEndIndex.push(residue + 1);
+    residueOffset.push(residue + 1);
     entityIndex.push(entity);
 
     // finish entity
-    chainStartIndex.push(entityStartChain);
-    chainEndIndex.push(chain + 1);
+    chainOffset.push(chain + 1);
 
     residue++;
     chain++;
@@ -97,8 +93,8 @@ function createModel(moleculeId: string, data: Data, startRow: number, rowCount:
         id: pdbx_PDB_model_num.getInteger(startRow),
         atoms: { dataIndex, residueIndex, count: atom },
         residues: { atomOffset, secondaryStructureType, secondaryStructureIndex, chainIndex, count: residue, key: new Int32Array(residue) as any },
-        chains: { residueStartIndex, residueEndIndex, entityIndex, count: chain, key: new Int32Array(chain) as any },
-        entities: { chainStartIndex, chainEndIndex, count: entity, key: new Int32Array(entity) as any, dataIndex: new Int32Array(entity) as any },
+        chains: { residueOffset, entityIndex, count: chain, key: new Int32Array(chain) as any },
+        entities: { chainOffset, count: entity, key: new Int32Array(entity) as any, dataIndex: new Int32Array(entity) as any },
         positions: { x, y, z },
         data,
         '@spatialLookup': void 0,
@@ -135,14 +131,14 @@ function assignKeysAndDataIndices(model: Model) {
 
     const { dataIndex } = model.atoms;
     const { key: residueKey, atomOffset } = model.residues;
-    const { key: chainKey, residueStartIndex, residueEndIndex } = model.chains;
-    const { key: entityKey, count: entityCount, chainStartIndex, chainEndIndex, dataIndex: entityDataIndex } = model.entities;
+    const { key: chainKey, residueOffset } = model.chains;
+    const { key: entityKey, count: entityCount, chainOffset, dataIndex: entityDataIndex } = model.entities;
 
     const { label_entity_id, auth_asym_id, auth_seq_id, pdbx_PDB_ins_code } = model.data.atom_site;
 
     for (let eI = 0; eI < entityCount; eI++) {
-        const chainStart = chainStartIndex[eI], chainEnd = chainEndIndex[eI];
-        let dataRow = dataIndex[atomOffset[residueStartIndex[chainStart]]];
+        const chainStart = chainOffset[eI], chainEnd = chainOffset[eI + 1];
+        let dataRow = dataIndex[atomOffset[residueOffset[chainStart]]];
 
         const entId = label_entity_id.getString(dataRow)!;
         entityDataIndex[eI] = entityDataIndexMap.get(entId) || 0;
@@ -151,7 +147,7 @@ function assignKeysAndDataIndices(model: Model) {
         entityKey[eI] = eKey;
         const chainMap = getElementSubstructureKeyMap(chainMaps, eKey);
         for (let cI = chainStart; cI < chainEnd; cI++) {
-            const residueStart = residueStartIndex[cI], residueEnd = residueEndIndex[cI];
+            const residueStart = residueOffset[cI], residueEnd = residueOffset[cI + 1];
             dataRow = dataIndex[atomOffset[residueStart]];
 
             const cKey = getElementKey(chainMap, auth_asym_id.getString(dataRow)!, chainCounter);
@@ -232,13 +228,13 @@ function assignSecondaryStructure(model: Model) {
     extendSecondaryStructureMap(model.data.secondaryStructure.structConf, SecondaryStructureType.StructConf, map);
     extendSecondaryStructureMap(model.data.secondaryStructure.sheetRange, SecondaryStructureType.StructSheetRange, map);
 
-    const { residueStartIndex, residueEndIndex, count: chainCount } = model.chains;
+    const { residueOffset, count: chainCount } = model.chains;
     const { atomOffset } = model.residues;
     const { dataIndex } = model.atoms;
     const { label_asym_id, label_seq_id, pdbx_PDB_ins_code } = model.data.atom_site;
 
     for (let cI = 0; cI < chainCount; cI++) {
-        const resStart = residueStartIndex[cI], resEnd = residueEndIndex[cI];
+        const resStart = residueOffset[cI], resEnd = residueOffset[cI + 1];
         const asymId = label_asym_id.getString(dataIndex[atomOffset[resStart]])!;
 
         if (map.has(asymId)) {

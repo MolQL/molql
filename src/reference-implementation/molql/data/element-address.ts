@@ -33,18 +33,18 @@ namespace ElementAddress {
     }
 
     export function setChainLayer(model: Model, address: ElementAddress, chainIndex: number) {
-        const { residues: { atomOffset }, chains: { residueStartIndex }, atoms: { dataIndex } } = model;
+        const { residues: { atomOffset }, chains: { residueOffset }, atoms: { dataIndex } } = model;
         address.chain = chainIndex;
-        address.residue = residueStartIndex[chainIndex];
+        address.residue = residueOffset[chainIndex];
         address.atom = atomOffset[address.residue];
         address.dataIndex = dataIndex[address.atom];
     }
 
     export function setEntityLayer(model: Model, address: ElementAddress, entityIndex: number) {
-        const { residues: { atomOffset }, chains: { residueStartIndex }, entities: { chainStartIndex }, atoms: { dataIndex } } = model;
+        const { residues: { atomOffset }, chains: { residueOffset }, entities: { chainOffset }, atoms: { dataIndex } } = model;
         address.entity = entityIndex;
-        address.chain = chainStartIndex[entityIndex];
-        address.residue = residueStartIndex[address.chain];
+        address.chain = chainOffset[entityIndex];
+        address.residue = residueOffset[address.chain];
         address.atom = atomOffset[address.residue];
         address.dataIndex = dataIndex[address.atom];
     }

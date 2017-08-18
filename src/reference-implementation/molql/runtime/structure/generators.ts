@@ -34,8 +34,8 @@ type GroupCtx = {
 function atomGroupsIterator(env: Environment, { entityTest, chainTest, residueTest, atomTest }: GeneratorParams, groupCtx: GroupCtx) {
     const ctx = env.context;
     const { model, mask } = ctx;
-    const { chainStartIndex, chainEndIndex, count: entityCount } = model.entities;
-    const { residueStartIndex, residueEndIndex } = model.chains;
+    const { chainOffset, count: entityCount } = model.entities;
+    const { residueOffset } = model.chains;
     const { atomOffset } = model.residues;
 
     Environment.lockSlot(env, 'element');
@@ -44,11 +44,11 @@ function atomGroupsIterator(env: Environment, { entityTest, chainTest, residueTe
         ElementAddress.setEntityLayer(model, element, eI);
         if (!entityTest(env)) continue;
 
-        for (let cI = chainStartIndex[eI], _cI = chainEndIndex[eI]; cI < _cI; cI++) {
+        for (let cI = chainOffset[eI], _cI = chainOffset[eI + 1]; cI < _cI; cI++) {
             ElementAddress.setChainLayer(model, element, cI);
             if (!chainTest(env)) continue;
 
-            for (let rI = residueStartIndex[cI], _rI = residueEndIndex[cI]; rI < _rI; rI++) {
+            for (let rI = residueOffset[cI], _rI = residueOffset[cI + 1]; rI < _rI; rI++) {
                 ElementAddress.setResidueLayer(model, element, rI);
                 if (!residueTest(env)) continue;
 
