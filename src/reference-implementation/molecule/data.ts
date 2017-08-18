@@ -62,7 +62,7 @@ export interface Entities {
 export interface Bonds {
     /**
      * Where bonds for atom A start and end.
-     * Start at 2 * idx, end at 2 * idx + 1
+     * Start at idx, end at idx + 1
      */
     offset: number[],
     neighbor: number[],
