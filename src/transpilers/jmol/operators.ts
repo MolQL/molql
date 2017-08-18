@@ -26,7 +26,7 @@ const operators: OperatorList = [
     name: 'and',
     type: h.binaryLeft,
     rule: h.infixOp(/AND|&/i),
-    map: (op, selection, by) => B.struct.modifier.intersectBy({ selection, by })
+    map: (op, selection, by) => B.struct.modifier.intersectBy({ 0: selection, by })
   },
   {
     '@desc': 'Selects atoms included in either s1 or s2.',

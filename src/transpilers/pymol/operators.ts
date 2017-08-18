@@ -29,7 +29,7 @@ const operators: OperatorList = [
     name: 'and',
     type: h.binaryLeft,
     rule: h.infixOp(/AND|&/i),
-    map: (op, selection, by) => B.struct.modifier.intersectBy({ selection, by })
+    map: (op, selection, by) => B.struct.modifier.intersectBy({ 0: selection, by })
   },
   {
     '@desc': 'Selects atoms included in either s1 or s2.',
@@ -84,7 +84,7 @@ const operators: OperatorList = [
     rule: h.postfixOp(/GAP\s+([-+]?[0-9]*\.?[0-9]+)/i, 1).map(parseFloat),
     map: (distance: number, target: Expression) => {
       return B.struct.filter.within({
-        0: B.struct.generator.atomGroups(),
+        '0': B.struct.generator.atomGroups(),
         target,
         radius: B.core.math.add([distance, 1.4]) // TODO replace by vdw
       })
@@ -98,7 +98,7 @@ const operators: OperatorList = [
     rule: h.postfixOp(/(AROUND|a\.)\s+([-+]?[0-9]*\.?[0-9]+)/i, 2).map(parseFloat),
     map: (radius: number, target: Expression) => {
       return B.struct.filter.within({
-        0: B.struct.generator.atomGroups(), target, radius
+        '0': B.struct.generator.atomGroups(), target, radius
       })
     }
   },
@@ -130,7 +130,7 @@ const operators: OperatorList = [
     rule: h.ofOp('NEAR_TO', 'nto.'),
     map: (radius: number, selection: Expression, target: Expression) => {
       return B.struct.modifier.exceptBy({
-        0: B.struct.filter.within({ 0: selection, target, radius }),
+        '0': B.struct.filter.within({ '0': selection, target, radius }),
         by: target
       })
     }
@@ -143,21 +143,21 @@ const operators: OperatorList = [
     rule: h.ofOp('BEYOND', 'be.'),
     map: (radius: number, selection: Expression, target: Expression) => {
       return B.struct.modifier.exceptBy({
-        0: B.struct.filter.within({ 0: selection, target, radius, invert: true }),
+        '0': B.struct.filter.within({ '0': selection, target, radius, invert: true }),
         by: target
       })
     }
   },
   {
     '@desc': 'Expands selection to complete residues.',
-    '@examples': ['BYRES s1'],
-    name: 'byres',
+    '@examples': ['BYRESIDUE s1'],
+    name: 'byresidue',
     type: h.prefix,
-    rule: h.prefixOp(/BYRES|br\./i),
+    rule: h.prefixOp(/BYRESIDUE|byresi|byres|br\./i),
     map: (op: string, selection: Expression) => {
       return B.struct.generator.queryInSelection({
-        0: B.struct.modifier.expandProperty({
-          0: B.struct.modifier.union({ 0: selection }),
+        '0': B.struct.modifier.expandProperty({
+          '0': B.struct.modifier.union({ 0: selection }),
           property: B.ammp('residueKey')
         }),
         query: B.struct.generator.atomGroups()
@@ -170,7 +170,7 @@ const operators: OperatorList = [
     name: 'bymolecule',
     isUnsupported: true,
     type: h.prefix,
-    rule: h.prefixOp(/BYMOLECULE|bm\./i),
+    rule: h.prefixOp(/BYMOLECULE|bymol|bm\./i),
     map: (op: string, selection: Expression) => [op, selection]
   },
   {
@@ -179,7 +179,7 @@ const operators: OperatorList = [
     name: 'byfragment',
     isUnsupported: true,
     type: h.prefix,
-    rule: h.prefixOp(/BYFRAGMENT|bf\./i),
+    rule: h.prefixOp(/BYFRAGMENT|byfrag|bf\./i),
     map: (op: string, selection: Expression) => [op, selection]
   },
   {
@@ -187,11 +187,11 @@ const operators: OperatorList = [
     '@examples': ['BYSEGMENT s1'],
     name: 'bysegment',
     type: h.prefix,
-    rule: h.prefixOp(/BYSEGMENT|bs\./i),
+    rule: h.prefixOp(/BYSEGMENT|bysegi|byseg|bs\./i),
     map: (op: string, selection: Expression) => {
       return B.struct.generator.queryInSelection({
-        0: B.struct.modifier.expandProperty({
-          0: B.struct.modifier.union({ 0: selection }),
+        '0': B.struct.modifier.expandProperty({
+          '0': B.struct.modifier.union({ 0: selection }),
           property: B.ammp('chainKey')
         }),
         query: B.struct.generator.atomGroups()
@@ -204,7 +204,7 @@ const operators: OperatorList = [
     name: 'byobject',
     isUnsupported: true,
     type: h.prefix,
-    rule: h.prefixOp(/BYOBJECT|bo\./i),
+    rule: h.prefixOp(/BYOBJECT|byobj|bo\./i),
     map: (op: string, selection: Expression) => [op, selection]
   },
   {

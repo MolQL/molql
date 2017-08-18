@@ -24,29 +24,29 @@ function proteinExpr() {
 
 function nucleicExpr() {
   return B.struct.filter.pick({
-    selection: B.struct.generator.atomGroups({
+    0: B.struct.generator.atomGroups({
       'group-by': B.ammp('residueKey')
     }),
     test: B.core.logic.and([
       B.core.set.isSubset([
         // B.core.type.set([ 'P', 'O1P', 'O2P' ]),
         B.core.type.set([ 'P' ]),
-        B.struct.atomSet.propertySet({
-          property: B.ammp('label_atom_id')
-        })
+        B.struct.atomSet.propertySet([
+          B.ammp('label_atom_id')
+        ])
       ]),
       B.core.logic.or([
         B.core.set.isSubset([
           B.core.type.set([ "O3'", "C3'", "C4'", "C5'", "O5'" ]),
-          B.struct.atomSet.propertySet({
-            property: B.ammp('label_atom_id')
-          })
+          B.struct.atomSet.propertySet([
+            B.ammp('label_atom_id')
+          ])
         ]),
         B.core.set.isSubset([
           B.core.type.set([ 'O3*', 'C3*', 'C4*', 'C5*', 'O5*' ]),
-          B.struct.atomSet.propertySet({
-            property: B.ammp('label_atom_id')
-          })
+          B.struct.atomSet.propertySet([
+            B.ammp('label_atom_id')
+          ])
         ])
       ])
     ])
@@ -56,7 +56,7 @@ function nucleicExpr() {
 function backboneExpr() {
   return B.struct.combinator.merge([
     B.struct.generator.queryInSelection({
-      selection: proteinExpr(),
+      0: proteinExpr(),
       query: B.struct.generator.atomGroups({
         'atom-test': B.core.set.has([
           B.core.type.set(Backbone.protein),
@@ -65,7 +65,7 @@ function backboneExpr() {
       })
     }),
     B.struct.generator.queryInSelection({
-      selection: nucleicExpr(),
+      0: nucleicExpr(),
       query: B.struct.generator.atomGroups({
         'atom-test': B.core.set.has([
           B.core.type.set(Backbone.nucleic),
@@ -149,7 +149,7 @@ const keywords: KeywordDict = {
   acyclic: {
     '@desc': '`protein and not cyclic`',
     map: () => B.struct.modifier.intersectBy({
-      selection: proteinExpr(),
+      0: proteinExpr(),
       by: h.invertExpr(resnameExpr(ResDict.cyclic))
     })
   },
@@ -175,8 +175,8 @@ const keywords: KeywordDict = {
   bonded: {
     '@desc': 'atoms for which numbonds > 0',
     map: () => B.struct.filter.pick({
-      selection: B.struct.modifier.includeConnected({
-        selection: B.struct.generator.atomGroups(),
+      0: B.struct.modifier.includeConnected({
+        0: B.struct.generator.atomGroups(),
         'bond-test': B.struct.bondProperty.hasFlags([
           B.struct.type.bondFlags(['covalent', 'metallic', 'sulfide'])
         ])
@@ -213,7 +213,7 @@ const keywords: KeywordDict = {
     '@desc': 'name "[0-9]?H.*"',
     map: () => B.struct.generator.atomGroups({
       'atom-test': B.core.str.match([
-        B.core.type.regex('^[0-9]?H.*$'),
+        B.core.type.regex(['^[0-9]?[H].*$', 'i']),
         B.ammp('label_atom_id')
       ])
     })
@@ -221,7 +221,7 @@ const keywords: KeywordDict = {
   large: {
     '@desc': '`protein and not (small or medium)`',
     map: () => B.struct.modifier.intersectBy({
-      selection: proteinExpr(),
+      0: proteinExpr(),
       by: h.invertExpr(
         resnameExpr(ResDict.small.concat(ResDict.medium))
       )
@@ -242,7 +242,7 @@ const keywords: KeywordDict = {
   polar: {
     '@desc': '`protein and not hydrophobic`',
     map: () => B.struct.modifier.intersectBy({
-      selection: proteinExpr(),
+      0: proteinExpr(),
       by: h.invertExpr(resnameExpr(ResDict.hydrophobic))
     })
   },
@@ -261,7 +261,7 @@ const keywords: KeywordDict = {
   surface: {
     '@desc': '`protein and not buried`',
     map: () => B.struct.modifier.intersectBy({
-      selection: proteinExpr(),
+      0: proteinExpr(),
       by: h.invertExpr(resnameExpr(ResDict.buried))
     })
   },
