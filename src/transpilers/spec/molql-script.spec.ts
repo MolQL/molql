@@ -51,9 +51,7 @@ describe('molql-script', () => {
   (atom.sel.atom-groups
     :residue-test true
     :group-by (atom.key.res))
-    :target (atom.sel.atom-groups
-      :residue-test (= (atom.label_comp_id) HEM)
-      :group-by (atom.key.res))
+    :target (atom.sel.res (= atom.label_comp_id HEM))
   ;; default bond test allows only covalent bonds
   :bond-test true
   :disjunct true)`

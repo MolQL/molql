@@ -4,14 +4,22 @@
  * @author David Sehnal <david.sehnal@gmail.com>
  */
 
-import Symbol from '../../molql/symbol'
+import Symbol, { Arguments, Argument } from '../../molql/symbol'
+import B from '../../molql/builder'
 import MolQL from '../../molql/symbol-table'
+import Type from '../../molql/type'
+import * as Struct from '../../molql/symbol-table/structure'
+import Expression from '../../mini-lisp/expression'
 import { UniqueArrayBuilder } from '../../reference-implementation/utils/collections'
 
 export type MolQLScriptSymbol =
     | { kind: 'alias', aliases: string[], symbol: Symbol }
+    | { kind: 'macro', aliases: string[], symbol: Symbol, translate: (args: any) => Expression }
 
 function Alias(symbol: Symbol, ...aliases: string[]): MolQLScriptSymbol { return { kind: 'alias', aliases, symbol }; }
+function Macro(symbol: Symbol, translate: (args: any) => Expression, ...aliases: string[]): MolQLScriptSymbol {
+    return { kind: 'macro', symbol, translate, aliases: [symbol.info.name, ...aliases] };
+}
 
 const list: MolQLScriptSymbol[] = [
     Alias(MolQL.core.type.bool, 'bool'),
@@ -135,7 +143,22 @@ const list: MolQLScriptSymbol[] = [
 
     Alias(MolQL.structure.type.bondFlags, 'bond.flags'),
     Alias(MolQL.structure.bondProperty.order, 'bond.order'),
-    Alias(MolQL.structure.bondProperty.hasFlags, 'bond.has-flags')
+    Alias(MolQL.structure.bondProperty.hasFlags, 'bond.has-flags'),
+
+    Macro(Symbol('atom.sel.res', Arguments.Dictionary({
+        0: Argument(Type.Bool, { isOptional: true, defaultValue: true, description: 'Test applied to the 1st atom of each residue. '})
+    }), Struct.Types.AtomSelection, 'A list of atom sets grouped by residue.'),
+    args => B.struct.generator.atomGroups({
+        'residue-test': (args && args[0]) || true,
+        'group-by': B.ammp('residueKey')
+    })),
+    Macro(Symbol('atom.sel.chains', Arguments.Dictionary({
+        0: Argument(Type.Bool, { isOptional: true, defaultValue: true, description: 'Test applied to the 1st atom of each chain. '})
+    }), Struct.Types.AtomSelection, 'A list of atom sets grouped by chain.'),
+    args => B.struct.generator.atomGroups({
+        'chain-test': (args && args[0]) || true,
+        'group-by': B.ammp('chainKey')
+    }))
 ];
 
 export const Constants = [

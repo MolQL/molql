@@ -28,11 +28,7 @@ const lang: Language = {
     }, {
         name: 'Cluster LYS residues within 5 ang',
         value: `(atom.sel.cluster
-  (atom.sel.atom-groups
-    :residue-test (eq
-      (atom.auth_comp_id)
-      LYS)
-    :group-by (atom.key.res))
+  (atom.sel.res (= atom.label_comp_id LYS))
   :max-distance 5)`
     }, {
         name: 'Residues with max b-factor < 45',
@@ -52,18 +48,14 @@ const lang: Language = {
   (atom.sel.atom-groups
     :residue-test true
     :group-by (atom.key.res))
-  :target (atom.sel.atom-groups
-    :residue-test (= (atom.label_comp_id) HEM)
-    :group-by (atom.key.res))
+  :target (atom.sel.res (= atom.label_comp_id HEM))
   ;; default bond test allows only covalent bonds
   :bond-test true
   :disjunct true)`
     }, {
       name: 'HEM and 2 layers of connected residues',
       value: `(atom.sel.include-connected
-  (atom.sel.atom-groups
-    :residue-test (= (atom.label_comp_id) HEM)
-    :group-by (atom.key.res))
+  (atom.sel.res (= atom.label_comp_id HEM))
   ;; default bond test allows only covalent bonds
   ;; another option is to use :bond-test true to allow any connection
   :bond-test (bond.has-flags (bond.flags metallic covalent))

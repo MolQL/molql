@@ -9,14 +9,20 @@ import * as P from 'parsimmon'
 
 import Transpiler from '../transpiler'
 import Expression from '../../mini-lisp/expression'
-import { SymbolMap } from './symbols'
+import { SymbolMap, MolQLScriptSymbol } from './symbols'
 import B from '../../molql/builder'
 
 const ws = P.regex(/[\n\r\s]*/)
 
-function getSymbol(name: string) {
-  const s = SymbolMap[name] && SymbolMap[name]!.symbol;
-  return s && s.id;
+// function getSymbol(name: string): MolQLScriptSymbol {
+//   const s = SymbolMap[name] && SymbolMap[name]!.symbol;
+// }
+
+function getSymbolExpression(s: MolQLScriptSymbol, args?: any) {
+  switch (s.kind) {
+    case 'alias': return args ? Expression.Apply(s.symbol.id, args) : Expression.Apply(s.symbol.id);
+    case 'macro': return s.translate(args);
+  }
 }
 
 const lang = P.createLanguage({
@@ -66,7 +72,7 @@ const lang = P.createLanguage({
   Symbol: function () {
     return P.regexp(/[^\s'`,@()\[\]{}';:]+/)  // /[a-zA-Z_-][a-zA-Z0-9_.-]+/)
       .map(x => {
-        const s = getSymbol(x);
+        const s = SymbolMap[x];
         if (!s) {
           throw new Error(`'${x}': unknown symbol.`);
         }
@@ -78,8 +84,8 @@ const lang = P.createLanguage({
   String: function () {
     return P.regexp(/[a-zA-Z_-]+[a-zA-Z0-9_.-]*/)
       .map(x => {
-        const s = getSymbol(x);
-        if (s) return Expression.Apply(s);
+        const s = SymbolMap[x];
+        if (s) return getSymbolExpression(s);
         return x;
       }).desc('string')
   },
@@ -146,11 +152,11 @@ const lang = P.createLanguage({
           if (array) {
             for (let i = 0; i < array.length; i++) named[i] = array[i];
           }
-          return Expression.Apply(x[0], named);
+          return getSymbolExpression(x[0], named);
         } else if (array && array.length) {
-          return Expression.Apply(x[0], x[1]);
+          return getSymbolExpression(x[0], x[1]);
         } else {
-          return Expression.Apply(x[0])
+          return getSymbolExpression(x[0])
         }
       })
       .desc('list')
