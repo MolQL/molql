@@ -13,6 +13,7 @@ export namespace Types {
     export const ElementSymbol = Type.Value('Structure', 'ElementSymbol');
     export const BondFlags = Type.Value('Structure', 'BondFlags');
     export const RingFingerprint = Type.Value('Structure', 'RingFingerprint');
+    export const EntityType = Type.Value('Structure', 'EntityType');
     export const ResidueId = Type.Value('Structure', 'ResidueId');
 
     export const AtomSet = Type.Value('Structure', 'AtomSet');
@@ -25,6 +26,7 @@ export namespace Types {
 const type = {
     '@header': 'Types',
     elementSymbol: symbol(Arguments.Dictionary({ 0: Argument(Type.Str) }), Types.ElementSymbol, 'Create element symbol representation from a string value.'),
+    entityType: symbol(Arguments.Dictionary({ 0: Argument(Type.Str) }), Types.EntityType, 'Create normalized representation of entity type: polymer/non-polymer/water/unknown.'),
     bondFlags: symbol(Arguments.List(Type.Str), Types.BondFlags, 'Create bond flags representation from a list of strings. Allowed flags: covalent, metallic, ion, hydrogen, sulfide, computed, aromatic.'),
     ringFingerprint: symbol(Arguments.List(Types.ElementSymbol, { nonEmpty: true }), Types.RingFingerprint, 'Create ring fingerprint from the supplied atom element list.'),
     authResidueId: symbol(Arguments.Dictionary({
@@ -232,7 +234,7 @@ const atomProperty = {
         occupancy: atomProp(Type.Num),
         B_iso_or_equiv: atomProp(Type.Num),
 
-        entityType: atomProp(Type.Str, 'Type of the entity as defined in mmCIF (polymer, non-polymer, water)'),
+        entityType: atomProp(Types.EntityType, 'Type of the entity as defined in mmCIF (polymer, non-polymer, water, unknown)'),
     }
 }
 

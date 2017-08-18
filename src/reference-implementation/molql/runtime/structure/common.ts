@@ -29,3 +29,13 @@ export function ringFingerprint(env: Environment, elements: Expression<string>[]
     for (const e of elements) els.push(e(env));
     return getRingFingerprint(els);
 }
+
+export function entityType(type: string) {
+    const t = (type || '').toLowerCase();
+    switch (t) {
+        case 'polymer':
+        case 'non-polymer':
+        case 'water': return 'water';
+        default: return 'unknown';
+    }
+}

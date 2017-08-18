@@ -171,6 +171,12 @@ export const Constants = [
     'computed',
     'aromatic',
 
+    // entity types,
+    'polymer',
+    'non-polymer',
+    'water',
+    'unknown',
+
     'true',
     'false'
 ];

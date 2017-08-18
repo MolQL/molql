@@ -74,7 +74,7 @@ describe('generator', () => {
     testPropEq(B.struct.atomProperty.macromolecular.occupancy, 1.0, 'occupancy');
 
     it(`entityType`, function() {
-        const q = B.struct.generator.atomGroups({ 'atom-test': B.core.rel.eq([B.ammp('entityType'), 'water']) })
+        const q = B.struct.generator.atomGroups({ 'atom-test': B.core.rel.eq([B.ammp('entityType'), B.struct.type.entityType(['water'])]) })
         const sel = Data.compileQuery(q)(Data.ctx);
         expect(AtomSelection.atomSets(sel).length).toBeGreaterThan(0);
         const check = Data.checkAtomSelection(Data.model, sel, (i, cols) => cols.type_symbol.getString(i) === 'O');
