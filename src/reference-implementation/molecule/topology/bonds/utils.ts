@@ -4,8 +4,8 @@
  * @author David Sehnal <david.sehnal@gmail.com>
  */
 
-import { FastMap } from '../../utils/collections'
-import { Model, BondFlag } from '../data'
+import { FastMap } from '../../../utils/collections'
+import { Model, BondFlag } from '../../data'
 import CIF from 'ciftools.js'
 
 export class StructConn {

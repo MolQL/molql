@@ -4,11 +4,11 @@
  * @author David Sehnal <david.sehnal@gmail.com>
  */
 
-import { FastSet, FastMap } from '../../utils/collections'
-import Mask from '../../utils/mask'
-import { ComponentBondInfo, StructConn } from './bonds-utils'
-import { Model, BondFlag, Bonds } from '../data'
-import { ElementIndex, ElementBondThresholds, ElementPairThresholds, DefaultBondingRadius } from '../constants'
+import { FastSet, FastMap } from '../../../utils/collections'
+import Mask from '../../../utils/mask'
+import { ComponentBondInfo, StructConn } from './utils'
+import { Model, BondFlag, Bonds } from '../../data'
+import { ElementIndex, ElementBondThresholds, ElementPairThresholds, DefaultBondingRadius } from '../../constants'
 
 export interface BondComputationParameters {
     maxHbondLength: number,

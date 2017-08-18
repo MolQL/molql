@@ -4,9 +4,9 @@
  * @author David Sehnal <david.sehnal@gmail.com>
  */
 
-import { Model, Bonds } from '../data'
+import { Model, Bonds } from '../../data'
 
-export function computeRings(model: Model) {
+export default function computeRings(model: Model) {
     const size = largestResidue(model);
     const state = State(model, size);
 

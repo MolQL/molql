@@ -6,9 +6,9 @@
 
 import * as mmCIF from './mmcif'
 import SpatialLookup from '../utils/spatial-lookup'
-import computeBonds from './topology/bonds-compute'
+import computeBonds from './topology/bonds/compute'
 import computeConnectedComponents from './topology/connected-components'
-import * as Rings from './topology/rings'
+import Rings from './topology/rings/collection'
 import { ElementIndex, ElementVdwRadii, DefaultVdwRadius } from './constants'
 
 export const enum SecondaryStructureType {
@@ -100,7 +100,7 @@ export interface Model {
     '@spatialLookup': SpatialLookup | undefined,
     '@connectedComponentKey': number[] | undefined,
     '@bonds': Bonds | undefined,
-    '@rings': number[][] | undefined
+    '@rings': Rings | undefined
 }
 
 export interface Structure {
@@ -170,7 +170,7 @@ export namespace Model {
 
     export function rings(model: Model) {
         if (model['@rings']) return model['@rings']!;
-        const rings = Rings.computeRings(model);;
+        const rings = Rings(model);
         model['@rings'] = rings;
         return rings;
     }
