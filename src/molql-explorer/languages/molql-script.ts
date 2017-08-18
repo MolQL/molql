@@ -19,10 +19,7 @@ const lang: Language = {
     }, {
         name: 'All residues within 5 ang from Fe atom',
         value: `(atom.sel.include-surroundings
-  (atom.sel.atom-groups
-    :atom-test (=
-      (atom.el)
-      (atom.new.el Fe)))
+  (atom.sel.atoms (= atom.el _Fe))
   :radius 5
   :as-whole-residues true)`
     }, {
@@ -33,8 +30,7 @@ const lang: Language = {
     }, {
         name: 'Residues with max b-factor < 45',
         value: `(atom.sel.pick
-  (atom.sel.atom-groups
-    :group-by (atom.key.res))
+  atom.sel.res
   :test (<
     (atom.set.reduce
       :initial (atom.B_iso_or_equiv)
@@ -45,9 +41,7 @@ const lang: Language = {
     }, {
       name: 'Residues connected to HEM',
       value: `(atom.sel.is-connected-to
-  (atom.sel.atom-groups
-    :residue-test true
-    :group-by (atom.key.res))
+  atom.sel.res
   :target (atom.sel.res (= atom.label_comp_id HEM))
   ;; default bond test allows only covalent bonds
   :bond-test true

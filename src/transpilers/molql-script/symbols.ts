@@ -146,18 +146,24 @@ const list: MolQLScriptSymbol[] = [
     Alias(MolQL.structure.bondProperty.order, 'bond.order'),
     Alias(MolQL.structure.bondProperty.hasFlags, 'bond.has-flags'),
 
+    Macro(Symbol('atom.sel.atoms', Arguments.Dictionary({
+        0: Argument(Type.Bool, { isOptional: true, defaultValue: true, description: 'Test applied to each atom.' })
+    }), Struct.Types.AtomSelection, 'A selection of singleton atom sets.'),
+    args => B.struct.generator.atomGroups({ 'atom-test': (args && args[0] !== void 0) ? args[0] : true })),
+
     Macro(Symbol('atom.sel.res', Arguments.Dictionary({
-        0: Argument(Type.Bool, { isOptional: true, defaultValue: true, description: 'Test applied to the 1st atom of each residue. '})
-    }), Struct.Types.AtomSelection, 'A list of atom sets grouped by residue.'),
+        0: Argument(Type.Bool, { isOptional: true, defaultValue: true, description: 'Test applied to the 1st atom of each residue.' })
+    }), Struct.Types.AtomSelection, 'A selection of atom sets grouped by residue.'),
     args => B.struct.generator.atomGroups({
-        'residue-test': (args && args[0]) || true,
+        'residue-test': (args && args[0] !== void 0) ? args[0] : true,
         'group-by': B.ammp('residueKey')
     })),
+
     Macro(Symbol('atom.sel.chains', Arguments.Dictionary({
-        0: Argument(Type.Bool, { isOptional: true, defaultValue: true, description: 'Test applied to the 1st atom of each chain. '})
-    }), Struct.Types.AtomSelection, 'A list of atom sets grouped by chain.'),
+        0: Argument(Type.Bool, { isOptional: true, defaultValue: true, description: 'Test applied to the 1st atom of each chain.' })
+    }), Struct.Types.AtomSelection, 'A selection of atom sets grouped by chain.'),
     args => B.struct.generator.atomGroups({
-        'chain-test': (args && args[0]) || true,
+        'chain-test': (args && args[0] !== void 0) ? args[0] : true,
         'group-by': B.ammp('chainKey')
     }))
 ];
