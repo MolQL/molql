@@ -11,7 +11,7 @@ import { symbol } from '../helpers'
 
 export namespace Types {
     export const ElementSymbol = Type.Value('Structure', 'ElementSymbol');
-    export const BondFlag = Type.OneOf('Structure', 'BondFlags', Type.Str, ['covalent', 'metallic', 'ion', 'hydrogen', 'sulfide', 'computed', 'aromatic']);
+    export const BondFlag = Type.OneOf('Structure', 'BondFlag', Type.Str, ['covalent', 'metallic', 'ion', 'hydrogen', 'sulfide', 'computed', 'aromatic']);
     export const RingFingerprint = Type.Value('Structure', 'RingFingerprint');
     export const EntityType = Type.OneOf('Structure', 'EntityType', Type.Str, ['polymer', 'non-polymer', 'water', 'unknown']);
     export const ResidueId = Type.Value('Structure', 'ResidueId');
