@@ -74,6 +74,7 @@ const list: MolQLScriptSymbol[] = [
     Alias(MolQL.core.set.isSubset, 'set.subset'),
 
     Alias(MolQL.structure.type.elementSymbol, 'atom.new.el'),
+    Alias(MolQL.structure.type.entityType, 'atom.new.ent-type'),
     Alias(MolQL.structure.type.authResidueId, 'atom.new.auth-resid'),
     Alias(MolQL.structure.type.labelResidueId, 'atom.new.label-resid'),
     Alias(MolQL.structure.type.ringFingerprint, 'atom.ringfp'),
