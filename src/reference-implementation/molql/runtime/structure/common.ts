@@ -5,8 +5,10 @@
  */
 
 import Environment from '../environment'
+import Expression from '../expression'
 import BondAddress from '../../data/bond-address'
 import { Bonds } from '../../../molecule/data'
+import { getRingFingerprint } from '../../../molecule/topology/rings/collection'
 
 export type BondTest = (env: Environment) => boolean
 
@@ -20,4 +22,10 @@ export function testBond(env: Environment, slot: BondAddress, a: number, b: numb
     slot.order = order;
     slot.flags = flags;
     return test(env);
+}
+
+export function ringFingerprint(env: Environment, elements: Expression<string>[]) {
+    const els: string[] = [];
+    for (const e of elements) els.push(e(env));
+    return getRingFingerprint(els);
 }

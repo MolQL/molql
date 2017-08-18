@@ -72,6 +72,13 @@ const lang: Language = {
     }, {
       name: 'All rings',
       value: `(atom.sel.rings)`
+    }, {
+      name: 'CCCCN and CCNCN rings',
+      value: `(atom.sel.rings
+  (atom.ringfp _C _N _C _N _C)
+  ;; the "rotation" of element symbols has no effect
+  ;; the following is the same as (atom.ringfp _C _C _C _C _N)
+  (atom.ringfp _C _C _C _N _C))`
     }]
 }
 

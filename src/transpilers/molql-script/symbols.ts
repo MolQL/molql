@@ -68,6 +68,7 @@ const list: MolQLScriptSymbol[] = [
     Alias(MolQL.structure.type.elementSymbol, 'atom.new.el'),
     Alias(MolQL.structure.type.authResidueId, 'atom.new.auth-resid'),
     Alias(MolQL.structure.type.labelResidueId, 'atom.new.label-resid'),
+    Alias(MolQL.structure.type.ringFingerprint, 'atom.ringfp'),
 
     Alias(MolQL.structure.slot.atom, 'atom.current'),
     Alias(MolQL.structure.slot.atomSetReduce, 'atom.set.reduce.value'),

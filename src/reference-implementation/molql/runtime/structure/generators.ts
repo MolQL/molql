@@ -6,7 +6,7 @@
 
 import Environment from '../environment'
 import Expression from '../expression'
-import { FastMap, sortAsc } from '../../../utils/collections'
+import { FastMap, FastSet, sortAsc } from '../../../utils/collections'
 import AtomSet from '../../data/atom-set'
 import AtomSelection from '../../data/atom-selection'
 import ElementAddress from '../../data/element-address'
@@ -135,14 +135,29 @@ export function querySelection(env: Environment, selection: Expression<AtomSelec
     }
 }
 
-export function rings(env: Environment) {
+export function rings(env: Environment, fingerprints: Expression<string>[]) {
     const rings = Model.rings(env.context.model);
     const ret = AtomSelection.linearBuilder();
-    for (const r of rings.all) {
-        // copy and sort it
-        const xs: number[] = [];
-        for (let i = 0, _i = r.length; i < _i; i++) xs[xs.length] = r[i];
-        ret.add(AtomSet(sortAsc(xs)));
+
+    if (fingerprints.length) {
+        const set = FastSet.ofArray(fingerprints.map(f => f(env)));
+        set.forEach(fp => {
+            const rs = rings.byFingerprint.get(fp);
+            if (!rs) return;
+            for (const rI of rs) {
+                const r = rings.all[rI];
+                const xs: number[] = [];
+                for (let i = 0, _i = r.length; i < _i; i++) xs[xs.length] = r[i];
+                ret.add(AtomSet(sortAsc(xs)));
+            }
+        });
+    } else {
+        for (const r of rings.all) {
+            // copy and sort it
+            const xs: number[] = [];
+            for (let i = 0, _i = r.length; i < _i; i++) xs[xs.length] = r[i];
+            ret.add(AtomSet(sortAsc(xs)));
+        }
     }
     return ret.getSelection();
 }

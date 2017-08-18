@@ -179,6 +179,7 @@ export const SymbolRuntime: Symbol.Info[] = [
     // ============= TYPES ================
     Symbol(MolQL.structure.type.elementSymbol, staticAttr)((env, v) => ElementSymbol(v[0](env))),
     Symbol(MolQL.structure.type.bondFlags, staticAttr)((env, v) => StructureRuntime.BondProperties.createFlags(env, v as any)),
+    Symbol(MolQL.structure.type.ringFingerprint, staticAttr)((env, v) => StructureRuntime.Common.ringFingerprint(env, v as any)),
     Symbol(MolQL.structure.type.authResidueId, staticAttr)((env, v) => ResidueIdentifier.auth(v[0](env), v[1](env), v[2] && v[2](env))),
     Symbol(MolQL.structure.type.labelResidueId, staticAttr)((env, v) => ResidueIdentifier.label(v[0](env), v[1](env), v[2](env), v[3] && v[3](env))),
 
@@ -190,8 +191,8 @@ export const SymbolRuntime: Symbol.Info[] = [
     Symbol(MolQL.structure.generator.atomGroups)((env, v) =>
         (env) => StructureRuntime.Generators.atomGroupsGenerator(env, { entityTest: v['entity-test'], chainTest: v['chain-test'], residueTest: v['residue-test'], atomTest: v['atom-test'], groupBy: v['group-by'] })),
     Symbol(MolQL.structure.generator.queryInSelection)((env, v) => env => StructureRuntime.Generators.querySelection(env, v[0](env), v.query(env), v['in-complement'])),
-    Symbol(MolQL.structure.generator.rings)(() => env => StructureRuntime.Generators.rings(env)),
-    Symbol(MolQL.structure.generator.empty)(() => env => StructureRuntime.Generators.empty(env)),
+    Symbol(MolQL.structure.generator.rings)((env, v) => env => StructureRuntime.Generators.rings(env, v as any)),
+    Symbol(MolQL.structure.generator.empty)((env, v) => env => StructureRuntime.Generators.empty(env)),
 
     // ============= MODIFIERS ================
     Symbol(MolQL.structure.modifier.queryEach)((env, v) => env => StructureRuntime.Modifiers.queryEach(env, v[0](env), v.query(env))),

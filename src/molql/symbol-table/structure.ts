@@ -12,6 +12,7 @@ import { symbol } from '../helpers'
 export namespace Types {
     export const ElementSymbol = Type.Value('Structure', 'ElementSymbol');
     export const BondFlags = Type.Value('Structure', 'BondFlags');
+    export const RingFingerprint = Type.Value('Structure', 'RingFingerprint');
     export const ResidueId = Type.Value('Structure', 'ResidueId');
 
     export const AtomSet = Type.Value('Structure', 'AtomSet');
@@ -25,6 +26,7 @@ const type = {
     '@header': 'Types',
     elementSymbol: symbol(Arguments.Dictionary({ 0: Argument(Type.Str) }), Types.ElementSymbol, 'Create element symbol representation from a string value.'),
     bondFlags: symbol(Arguments.List(Type.Str), Types.BondFlags, 'Create bond flags representation from a list of strings. Allowed flags: covalent, metallic, ion, hydrogen, sulfide, computed, aromatic.'),
+    ringFingerprint: symbol(Arguments.List(Types.ElementSymbol, { nonEmpty: true }), Types.RingFingerprint, 'Create ring fingerprint from the supplied atom element list.'),
     authResidueId: symbol(Arguments.Dictionary({
         0: Argument(Type.Str, { description: 'auth_asym_id' }),
         1: Argument(Type.Num, { description: 'auth_seq_id' }),
@@ -54,7 +56,7 @@ const generator = {
         'group-by': Argument(Type.Any, { isOptional: true, defaultValue: `atom-key`, description: 'Group atoms to sets based on this property. Default: each atom has its own set' }),
     }), Types.AtomSelectionQuery, 'Return all atoms for which the tests are satisfied, grouped into sets.'),
 
-    rings: symbol(Arguments.None, Types.AtomSelectionQuery),
+    rings: symbol(Arguments.List(Types.RingFingerprint), Types.AtomSelectionQuery, 'Return rings with the specified fingerprint(s). If no fingerprints are given, return all rings.'),
 
     queryInSelection: symbol(Arguments.Dictionary({
         0: Argument(Types.AtomSelectionQuery),

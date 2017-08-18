@@ -11,6 +11,7 @@ import * as Combinators from './structure/combinators'
 import * as AtomSet from './structure/atom-set'
 import * as AtomProperties from './structure/atom-properties'
 import * as BondProperties from './structure/bond-properties'
+import * as Common from './structure/common'
 
 export default {
     Generators,
@@ -19,5 +20,6 @@ export default {
     Combinators,
     AtomSet,
     AtomProperties,
-    BondProperties
+    BondProperties,
+    Common
 }
