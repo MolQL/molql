@@ -151,7 +151,7 @@ const combinator = {
     intersect: symbol(Arguments.List(Types.AtomSelectionQuery), Types.AtomSelectionQuery, 'Return all unique atom sets that appear in all of the source selections.'),
     merge: symbol(Arguments.List(Types.AtomSelectionQuery), Types.AtomSelectionQuery, 'Merges multiple selections into a single one. Only unique atom sets are kept.'),
     distanceCluster: symbol(Arguments.Dictionary({
-        matrix: Argument(Core.Types.List(Core.Types.List(Type.Num)), { description: 'Distance matrix, represented as list of rows (num[][])). Lower triangle is min distance, upper triange is max distance.' }),
+        matrix: Argument(Core.Types.List(Core.Types.List(Type.Num)), { description: 'Distance matrix, represented as list of rows (num[][])). Lower triangle is min distance, upper triangle is max distance.' }),
         selections: Argument(Core.Types.List(Types.AtomSelectionQuery), { description: 'A list of held selections.' })
     }), Types.AtomSelectionQuery, 'Pick combinations of atom sets from the source sequences that are mutually within distances specified by a matrix.')
 }
