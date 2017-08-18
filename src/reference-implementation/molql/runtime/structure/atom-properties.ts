@@ -9,7 +9,7 @@ import SymbolRuntime from '../../symbol'
 import Environment from '../environment'
 import RuntimeExpression from '../expression'
 import ElementAddress from '../../data/element-address'
-import { Model, ElementSymbol, ResidueIdentifier } from '../../../molecule/data'
+import { Model, ElementSymbol, ResidueIdentifier, VdwRadius } from '../../../molecule/data'
 
 function prop(runtime: SymbolRuntime) { return runtime; }
 
@@ -19,6 +19,8 @@ function getAddress(env: Environment, xs: { 0?: RuntimeExpression }): ElementAdd
 
 export const Core: { [P in keyof typeof MolQL.structure.atomProperty.core]?: SymbolRuntime } = {
     elementSymbol: prop((env, v) => ElementSymbol(env.context.atom_site.type_symbol.getString(getAddress(env, v).dataIndex) || '')),
+
+    vdw: prop((env, v) => VdwRadius(env.context.atom_site.type_symbol.getString(getAddress(env, v).dataIndex) || '')),
 
     x: prop((env, v) => env.context.model.positions.x[getAddress(env, v).atom]),
     y: prop((env, v) => env.context.model.positions.y[getAddress(env, v).atom]),

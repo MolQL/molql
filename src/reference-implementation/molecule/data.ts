@@ -9,6 +9,7 @@ import SpatialLookup from '../utils/spatial-lookup'
 import computeBonds from './topology/bonds-compute'
 import computeConnectedComponents from './topology/connected-components'
 import * as Rings from './topology/rings'
+import { ElementIndex, ElementVdwRadii, DefaultVdwRadius } from './constants'
 
 export const enum SecondaryStructureType {
     None = 0,
@@ -116,6 +117,11 @@ export function ElementSymbol(symbol: any): string {
     val = typeof symbol === 'string' ? symbol.toUpperCase() : `${symbol}`.toUpperCase();
     elementSymbolCache[symbol] = val;
     return val;
+}
+
+export function VdwRadius(element: string): number {
+    const i = ElementIndex[element];
+    return i === void 0 ? DefaultVdwRadius : ElementVdwRadii[i]!
 }
 
 export type ResidueIdentifier = string

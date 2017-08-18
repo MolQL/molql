@@ -86,7 +86,7 @@ const operators: OperatorList = [
       return B.struct.filter.within({
         '0': B.struct.generator.atomGroups(),
         target,
-        radius: B.core.math.add([distance, 1.4]) // TODO replace by vdw
+        radius: B.core.math.add([distance, B.acp('vdw')])
       })
     }
   },

@@ -5,6 +5,7 @@
  */
 
 // https://pymol.org/dokuwiki/doku.php?id=selection:alpha
+// https://github.com/evonove/pymol/blob/master/pymol/layer3/Selector.cpp
 
 import * as P from 'parsimmon'
 

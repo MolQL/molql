@@ -185,6 +185,8 @@ const atomProperty = {
 
         elementSymbol: atomProp(Types.ElementSymbol),
 
+        vdw: atomProp(Type.Num, 'Van der Waals radius'),
+
         x: atomProp(Type.Num, 'Cartesian X coordinate'),
         y: atomProp(Type.Num, 'Cartesian Y coordinate'),
         z: atomProp(Type.Num, 'Cartesian Z coordinate'),
