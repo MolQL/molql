@@ -8,6 +8,7 @@ import * as mmCIF from './mmcif'
 import SpatialLookup from '../utils/spatial-lookup'
 import computeBonds from './topology/bonds-compute'
 import computeConnectedComponents from './topology/connected-components'
+import * as Rings from './topology/rings'
 
 export const enum SecondaryStructureType {
     None = 0,
@@ -97,7 +98,8 @@ export interface Model {
 
     '@spatialLookup': SpatialLookup | undefined,
     '@connectedComponentKey': number[] | undefined,
-    '@bonds': Bonds | undefined
+    '@bonds': Bonds | undefined,
+    '@rings': number[][] | undefined
 }
 
 export interface Structure {
@@ -160,6 +162,13 @@ export namespace Model {
         return bonds;
     }
 
+    export function rings(model: Model) {
+        if (model['@rings']) return model['@rings']!;
+        const rings = Rings.computeRings(model);;
+        model['@rings'] = rings;
+        return rings;
+    }
+
     export function connectedComponentKey(model: Model): number[] {
         if (model['@connectedComponentKey']) return model['@connectedComponentKey']!;
         const key = computeConnectedComponents(model);
@@ -190,6 +199,10 @@ export namespace Model {
         const { atomStartIndex, atomEndIndex } = model.residues;
         const { dataIndex } = model.atoms;
         const { label_atom_id, label_alt_id } = model.data.atom_site;
+
+        if (!atomName) {
+            console.log(residueIndex, {  atomName });
+        }
 
         for (let i = atomStartIndex[residueIndex], _i = atomEndIndex[residueIndex]; i <= _i; i++) {
             const idx = dataIndex[i];

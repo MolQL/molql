@@ -69,6 +69,9 @@ const lang: Language = {
   :bond-test (bond.has-flags (bond.flags metallic covalent))
   :layer-count 2
   :as-whole-residues true)`
+    }, {
+      name: 'All rings',
+      value: `(atom.sel.rings)`
     }]
 }
 

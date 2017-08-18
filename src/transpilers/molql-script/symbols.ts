@@ -74,6 +74,7 @@ const list: MolQLScriptSymbol[] = [
 
     Alias(MolQL.structure.generator.atomGroups, 'atom.sel.atom-groups'),
     Alias(MolQL.structure.generator.queryInSelection, 'atom.sel.query-in-selection'),
+    Alias(MolQL.structure.generator.rings, 'atom.sel.rings'),
     Alias(MolQL.structure.generator.empty, 'atom.sel.empty'),
 
     Alias(MolQL.structure.modifier.queryEach, 'atom.sel.query-each'),

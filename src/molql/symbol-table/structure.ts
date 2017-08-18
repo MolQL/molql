@@ -54,6 +54,8 @@ const generator = {
         'group-by': Argument(Type.Any, { isOptional: true, defaultValue: `atom-key`, description: 'Group atoms to sets based on this property. Default: each atom has its own set' }),
     }), Types.AtomSelectionQuery, 'Return all atoms for which the tests are satisfied, grouped into sets.'),
 
+    rings: symbol(Arguments.None, Types.AtomSelectionQuery),
+
     queryInSelection: symbol(Arguments.Dictionary({
         0: Argument(Types.AtomSelectionQuery),
         query: Argument(Types.AtomSelectionQuery),

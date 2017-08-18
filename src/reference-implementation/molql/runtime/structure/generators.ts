@@ -11,6 +11,7 @@ import AtomSet from '../../data/atom-set'
 import AtomSelection from '../../data/atom-selection'
 import ElementAddress from '../../data/element-address'
 import Context from '../context'
+import { Model } from '../../../molecule/data'
 import Mask from '../../../utils/mask'
 
 type Pred = Expression<boolean>
@@ -134,4 +135,13 @@ export function querySelection(env: Environment, selection: Expression<AtomSelec
     }
 }
 
-export function empty() { return AtomSelection.empty }
+export function rings(env: Environment) {
+    const rings = Model.rings(env.context.model);
+    const ret = AtomSelection.linearBuilder();
+    for (const r of rings) {
+        ret.add(AtomSet(r));
+    }
+    return ret.getSelection();
+}
+
+export function empty(env: Environment) { return AtomSelection.empty }
