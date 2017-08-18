@@ -162,30 +162,11 @@ const list: MolQLScriptSymbol[] = [
     }))
 ];
 
-export const Constants = [
-    // bond types
-    'covalent',
-    'metallic',
-    'ion',
-    'hydrogen',
-    'sulfide',
-    'computed',
-    'aromatic',
-
-    // entity types,
-    'polymer',
-    'non-polymer',
-    'water',
-    'unknown',
-
-    'true',
-    'false'
-];
-
 const normalized = (function () {
     const symbolList: [string, MolQLScriptSymbol][] = [];
     const symbolMap: { [id: string]: MolQLScriptSymbol | undefined } = Object.create(null);
     const namedArgs = UniqueArrayBuilder<string>();
+    const constants = UniqueArrayBuilder<string>();
 
     for (const s of list) {
         for (const a of s.aliases) {
@@ -194,15 +175,25 @@ const normalized = (function () {
             symbolMap[a] = s;
         }
         const args = s.symbol.args;
-        if (args.kind !== 'dictionary') continue;
+        if (args.kind !== 'dictionary') {
+            if (args.type.kind === 'oneof') {
+                Type.oneOfValues(args.type).forEach(v => UniqueArrayBuilder.add(constants, v, v));
+            }
+            continue;
+        }
         for (const a of Object.keys(args.map)) {
             if (isNaN(a as any)) UniqueArrayBuilder.add(namedArgs, a, a);
+            const arg = ((args.map as any)[a]) as Argument;
+            if (arg.type.kind === 'oneof') {
+                Type.oneOfValues(arg.type).forEach(v => UniqueArrayBuilder.add(constants, v, v));
+            }
         }
     }
 
-    return { symbolList, symbolMap, namedArgs: namedArgs.array }
+    return { symbolList, symbolMap, namedArgs: namedArgs.array, constants: constants.array }
 })();
 
+export const Constants = normalized.constants;
 export const NamedArgs = normalized.namedArgs;
 export const SymbolMap = normalized.symbolMap;
 export const SymbolList = normalized.symbolList;

@@ -11,9 +11,9 @@ import { symbol } from '../helpers'
 
 export namespace Types {
     export const ElementSymbol = Type.Value('Structure', 'ElementSymbol');
-    export const BondFlags = Type.Value('Structure', 'BondFlags');
+    export const BondFlag = Type.OneOf('Structure', 'BondFlags', Type.Str, ['covalent', 'metallic', 'ion', 'hydrogen', 'sulfide', 'computed', 'aromatic']);
     export const RingFingerprint = Type.Value('Structure', 'RingFingerprint');
-    export const EntityType = Type.Value('Structure', 'EntityType');
+    export const EntityType = Type.OneOf('Structure', 'EntityType', Type.Str, ['polymer', 'non-polymer', 'water', 'unknown']);
     export const ResidueId = Type.Value('Structure', 'ResidueId');
 
     export const AtomSet = Type.Value('Structure', 'AtomSet');
@@ -26,8 +26,8 @@ export namespace Types {
 const type = {
     '@header': 'Types',
     elementSymbol: symbol(Arguments.Dictionary({ 0: Argument(Type.Str) }), Types.ElementSymbol, 'Create element symbol representation from a string value.'),
-    entityType: symbol(Arguments.Dictionary({ 0: Argument(Type.Str) }), Types.EntityType, 'Create normalized representation of entity type: polymer/non-polymer/water/unknown.'),
-    bondFlags: symbol(Arguments.List(Type.Str), Types.BondFlags, 'Create bond flags representation from a list of strings. Allowed flags: covalent, metallic, ion, hydrogen, sulfide, computed, aromatic.'),
+    entityType: symbol(Arguments.Dictionary({ 0: Argument(Types.EntityType) }), Types.EntityType, `Create normalized representation of entity type: ${Type.oneOfValues(Types.EntityType).join(', ')}.`),
+    bondFlags: symbol(Arguments.List(Types.BondFlag), Types.BondFlag, `Create bond flags representation from a list of strings. Allowed flags: ${Type.oneOfValues(Types.BondFlag).join(', ')}.`),
     ringFingerprint: symbol(Arguments.List(Types.ElementSymbol, { nonEmpty: true }), Types.RingFingerprint, 'Create ring fingerprint from the supplied atom element list.'),
     authResidueId: symbol(Arguments.Dictionary({
         0: Argument(Type.Str, { description: 'auth_asym_id' }),
@@ -242,7 +242,7 @@ const bondProperty = {
     '@header': 'Bond Properties',
 
     hasFlags: symbol(Arguments.Dictionary({
-        0: Argument(Types.BondFlags),
+        0: Argument(Types.BondFlag),
         partial: Argument(Type.Bool, { isOptional: true, defaultValue: true, description: 'If false, all flags must be present.' }),
     }), Type.Bool, 'Test if the current bond has at least one (or all if partial = false) of the specified flags.'),
     order: bondProp(Type.Num)

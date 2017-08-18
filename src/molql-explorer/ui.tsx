@@ -234,9 +234,12 @@ class CompiledQuery extends Observer<{ state: State }, { error?: string, express
                 : 'Enter query...';
         }
 
-        return <pre style={{ position: 'absolute', left: 0, right: 0, bottom: 0, top: 0, background: 'white', fontSize: '10pt', margin: 0, padding: '10px', color: this.state.error ? 'red' : void 0 }}>
+        const style: React.HTMLAttributes<HTMLDivElement>['style'] = { position: 'absolute', left: 0, right: 0, bottom: 0, top: 0, background: 'white', fontSize: '10pt', margin: 0, padding: '10px', color: this.state.error ? 'red' : void 0 }
+
+        if (this.state.error) return <div style={style}>{content}</div>
+        return <pre style={style}>
             {content}
-        </pre>
+        </pre>;
     }
 }
 

@@ -6,6 +6,7 @@
 
 import Expression from '../../../mini-lisp/expression'
 import Type from '../../../molql/type'
+import exprFormatter from '../../mini-lisp/expression-formatter'
 import format from './formatter'
 import { SymbolMap, Argument, Arguments } from '../../../molql/symbol'
 import { FastMap, UniqueArrayBuilder } from '../../utils/collections'
@@ -20,13 +21,13 @@ type TypeContext = FastMap<string, TypeContextEntry>
 function typeCheck(symbols: SymbolMap, ctx: TypeContext, expr: Expression, type: Type, hint: string) {
     if (Expression.isLiteral(expr)) {
         const l = getLiteralType(expr);
-        if (!assignType(ctx, l, type)) notAssignable(ctx, hint, l, type);
+        if (!assignType(ctx, expr, l, type)) notAssignable(ctx, hint, expr, l, type);
     } else if (Expression.isApply(expr) && Expression.isLiteral(expr.head)) {
         const symbol = getSymbol(symbols, expr.head);
         const argsCtx: TypeContext = FastMap.create();
         assignArguments(symbols, argsCtx, symbol.id, expr.args, symbol.args);
         const t = resolveType(argsCtx, symbol.type);
-        if (!assignType(ctx, t, type)) notAssignable(ctx, hint, t, type);
+        if (!assignType(ctx, expr, t, type)) notAssignable(ctx, hint, expr, t, type);
     }
 }
 
@@ -40,8 +41,10 @@ function throwError(msg: string) {
     throw new Error(msg);
 }
 
-function notAssignable(ctx: TypeContext, hint: string, a: Type, b: Type) {
-    throwError(`${hint}${!!hint ? ': ' : ''}type '${format(resolveType(ctx, a))}' is not assignable to '${format(resolveType(ctx, b))}'.`);
+function notAssignable(ctx: TypeContext, hint: string, expr: Expression, a: Type, b: Type) {
+    const e = exprFormatter(expr).substr(0, 10).replace(/\n.*/g, '');
+    const oneof = b.kind === 'oneof' ? ` Value must be one of: ${Type.oneOfValues(b).join(', ')}.` : '';
+    throwError(`${hint}${!!hint ? ': ' : ''}type '${format(resolveType(ctx, a))}' in '${e}' is not assignable to '${format(resolveType(ctx, b))}'.${oneof}`);
 }
 
 function assignArguments(symbols: SymbolMap, ctx: TypeContext, symbolId: string, exprArgs: Expression.Arguments | undefined, args: Arguments): void {
@@ -105,7 +108,8 @@ function hasVariables(type: Type): boolean {
         case 'variable': return true;
         case 'value':
         case 'any':
-        case 'any-value': return false;
+        case 'any-value':
+        case 'oneof': return false;
         case 'container': return hasVariables(type.child);
         case 'union': {
             for (let t of type.types) {
@@ -125,39 +129,61 @@ function getLiteralType(expr: Expression.Literal) {
     }
 }
 
-function assignType(ctx: TypeContext, a: Type, b: Type): boolean {
+function assignType(ctx: TypeContext, value: Expression, a: Type, b: Type): boolean {
     if (a.kind === 'variable') {
         let t = a.type;
         if (a.isConstraint) {
             if (ctx.has(a.name)) t = ctx.get(a.name)!.type;
-            else return assignType(ctx, b, a);
+            else return assignType(ctx, value, b, a);
         }
-        return assignType(ctx, t, b);
+        return assignType(ctx, value, t, b);
     }
 
     switch (b.kind) {
         case 'any': return true;
-        case 'any-value': return a.kind === 'value' || a.kind === 'any-value';
-        case 'value': return a.kind === 'value' && a.name === b.name && a.namespace === b.namespace;
-        case 'container': return a.kind === 'container' && a.name === b.name && a.namespace === b.namespace && assignType(ctx, a.child, b.child);
+        case 'any-value': return a.kind === 'value' || a.kind === 'any-value' || a.kind === 'oneof';
+        case 'value': {
+            if (a.kind === 'value') return a.name === b.name && a.namespace === b.namespace;
+            else if (a.kind === 'oneof') return a.type.name === b.name && a.type.namespace === b.namespace;
+            return false;
+        }
+        case 'container': return a.kind === 'container' && a.name === b.name && a.namespace === b.namespace && assignType(ctx, value, a.child, b.child);
         case 'union': {
             if (a.kind === 'union') {
                 for (let t of a.types) {
-                    if (!assignType(ctx, t, b)) return false;
+                    if (!assignType(ctx, value, t, b)) return false;
                 }
                 return true;
             } else {
                 for (let t of b.types) {
-                    if (!assignType(ctx, a, t)) return true;
+                    if (!assignType(ctx, value, a, t)) return true;
                 }
                 return false;
             }
         }
+        case 'oneof': {
+            if (a.kind === 'oneof') {
+                if (a.namespace === b.namespace && a.name === b.name) return true;
+                const keys = Object.keys(a.values);
+                let hasAll = true;
+                for (const k of keys) {
+                    if (a.values[k] && !b.values[k]) {
+                        hasAll = false;
+                        break;
+                    }
+                }
+                if (hasAll) return true;
+                if (Expression.isLiteral(value) && b.values[value as any]) return true;
+                return false;
+            } else if (Expression.isLiteral(value)) {
+                return !!b.values[value as any];
+            } else return true;
+        }
         case 'variable': {
-            if (!assignType(ctx, a, b.type)) return false;
+            if (!assignType(ctx, value, a, b.type)) return false;
             if (ctx.has(b.name)) {
                 const e = ctx.get(b.name)!;
-                if (b.isConstraint && !assignType(ctx, a, e.type)) return false;
+                if (b.isConstraint && !assignType(ctx, value, a, e.type)) return false;
                 if (UniqueArrayBuilder.add(e.seen, format(a), a)) e.type = Type.Union(e.seen.array);
             } else {
                 const e: TypeContextEntry = { type: a, seen: UniqueArrayBuilder() };

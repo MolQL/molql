@@ -13,7 +13,8 @@ export default function format(type: Type): string {
         case 'value': return type.name;
         case 'variable': return type.type && type.type.kind !== 'any' ? `${type.name}: ${format(type.type)}` : type.name;
         case 'container': return type.alias ? type.alias : `${type.name}[${format(type.child)}]`;
-        case 'union': return type.types.map(format).join(' | ')
+        case 'union': return type.types.map(format).join(' | ');
+        case 'oneof': return type.name;
         default: throw new Error(`unknown type kind`);
     }
 }

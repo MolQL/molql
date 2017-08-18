@@ -80,7 +80,7 @@ function processResidue(state: State, rI: number) {
     const { atomOffset } = state.model.residues;
     const { visited } = state;
     state.startVertex = atomOffset[rI];
-    state.endVertex = atomOffset[rI];
+    state.endVertex = atomOffset[rI + 1];
 
     // no two atom rings
     if (state.endVertex - state.startVertex < 3) return;
