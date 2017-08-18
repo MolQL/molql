@@ -105,7 +105,8 @@ function createModel(moleculeId: string, data: Data, startRow: number, rowCount:
         data,
         '@spatialLookup': void 0,
         '@connectedComponentKey': void 0,
-        '@bonds': void 0
+        '@bonds': void 0,
+        '@rings': void 0
     };
 }
 

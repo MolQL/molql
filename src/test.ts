@@ -49,6 +49,9 @@ import B from './molql/builder'
 
 
 function run(model: Model) {
+
+    Model.rings(model);
+
     // const query = B.Struct.gen(g => g.atomGroups, {
     //     'residue-test': B.operator(o => o.relational.eq, [B.Struct.atomProp(p => p.auth_comp_id), 'ALA']),
     //     'atom-test': B.operator(o => o.set.has, [

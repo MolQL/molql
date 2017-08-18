@@ -109,7 +109,10 @@ export namespace StructConn {
             if (ps.label_asym_id.getValuePresence(row) !== CIF.ValuePresence.Present) return void 0;
             const residueIndex = Model.findResidueIndexByLabel(model, ps.label_asym_id.getString(row)!, ps.label_seq_id.getInteger(row), ps.ins_code.getString(row));
             if (residueIndex < 0) return void 0;
-            const atomIndex = Model.findAtomIndexByLabelName(model, residueIndex, ps.label_atom_id.getString(row)!, ps.label_alt_id.getString(row));
+            const atomName = ps.label_atom_id.getString(row);
+            // turns out "mismat" records might not have atom name value
+            if (!atomName) return void 0;
+            const atomIndex = Model.findAtomIndexByLabelName(model, residueIndex, atomName, ps.label_alt_id.getString(row));
             if (atomIndex < 0) return void 0;
             return { residueIndex, atomIndex, symmetry: ps.symmetry.getString(row) || '1_555' };
         }
