@@ -36,7 +36,7 @@ function atomGroupsIterator(env: Environment, { entityTest, chainTest, residueTe
     const { model, mask } = ctx;
     const { chainStartIndex, chainEndIndex, count: entityCount } = model.entities;
     const { residueStartIndex, residueEndIndex } = model.chains;
-    const { atomStartIndex, atomEndIndex } = model.residues;
+    const { atomOffset } = model.residues;
 
     Environment.lockSlot(env, 'element');
     const element = env.slots.element;
@@ -52,7 +52,7 @@ function atomGroupsIterator(env: Environment, { entityTest, chainTest, residueTe
                 ElementAddress.setResidueLayer(model, element, rI);
                 if (!residueTest(env)) continue;
 
-                for (let aI = atomStartIndex[rI], _aI = atomEndIndex[rI]; aI < _aI; aI++) {
+                for (let aI = atomOffset[rI], _aI = atomOffset[rI + 1]; aI < _aI; aI++) {
                     if (!mask.has(aI)) continue;
 
                     ElementAddress.setAtomLayer(model, element, aI);

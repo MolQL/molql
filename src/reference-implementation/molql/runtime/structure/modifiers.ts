@@ -216,7 +216,7 @@ export function includeSurroundings(env: Environment, selection: Selection, radi
     const asResidues = !!wholeResidues && !!wholeResidues(env);
     const { x, y, z } = model.positions;
     const { residueIndex } = model.atoms;
-    const { atomStartIndex, atomEndIndex } = model.residues;
+    const { atomOffset } = model.residues;
 
     const builder = AtomSelection.uniqueBuilder();
     const includedResides = FastSet.create<number>();
@@ -231,7 +231,7 @@ export function includeSurroundings(env: Environment, selection: Selection, radi
                     const rI = residueIndex[b];
                     if (includedResides.has(rI)) continue;
                     includedResides.add(rI);
-                    for (let j = atomStartIndex[rI], _j = atomEndIndex[rI]; j < _j; j++) {
+                    for (let j = atomOffset[rI], _j = atomOffset[rI + 1]; j < _j; j++) {
                         if (!mask.has(j)) continue;
                         UniqueArrayBuilder.add(atoms, j, j);
                     }
@@ -287,11 +287,11 @@ function _expandFrontierResidues({ env, model, mask, bonds, test, slot }: Expand
     const newFrontier: number[] = [];
     const { neighbor, offset: bondAtomOffset, order, flags } = bonds;
 
-    const { atomStartIndex, atomEndIndex } = model.residues;
+    const { atomOffset } = model.residues;
     const { residueIndex } = model.atoms;
 
     for (const rI of frontier) {
-        for (let a = atomStartIndex[rI], _a = atomEndIndex[rI]; a < _a; a++) {
+        for (let a = atomOffset[rI], _a = atomOffset[rI + 1]; a < _a; a++) {
             if (!mask.has(a)) continue;
 
             const start = bondAtomOffset[a], end = bondAtomOffset[a + 1];
@@ -310,7 +310,7 @@ function _expandFrontierResidues({ env, model, mask, bonds, test, slot }: Expand
 function _expandResidues(ctx: ExpandConnectedCtx, atomSet: AtomSet, numLayers: number) {
     if (!numLayers) return atomSet;
 
-    const { atomStartIndex, atomEndIndex } = ctx.model.residues;
+    const { atomOffset } = ctx.model.residues;
     const { residueIndex } = ctx.model.atoms;
 
     const residues = UniqueArrayBuilder<number>();
@@ -329,7 +329,7 @@ function _expandResidues(ctx: ExpandConnectedCtx, atomSet: AtomSet, numLayers: n
     sortAsc(residues.array);
     const atoms: number[] = [];
     for (let rI of residues.array) {
-        for (let a = atomStartIndex[rI], _a = atomEndIndex[rI]; a < _a; a++) {
+        for (let a = atomOffset[rI], _a = atomOffset[rI + 1]; a < _a; a++) {
             if (mask.has(a)) atoms[atoms.length] = a;
         }
     }

@@ -70,17 +70,17 @@ function resetState(state: State) {
 }
 
 function largestResidue({ residues }: Model) {
-    const { atomStartIndex, atomEndIndex, count } = residues;
+    const { atomOffset, count } = residues;
     let size = 0;
-    for (let i = 0; i < count; i++) size = Math.max(size, atomEndIndex[i] - atomStartIndex[i]);
+    for (let i = 0; i < count; i++) size = Math.max(size, atomOffset[i + 1] - atomOffset[i]);
     return size;
 }
 
 function processResidue(state: State, rI: number) {
-    const { atomStartIndex, atomEndIndex } = state.model.residues;
+    const { atomOffset } = state.model.residues;
     const { visited } = state;
-    state.startVertex = atomStartIndex[rI];
-    state.endVertex = atomEndIndex[rI];
+    state.startVertex = atomOffset[rI];
+    state.endVertex = atomOffset[rI];
 
     // no two atom rings
     if (state.endVertex - state.startVertex < 3) return;

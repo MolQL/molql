@@ -13,7 +13,7 @@ type Data = Model['data']
 
 function createModel(moleculeId: string, data: Data, startRow: number, rowCount: number): Model {
     const dataIndex: number[] = [], residueIndex: number[] = [];
-    const atomStartIndex: number[] = [], atomEndIndex: number[] = [], chainIndex: number[] = [];
+    const atomOffset: number[] = [0], chainIndex: number[] = [];
     const x: number[] = [], y: number[] = [], z: number[] = [];
     const residueStartIndex: number[] = [], residueEndIndex: number[] = [], entityIndex: number[] = [];
     const chainStartIndex: number[] = [], chainEndIndex: number[] = [];
@@ -38,8 +38,7 @@ function createModel(moleculeId: string, data: Data, startRow: number, rowCount:
             || !pdbx_PDB_ins_code.areValuesEqual(currentResidueRow, i);
 
         if (newResidue) {
-            atomStartIndex.push(residueStartAtom)
-            atomEndIndex.push(atom);
+            atomOffset.push(atom)
             chainIndex.push(chain)
             residueStartAtom = atom;
             residue++;
@@ -74,8 +73,7 @@ function createModel(moleculeId: string, data: Data, startRow: number, rowCount:
 
 
     // finish residue
-    atomStartIndex.push(residueStartAtom)
-    atomEndIndex.push(atom);
+    atomOffset.push(atom);
     chainIndex.push(chain);
 
     // finish chain
@@ -98,9 +96,9 @@ function createModel(moleculeId: string, data: Data, startRow: number, rowCount:
         moleculeId,
         id: pdbx_PDB_model_num.getInteger(startRow),
         atoms: { dataIndex, residueIndex, count: atom },
-        residues: { atomStartIndex, atomEndIndex, secondaryStructureType, secondaryStructureIndex, chainIndex, count: residue, key: new Int32Array(residue) as any },
-        chains: { residueStartIndex, residueEndIndex, entityIndex, count: chain, key: new Int32Array(residue) as any },
-        entities: { chainStartIndex, chainEndIndex, count: entity, key: new Int32Array(residue) as any, dataIndex: new Int32Array(residue) as any },
+        residues: { atomOffset, secondaryStructureType, secondaryStructureIndex, chainIndex, count: residue, key: new Int32Array(residue) as any },
+        chains: { residueStartIndex, residueEndIndex, entityIndex, count: chain, key: new Int32Array(chain) as any },
+        entities: { chainStartIndex, chainEndIndex, count: entity, key: new Int32Array(entity) as any, dataIndex: new Int32Array(entity) as any },
         positions: { x, y, z },
         data,
         '@spatialLookup': void 0,
@@ -136,7 +134,7 @@ function assignKeysAndDataIndices(model: Model) {
     const residueMaps = FastMap.create<number, FastMap<string, number>>(), residueCounter = { index: 0 };
 
     const { dataIndex } = model.atoms;
-    const { key: residueKey, atomStartIndex } = model.residues;
+    const { key: residueKey, atomOffset } = model.residues;
     const { key: chainKey, residueStartIndex, residueEndIndex } = model.chains;
     const { key: entityKey, count: entityCount, chainStartIndex, chainEndIndex, dataIndex: entityDataIndex } = model.entities;
 
@@ -144,7 +142,7 @@ function assignKeysAndDataIndices(model: Model) {
 
     for (let eI = 0; eI < entityCount; eI++) {
         const chainStart = chainStartIndex[eI], chainEnd = chainEndIndex[eI];
-        let dataRow = dataIndex[atomStartIndex[residueStartIndex[chainStart]]];
+        let dataRow = dataIndex[atomOffset[residueStartIndex[chainStart]]];
 
         const entId = label_entity_id.getString(dataRow)!;
         entityDataIndex[eI] = entityDataIndexMap.get(entId) || 0;
@@ -154,13 +152,13 @@ function assignKeysAndDataIndices(model: Model) {
         const chainMap = getElementSubstructureKeyMap(chainMaps, eKey);
         for (let cI = chainStart; cI < chainEnd; cI++) {
             const residueStart = residueStartIndex[cI], residueEnd = residueEndIndex[cI];
-            dataRow = dataIndex[atomStartIndex[residueStart]];
+            dataRow = dataIndex[atomOffset[residueStart]];
 
             const cKey = getElementKey(chainMap, auth_asym_id.getString(dataRow)!, chainCounter);
             chainKey[cI] = cKey;
             const residueMap = getElementSubstructureKeyMap(residueMaps, cKey);
             for (let rI = residueStart; rI < residueEnd; rI++) {
-                dataRow = dataIndex[atomStartIndex[rI]];
+                dataRow = dataIndex[atomOffset[rI]];
                 residueKey[rI] = getElementKey(residueMap, pdbx_PDB_ins_code.getValuePresence(dataRow) !== CIF.ValuePresence.Present
                     ? auth_seq_id.getInteger(dataRow)
                     : `${auth_seq_id.getInteger(dataRow)} ${pdbx_PDB_ins_code.getString(dataRow)}`, residueCounter);
@@ -208,14 +206,14 @@ function extendSecondaryStructureMap<T extends mmCIF.StructConf | mmCIF.StructSh
 }
 
 function assignSecondaryStructureEntry(model: Model, entry: SecondaryStructureEntry, resStart: number, resEnd: number) {
-    const { atomStartIndex, secondaryStructureIndex, secondaryStructureType } = model.residues;
+    const { atomOffset, secondaryStructureIndex, secondaryStructureType } = model.residues;
     const { dataIndex } = model.atoms;
     const { label_seq_id, pdbx_PDB_ins_code } = model.data.atom_site;
     const { endSeqNumber, endInsCode, rowIndex, type } = entry;
 
     let rI = resStart;
     while (rI < resEnd) {
-        const atomRowIndex = dataIndex[atomStartIndex[rI]];
+        const atomRowIndex = dataIndex[atomOffset[rI]];
         const seqNumber = label_seq_id.getInteger(atomRowIndex);
 
         if ((seqNumber > endSeqNumber) ||
@@ -235,19 +233,19 @@ function assignSecondaryStructure(model: Model) {
     extendSecondaryStructureMap(model.data.secondaryStructure.sheetRange, SecondaryStructureType.StructSheetRange, map);
 
     const { residueStartIndex, residueEndIndex, count: chainCount } = model.chains;
-    const { atomStartIndex } = model.residues;
+    const { atomOffset } = model.residues;
     const { dataIndex } = model.atoms;
     const { label_asym_id, label_seq_id, pdbx_PDB_ins_code } = model.data.atom_site;
 
     for (let cI = 0; cI < chainCount; cI++) {
         const resStart = residueStartIndex[cI], resEnd = residueEndIndex[cI];
-        const asymId = label_asym_id.getString(dataIndex[atomStartIndex[resStart]])!;
+        const asymId = label_asym_id.getString(dataIndex[atomOffset[resStart]])!;
 
         if (map.has(asymId)) {
             const entries = map.get(asymId)!;
 
             for (let rI = resStart; rI < resEnd; rI++) {
-                let atomRowIndex = dataIndex[atomStartIndex[rI]];
+                let atomRowIndex = dataIndex[atomOffset[rI]];
                 let seqNumber = label_seq_id.getInteger(atomRowIndex);
                 if (entries.has(seqNumber)) {
                     const entry = entries.get(seqNumber)!;

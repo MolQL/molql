@@ -30,8 +30,6 @@ function Rings(model: Model): Rings {
         idx++;
     }
 
-    console.log(byFingerprint)
-
     return { all: rings, byFingerprint };
 }
 

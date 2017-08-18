@@ -26,26 +26,26 @@ namespace ElementAddress {
     }
 
     export function setResidueLayer(model: Model, address: ElementAddress, residueIndex: number) {
-        const { residues: { atomStartIndex }, atoms: { dataIndex } } = model;
-        address.atom = atomStartIndex[residueIndex];
+        const { residues: { atomOffset }, atoms: { dataIndex } } = model;
+        address.atom = atomOffset[residueIndex];
         address.dataIndex = dataIndex[address.atom];
         address.residue = residueIndex;
     }
 
     export function setChainLayer(model: Model, address: ElementAddress, chainIndex: number) {
-        const { residues: { atomStartIndex }, chains: { residueStartIndex }, atoms: { dataIndex } } = model;
+        const { residues: { atomOffset }, chains: { residueStartIndex }, atoms: { dataIndex } } = model;
         address.chain = chainIndex;
         address.residue = residueStartIndex[chainIndex];
-        address.atom = atomStartIndex[address.residue];
+        address.atom = atomOffset[address.residue];
         address.dataIndex = dataIndex[address.atom];
     }
 
     export function setEntityLayer(model: Model, address: ElementAddress, entityIndex: number) {
-        const { residues: { atomStartIndex }, chains: { residueStartIndex }, entities: { chainStartIndex }, atoms: { dataIndex } } = model;
+        const { residues: { atomOffset }, chains: { residueStartIndex }, entities: { chainStartIndex }, atoms: { dataIndex } } = model;
         address.entity = entityIndex;
         address.chain = chainStartIndex[entityIndex];
         address.residue = residueStartIndex[address.chain];
-        address.atom = atomStartIndex[address.residue];
+        address.atom = atomOffset[address.residue];
         address.dataIndex = dataIndex[address.atom];
     }
 }

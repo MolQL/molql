@@ -37,8 +37,7 @@ export interface Atoms {
 }
 
 export interface Residues {
-    atomStartIndex: number[],
-    atomEndIndex: number[],
+    atomOffset: number[],
     secondaryStructureType: number[],
     secondaryStructureIndex: number[]
     key: number[],
@@ -141,13 +140,13 @@ export namespace ResidueIdentifier {
     }
 
     export function authOfResidueIndex(model: Model, residueIndex: number) {
-        const row = model.atoms.dataIndex[model.residues.atomStartIndex[residueIndex]];
+        const row = model.atoms.dataIndex[model.residues.atomOffset[residueIndex]];
         const { atom_site } = model.data;
         return auth(atom_site.auth_asym_id.getString(row)!, atom_site.auth_seq_id.getInteger(row), atom_site.pdbx_PDB_ins_code.getString(row));
     }
 
     export function labelOfResidueIndex(model: Model, residueIndex: number) {
-        const row = model.atoms.dataIndex[model.residues.atomStartIndex[residueIndex]];
+        const row = model.atoms.dataIndex[model.residues.atomOffset[residueIndex]];
         const { atom_site } = model.data;
         return label(atom_site.label_entity_id.getString(row)!, atom_site.label_asym_id.getString(row)!, atom_site.label_seq_id.getInteger(row), atom_site.pdbx_PDB_ins_code.getString(row));
     }
@@ -184,15 +183,15 @@ export namespace Model {
 
     export function findResidueIndexByLabel(model: Model, asymId: string, seqNumber: number, insCode: string | null) {
         const { residueStartIndex, residueEndIndex, count: cCount } = model.chains;
-        const { atomStartIndex } = model.residues;
+        const { atomOffset } = model.residues;
         const { dataIndex } = model.atoms;
         const { label_asym_id, label_seq_id, pdbx_PDB_ins_code } = model.data.atom_site;
 
         for (let cI = 0; cI < cCount; cI++) {
-            let idx = dataIndex[atomStartIndex[residueStartIndex[cI]]];
+            let idx = dataIndex[atomOffset[residueStartIndex[cI]]];
             if (!label_asym_id.stringEquals(idx, asymId)) continue;
             for (let rI = residueStartIndex[cI], _r = residueEndIndex[cI]; rI < _r; rI++) {
-                idx = dataIndex[atomStartIndex[rI]];
+                idx = dataIndex[atomOffset[rI]];
                 if (label_seq_id.getInteger(idx) === seqNumber && (!insCode || pdbx_PDB_ins_code.stringEquals(idx, insCode))) {
                     return rI;
                 }
@@ -202,15 +201,11 @@ export namespace Model {
     }
 
     export function findAtomIndexByLabelName(model: Model, residueIndex: number, atomName: string, altLoc: string | null) {
-        const { atomStartIndex, atomEndIndex } = model.residues;
+        const { atomOffset } = model.residues;
         const { dataIndex } = model.atoms;
         const { label_atom_id, label_alt_id } = model.data.atom_site;
 
-        if (!atomName) {
-            console.log(residueIndex, {  atomName });
-        }
-
-        for (let i = atomStartIndex[residueIndex], _i = atomEndIndex[residueIndex]; i <= _i; i++) {
+        for (let i = atomOffset[residueIndex], _i = atomOffset[residueIndex + 1]; i <= _i; i++) {
             const idx = dataIndex[i];
             if (label_atom_id.stringEquals(idx, atomName) && (!altLoc || label_alt_id.stringEquals(idx, altLoc))) return i;
         }
