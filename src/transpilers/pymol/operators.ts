@@ -239,10 +239,16 @@ const operators: OperatorList = [
     '@desc': 'All rings of size ≤ 7 which have at least one atom in s1.',
     '@examples': ['BYRING s1'],
     name: 'byring',
-    isUnsupported: true,
     type: h.prefix,
     rule: h.prefixOp(/BYRING/i),
-    map: (op: string, selection: Expression) => [op, selection]
+    map: (op: string, selection: Expression) => {
+      return B.struct.filter.pick({
+        '0': B.struct.generator.rings(),
+        test: B.core.rel.gr([
+          B.struct.atomSet.countQuery([ selection ]), 1
+        ])
+      })
+    }
   },
   {
     '@desc': 'Selects atoms directly bonded to s1, excludes s1.',
