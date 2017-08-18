@@ -11,7 +11,7 @@ const keywords: KeywordDict = {
   // general terms
   all: {
     '@desc': 'all atoms; same as *',
-    short: '*',
+    abbr: ['*'],
     map: () => B.struct.generator.atomGroups()
   },
   bonded: {

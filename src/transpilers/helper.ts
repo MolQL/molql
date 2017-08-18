@@ -177,6 +177,11 @@ export function invertExpr (selection: Expression) {
   })
 }
 
+function getNamesRegex(name: string, abbr?: string[]) {
+  const names = abbr ? [name].concat(abbr) : [name]
+  return RegExp(names.map(escapeRegExp).join('|'), 'i')
+}
+
 export function getPropertyRules(properties: PropertyDict) {
   // in keyof typeof properties
   const propertiesDict: {[name: string]: P.Parser<any>} = {}
@@ -207,8 +212,7 @@ export function getNamedPropertyRules(properties: PropertyDict) {
       if (ps.isUnsupported) errorFn()
       return testExpr(ps.property, ps.map(x))
     })
-    const reStr = ps.short ? `${name}|${escapeRegExp(ps.short)}` : `${name}`
-    const nameRule = P.regex(RegExp(reStr, 'i')).trim(P.optWhitespace)
+    const nameRule = P.regex(getNamesRegex(name, ps.abbr)).trim(P.optWhitespace)
     const groupMap = (x: any) => B.struct.generator.atomGroups({[ps.level]: x})
 
     if (ps.isNumeric) {
@@ -234,9 +238,8 @@ export function getKeywordRules (keywords: KeywordDict) {
 
   Object.keys(keywords).forEach( name => {
     const ks = keywords[name]
-    const reStr = ks.short ? `${name}|${escapeRegExp(ks.short)}` : `${name}`
     const mapFn = ks.map ? ks.map : makeError(`keyword '${name}' not supported`)
-    const rule = P.regex(RegExp(reStr, 'i')).map(mapFn)
+    const rule = P.regex(getNamesRegex(name, ks.abbr)).map(mapFn)
     keywordsList.push(rule)
   })
 

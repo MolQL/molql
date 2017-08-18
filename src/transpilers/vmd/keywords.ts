@@ -135,7 +135,7 @@ const keywords: KeywordDict = {
   },
   water: {
     '@desc': 'all atoms with the resname H2O, HH0, OHH, HOH, OH2, SOL, WAT, TIP, TIP2, TIP3 or TIP4',
-    short: 'waters',
+    abbr: ['waters'],
     map: () => resnameExpr(ResDict.water)
   },
   at: {

@@ -15,7 +15,7 @@ export interface AtomGroupArgs {
 
 export interface Keyword {
   '@desc': string
-  short?: string
+  abbr?: string[]
   map?: () => Expression  // not given means the keyword is unsupported
 }
 
@@ -26,7 +26,7 @@ export interface Property {
   '@examples': string[]
   isUnsupported?: boolean
   isNumeric?: boolean
-  short?: string
+  abbr?: string[]
   regex: RegExp
   map: (s: string) => any
   level: 'atom-test' | 'residue-test' | 'chain-test' | 'entity-test'
