@@ -18,6 +18,8 @@ export type MolQLScriptSymbol =
 
 function Alias(symbol: Symbol, ...aliases: string[]): MolQLScriptSymbol { return { kind: 'alias', aliases, symbol }; }
 function Macro(symbol: Symbol, translate: (args: any) => Expression, ...aliases: string[]): MolQLScriptSymbol {
+    symbol.info.namespace = 'molql-macro';
+    symbol.id = `molql-macro.${symbol.info.name}`;
     return { kind: 'macro', symbol, translate, aliases: [symbol.info.name, ...aliases] };
 }
 
