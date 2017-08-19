@@ -85,6 +85,15 @@ function resnameExpr(resnameList: string[]) {
   })
 }
 
+function secStrucExpr(flags: string[]) {
+  return B.struct.generator.atomGroups({
+    'residue-test': B.core.flags.hasAll([
+      B.ammp('secondaryStructureFlags'),
+      B.struct.type.secondaryStructureFlags(flags)
+    ])
+  })
+}
+
 const Backbone = {
   nucleic: [ 'P', "O3'", "O5'", "C5'", "C4'", "C3'", 'OP1', 'OP2', 'O3*', 'O5*', 'C5*', 'C4*', 'C3*' ],
   protein: [ 'C', 'N', 'CA', 'O' ]
@@ -267,31 +276,43 @@ const keywords: KeywordDict = {
     })
   },
   alpha_helix: {
-    '@desc': "atom's residue is in an alpha helix"
+    '@desc': "atom's residue is in an alpha helix",
+    map: () => secStrucExpr(['alpha'])
   },
   pi_helix: {
-    '@desc': "atom's residue is in a pi helix"
+    '@desc': "atom's residue is in a pi helix",
+    map: () => secStrucExpr(['pi'])
   },
   helix_3_10: {
-    '@desc': "atom's residue is in a 3-10 helix"
+    '@desc': "atom's residue is in a 3-10 helix",
+    map: () => secStrucExpr(['3-10'])
   },
   helix: {
-    '@desc': "atom's residue is in an alpha or pi or 3-10 helix"
+    '@desc': "atom's residue is in an alpha or pi or 3-10 helix",
+    map: () => secStrucExpr(['helix'])
   },
   extended_beta: {
-    '@desc': "atom's residue is a beta sheet"
+    '@desc': "atom's residue is a beta sheet",
+    map: () => secStrucExpr(['sheet'])
   },
   bridge_beta: {
-    '@desc': "atom's residue is a beta sheet"
+    '@desc': "atom's residue is a beta sheet",
+    map: () => secStrucExpr(['bridge'])
   },
   sheet: {
-    '@desc': "atom's residue is a beta sheet"
+    '@desc': "atom's residue is a beta sheet",
+    map: () => secStrucExpr(['beta'])
   },
   turn: {
-    '@desc': "atom's residue is in a turn conformation"
+    '@desc': "atom's residue is in a turn conformation",
+    map: () => secStrucExpr(['turn'])
   },
   coil: {
-    '@desc': "atom's residue is in a coil conformation"
+    '@desc': "atom's residue is in a coil conformation",
+    map: () => B.struct.modifier.intersectBy({
+      0: proteinExpr(),
+      by: secStrucExpr(['none'])
+    })
   }
 }
 
