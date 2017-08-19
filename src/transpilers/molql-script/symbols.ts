@@ -165,7 +165,7 @@ const list: MolQLScriptSymbol[] = [
         'group-by': B.ammp('chainKey')
     })),
 
-    Macro(Symbol('sec-struct.is', Arguments.List(Struct.Types.SecondaryStructureFlag), Type.Bool,
+    Macro(Symbol('atom.sec-struct.is', Arguments.List(Struct.Types.SecondaryStructureFlag), Type.Bool,
         `Test if the current atom is part of an secondary structure. Optionally specify allowed sec. struct. types: ${Type.oneOfValues(Struct.Types.SecondaryStructureFlag).join(', ')}`),
     args => B.struct.atomProperty.macromolecular.isSecondaryStructure([B.struct.type.secondaryStructureFlags(args)])),
 
