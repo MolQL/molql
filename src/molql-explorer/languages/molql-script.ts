@@ -65,6 +65,10 @@ const lang: Language = {
   ;; the "rotation" of element symbols has no effect
   ;; the following is the same as (atom.ringfp _C _C _C _C _N)
   (atom.ringfp _C _C _C _N _C))`
+    }, {
+      name: 'Sheets',
+      value: `(atom.sel.res
+  (atom.is-sec-struct (atom.sec-struct-flags sheet)))`
     }]
 }
 

@@ -19,7 +19,7 @@ function getAddress(env: Environment, xs: { 0?: RuntimeExpression }): ElementAdd
     return (xs[0] && xs[0]!(env)) || env.slots.element;
 }
 
-function createSecondaryStructureFlags(env: Environment, fs: RuntimeExpression<string>[]) {
+export function createSecondaryStructureFlags(env: Environment, fs: RuntimeExpression<string>[]) {
     let ret = SecondaryStructureFlags.None
     for (const f of fs) {
         switch (('' + f(env)).toLowerCase()) {
@@ -44,11 +44,7 @@ export const Core: { [P in keyof typeof MolQL.structure.atomProperty.core]?: Sym
     y: prop((env, v) => env.context.model.positions.y[getAddress(env, v).atom]),
     z: prop((env, v) => env.context.model.positions.z[getAddress(env, v).atom]),
 
-    atomKey: prop((env, v) => getAddress(env, v).atom),
-
-    hasSecondaryStructureFlag: prop((env, v) => {
-        return SecondaryStructure.hasFlags(env.context.model, env.slots.element.residue, createSecondaryStructureFlags(env, v as any))
-    }),
+    atomKey: prop((env, v) => getAddress(env, v).atom)
 }
 
 export const Topology: { [P in keyof typeof MolQL.structure.atomProperty.topology]?: SymbolRuntime } = {
@@ -92,5 +88,9 @@ export const Macromolecular: { [P in keyof typeof MolQL.structure.atomProperty.m
     entityType: prop((env, v) => {
         const { model } = env.context;
         return model.data.entity.type.getString(model.entities.dataIndex[getAddress(env, v).entity])
+    }),
+
+    isSecondaryStructure: prop((env, v) => {
+        return SecondaryStructure.checkFlags(env.context.model, env.slots.element.residue, !(v as any)[0] ? 0 : (v as any)[0](env))
     }),
 }

@@ -77,6 +77,7 @@ const list: MolQLScriptSymbol[] = [
     Alias(MolQL.structure.type.entityType, 'atom.new.ent-type'),
     Alias(MolQL.structure.type.authResidueId, 'atom.new.auth-resid'),
     Alias(MolQL.structure.type.labelResidueId, 'atom.new.label-resid'),
+    Alias(MolQL.structure.type.secondaryStructureFlags, 'atom.sec-struct-flags'),
     Alias(MolQL.structure.type.ringFingerprint, 'atom.ringfp'),
 
     Alias(MolQL.structure.slot.atom, 'atom.current'),
@@ -116,7 +117,6 @@ const list: MolQLScriptSymbol[] = [
     Alias(MolQL.structure.atomProperty.core.y, 'atom.y'),
     Alias(MolQL.structure.atomProperty.core.z, 'atom.z'),
     Alias(MolQL.structure.atomProperty.core.atomKey, 'atom.key'),
-    Alias(MolQL.structure.atomProperty.core.hasSecondaryStructureFlag, 'atom.has.sec-struc'),
 
     Alias(MolQL.structure.atomProperty.topology.connectedComponentKey, 'atom.key.molecule'),
 
@@ -142,6 +142,8 @@ const list: MolQLScriptSymbol[] = [
     Alias(MolQL.structure.atomProperty.macromolecular.occupancy, 'atom.occupancy'),
     Alias(MolQL.structure.atomProperty.macromolecular.B_iso_or_equiv, 'atom.B_iso_or_equiv'),
     Alias(MolQL.structure.atomProperty.macromolecular.entityType, 'atom.entity-type'),
+
+    Alias(MolQL.structure.atomProperty.macromolecular.isSecondaryStructure, 'atom.is-sec-struct'),
 
     Alias(MolQL.structure.type.bondFlags, 'bond.flags'),
     Alias(MolQL.structure.bondProperty.order, 'bond.order'),

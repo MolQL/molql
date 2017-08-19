@@ -12,7 +12,7 @@ import { symbol } from '../helpers'
 export namespace Types {
     export const ElementSymbol = Type.Value('Structure', 'ElementSymbol');
     export const BondFlag = Type.OneOf('Structure', 'BondFlag', Type.Str, ['covalent', 'metallic', 'ion', 'hydrogen', 'sulfide', 'computed', 'aromatic']);
-    export const SecondaryStructureFlag = Type.OneOf('Structure', 'SecondaryStructureFlag', Type.Str, ['alpha', '3-10', 'pi', 'sheet', 'strand', 'helix', 'turn', 'none']);
+    export const SecondaryStructureFlag = Type.OneOf('Structure', 'SecondaryStructureFlag', Type.Str, ['alpha', '3-10', 'pi', 'sheet', 'strand', 'helix', 'turn']);
     export const RingFingerprint = Type.Value('Structure', 'RingFingerprint');
     export const EntityType = Type.OneOf('Structure', 'EntityType', Type.Str, ['polymer', 'non-polymer', 'water', 'unknown']);
     export const ResidueId = Type.Value('Structure', 'ResidueId');
@@ -26,10 +26,30 @@ export namespace Types {
 
 const type = {
     '@header': 'Types',
-    elementSymbol: symbol(Arguments.Dictionary({ 0: Argument(Type.Str) }), Types.ElementSymbol, 'Create element symbol representation from a string value.'),
-    entityType: symbol(Arguments.Dictionary({ 0: Argument(Types.EntityType) }), Types.EntityType, `Create normalized representation of entity type: ${Type.oneOfValues(Types.EntityType).join(', ')}.`),
-    bondFlags: symbol(Arguments.List(Types.BondFlag), Types.BondFlag, `Create bond flags representation from a list of strings. Allowed flags: ${Type.oneOfValues(Types.BondFlag).join(', ')}.`),
-    ringFingerprint: symbol(Arguments.List(Types.ElementSymbol, { nonEmpty: true }), Types.RingFingerprint, 'Create ring fingerprint from the supplied atom element list.'),
+    elementSymbol: symbol(
+        Arguments.Dictionary({ 0: Argument(Type.Str) }),
+        Types.ElementSymbol, 'Create element symbol representation from a string value.'),
+
+    entityType: symbol(
+        Arguments.Dictionary({ 0: Argument(Types.EntityType) }),
+        Types.EntityType,
+        `Create normalized representation of entity type: ${Type.oneOfValues(Types.EntityType).join(', ')}.`),
+
+    bondFlags: symbol(
+        Arguments.List(Types.BondFlag),
+        Types.BondFlag,
+        `Create bond flags representation from a list of strings. Allowed flags: ${Type.oneOfValues(Types.BondFlag).join(', ')}.`),
+
+    ringFingerprint: symbol(
+        Arguments.List(Types.ElementSymbol, { nonEmpty: true }),
+        Types.RingFingerprint,
+        'Create ring fingerprint from the supplied atom element list.'),
+
+    secondaryStructureFlags: symbol(
+        Arguments.List(Types.SecondaryStructureFlag),
+        Types.SecondaryStructureFlag,
+        `Create secondary structure flags representation from a list of strings. Allowed flags: ${Type.oneOfValues(Types.SecondaryStructureFlag).join(', ')}.`),
+
     authResidueId: symbol(Arguments.Dictionary({
         0: Argument(Type.Str, { description: 'auth_asym_id' }),
         1: Argument(Type.Num, { description: 'auth_seq_id' }),
@@ -198,7 +218,6 @@ const atomProperty = {
 
         atomKey: atomProp(Type.AnyValue, 'Unique value for each atom. Main use case is grouping of atoms.'),
 
-        hasSecondaryStructureFlag: symbol(Arguments.List(Types.SecondaryStructureFlag), Type.Bool, `Check if the current atom has at least one of the specified secondary structure flags. Allowed flags: ${Type.oneOfValues(Types.SecondaryStructureFlag).join(', ')}.`)
     },
 
     topology: {
@@ -238,6 +257,10 @@ const atomProperty = {
         B_iso_or_equiv: atomProp(Type.Num),
 
         entityType: atomProp(Types.EntityType, 'Type of the entity as defined in mmCIF (polymer, non-polymer, water, unknown)'),
+
+        isSecondaryStructure: symbol(Arguments.Dictionary({
+            0: Argument(Types.SecondaryStructureFlag, { isOptional: true }),
+        }), Type.Bool, 'Test if the current atom is part of an secondary structure. Optionally specify allowed sec. struct. types.')
     }
 }
 
