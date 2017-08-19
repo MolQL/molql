@@ -105,4 +105,15 @@ describe('types', () => {
     testFn(B.core.set.has, [B.set(1, 2, 3), 2], true);
     testFn(B.core.set.isSubset, [B.set(1, 2, 3), B.set(1, 2, 3, 4)], true);
     testFn(B.core.set.isSubset, [B.set(1, 2, 3, 6), B.set(1, 2, 3, 4)], false);
+
+    const bf = (x: string) => B.core.type.bitflags([parseInt(x, 2)]);
+    testFn(B.core.flags.hasAny, [bf('0101'), bf('0')], true);
+    testFn(B.core.flags.hasAny, [bf('0101'), bf('100')], true);
+    testFn(B.core.flags.hasAny, [bf('0101'), bf('10')], false);
+    testFn(B.core.flags.hasAny, [bf('0'), bf('0')], false);
+
+    testFn(B.core.flags.hasAll, [bf('0101'), bf('0')], false);
+    testFn(B.core.flags.hasAll, [bf('0101'), bf('100')], true);
+    testFn(B.core.flags.hasAll, [bf('0101'), bf('111')], false);
+    testFn(B.core.flags.hasAll, [bf('0'), bf('0')], true);
 });

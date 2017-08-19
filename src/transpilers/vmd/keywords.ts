@@ -177,7 +177,8 @@ const keywords: KeywordDict = {
     map: () => B.struct.filter.pick({
       '0': B.struct.modifier.includeConnected({
         '0': B.struct.generator.atomGroups(),
-        'bond-test': B.struct.bondProperty.hasFlags([
+        'bond-test': B.core.flags.hasAny([
+          B.struct.bondProperty.flags(),
           B.struct.type.bondFlags(['covalent', 'metallic', 'sulfide'])
         ])
       }),

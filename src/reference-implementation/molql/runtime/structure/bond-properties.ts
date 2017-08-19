@@ -7,7 +7,6 @@
 import MolQL from '../../../../molql/symbol-table'
 import SymbolRuntime, { RuntimeArguments, forEachPositionalArg } from '../../symbol'
 import Environment from '../environment'
-import Expression from '../expression'
 import { BondFlag } from '../../../structure/data'
 
 function rt(runtime: SymbolRuntime) { return runtime; }
@@ -27,11 +26,6 @@ export function createFlags(env: Environment, args: RuntimeArguments) {
 }
 
 export const Properties: { [P in keyof typeof MolQL.structure.bondProperty]?: SymbolRuntime } = {
-    order: rt((env, v) => env.slots.bond.order)
-}
-
-export function hasFlags(env: Environment, flags: Expression<number>, partial?: Expression<boolean>) {
-    const fs = flags(env);
-    if (partial ? !!partial(env) : true) return !fs || (env.slots.bond.flags & fs) !== 0;
-    return (env.slots.bond.flags & fs) === fs;
+    order: rt((env, v) => env.slots.bond.order),
+    flags: rt((env, v) => env.slots.bond.flags),
 }

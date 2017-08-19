@@ -130,7 +130,7 @@ export function VdwRadius(element: string): number {
 }
 
 export namespace SecondaryStructure {
-    function flag(model: Model, residueIndex: number) {
+    export function flags(model: Model, residueIndex: number) {
         const type = model.secondaryStructure.type[residueIndex]
 
         let flag = SecondaryStructureType.None;
@@ -149,12 +149,6 @@ export namespace SecondaryStructure {
                 return SecondaryStructureFlags.BetaSheet
         }
         return flag;
-    }
-
-    export function checkFlags(model: Model, residueIndex: number, flags: number) {
-        const residueFlags = flag(model, residueIndex);
-        if (!flags) return residueFlags !== SecondaryStructureType.None;
-        return (residueFlags & flags) !== 0;
     }
 }
 

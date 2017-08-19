@@ -167,17 +167,11 @@ const list: MolQLScriptSymbol[] = [
 
     Macro(Symbol('atom.sec-struct.is', Arguments.List(Struct.Types.SecondaryStructureFlag), Type.Bool,
         `Test if the current atom is part of an secondary structure. Optionally specify allowed sec. struct. types: ${Type.oneOfValues(Struct.Types.SecondaryStructureFlag).join(', ')}`),
-    args => B.struct.atomProperty.macromolecular.isSecondaryStructure([B.struct.type.secondaryStructureFlags(args)])),
+    args => B.core.flags.hasAny([B.struct.atomProperty.macromolecular.secondaryStructureFlags(), B.struct.type.secondaryStructureFlags(args)])),
 
-    Macro(Symbol('bond.is', Arguments.Dictionary({
-        0: Argument(Struct.Types.BondFlag, { isRest: true }),
-            partial: Argument(Type.Bool, { isOptional: true, defaultValue: true, description: 'If false, all flags must be present.' }),
-        }), Type.Bool,
+    Macro(Symbol('bond.is', Arguments.List(Struct.Types.BondFlag), Type.Bool,
         `Test if the current bond has at least one (or all if partial = false) of the specified flags: ${Type.oneOfValues(Struct.Types.BondFlag).join(', ')}`),
-    args => B.struct.bondProperty.hasFlags({
-        0: B.struct.type.bondFlags(getPositionalArgs(args)),
-        ...pickArgs(args, 'partial')
-    })),
+    args => B.core.flags.hasAny([B.struct.bondProperty.flags(), B.struct.type.bondFlags(getPositionalArgs(args))])),
 ];
 
 function getPositionalArgs(args: any) {
@@ -188,17 +182,17 @@ function getPositionalArgs(args: any) {
     return ret.length ? ret : void 0;
 }
 
-function pickArgs(args: any, ...names: string[]) {
-    const ret = Object.create(null);
-    let count = 0;
-    for (let k of Object.keys(args)) {
-        if (names.indexOf(k) >= 0) {
-            ret[k] = args[k];
-            count++;
-        }
-    }
-    return count ? ret : void 0;
-}
+// function pickArgs(args: any, ...names: string[]) {
+//     const ret = Object.create(null);
+//     let count = 0;
+//     for (let k of Object.keys(args)) {
+//         if (names.indexOf(k) >= 0) {
+//             ret[k] = args[k];
+//             count++;
+//         }
+//     }
+//     return count ? ret : void 0;
+// }
 
 const normalized = (function () {
     const symbolList: [string, MolQLScriptSymbol][] = [];

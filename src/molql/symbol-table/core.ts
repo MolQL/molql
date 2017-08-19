@@ -21,6 +21,9 @@ export namespace Types {
     export const Set = <T extends Type>(t?: T) => Type.Container<Set<T['@type']>>('Core', 'Set', t || AnyValueVar);
     export const List = <T extends Type>(t?: T) => Type.Container<List<T['@type']>>('Core', 'List', t || AnyVar);
     export const Fn = <T extends Type>(t?: T, alias?: string) => Type.Container<(env: any) => T['@type']>('Core', 'Fn', t || AnyVar, alias);
+    export const Flags = <T extends Type>(t: T, alias?: string) => Type.Container<number>('Core', 'Flags', t, alias);
+
+    export const BitFlags = Flags(Type.Num, 'BitFlags');
 }
 
 function unaryOp<T extends Type>(type: T, description?: string) {
@@ -50,7 +53,8 @@ const type = {
         }), Types.Regex, 'Creates a regular expression from a string using the ECMAscript syntax.'),
 
     list: symbol(Arguments.List(Types.AnyVar), Types.List()),
-    set: symbol(Arguments.List(Types.AnyValueVar), Types.Set())
+    set: symbol(Arguments.List(Types.AnyValueVar), Types.Set()),
+    bitflags: symbol(Arguments.Dictionary({ 0: Argument(Type.Num) }), Types.BitFlags, 'Interpret a number as bitflags.'),
 };
 
 const logic = {
@@ -135,6 +139,18 @@ const set = {
     isSubset: symbol(Arguments.Dictionary({ 0: Argument(Types.Set(Types.ConstrainedVar)), 1: Argument(Types.Set(Types.ConstrainedVar)) }), Type.Bool, 'Check if the the 1st argument is a subset of the 2nd.')
 };
 
+const flags = {
+    '@header': 'Flags',
+    hasAny: symbol(Arguments.Dictionary({
+        0: Argument(Types.Flags(Types.ConstrainedVar)),
+        1: Argument(Types.Flags(Types.ConstrainedVar))
+    }), Type.Bool, 'Check if the the 1st argument has at least one of the 2nd one\'s flags.'),
+    hasAll: symbol(Arguments.Dictionary({
+        0: Argument(Types.Flags(Types.ConstrainedVar)),
+        1: Argument(Types.Flags(Types.ConstrainedVar))
+    }), Type.Bool, 'Check if the the 1st argument has all 2nd one\'s flags.'),
+}
+
 export default {
     '@header': 'Language Primitives',
     type,
@@ -144,7 +160,8 @@ export default {
     math,
     str,
     list,
-    set
+    set,
+    flags
 }
 
 

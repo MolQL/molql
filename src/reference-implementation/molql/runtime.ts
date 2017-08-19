@@ -41,6 +41,7 @@ export const SymbolRuntime: Symbol.Info[] = [
         return set;
     }),
     Symbol(MolQL.core.type.regex, staticAttr)((env, v) => new RegExp(v[0](env), (v[1] && v[1](env)) || '')),
+    Symbol(MolQL.core.type.bitflags, staticAttr)((env, v) => +v[0](env)),
 
     // ============= LOGIC ================
     Symbol(MolQL.core.logic.not, staticAttr)((env, v) => !v[0](env)),
@@ -172,13 +173,27 @@ export const SymbolRuntime: Symbol.Info[] = [
     Symbol(MolQL.core.set.has, staticAttr)((env, v) => v[0](env).has(v[1](env))),
     Symbol(MolQL.core.set.isSubset, staticAttr)((env, v) => FastSet.isSubset(v[0](env) as FastSet<any>, v[1](env) as FastSet<any>)),
 
+    // ============= FLAGS ================
+    Symbol(MolQL.core.flags.hasAny, staticAttr)((env, v) => {
+        const test = v[1](env);
+        const tested = v[0](env);
+        if (!test) return !!tested;
+        return (tested & test) !== 0;
+    }),
+    Symbol(MolQL.core.flags.hasAll, staticAttr)((env, v) => {
+        const test = v[1](env);
+        const tested = v[0](env);
+        if (!test) return !tested;
+        return (tested & test) === test;
+    }),
+
     ////////////////////////////////////
     // Structure
 
     // ============= TYPES ================
     Symbol(MolQL.structure.type.elementSymbol, staticAttr)((env, v) => ElementSymbol(v[0](env))),
-    Symbol(MolQL.structure.type.bondFlags, staticAttr)((env, v) => StructureRuntime.BondProperties.createFlags(env, v as any) as any),
-    Symbol(MolQL.structure.type.secondaryStructureFlags, staticAttr)((env, v) => StructureRuntime.AtomProperties.createSecondaryStructureFlags(env, v) as any),
+    Symbol(MolQL.structure.type.bondFlags, staticAttr)((env, v) => StructureRuntime.BondProperties.createFlags(env, v)),
+    Symbol(MolQL.structure.type.secondaryStructureFlags, staticAttr)((env, v) => StructureRuntime.AtomProperties.createSecondaryStructureFlags(env, v)),
     Symbol(MolQL.structure.type.entityType, staticAttr)((env, v) => StructureRuntime.Common.entityType(v[0](env))),
     Symbol(MolQL.structure.type.ringFingerprint, staticAttr)((env, v) => StructureRuntime.Common.ringFingerprint(env, v as any)),
 
@@ -247,8 +262,7 @@ export const SymbolRuntime: Symbol.Info[] = [
     ...props(MolQL.structure.atomProperty.macromolecular, StructureRuntime.AtomProperties.Macromolecular),
 
     // ============= BOND PROPERTIES ================
-    ...props(MolQL.structure.bondProperty, StructureRuntime.BondProperties.Properties),
-    Symbol(MolQL.structure.bondProperty.hasFlags)((env, v) => StructureRuntime.BondProperties.hasFlags(env, v[0] as any, v.partial))
+    ...props(MolQL.structure.bondProperty, StructureRuntime.BondProperties.Properties)
 ]
 
 function props<S>(symbols: S, implementation: { [P in keyof S]?: any }) {
