@@ -8,7 +8,7 @@ import MolQL from '../../../../molql/symbol-table'
 import SymbolRuntime from '../../symbol'
 import Environment from '../environment'
 import Expression from '../expression'
-import { BondFlag } from '../../../molecule/data'
+import { BondFlag } from '../../../structure/data'
 
 function rt(runtime: SymbolRuntime) { return runtime; }
 

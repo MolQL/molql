@@ -11,7 +11,7 @@ import ElementAddress from '../../data/element-address'
 import AtomSelection from '../../data/atom-selection'
 import { FastSet } from '../../../utils/collections'
 import Mask from '../../../utils/mask'
-import { Model } from '../../../molecule/data'
+import { Model } from '../../../structure/data'
 import { defaultBondTest, testBond } from './common'
 
 type Selection = Expression<AtomSelection>

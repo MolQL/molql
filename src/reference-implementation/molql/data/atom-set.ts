@@ -5,7 +5,7 @@
  */
 
 import { UniqueArrayBuilder, sortAsc } from '../../utils/collections'
-import { Model } from '../../molecule/data'
+import { Model } from '../../structure/data'
 import Mask from '../../utils/mask'
 
 interface AtomSet { '@kind'?: 'atom-set' }

@@ -81,7 +81,7 @@ export interface Bonds {
 }
 
 export interface Model {
-    moleculeId: string,
+    structureId: string,
     id: number,
     data: {
         atom_site: mmCIF.Category<mmCIF.AtomSite>,

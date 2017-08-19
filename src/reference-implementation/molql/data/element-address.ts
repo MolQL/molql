@@ -4,7 +4,7 @@
  * @author David Sehnal <david.sehnal@gmail.com>
  */
 
-import { Model } from '../../molecule/data'
+import { Model } from '../../structure/data'
 
 interface ElementAddress { dataIndex: number, atom: number, residue: number, chain: number, entity: number }
 function ElementAddress(): ElementAddress { return { dataIndex: 0, atom: 0, residue: 0, chain: 0, entity: 0 }; }

@@ -11,7 +11,7 @@ import AtomSet from '../../data/atom-set'
 import AtomSelection from '../../data/atom-selection'
 import ElementAddress from '../../data/element-address'
 import Context from '../context'
-import { Model } from '../../../molecule/data'
+import { Model } from '../../../structure/data'
 import Mask from '../../../utils/mask'
 
 type Pred = Expression<boolean>

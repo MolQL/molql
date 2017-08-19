@@ -7,8 +7,8 @@
 import Environment from '../environment'
 import Expression from '../expression'
 import BondAddress from '../../data/bond-address'
-import { Bonds } from '../../../molecule/data'
-import { getRingFingerprint } from '../../../molecule/topology/rings/collection'
+import { Bonds } from '../../../structure/data'
+import { getRingFingerprint } from '../../../structure/topology/rings/collection'
 
 export type BondTest = (env: Environment) => boolean
 

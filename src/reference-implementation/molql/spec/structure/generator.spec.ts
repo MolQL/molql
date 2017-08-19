@@ -9,7 +9,7 @@ import 'jasmine'
 import AtomSelection from '../../data/atom-selection'
 import B from '../../../../molql/builder'
 import * as Data from '../data'
-import * as mmCif from '../../../molecule/mmcif'
+import * as mmCif from '../../../structure/mmcif'
 
 function testPropEq(symbol: any, value: any, category: mmCif.AtomSite) {
     it(`${category}`, function() {

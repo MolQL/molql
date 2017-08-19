@@ -7,9 +7,9 @@
 import * as fs from 'fs'
 
 import Expression from '../../../mini-lisp/expression'
-import * as mmCIF from '../../molecule/mmcif'
-import parseCIF from '../../molecule/parser'
-import { Model } from '../../molecule/data'
+import * as mmCIF from '../../structure/mmcif'
+import parseCIF from '../../structure/parser'
+import { Model } from '../../structure/data'
 import AtomSet from '../data/atom-set'
 import Context from '../runtime/context'
 import Environtment from '../runtime/environment'

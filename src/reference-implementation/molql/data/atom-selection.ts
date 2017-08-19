@@ -6,7 +6,7 @@
 
 import { sortAsc, FastMap, FastSet } from '../../utils/collections'
 import Mask from '../../utils/mask'
-import { Model } from '../../molecule/data'
+import { Model } from '../../structure/data'
 import SpatialLookup, { FindFunc } from '../../utils/spatial-lookup'
 import AtomSet from './atom-set'
 

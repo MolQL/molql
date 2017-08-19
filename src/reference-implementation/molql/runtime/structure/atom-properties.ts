@@ -10,8 +10,8 @@ import SymbolRuntime from '../../symbol'
 import Environment from '../environment'
 import RuntimeExpression from '../expression'
 import ElementAddress from '../../data/element-address'
-import { Model, ElementSymbol, ResidueIdentifier, VdwRadius, SecondaryStructure } from '../../../molecule/data'
-import { SecondaryStructureFlags } from '../../../molecule/topology/secondary-structure'
+import { Model, ElementSymbol, ResidueIdentifier, VdwRadius, SecondaryStructure } from '../../../structure/data'
+import { SecondaryStructureFlags } from '../../../structure/topology/secondary-structure'
 
 function prop(runtime: SymbolRuntime) { return runtime; }
 

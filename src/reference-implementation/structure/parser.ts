@@ -11,7 +11,7 @@ import { FastMap } from '../utils/collections'
 
 type Data = Model['data']
 
-function createModel(moleculeId: string, data: Data, startRow: number, rowCount: number): Model {
+function createModel(structureId: string, data: Data, startRow: number, rowCount: number): Model {
     const dataIndex: number[] = [], residueIndex: number[] = [];
     const atomOffset: number[] = [0], chainIndex: number[] = [];
     const x: number[] = [], y: number[] = [], z: number[] = [];
@@ -86,7 +86,7 @@ function createModel(moleculeId: string, data: Data, startRow: number, rowCount:
     entity++;
 
     return {
-        moleculeId,
+        structureId,
         id: pdbx_PDB_model_num.getInteger(startRow),
         atoms: { dataIndex, residueIndex, count: atom },
         residues: { atomOffset, chainIndex, count: residue, key: new Int32Array(residue) as any },

@@ -102,7 +102,7 @@ function stringWriter() {
 export default function to_mmCIF_string(model: Model, atomIndices: ArrayLike<number>) {
     const writer = new CIF.Text.Writer();
     const ctx: WriterContext = { model, atomIndices };
-    writer.startDataBlock(model.moleculeId);
+    writer.startDataBlock(model.structureId);
     writer.writeCategory(_atom_site, [ctx]);
     writer.encode();
     const result = stringWriter();

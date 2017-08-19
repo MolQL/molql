@@ -5,12 +5,12 @@
  */
 
 import * as fs from 'fs'
-import { Model } from './reference-implementation/molecule/data'
+import { Model } from './reference-implementation/structure/data'
 import AtomSelection from './reference-implementation/molql/data/atom-selection'
 import AtomSet from './reference-implementation/molql/data/atom-set'
-import parseCIF from './reference-implementation/molecule/parser'
+import parseCIF from './reference-implementation/structure/parser'
 import compile from './reference-implementation/molql/compiler'
-import mmCIFwriter from './reference-implementation/molecule/writer'
+import mmCIFwriter from './reference-implementation/structure/writer'
 import Context from './reference-implementation/molql/runtime/context'
 import typeCheck from './reference-implementation/molql/type/checker'
 //import formatE from './reference-implementation/mini-lisp/expression-formatter'

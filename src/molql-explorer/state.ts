@@ -6,12 +6,12 @@
 
 import LiteMol from 'litemol'
 import Expression from '../mini-lisp/expression'
-import { Model } from '../reference-implementation/molecule/data'
+import { Model } from '../reference-implementation/structure/data'
 import AtomSelection from '../reference-implementation/molql/data/atom-selection'
 import AtomSet from '../reference-implementation/molql/data/atom-set'
-import parseCIF from '../reference-implementation/molecule/parser'
+import parseCIF from '../reference-implementation/structure/parser'
 import compile, { Compiled } from '../reference-implementation/molql/compiler'
-import mmCIFwriter from '../reference-implementation/molecule/writer'
+import mmCIFwriter from '../reference-implementation/structure/writer'
 import Context from '../reference-implementation/molql/runtime/context'
 
 import Language, { Example } from './languages/language'
@@ -20,7 +20,7 @@ import Languages from './languages'
 import Rx = LiteMol.Core.Rx
 import Transformer = LiteMol.Bootstrap.Entity.Transformer
 
-export interface MoleculeData {
+export interface StructureData {
     data: string,
     model: Model
 }
@@ -40,7 +40,7 @@ class State {
     currentLanguage = new Rx.BehaviorSubject<{ language: Language, example: Example | undefined }>({ language: Languages[0], example: Languages[0].examples[0] });
 
     pdbId = '1tqn';
-    moleculeData: MoleculeData | undefined = void 0;
+    structureData: StructureData | undefined = void 0;
     loaded = new Rx.BehaviorSubject<boolean>(false);
 
     currentSymbol = new Rx.BehaviorSubject<string>('');
@@ -48,7 +48,7 @@ class State {
 
     queryResult = new Rx.BehaviorSubject<{ kind: 'content' | 'error', content: string }>({ kind: 'content', content: 'No query executed yet...'});
 
-    async loadMolecule() {
+    async loadStructure() {
         try {
             this.fullPlugin.clear();
             this.resultPlugin.clear();
@@ -67,7 +67,7 @@ class State {
 
             await main.applyTransform(t);
             const model = parseCIF(data).models[0];
-            this.moleculeData = { data, model };
+            this.structureData = { data, model };
             this.loaded.onNext(true);
         } catch (e) {
             console.error(e);
@@ -83,7 +83,7 @@ class State {
             this.resultPlugin.command(LiteMol.Bootstrap.Command.Tree.RemoveNode, 'selection');
             this.queryResult.onNext({ kind: 'content', content: 'No query executed yet...'});
 
-            const model = this.moleculeData!.model;
+            const model = this.structureData!.model;
 
             const ctx = Context.ofModel(model);
             const res = query.compiled(ctx);
@@ -103,7 +103,7 @@ class State {
                     isNotSelectable: true
                 }
 
-                tQ.add(queryP.context.tree.root, Transformer.Data.FromData, { data: this.moleculeData!.data }, { ref: 'whole' })
+                tQ.add(queryP.context.tree.root, Transformer.Data.FromData, { data: this.structureData!.data }, { ref: 'whole' })
                     .then(Transformer.Data.ParseCif, {})
                     .then(Transformer.Molecule.CreateFromMmCif, { blockIndex: 0 }, {})
                     .then(Transformer.Molecule.CreateModel, { modelIndex: 0 }, {})

@@ -8,7 +8,7 @@ import MolQL from '../../molql/symbol-table'
 import Symbol, { SymbolRuntimeTable } from './symbol'
 import { isSymbol } from '../../molql/symbol'
 import { FastSet } from '../utils/collections'
-import { ElementSymbol, ResidueIdentifier } from '../molecule/data'
+import { ElementSymbol, ResidueIdentifier } from '../structure/data'
 import StructureRuntime from './runtime/structure'
 
 const staticAttr: Symbol.Attributes = { isStatic: true }

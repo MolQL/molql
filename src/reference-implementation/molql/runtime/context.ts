@@ -5,7 +5,7 @@
  */
 
 import Mask from '../../utils/mask'
-import { Model } from '../../molecule/data'
+import { Model } from '../../structure/data'
 import AtomSet from '../data/atom-set'
 import AtomSelection from '../data/atom-selection'
 

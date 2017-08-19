@@ -140,7 +140,7 @@ class LoadMolecule extends Observer<{ state: State }, { }> {
                  <input className='u-full-width' type='text' placeholder='PDB id...' defaultValue={this.props.state.pdbId} onChange={e => this.props.state.pdbId = e.target.value }  />
             </div>
             <div className='six columns'>
-                <button className='u-full-width button-primary' onClick={() => this.props.state.loadMolecule()}>Load Molecule</button>
+                <button className='u-full-width button-primary' onClick={() => this.props.state.loadStructure()}>Download</button>
             </div>
         </div>;
     }
@@ -194,6 +194,7 @@ class QueryHint extends Observer<{ state: State }, { isActive: boolean, descript
             const _s = MolQLScript.SymbolMap[symbol]
             const symb = _s && _s.symbol;
             if (symb) this.setState({ description: symb.info.description, info: formatSymbol(symb, symbol) });
+            else this.setState({ info: '' })
         });
     }
     render() {
