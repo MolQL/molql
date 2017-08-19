@@ -48,14 +48,12 @@ const testStrings: {[index: string]: string[]} = {
   ],
   molQLscript: [
     `
-    (atom.sel.atom-groups ;; comment
+    (sel.atom.atom-groups ;; comment
       :residue-test (eq
         (atom.auth_comp_id)
         ALA)
       :atom-test (set.has
-        (set
-          (atom.new.el C)
-          (atom.new.el N))
+        (set _C _N)
         (atom.el)))
     `
   ],

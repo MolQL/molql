@@ -73,39 +73,36 @@ const list: MolQLScriptSymbol[] = [
     Alias(MolQL.core.set.has, 'set.has'),
     Alias(MolQL.core.set.isSubset, 'set.subset'),
 
-    Alias(MolQL.structure.type.elementSymbol, 'atom.new.el'),
-    Alias(MolQL.structure.type.entityType, 'atom.new.ent-type'),
-    Alias(MolQL.structure.type.authResidueId, 'atom.new.auth-resid'),
-    Alias(MolQL.structure.type.labelResidueId, 'atom.new.label-resid'),
-    //Alias(MolQL.structure.type.secondaryStructureFlags, 'atom.sec-struct-flags'),
-    Alias(MolQL.structure.type.ringFingerprint, 'atom.ringfp'),
+    Alias(MolQL.structure.type.entityType, 'ent-type'),
+    Alias(MolQL.structure.type.authResidueId, 'auth-resid'),
+    Alias(MolQL.structure.type.labelResidueId, 'label-resid'),
+    Alias(MolQL.structure.type.ringFingerprint, 'ringfp'),
 
-    Alias(MolQL.structure.slot.atom, 'atom.current'),
     Alias(MolQL.structure.slot.atomSetReduce, 'atom.set.reduce.value'),
 
-    Alias(MolQL.structure.generator.atomGroups, 'atom.sel.atom-groups'),
-    Alias(MolQL.structure.generator.queryInSelection, 'atom.sel.query-in-selection'),
-    Alias(MolQL.structure.generator.rings, 'atom.sel.rings'),
-    Alias(MolQL.structure.generator.empty, 'atom.sel.empty'),
+    Alias(MolQL.structure.generator.atomGroups, 'sel.atom.atom-groups'),
+    Alias(MolQL.structure.generator.queryInSelection, 'sel.atom.query-in-selection'),
+    Alias(MolQL.structure.generator.rings, 'sel.atom.rings'),
+    Alias(MolQL.structure.generator.empty, 'sel.atom.empty'),
 
-    Alias(MolQL.structure.modifier.queryEach, 'atom.sel.query-each'),
-    Alias(MolQL.structure.modifier.intersectBy, 'atom.sel.intersect-by'),
-    Alias(MolQL.structure.modifier.exceptBy, 'atom.sel.except-by'),
-    Alias(MolQL.structure.modifier.unionBy, 'atom.sel.union-by'),
-    Alias(MolQL.structure.modifier.union, 'atom.sel.union'),
-    Alias(MolQL.structure.modifier.cluster, 'atom.sel.cluster'),
-    Alias(MolQL.structure.modifier.includeSurroundings, 'atom.sel.include-surroundings'),
-    Alias(MolQL.structure.modifier.includeConnected, 'atom.sel.include-connected'),
-    Alias(MolQL.structure.modifier.expandProperty, 'atom.sel.expand-property'),
+    Alias(MolQL.structure.modifier.queryEach, 'sel.atom.query-each'),
+    Alias(MolQL.structure.modifier.intersectBy, 'sel.atom.intersect-by'),
+    Alias(MolQL.structure.modifier.exceptBy, 'sel.atom.except-by'),
+    Alias(MolQL.structure.modifier.unionBy, 'sel.atom.union-by'),
+    Alias(MolQL.structure.modifier.union, 'sel.atom.union'),
+    Alias(MolQL.structure.modifier.cluster, 'sel.atom.cluster'),
+    Alias(MolQL.structure.modifier.includeSurroundings, 'sel.atom.include-surroundings'),
+    Alias(MolQL.structure.modifier.includeConnected, 'sel.atom.include-connected'),
+    Alias(MolQL.structure.modifier.expandProperty, 'sel.atom.expand-property'),
 
-    Alias(MolQL.structure.filter.pick, 'atom.sel.pick'),
-    Alias(MolQL.structure.filter.withSameAtomProperties, 'atom.sel.with-same-atom-properties'),
-    Alias(MolQL.structure.filter.within, 'atom.sel.within'),
-    Alias(MolQL.structure.filter.isConnectedTo, 'atom.sel.is-connected-to'),
+    Alias(MolQL.structure.filter.pick, 'sel.atom.pick'),
+    Alias(MolQL.structure.filter.withSameAtomProperties, 'sel.atom.with-same-atom-properties'),
+    Alias(MolQL.structure.filter.within, 'sel.atom.within'),
+    Alias(MolQL.structure.filter.isConnectedTo, 'sel.atom.is-connected-to'),
 
-    Alias(MolQL.structure.combinator.intersect, 'atom.sel.intersect'),
-    Alias(MolQL.structure.combinator.merge, 'atom.sel.merge'),
-    Alias(MolQL.structure.combinator.distanceCluster, 'atom.sel.dist-cluster'),
+    Alias(MolQL.structure.combinator.intersect, 'sel.atom.intersect'),
+    Alias(MolQL.structure.combinator.merge, 'sel.atom.merge'),
+    Alias(MolQL.structure.combinator.distanceCluster, 'sel.atom.dist-cluster'),
 
     Alias(MolQL.structure.atomSet.atomCount, 'atom.set.atom-count'),
     Alias(MolQL.structure.atomSet.countQuery, 'atom.set.count-query'),
@@ -147,12 +144,12 @@ const list: MolQLScriptSymbol[] = [
 
     Alias(MolQL.structure.bondProperty.order, 'bond.order'),
 
-    Macro(Symbol('atom.sel.atoms', Arguments.Dictionary({
+    Macro(Symbol('sel.atom.atoms', Arguments.Dictionary({
         0: Argument(Type.Bool, { isOptional: true, defaultValue: true, description: 'Test applied to each atom.' })
     }), Struct.Types.AtomSelection, 'A selection of singleton atom sets.'),
     args => B.struct.generator.atomGroups({ 'atom-test': (args && args[0] !== void 0) ? args[0] : true })),
 
-    Macro(Symbol('atom.sel.res', Arguments.Dictionary({
+    Macro(Symbol('sel.atom.res', Arguments.Dictionary({
         0: Argument(Type.Bool, { isOptional: true, defaultValue: true, description: 'Test applied to the 1st atom of each residue.' })
     }), Struct.Types.AtomSelection, 'A selection of atom sets grouped by residue.'),
     args => B.struct.generator.atomGroups({
@@ -160,7 +157,7 @@ const list: MolQLScriptSymbol[] = [
         'group-by': B.ammp('residueKey')
     })),
 
-    Macro(Symbol('atom.sel.chains', Arguments.Dictionary({
+    Macro(Symbol('sel.atom.chains', Arguments.Dictionary({
         0: Argument(Type.Bool, { isOptional: true, defaultValue: true, description: 'Test applied to the 1st atom of each chain.' })
     }), Struct.Types.AtomSelection, 'A selection of atom sets grouped by chain.'),
     args => B.struct.generator.atomGroups({
@@ -168,11 +165,11 @@ const list: MolQLScriptSymbol[] = [
         'group-by': B.ammp('chainKey')
     })),
 
-    Macro(Symbol('atom.is-sec-struct', Arguments.List(Struct.Types.SecondaryStructureFlag), Type.Bool,
+    Macro(Symbol('sec-struct.is', Arguments.List(Struct.Types.SecondaryStructureFlag), Type.Bool,
         `Test if the current atom is part of an secondary structure. Optionally specify allowed sec. struct. types: ${Type.oneOfValues(Struct.Types.SecondaryStructureFlag).join(', ')}`),
     args => B.struct.atomProperty.macromolecular.isSecondaryStructure([B.struct.type.secondaryStructureFlags(args)])),
 
-    Macro(Symbol('bond.has-flags', Arguments.Dictionary({
+    Macro(Symbol('bond.is', Arguments.Dictionary({
         0: Argument(Struct.Types.BondFlag, { isRest: true }),
             partial: Argument(Type.Bool, { isOptional: true, defaultValue: true, description: 'If false, all flags must be present.' }),
         }), Type.Bool,

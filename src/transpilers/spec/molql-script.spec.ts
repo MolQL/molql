@@ -12,22 +12,20 @@ import compile from '../../reference-implementation/molql/compiler'
 describe('molql-script', () => {
     const examples = [{
         name: 'All C or N atoms in ALA residues',
-        value: `(atom.sel.atom-groups
+        value: `(sel.atom.atom-groups
   :residue-test (= atom.auth_comp_id ALA)
   :atom-test (set.has { _C _N } (atom.el)))`
     }, {
         name: 'All residues within 5 ang from Fe atom',
-        value: `(atom.sel.include-surroundings
-  (atom.sel.atom-groups
-    :atom-test (=
-      (atom.el)
-      (atom.new.el Fe)))
+        value: `(sel.atom.include-surroundings
+  (sel.atom.atom-groups
+    :atom-test (= atom.el _Fe))
   :radius 5
   :as-whole-residues true)`
     }, {
         name: 'Cluster LYS residues within 5 ang',
-        value: `(atom.sel.cluster
-  (atom.sel.atom-groups
+        value: `(sel.atom.cluster
+  (sel.atom.atom-groups
     :residue-test (eq
       (atom.auth_comp_id)
       LYS)
@@ -35,8 +33,8 @@ describe('molql-script', () => {
   :max-distance 5)`
     }, {
         name: 'Residues with max b-factor < 45',
-        value: `(atom.sel.pick
-  (atom.sel.atom-groups
+        value: `(sel.atom.pick
+  (sel.atom.atom-groups
     :group-by (atom.key.res))
   :test (<
     (atom.set.reduce
@@ -47,21 +45,21 @@ describe('molql-script', () => {
     35))`
     }, {
       name: 'Residues connected to HEM',
-      value: `(atom.sel.is-connected-to
-  (atom.sel.atom-groups
+      value: `(sel.atom.is-connected-to
+  (sel.atom.atom-groups
     :residue-test true
     :group-by (atom.key.res))
-    :target (atom.sel.res (= atom.label_comp_id HEM))
+    :target (sel.atom.res (= atom.label_comp_id HEM))
   ;; default bond test allows only covalent bonds
   :bond-test true
   :disjunct true)`
     }, {
       name: 'HEM and 2 layers of connected residues',
-      value: `(atom.sel.include-connected
-  (atom.sel.atom-groups
+      value: `(sel.atom.include-connected
+  (sel.atom.atom-groups
     :residue-test (= (atom.label_comp_id) HEM)
     :group-by (atom.key.res))
-  :bond-test (bond.has-flags metallic covalent)
+  :bond-test (bond.is metallic covalent)
   :layer-count 2
   :as-whole-residues true)`
     }];
