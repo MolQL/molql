@@ -116,6 +116,7 @@ const list: MolQLScriptSymbol[] = [
     Alias(MolQL.structure.atomProperty.core.y, 'atom.y'),
     Alias(MolQL.structure.atomProperty.core.z, 'atom.z'),
     Alias(MolQL.structure.atomProperty.core.atomKey, 'atom.key'),
+    Alias(MolQL.structure.atomProperty.core.hasSecondaryStructureFlag, 'atom.has.sec-struc'),
 
     Alias(MolQL.structure.atomProperty.topology.connectedComponentKey, 'atom.key.molecule'),
 

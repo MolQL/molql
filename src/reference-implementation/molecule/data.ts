@@ -10,6 +10,7 @@ import computeBonds from './topology/bonds/compute'
 import computeConnectedComponents from './topology/connected-components'
 import Rings from './topology/rings/collection'
 import { ElementIndex, ElementVdwRadii, DefaultVdwRadius } from './constants'
+import { SecondaryStructureFlags, SecondaryStructureMmcif, SecondaryStructurePdb } from './topology/secondary-structure'
 
 export const enum SecondaryStructureType {
     None = 0,
@@ -27,7 +28,7 @@ export const enum BondFlag {
     Aromatic             = 0x20,
     Computed             = 0x40
     // currently at most 16 flags are supported!!
-    // if nore flags needs to be added, _computeBonds in topology/bonds-compute.ts must be updated.
+    // if nore flags needs to be added, _computeBonds in topology/bonds/compute.ts must be updated.
 }
 
 export interface Atoms {
@@ -119,6 +120,34 @@ export function ElementSymbol(symbol: any): string {
 export function VdwRadius(element: string): number {
     const i = ElementIndex[element];
     return i === void 0 ? DefaultVdwRadius : ElementVdwRadii[i]!
+}
+
+export namespace SecondaryStructure {
+    function flag(model: Model, residueIndex: number) {
+        const type = model.residues.secondaryStructureType[residueIndex]
+        let flag
+        switch (type) {
+            case SecondaryStructureType.StructConf:
+                const index = model.residues.secondaryStructureIndex[residueIndex]
+                const helixClass = model.data.secondaryStructure.structConf.pdbx_PDB_helix_class.getString(index)
+                if (helixClass !== null) {
+                    flag = SecondaryStructurePdb[helixClass]
+                    console.log(helixClass, flag)
+                } else {
+                    const confType = model.data.secondaryStructure.structConf.conf_type_id.getString(index)
+                    if (confType !== null) flag = SecondaryStructureMmcif[confType]
+                    console.log(confType, flag)
+                }
+                break
+            case SecondaryStructureType.StructSheetRange:
+                return SecondaryStructureFlags.BetaSheet
+        }
+        return flag === void 0 ? SecondaryStructureType.None : flag
+    }
+
+    export function hasFlags(model: Model, residueIndex: number, flags: number) {
+        return !flags || (flag(model, residueIndex) & flags) !== 0;
+    }
 }
 
 export type ResidueIdentifier = string

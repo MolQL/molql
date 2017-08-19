@@ -12,6 +12,7 @@ import { symbol } from '../helpers'
 export namespace Types {
     export const ElementSymbol = Type.Value('Structure', 'ElementSymbol');
     export const BondFlag = Type.OneOf('Structure', 'BondFlag', Type.Str, ['covalent', 'metallic', 'ion', 'hydrogen', 'sulfide', 'computed', 'aromatic']);
+    export const SecondaryStructureFlag = Type.OneOf('Structure', 'SecondaryStructureFlag', Type.Str, ['alpha', '3-10', 'pi', 'sheet', 'strand', 'helix', 'turn', 'none']);
     export const RingFingerprint = Type.Value('Structure', 'RingFingerprint');
     export const EntityType = Type.OneOf('Structure', 'EntityType', Type.Str, ['polymer', 'non-polymer', 'water', 'unknown']);
     export const ResidueId = Type.Value('Structure', 'ResidueId');
@@ -195,7 +196,9 @@ const atomProperty = {
         y: atomProp(Type.Num, 'Cartesian Y coordinate'),
         z: atomProp(Type.Num, 'Cartesian Z coordinate'),
 
-        atomKey: atomProp(Type.AnyValue, 'Unique value for each atom. Main use case is grouping of atoms.')
+        atomKey: atomProp(Type.AnyValue, 'Unique value for each atom. Main use case is grouping of atoms.'),
+
+        hasSecondaryStructureFlag: symbol(Arguments.List(Types.SecondaryStructureFlag), Type.Bool, `Check if the current atom has at least one of the specified secondary structure flags. Allowed flags: ${Type.oneOfValues(Types.SecondaryStructureFlag).join(', ')}.`)
     },
 
     topology: {

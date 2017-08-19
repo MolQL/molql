@@ -2,6 +2,7 @@
  * Copyright (c) 2017 MolQL contributors, licensed under MIT, See LICENSE file for more info.
  *
  * @author David Sehnal <david.sehnal@gmail.com>
+ * @author Alexander Rose <alexander.rose@weirdbyte.de>
  */
 
 import MolQL from '../../../../molql/symbol-table'
@@ -9,12 +10,29 @@ import SymbolRuntime from '../../symbol'
 import Environment from '../environment'
 import RuntimeExpression from '../expression'
 import ElementAddress from '../../data/element-address'
-import { Model, ElementSymbol, ResidueIdentifier, VdwRadius } from '../../../molecule/data'
+import { Model, ElementSymbol, ResidueIdentifier, VdwRadius, SecondaryStructure } from '../../../molecule/data'
+import { SecondaryStructureFlags } from '../../../molecule/topology/secondary-structure'
 
 function prop(runtime: SymbolRuntime) { return runtime; }
 
 function getAddress(env: Environment, xs: { 0?: RuntimeExpression }): ElementAddress {
     return (xs[0] && xs[0]!(env)) || env.slots.element;
+}
+
+function createSecondaryStructureFlags(env: Environment, fs: RuntimeExpression<string>[]) {
+    let ret = SecondaryStructureFlags.None
+    for (const f of fs) {
+        switch (('' + f(env)).toLowerCase()) {
+            case 'alpha': ret |= SecondaryStructureFlags.HelixAlpha; break;
+            case '3-10': ret |= SecondaryStructureFlags.Helix3Ten; break;
+            case 'pi': ret |= SecondaryStructureFlags.HelixPi; break;
+            case 'sheet': ret |= SecondaryStructureFlags.BetaSheet; break;
+            case 'strand': ret |= SecondaryStructureFlags.BetaStrand; break;
+            case 'helix': ret |= SecondaryStructureFlags.Helix; break;
+            case 'turn': ret |= SecondaryStructureFlags.Turn; break;
+        }
+    }
+    return ret;
 }
 
 export const Core: { [P in keyof typeof MolQL.structure.atomProperty.core]?: SymbolRuntime } = {
@@ -27,6 +45,10 @@ export const Core: { [P in keyof typeof MolQL.structure.atomProperty.core]?: Sym
     z: prop((env, v) => env.context.model.positions.z[getAddress(env, v).atom]),
 
     atomKey: prop((env, v) => getAddress(env, v).atom),
+
+    hasSecondaryStructureFlag: prop((env, v) => {
+        return SecondaryStructure.hasFlags(env.context.model, env.slots.element.residue, createSecondaryStructureFlags(env, v as any))
+    }),
 }
 
 export const Topology: { [P in keyof typeof MolQL.structure.atomProperty.topology]?: SymbolRuntime } = {
