@@ -28,6 +28,7 @@ export function createSecondaryStructureFlags(env: Environment, args: RuntimeArg
             case 'sheet': ctx.flag |= SecondaryStructureFlags.BetaSheet; break;
             case 'strand': ctx.flag |= SecondaryStructureFlags.BetaStrand; break;
             case 'helix': ctx.flag |= SecondaryStructureFlags.Helix; break;
+            case 'beta': ctx.flag |= SecondaryStructureFlags.Beta; break;
             case 'turn': ctx.flag |= SecondaryStructureFlags.Turn; break;
         }
     }).flag;

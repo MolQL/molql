@@ -146,7 +146,7 @@ export namespace SecondaryStructure {
                 }
                 break
             case SecondaryStructureType.StructSheetRange:
-                return SecondaryStructureFlags.BetaSheet
+                return SecondaryStructureFlags.Beta | SecondaryStructureFlags.BetaSheet
         }
         return flag;
     }

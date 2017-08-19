@@ -15,7 +15,7 @@ export namespace Types {
     export const BondFlag = Type.OneOf('Structure', 'BondFlag', Type.Str, ['covalent', 'metallic', 'ion', 'hydrogen', 'sulfide', 'computed', 'aromatic']);
     export const BondFlags = Core.Types.Flags(BondFlag, 'BondFlags');
 
-    export const SecondaryStructureFlag = Type.OneOf('Structure', 'SecondaryStructureFlag', Type.Str, ['alpha', '3-10', 'pi', 'sheet', 'strand', 'helix', 'turn']);
+    export const SecondaryStructureFlag = Type.OneOf('Structure', 'SecondaryStructureFlag', Type.Str, ['alpha', 'beta', '3-10', 'pi', 'sheet', 'strand', 'helix', 'turn', 'none']);
     export const SecondaryStructureFlags = Core.Types.Flags(SecondaryStructureFlag, 'SecondaryStructureFlag');
 
     export const RingFingerprint = Type.Value('Structure', 'RingFingerprint');
