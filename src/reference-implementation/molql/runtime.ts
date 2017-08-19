@@ -178,7 +178,7 @@ export const SymbolRuntime: Symbol.Info[] = [
     // ============= TYPES ================
     Symbol(MolQL.structure.type.elementSymbol, staticAttr)((env, v) => ElementSymbol(v[0](env))),
     Symbol(MolQL.structure.type.bondFlags, staticAttr)((env, v) => StructureRuntime.BondProperties.createFlags(env, v as any) as any),
-    Symbol(MolQL.structure.type.secondaryStructureFlags, staticAttr)((env, v) => StructureRuntime.AtomProperties.createSecondaryStructureFlags(env, v as any) as any),
+    Symbol(MolQL.structure.type.secondaryStructureFlags, staticAttr)((env, v) => StructureRuntime.AtomProperties.createSecondaryStructureFlags(env, v) as any),
     Symbol(MolQL.structure.type.entityType, staticAttr)((env, v) => StructureRuntime.Common.entityType(v[0](env))),
     Symbol(MolQL.structure.type.ringFingerprint, staticAttr)((env, v) => StructureRuntime.Common.ringFingerprint(env, v as any)),
 

@@ -5,27 +5,25 @@
  */
 
 import MolQL from '../../../../molql/symbol-table'
-import SymbolRuntime from '../../symbol'
+import SymbolRuntime, { RuntimeArguments, forEachPositionalArg } from '../../symbol'
 import Environment from '../environment'
 import Expression from '../expression'
 import { BondFlag } from '../../../structure/data'
 
 function rt(runtime: SymbolRuntime) { return runtime; }
 
-export function createFlags(env: Environment, fs: Expression<string>[]) {
-    let ret = BondFlag.None
-    for (const f of fs) {
+export function createFlags(env: Environment, args: RuntimeArguments) {
+    return forEachPositionalArg(args, { flag: BondFlag.None }, (f, ctx) => {
         switch (('' + f(env)).toLowerCase()) {
-            case 'covalent': ret |= BondFlag.Covalent; break;
-            case 'metallic': ret |= BondFlag.MetallicCoordination; break;
-            case 'ion': ret |= BondFlag.Ion; break;
-            case 'hydrogen': ret |= BondFlag.Hydrogen; break;
-            case 'sulfide': ret |= BondFlag.Sulfide; break;
-            case 'aromatic': ret |= BondFlag.Aromatic; break;
-            case 'computed': ret |= BondFlag.Computed; break;
+            case 'covalent': ctx.flag |= BondFlag.Covalent; break;
+            case 'metallic': ctx.flag |= BondFlag.MetallicCoordination; break;
+            case 'ion': ctx.flag |= BondFlag.Ion; break;
+            case 'hydrogen': ctx.flag |= BondFlag.Hydrogen; break;
+            case 'sulfide': ctx.flag |= BondFlag.Sulfide; break;
+            case 'aromatic': ctx.flag |= BondFlag.Aromatic; break;
+            case 'computed': ctx.flag |= BondFlag.Computed; break;
         }
-    }
-    return ret;
+    }).flag;
 }
 
 export const Properties: { [P in keyof typeof MolQL.structure.bondProperty]?: SymbolRuntime } = {

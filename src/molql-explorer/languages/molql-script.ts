@@ -52,7 +52,7 @@ const lang: Language = {
   (atom.sel.res (= atom.label_comp_id HEM))
   ;; default bond test allows only covalent bonds
   ;; another option is to use :bond-test true to allow any connection
-  :bond-test (bond.has-flags (bond.flags metallic covalent))
+  :bond-test (bond.has-flags metallic covalent)
   :layer-count 2
   :as-whole-residues true)`
     }, {
@@ -68,12 +68,12 @@ const lang: Language = {
     }, {
       name: 'Sheets',
       value: `(atom.sel.res
-  (atom.is-sec-struct (atom.sec-struct-flags sheet)))`
+  (atom.is-sec-struct sheet))`
     }, {
       name: 'Helices formed by at least 30 residues',
       value: `(atom.sel.pick
   (atom.sel.atom-groups
-    :residue-test (atom.is-sec-struct (atom.sec-struct-flags helix))
+    :residue-test (atom.is-sec-struct helix)
     :group-by atom.key.sec-struct)
   :test (<= 30 (atom.set.count-query atom.sel.res)))`
     }]

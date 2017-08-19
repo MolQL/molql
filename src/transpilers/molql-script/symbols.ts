@@ -77,7 +77,7 @@ const list: MolQLScriptSymbol[] = [
     Alias(MolQL.structure.type.entityType, 'atom.new.ent-type'),
     Alias(MolQL.structure.type.authResidueId, 'atom.new.auth-resid'),
     Alias(MolQL.structure.type.labelResidueId, 'atom.new.label-resid'),
-    Alias(MolQL.structure.type.secondaryStructureFlags, 'atom.sec-struct-flags'),
+    //Alias(MolQL.structure.type.secondaryStructureFlags, 'atom.sec-struct-flags'),
     Alias(MolQL.structure.type.ringFingerprint, 'atom.ringfp'),
 
     Alias(MolQL.structure.slot.atom, 'atom.current'),
@@ -144,11 +144,8 @@ const list: MolQLScriptSymbol[] = [
     Alias(MolQL.structure.atomProperty.macromolecular.entityType, 'atom.entity-type'),
 
     Alias(MolQL.structure.atomProperty.macromolecular.secondaryStructureKey, 'atom.key.sec-struct'),
-    Alias(MolQL.structure.atomProperty.macromolecular.isSecondaryStructure, 'atom.is-sec-struct'),
 
-    Alias(MolQL.structure.type.bondFlags, 'bond.flags'),
     Alias(MolQL.structure.bondProperty.order, 'bond.order'),
-    Alias(MolQL.structure.bondProperty.hasFlags, 'bond.has-flags'),
 
     Macro(Symbol('atom.sel.atoms', Arguments.Dictionary({
         0: Argument(Type.Bool, { isOptional: true, defaultValue: true, description: 'Test applied to each atom.' })
@@ -169,8 +166,42 @@ const list: MolQLScriptSymbol[] = [
     args => B.struct.generator.atomGroups({
         'chain-test': (args && args[0] !== void 0) ? args[0] : true,
         'group-by': B.ammp('chainKey')
-    }))
+    })),
+
+    Macro(Symbol('atom.is-sec-struct', Arguments.List(Struct.Types.SecondaryStructureFlag), Type.Bool,
+        `Test if the current atom is part of an secondary structure. Optionally specify allowed sec. struct. types: ${Type.oneOfValues(Struct.Types.SecondaryStructureFlag).join(', ')}`),
+    args => B.struct.atomProperty.macromolecular.isSecondaryStructure([B.struct.type.secondaryStructureFlags(args)])),
+
+    Macro(Symbol('bond.has-flags', Arguments.Dictionary({
+        0: Argument(Struct.Types.BondFlag, { isRest: true }),
+            partial: Argument(Type.Bool, { isOptional: true, defaultValue: true, description: 'If false, all flags must be present.' }),
+        }), Type.Bool,
+        `Test if the current bond has at least one (or all if partial = false) of the specified flags: ${Type.oneOfValues(Struct.Types.BondFlag).join(', ')}`),
+    args => B.struct.bondProperty.hasFlags({
+        0: B.struct.type.bondFlags(getPositionalArgs(args)),
+        ...pickArgs(args, 'partial')
+    })),
 ];
+
+function getPositionalArgs(args: any) {
+    const ret: any[] = [];
+    for (let k of Object.keys(args)) {
+        if (!isNaN(k as any)) ret.push(args[k]);
+    }
+    return ret.length ? ret : void 0;
+}
+
+function pickArgs(args: any, ...names: string[]) {
+    const ret = Object.create(null);
+    let count = 0;
+    for (let k of Object.keys(args)) {
+        if (names.indexOf(k) >= 0) {
+            ret[k] = args[k];
+            count++;
+        }
+    }
+    return count ? ret : void 0;
+}
 
 const normalized = (function () {
     const symbolList: [string, MolQLScriptSymbol][] = [];

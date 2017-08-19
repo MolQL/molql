@@ -11,8 +11,13 @@ import { symbol } from '../helpers'
 
 export namespace Types {
     export const ElementSymbol = Type.Value('Structure', 'ElementSymbol');
+
     export const BondFlag = Type.OneOf('Structure', 'BondFlag', Type.Str, ['covalent', 'metallic', 'ion', 'hydrogen', 'sulfide', 'computed', 'aromatic']);
+    export const BondFlags = Type.Container('Structure', 'Flags', BondFlag, 'BondFlags');
+
     export const SecondaryStructureFlag = Type.OneOf('Structure', 'SecondaryStructureFlag', Type.Str, ['alpha', '3-10', 'pi', 'sheet', 'strand', 'helix', 'turn']);
+    export const SecondaryStructureFlags = Type.Container('Structure', 'Flags', SecondaryStructureFlag, 'SecondaryStructureFlag');
+
     export const RingFingerprint = Type.Value('Structure', 'RingFingerprint');
     export const EntityType = Type.OneOf('Structure', 'EntityType', Type.Str, ['polymer', 'non-polymer', 'water', 'unknown']);
     export const ResidueId = Type.Value('Structure', 'ResidueId');
@@ -37,7 +42,7 @@ const type = {
 
     bondFlags: symbol(
         Arguments.List(Types.BondFlag),
-        Types.BondFlag,
+        Types.BondFlags,
         `Create bond flags representation from a list of strings. Allowed flags: ${Type.oneOfValues(Types.BondFlag).join(', ')}.`),
 
     ringFingerprint: symbol(
@@ -47,7 +52,7 @@ const type = {
 
     secondaryStructureFlags: symbol(
         Arguments.List(Types.SecondaryStructureFlag),
-        Types.SecondaryStructureFlag,
+        Types.SecondaryStructureFlags,
         `Create secondary structure flags representation from a list of strings. Allowed flags: ${Type.oneOfValues(Types.SecondaryStructureFlag).join(', ')}.`),
 
     authResidueId: symbol(Arguments.Dictionary({
@@ -259,7 +264,7 @@ const atomProperty = {
 
         secondaryStructureKey: atomProp(Type.AnyValue, 'Unique value for each secondary structure element.'),
         isSecondaryStructure: symbol(Arguments.Dictionary({
-            0: Argument(Types.SecondaryStructureFlag, { isOptional: true }),
+            0: Argument(Types.SecondaryStructureFlags, { isOptional: true }),
         }), Type.Bool, 'Test if the current atom is part of an secondary structure. Optionally specify allowed sec. struct. types.')
     }
 }
@@ -268,7 +273,7 @@ const bondProperty = {
     '@header': 'Bond Properties',
 
     hasFlags: symbol(Arguments.Dictionary({
-        0: Argument(Types.BondFlag),
+        0: Argument(Types.BondFlags),
         partial: Argument(Type.Bool, { isOptional: true, defaultValue: true, description: 'If false, all flags must be present.' }),
     }), Type.Bool, 'Test if the current bond has at least one (or all if partial = false) of the specified flags.'),
     order: bondProp(Type.Num)

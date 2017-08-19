@@ -177,7 +177,8 @@ function assignType(ctx: TypeContext, value: Expression, a: Type, b: Type): bool
                 return false;
             } else if (Expression.isLiteral(value)) {
                 return !!b.values[value as any];
-            } else return true;
+            }
+            return false;
         }
         case 'variable': {
             if (!assignType(ctx, value, a, b.type)) return false;

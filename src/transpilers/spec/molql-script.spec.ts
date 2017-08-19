@@ -61,7 +61,7 @@ describe('molql-script', () => {
   (atom.sel.atom-groups
     :residue-test (= (atom.label_comp_id) HEM)
     :group-by (atom.key.res))
-  :bond-test (bond.has-flags (bond.flags metallic covalent))
+  :bond-test (bond.has-flags metallic covalent)
   :layer-count 2
   :as-whole-residues true)`
     }];

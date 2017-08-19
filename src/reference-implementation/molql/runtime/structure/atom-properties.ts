@@ -6,7 +6,7 @@
  */
 
 import MolQL from '../../../../molql/symbol-table'
-import SymbolRuntime from '../../symbol'
+import SymbolRuntime, { RuntimeArguments, forEachPositionalArg } from '../../symbol'
 import Environment from '../environment'
 import RuntimeExpression from '../expression'
 import ElementAddress from '../../data/element-address'
@@ -19,20 +19,18 @@ function getAddress(env: Environment, xs: { 0?: RuntimeExpression }): ElementAdd
     return (xs[0] && xs[0]!(env)) || env.slots.element;
 }
 
-export function createSecondaryStructureFlags(env: Environment, fs: RuntimeExpression<string>[]) {
-    let ret = SecondaryStructureFlags.None
-    for (const f of fs) {
+export function createSecondaryStructureFlags(env: Environment, args: RuntimeArguments) {
+    return forEachPositionalArg(args, { flag: SecondaryStructureFlags.None }, (f, ctx) => {
         switch (('' + f(env)).toLowerCase()) {
-            case 'alpha': ret |= SecondaryStructureFlags.HelixAlpha; break;
-            case '3-10': ret |= SecondaryStructureFlags.Helix3Ten; break;
-            case 'pi': ret |= SecondaryStructureFlags.HelixPi; break;
-            case 'sheet': ret |= SecondaryStructureFlags.BetaSheet; break;
-            case 'strand': ret |= SecondaryStructureFlags.BetaStrand; break;
-            case 'helix': ret |= SecondaryStructureFlags.Helix; break;
-            case 'turn': ret |= SecondaryStructureFlags.Turn; break;
+            case 'alpha': ctx.flag |= SecondaryStructureFlags.HelixAlpha; break;
+            case '3-10': ctx.flag |= SecondaryStructureFlags.Helix3Ten; break;
+            case 'pi': ctx.flag |= SecondaryStructureFlags.HelixPi; break;
+            case 'sheet': ctx.flag |= SecondaryStructureFlags.BetaSheet; break;
+            case 'strand': ctx.flag |= SecondaryStructureFlags.BetaStrand; break;
+            case 'helix': ctx.flag |= SecondaryStructureFlags.Helix; break;
+            case 'turn': ctx.flag |= SecondaryStructureFlags.Turn; break;
         }
-    }
-    return ret;
+    }).flag;
 }
 
 export const Core: { [P in keyof typeof MolQL.structure.atomProperty.core]?: SymbolRuntime } = {

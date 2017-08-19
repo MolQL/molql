@@ -32,6 +32,14 @@ function SymbolRuntime<S extends Symbol>(symbol: S, attributes: Partial<SymbolRu
     };
 }
 
+export function forEachPositionalArg<Ctx>(args: RuntimeArguments, ctx: Ctx, f: (a: RuntimeExpression, ctx: Ctx) => void) {
+    for (const k of Object.keys(args)) {
+        if (isNaN(k as any)) continue;
+        f((args as any)[k], ctx);
+    }
+    return ctx;
+}
+
 export type SymbolRuntimeTable = { readonly [id: string]: SymbolRuntime.Info }
 
 export default SymbolRuntime
