@@ -55,6 +55,7 @@ const type = {
     list: symbol(Arguments.List(Types.AnyVar), Types.List()),
     set: symbol(Arguments.List(Types.AnyValueVar), Types.Set()),
     bitflags: symbol(Arguments.Dictionary({ 0: Argument(Type.Num) }), Types.BitFlags, 'Interpret a number as bitflags.'),
+    compositeKey: symbol(Arguments.List(Type.AnyValue), Type.AnyValue),
 };
 
 const logic = {

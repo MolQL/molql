@@ -28,6 +28,7 @@ const list: MolQLScriptSymbol[] = [
     Alias(MolQL.core.type.regex, 'regex'),
     Alias(MolQL.core.type.list, 'list'),
     Alias(MolQL.core.type.set, 'set'),
+    Alias(MolQL.core.type.compositeKey, 'compose-key'),
     Alias(MolQL.core.logic.not, 'not'),
     Alias(MolQL.core.logic.and, 'and'),
     Alias(MolQL.core.logic.or, 'or'),

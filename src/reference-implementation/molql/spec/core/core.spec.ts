@@ -116,4 +116,6 @@ describe('types', () => {
     testFn(B.core.flags.hasAll, [bf('0101'), bf('100')], true);
     testFn(B.core.flags.hasAll, [bf('0101'), bf('111')], false);
     testFn(B.core.flags.hasAll, [bf('0'), bf('0')], true);
+
+    testFn(B.core.type.compositeKey, ['x', 1], 'x-1');
 });

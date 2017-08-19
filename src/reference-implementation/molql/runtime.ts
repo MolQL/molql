@@ -42,6 +42,15 @@ export const SymbolRuntime: Symbol.Info[] = [
     }),
     Symbol(MolQL.core.type.regex, staticAttr)((env, v) => new RegExp(v[0](env), (v[1] && v[1](env)) || '')),
     Symbol(MolQL.core.type.bitflags, staticAttr)((env, v) => +v[0](env)),
+    Symbol(MolQL.core.type.compositeKey, staticAttr)((env, xs) => {
+        const key: string[] = [];
+        if (typeof xs.length === 'number') {
+            for (let i = 0, _i = xs.length; i < _i; i++) key[key.length] = '' + xs[i](env);
+        } else {
+            for (const k of Object.keys(xs)) key[key.length] = '' + xs[k](env);
+        }
+        return key.join('-');
+    }),
 
     // ============= LOGIC ================
     Symbol(MolQL.core.logic.not, staticAttr)((env, v) => !v[0](env)),
