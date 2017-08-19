@@ -143,6 +143,7 @@ const list: MolQLScriptSymbol[] = [
     Alias(MolQL.structure.atomProperty.macromolecular.B_iso_or_equiv, 'atom.B_iso_or_equiv'),
     Alias(MolQL.structure.atomProperty.macromolecular.entityType, 'atom.entity-type'),
 
+    Alias(MolQL.structure.atomProperty.macromolecular.secondaryStructureKey, 'atom.key.sec-struct'),
     Alias(MolQL.structure.atomProperty.macromolecular.isSecondaryStructure, 'atom.is-sec-struct'),
 
     Alias(MolQL.structure.type.bondFlags, 'bond.flags'),

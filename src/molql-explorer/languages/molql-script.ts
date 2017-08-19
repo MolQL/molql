@@ -69,6 +69,13 @@ const lang: Language = {
       name: 'Sheets',
       value: `(atom.sel.res
   (atom.is-sec-struct (atom.sec-struct-flags sheet)))`
+    }, {
+      name: 'Helices formed by at least 30 residues',
+      value: `(atom.sel.pick
+  (atom.sel.atom-groups
+    :residue-test (atom.is-sec-struct (atom.sec-struct-flags helix))
+    :group-by atom.key.sec-struct)
+  :test (<= 30 (atom.set.count-query atom.sel.res)))`
     }]
 }
 

@@ -85,16 +85,18 @@ function createModel(moleculeId: string, data: Data, startRow: number, rowCount:
     chain++;
     entity++;
 
-    const secondaryStructureType: number[] = new Uint8Array(residue) as any;
-    const secondaryStructureIndex: number[] = new Int32Array(residue) as any;
-
     return {
         moleculeId,
         id: pdbx_PDB_model_num.getInteger(startRow),
         atoms: { dataIndex, residueIndex, count: atom },
-        residues: { atomOffset, secondaryStructureType, secondaryStructureIndex, chainIndex, count: residue, key: new Int32Array(residue) as any },
+        residues: { atomOffset, chainIndex, count: residue, key: new Int32Array(residue) as any },
         chains: { residueOffset, entityIndex, count: chain, key: new Int32Array(chain) as any },
         entities: { chainOffset, count: entity, key: new Int32Array(entity) as any, dataIndex: new Int32Array(entity) as any },
+        secondaryStructure: {
+            type: new Uint8Array(residue) as any,
+            index: new Int32Array(residue) as any,
+            key: new Int32Array(residue) as any
+        },
         positions: { x, y, z },
         data,
         '@spatialLookup': void 0,
@@ -202,7 +204,8 @@ function extendSecondaryStructureMap<T extends mmCIF.StructConf | mmCIF.StructSh
 }
 
 function assignSecondaryStructureEntry(model: Model, entry: SecondaryStructureEntry, resStart: number, resEnd: number) {
-    const { atomOffset, secondaryStructureIndex, secondaryStructureType } = model.residues;
+    const { atomOffset } = model.residues;
+    const { index: secondaryStructureIndex, type: secondaryStructureType } = model.secondaryStructure
     const { dataIndex } = model.atoms;
     const { label_seq_id, pdbx_PDB_ins_code } = model.data.atom_site;
     const { endSeqNumber, endInsCode, rowIndex, type } = entry;
@@ -223,7 +226,7 @@ function assignSecondaryStructureEntry(model: Model, entry: SecondaryStructureEn
     }
 }
 
-function assignSecondaryStructure(model: Model) {
+function assignSecondaryStructureRanges(model: Model) {
     const map: SecondaryStructureMap = FastMap.create();
     extendSecondaryStructureMap(model.data.secondaryStructure.structConf, SecondaryStructureType.StructConf, map);
     extendSecondaryStructureMap(model.data.secondaryStructure.sheetRange, SecondaryStructureType.StructSheetRange, map);
@@ -252,6 +255,42 @@ function assignSecondaryStructure(model: Model) {
             }
         }
     }
+}
+
+function assignSecondaryStructureKey(model: Model) {
+    const { type, index, key } = model.secondaryStructure;
+    const { count } = model.residues;
+    const { sheet_id } = model.data.secondaryStructure.sheetRange;
+    const helix_index_key = FastMap.create<number, number>();
+    const sheet_id_key = FastMap.create<string, number>();
+    let currentKey = 1;
+    for (let i = 0; i < count; i++) {
+        switch (type[i]) {
+            case SecondaryStructureType.StructConf: {
+                const idx = index[i];
+                if (helix_index_key.has(idx)) key[i] = helix_index_key.get(idx)!;
+                else {
+                    key[i] = currentKey++;
+                    helix_index_key.set(idx, key[i]);
+                }
+                break;
+            }
+            case SecondaryStructureType.StructSheetRange: {
+                const sid = sheet_id.getString(index[i])!;
+                if (sheet_id_key.has(sid)) key[i] = sheet_id_key.get(sid)!;
+                else {
+                    key[i] = currentKey++;
+                    sheet_id_key.set(sid, key[i]);
+                }
+                break;
+            }
+        }
+    }
+}
+
+function assignSecondaryStructure(model: Model) {
+    assignSecondaryStructureRanges(model);
+    assignSecondaryStructureKey(model);
 }
 
 export default function parseCIF(cifData: string): Structure {

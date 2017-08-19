@@ -90,6 +90,7 @@ export const Macromolecular: { [P in keyof typeof MolQL.structure.atomProperty.m
         return model.data.entity.type.getString(model.entities.dataIndex[getAddress(env, v).entity])
     }),
 
+    secondaryStructureKey: prop((env, v) => env.context.model.secondaryStructure.key[env.slots.element.residue]),
     isSecondaryStructure: prop((env, v) => {
         return SecondaryStructure.checkFlags(env.context.model, env.slots.element.residue, !(v as any)[0] ? 0 : (v as any)[0](env))
     }),

@@ -39,8 +39,6 @@ export interface Atoms {
 
 export interface Residues {
     atomOffset: number[],
-    secondaryStructureType: number[],
-    secondaryStructureIndex: number[]
     key: number[],
     chainIndex: number[],
     count: number
@@ -58,6 +56,14 @@ export interface Entities {
     dataIndex: number[],
     key: number[],
     count: number
+}
+
+/** Secondary structure "indexed" by residues. */
+export interface SecondaryStructure {
+    type: number[],
+    index: number[],
+    /** unique value for each "element". This is because single sheet is speficied by multiple records. */
+    key: number[]
 }
 
 export interface Bonds {
@@ -92,6 +98,7 @@ export interface Model {
     positions: { x: number[], y: number[], z: number[] },
     atoms: Atoms,
     residues: Residues,
+    secondaryStructure: SecondaryStructure,
     chains: Chains,
     entities: Entities,
 
@@ -124,12 +131,12 @@ export function VdwRadius(element: string): number {
 
 export namespace SecondaryStructure {
     function flag(model: Model, residueIndex: number) {
-        const type = model.residues.secondaryStructureType[residueIndex]
+        const type = model.secondaryStructure.type[residueIndex]
 
         let flag = SecondaryStructureType.None;
         switch (type) {
             case SecondaryStructureType.StructConf:
-                const index = model.residues.secondaryStructureIndex[residueIndex]
+                const index = model.secondaryStructure.index[residueIndex]
                 const helixClass = model.data.secondaryStructure.structConf.pdbx_PDB_helix_class.getString(index)
                 if (helixClass !== null) {
                     flag = SecondaryStructurePdb[helixClass]

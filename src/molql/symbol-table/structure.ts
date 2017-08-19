@@ -216,8 +216,7 @@ const atomProperty = {
         y: atomProp(Type.Num, 'Cartesian Y coordinate'),
         z: atomProp(Type.Num, 'Cartesian Z coordinate'),
 
-        atomKey: atomProp(Type.AnyValue, 'Unique value for each atom. Main use case is grouping of atoms.'),
-
+        atomKey: atomProp(Type.AnyValue, 'Unique value for each atom. Main use case is grouping of atoms.')
     },
 
     topology: {
@@ -258,6 +257,7 @@ const atomProperty = {
 
         entityType: atomProp(Types.EntityType, 'Type of the entity as defined in mmCIF (polymer, non-polymer, water, unknown)'),
 
+        secondaryStructureKey: atomProp(Type.AnyValue, 'Unique value for each secondary structure element.'),
         isSecondaryStructure: symbol(Arguments.Dictionary({
             0: Argument(Types.SecondaryStructureFlag, { isOptional: true }),
         }), Type.Bool, 'Test if the current atom is part of an secondary structure. Optionally specify allowed sec. struct. types.')
