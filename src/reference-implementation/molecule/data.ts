@@ -132,11 +132,9 @@ export namespace SecondaryStructure {
                 const helixClass = model.data.secondaryStructure.structConf.pdbx_PDB_helix_class.getString(index)
                 if (helixClass !== null) {
                     flag = SecondaryStructurePdb[helixClass]
-                    console.log(helixClass, flag)
                 } else {
                     const confType = model.data.secondaryStructure.structConf.conf_type_id.getString(index)
                     if (confType !== null) flag = SecondaryStructureMmcif[confType]
-                    console.log(confType, flag)
                 }
                 break
             case SecondaryStructureType.StructSheetRange:
