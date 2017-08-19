@@ -21,7 +21,7 @@ const enum SSF {
     InverseTurn = 0x80,
 
     // sub-category
-    HelixOther = 0x100,
+    HelixOther = 0x100,  // protein
     Helix27 = 0x200,
     Helix3Ten = 0x400,
     HelixAlpha = 0x800,
@@ -30,22 +30,24 @@ const enum SSF {
     HelixPi = 0x4000,
     HelixPolyproline = 0x8000,
 
-    DoubleHelixOther = 0x10000,
+    DoubleHelixOther = 0x10000,  // nucleic
     DoubleHelixZ = 0x20000,
     DoubleHelixA = 0x40000,
     DoubleHelixB = 0x80000,
 
-    BetaOther = 0x100000,
+    BetaOther = 0x100000,  // protein
     BetaStrand = 0x200000,  // single strand
     BetaSheet = 0x400000,  // multiple hydrogen bonded strands
     BetaBarell = 0x800000,  // closed series of sheets
 
-    TurnOther = 0x1000000,
-    Turn1 = 0x2000000,  // turn, protein
+    TurnOther = 0x1000000,  // protein
+    Turn1 = 0x2000000,
     Turn2 = 0x4000000,
     Turn3 = 0x8000000,
+
+    NA = 0x10000000,  // not applicable/available
 }
-export { SSF as SecondaryStructureFlags }
+export { SSF as SecondaryStructureFlag }
 
 export const SecondaryStructureMmcif: { [value: string]: number } = {
     HELX_LH_27_P: SSF.Helix | SSF.LeftHanded | SSF.Helix27,  // left-handed 2-7 helix (protein)
@@ -112,7 +114,7 @@ export const SecondaryStructureStride: { [value: string]: number } = {
     B: SSF.Beta | SSF.BetaStrand,  // Isolated bridge
     b: SSF.Beta | SSF.BetaStrand,  // Isolated bridge
     T: SSF.Turn,  // Turn
-    C: SSF.None,  // Coil (none of the above)
+    C: SSF.NA,  // Coil (none of the above)
 }
 
 export const SecondaryStructureDssp: { [value: string]: number } = {

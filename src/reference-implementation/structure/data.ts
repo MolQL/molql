@@ -10,7 +10,7 @@ import computeBonds from './topology/bonds/compute'
 import computeConnectedComponents from './topology/connected-components'
 import Rings from './topology/rings/collection'
 import { ElementIndex, ElementVdwRadii, DefaultVdwRadius } from './constants'
-import { SecondaryStructureFlags, SecondaryStructureMmcif, SecondaryStructurePdb } from './topology/secondary-structure'
+import { SecondaryStructureFlag, SecondaryStructureMmcif, SecondaryStructurePdb } from './topology/secondary-structure'
 
 export const enum SecondaryStructureType {
     None = 0,
@@ -133,7 +133,7 @@ export namespace SecondaryStructure {
     export function flags(model: Model, residueIndex: number) {
         const type = model.secondaryStructure.type[residueIndex]
 
-        let flag = SecondaryStructureType.None;
+        let flag = SecondaryStructureFlag.NA;
         switch (type) {
             case SecondaryStructureType.StructConf:
                 const index = model.secondaryStructure.index[residueIndex]
@@ -146,7 +146,7 @@ export namespace SecondaryStructure {
                 }
                 break
             case SecondaryStructureType.StructSheetRange:
-                return SecondaryStructureFlags.Beta | SecondaryStructureFlags.BetaSheet
+                return SecondaryStructureFlag.Beta | SecondaryStructureFlag.BetaSheet
         }
         return flag;
     }

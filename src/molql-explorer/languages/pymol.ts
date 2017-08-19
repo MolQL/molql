@@ -14,6 +14,12 @@ const lang: Language = {
     examples: [{
         name: 'ALA residues',
         value: 'resn ALA'
+    }, {
+        name: 'atoms named "C","O","N", or "CA"',
+        value: 'name c+o+n+ca'
+    }, {
+        name: 'residues with helix or sheet secondary structure',
+        value: 'ss h+s'
     }]
 };
 

@@ -160,6 +160,8 @@ export function testExpr (property: any, args: any) {
       case '<=': return B.core.rel.lte(opArgs)
       default: throw new Error(`operator '${args.op}' not supported`);
     }
+  } else if (args && args.flags !== undefined) {
+    return B.core.flags.hasAny([ property, args.flags ])
   } else if (args && args.min !== undefined && args.max !== undefined) {
     return B.core.rel.inRange([ property, args.min, args.max ])
   } else if (!Array.isArray(args)) {

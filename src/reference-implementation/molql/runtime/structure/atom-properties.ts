@@ -11,7 +11,7 @@ import Environment from '../environment'
 import RuntimeExpression from '../expression'
 import ElementAddress from '../../data/element-address'
 import { Model, ElementSymbol, ResidueIdentifier, VdwRadius, SecondaryStructure } from '../../../structure/data'
-import { SecondaryStructureFlags } from '../../../structure/topology/secondary-structure'
+import { SecondaryStructureFlag } from '../../../structure/topology/secondary-structure'
 
 function prop(runtime: SymbolRuntime) { return runtime; }
 
@@ -20,16 +20,17 @@ function getAddress(env: Environment, xs: { 0?: RuntimeExpression }): ElementAdd
 }
 
 export function createSecondaryStructureFlags(env: Environment, args: RuntimeArguments) {
-    return forEachPositionalArg(args, { flag: SecondaryStructureFlags.None }, (f, ctx) => {
+    return forEachPositionalArg(args, { flag: SecondaryStructureFlag.None }, (f, ctx) => {
         switch (('' + f(env)).toLowerCase()) {
-            case 'alpha': ctx.flag |= SecondaryStructureFlags.HelixAlpha; break;
-            case '3-10': ctx.flag |= SecondaryStructureFlags.Helix3Ten; break;
-            case 'pi': ctx.flag |= SecondaryStructureFlags.HelixPi; break;
-            case 'sheet': ctx.flag |= SecondaryStructureFlags.BetaSheet; break;
-            case 'strand': ctx.flag |= SecondaryStructureFlags.BetaStrand; break;
-            case 'helix': ctx.flag |= SecondaryStructureFlags.Helix; break;
-            case 'beta': ctx.flag |= SecondaryStructureFlags.Beta; break;
-            case 'turn': ctx.flag |= SecondaryStructureFlags.Turn; break;
+            case 'alpha': ctx.flag |= SecondaryStructureFlag.HelixAlpha; break;
+            case '3-10': ctx.flag |= SecondaryStructureFlag.Helix3Ten; break;
+            case 'pi': ctx.flag |= SecondaryStructureFlag.HelixPi; break;
+            case 'sheet': ctx.flag |= SecondaryStructureFlag.BetaSheet; break;
+            case 'strand': ctx.flag |= SecondaryStructureFlag.BetaStrand; break;
+            case 'helix': ctx.flag |= SecondaryStructureFlag.Helix; break;
+            case 'beta': ctx.flag |= SecondaryStructureFlag.Beta; break;
+            case 'turn': ctx.flag |= SecondaryStructureFlag.Turn; break;
+            case 'none': ctx.flag |= SecondaryStructureFlag.NA; break;
         }
     }).flag;
 }

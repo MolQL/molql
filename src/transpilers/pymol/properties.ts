@@ -22,6 +22,17 @@ function elementListMap(x: string) {
   return x.split('+').map(B.struct.type.elementSymbol)
 }
 
+const sstrucDict: {[k: string]: string} = {
+  H: 'helix',
+  S: 'beta',
+  L: 'none'
+}
+function sstrucListMap(x: string) {
+  return { flags: B.struct.type.secondaryStructureFlags(
+    x.toUpperCase().split('+').map(ss => sstrucDict[ss] || 'none')
+  ) }
+}
+
 const properties: PropertyDict = {
   symbol: {
     '@desc': 'chemical-symbol-list: list of 1- or 2-letter chemical symbols from the periodic table',
@@ -99,11 +110,10 @@ const properties: PropertyDict = {
     level: 'atom-test'
   },
   ss: {
-    '@desc': 'secondary-structure-type list of single letters',
+    '@desc': 'secondary-structure-type list of single letters. Helical regions should be assigned H and sheet regions S. Loop regions can either be assigned L or be blank.',
     '@examples': ['ss H+S+L+""'],
-    isUnsupported: true,
-    abbr: ['ss'], regex: /[a-zA-Z+]+/, map: listMap,
-    level: 'residue-test'
+    abbr: ['ss'], regex: /[a-zA-Z+]+/, map: sstrucListMap,
+    level: 'residue-test', property: B.ammp('secondaryStructureFlags')
   },
 
   b: {
