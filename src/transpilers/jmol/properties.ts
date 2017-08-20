@@ -107,10 +107,10 @@ const properties: PropertyDict = {
   },
   bondcount: {
     '@desc': 'covalent bond count',
-    '@examples': [''],
-    isUnsupported: true,
+    '@examples': ['bondcount = 0'],
+    isNumeric: true,
     regex: rePosInt, map: parseInt,
-    level: 'atom-test'
+    level: 'atom-test', property: B.acp('bondCount')
   },
   bondingRadius: {
     '@desc': 'radius used for auto bonding; synonymous with ionic and ionicRadius',

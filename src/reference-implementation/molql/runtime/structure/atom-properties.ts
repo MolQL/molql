@@ -10,7 +10,7 @@ import SymbolRuntime, { RuntimeArguments, forEachPositionalArg } from '../../sym
 import Environment from '../environment'
 import RuntimeExpression from '../expression'
 import ElementAddress from '../../data/element-address'
-import { Model, ElementSymbol, ResidueIdentifier, VdwRadius, SecondaryStructure } from '../../../structure/data'
+import { Model, ElementSymbol, ResidueIdentifier, VdwRadius, SecondaryStructure, BondCount } from '../../../structure/data'
 import { SecondaryStructureFlag } from '../../../structure/topology/secondary-structure'
 
 function prop(runtime: SymbolRuntime) { return runtime; }
@@ -44,7 +44,9 @@ export const Core: { [P in keyof typeof MolQL.structure.atomProperty.core]?: Sym
     y: prop((env, v) => env.context.model.positions.y[getAddress(env, v).atom]),
     z: prop((env, v) => env.context.model.positions.z[getAddress(env, v).atom]),
 
-    atomKey: prop((env, v) => getAddress(env, v).atom)
+    atomKey: prop((env, v) => getAddress(env, v).atom),
+
+    bondCount: prop((env, v) => BondCount(env.context.model, getAddress(env, v).atom))
 }
 
 export const Topology: { [P in keyof typeof MolQL.structure.atomProperty.topology]?: SymbolRuntime } = {

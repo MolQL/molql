@@ -14,6 +14,9 @@ const lang: Language = {
     examples: [{
         name: 'Residue 50 or 135',
         value: '50 or 135'
+    }, {
+        name: 'atoms with no covalent bonds',
+        value: 'bondcount = 0'
     }]
 };
 

@@ -129,6 +129,16 @@ export function VdwRadius(element: string): number {
     return i === void 0 ? DefaultVdwRadius : ElementVdwRadii[i]!
 }
 
+export function BondCount(model: Model, atomIndex: number): number {
+    const { offset, flags } = Model.bonds(model)
+    const bCount = offset[atomIndex+1] - offset[atomIndex]
+    let count = 0
+    for (let bI = 0; bI < bCount; bI++) {
+        if ((flags[atomIndex + bI] & BondFlag.Covalent) !== 0) ++count
+    }
+    return count
+}
+
 export namespace SecondaryStructure {
     export function flags(model: Model, residueIndex: number) {
         const type = model.secondaryStructure.type[residueIndex]

@@ -221,7 +221,9 @@ const atomProperty = {
         y: atomProp(Type.Num, 'Cartesian Y coordinate'),
         z: atomProp(Type.Num, 'Cartesian Z coordinate'),
 
-        atomKey: atomProp(Type.AnyValue, 'Unique value for each atom. Main use case is grouping of atoms.')
+        atomKey: atomProp(Type.AnyValue, 'Unique value for each atom. Main use case is grouping of atoms.'),
+
+        bondCount: atomProp(Type.Num, 'Number of covalent bonds.')
     },
 
     topology: {
