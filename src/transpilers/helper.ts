@@ -186,9 +186,13 @@ export function invertExpr (selection: Expression) {
   })
 }
 
+function strLenSortFn (a: string, b: string) {
+  return a.length < b.length ? 1 : -1
+}
+
 function getNamesRegex(name: string, abbr?: string[]) {
   const names = abbr ? [name].concat(abbr) : [name]
-  return RegExp(names.map(escapeRegExp).join('|'), 'i')
+  return RegExp(names.sort(strLenSortFn).map(escapeRegExp).join('|'), 'i')
 }
 
 export function getPropertyRules(properties: PropertyDict) {

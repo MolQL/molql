@@ -170,6 +170,7 @@ function parse(lang: string, str: string) {
   } catch (e) {
     console.log(str)
     console.log(e.message)
+    console.log(e)
     console.log('\n')
   }
 }
