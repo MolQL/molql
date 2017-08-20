@@ -46,3 +46,12 @@ export interface Operator {
 }
 
 export type OperatorList = Operator[]
+
+export interface Function {
+  '@desc': string
+  '@examples': string[]
+  isUnsupported?: boolean
+  map: (x: any, y: any, z?: any) => Expression | Expression[]
+}
+
+export type FunctionDict = { [name: string]: Function }

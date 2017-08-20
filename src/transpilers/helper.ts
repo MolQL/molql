@@ -60,14 +60,17 @@ export function postfix(opParser: P.Parser<any>, nextParser: P.Parser<any>, mapF
 // that parsers everything at the next precedence level, and returns a parser
 // that parses as many binary operations as possible, associating them to the
 // right. (e.g. 1^2^3 is 1^(2^3) not (1^2)^3)
-export function binaryRight(opParser: P.Parser<any>, nextParser: P.Parser<any>) {
+export function binaryRight(opParser: P.Parser<any>, nextParser: P.Parser<any>, mapFn: any) {
   let parser: P.Parser<any> = P.lazy(() =>
     nextParser.chain(next =>
       P.seq(
         opParser,
         P.of(next),
         parser
-      ).or(P.of(next))
+      ).map((x) => {
+        console.log(x)
+        return x
+      }).or(P.of(next))
     )
   )
   return parser
@@ -125,6 +128,10 @@ export function prefixOp (re: RegExp, group: number = 0) {
 export function postfixOp (re: RegExp, group: number = 0) {
   return P.whitespace.then(P.regex(re, group))
 }
+
+// export function functionOp (re: RegExp, rule: P.Parser<any>) {
+//   return P.regex(re, group).wrap(P.string('('), P.string(')'))
+// }
 
 export function ofOp (name: string, short?: string) {
   const op = short ? `${name}|${escapeRegExp(short)}` : name
