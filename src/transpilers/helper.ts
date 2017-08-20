@@ -6,7 +6,7 @@
 
 import * as P from 'parsimmon'
 
-import { KeywordDict, PropertyDict } from './types'
+import { KeywordDict, PropertyDict, FunctionDict } from './types'
 import B from '../molql/builder'
 import Expression from '../mini-lisp/expression'
 
@@ -253,4 +253,37 @@ export function getKeywordRules (keywords: KeywordDict) {
   })
 
   return keywordsList
+}
+
+export function getFunctionRules (functions: FunctionDict, argRule: P.Parser<any>) {
+  const functionsList: P.Parser<any>[] = []
+  const begRule = P.regex(/\(\s*/)
+  const endRule = P.regex(/\s*\)/)
+
+  Object.keys(functions).forEach( name => {
+    const fs = functions[name]
+    const mapFn = fs.map ? fs.map : makeError(`function '${name}' not supported`)
+    const rule = P.regex(new RegExp(name, 'i')).skip(begRule).then(argRule).skip(endRule).map(mapFn)
+    functionsList.push(rule)
+  })
+
+  return functionsList
+}
+
+export function getNumericPropertyNameRules(properties: PropertyDict) {
+  const numericList: P.Parser<any>[] = []
+
+  Object.keys(properties).forEach( name => {
+    const ps = properties[name]
+    if (ps.isNumeric) {
+      const errorFn = makeError(`property '${name}' not supported`)
+      const rule = P.regex(new RegExp(name, 'i')).map(() => {
+        if (ps.isUnsupported) errorFn()
+        return ps.property
+      })
+      numericList.push(rule)
+    }
+  })
+
+  return numericList
 }

@@ -37,7 +37,7 @@ const properties: PropertyDict = {
   symbol: {
     '@desc': 'chemical-symbol-list: list of 1- or 2-letter chemical symbols from the periodic table',
     '@examples': ['symbol O+N'],
-    abbr: ['e.'], regex: /[a-zA-Z+]+/, map: listMap,
+    abbr: ['e.'], regex: /[a-zA-Z+]+/, map: elementListMap,
     level: 'atom-test', property: B.acp('elementSymbol')
   },
   name: {
@@ -93,8 +93,9 @@ const properties: PropertyDict = {
   text_type: {
     '@desc': 'type-string a list of up to 4 letter codes',
     '@examples': ['text_type HA+HC'],
-    abbr: ['tt.'], regex: /[a-zA-Z0-9+]+/, map: elementListMap,
-    level: 'atom-test', property: B.acp('elementSymbol')
+    isUnsupported: true,
+    abbr: ['tt.'], regex: /[a-zA-Z0-9+]+/, map: listMap,
+    level: 'atom-test'
   },
   id: {
     '@desc': 'external-index-number a single integer',
