@@ -34,8 +34,9 @@ const lang = P.createLanguage({
     return P.seq(
       P.lookahead(P.regex(/[^:]/)),
       P.alt(
+        // order matters
+        r.Identifier,
         r.ElementSymbol,
-        r.FnSymbol,
         r.Boolean,
         r.Number,
         r.String,
@@ -133,12 +134,20 @@ const lang = P.createLanguage({
       .desc('element-symbol')
   },
 
+  // // '&e' => core.ctrl.fn(e)
+  // FnSymbol: function (r) {
+  //   return P.string('&').skip(ws)
+  //     .then(P.alt(r.Expression, r.ListSymbol, r.SetSymbol))
+  //     .map(B.core.ctrl.fn)
+  //     .desc('fn-symbol')
+  // },
+
   // '&e' => core.ctrl.fn(e)
-  FnSymbol: function (r) {
-    return P.string('&').skip(ws)
-      .then(P.alt(r.Expression, r.ListSymbol, r.SetSymbol))
-      .map(B.core.ctrl.fn)
-      .desc('fn-symbol')
+  Identifier: function (r) {
+    return P.string('.')
+      .then(P.alt(r.String, r.QuotedString, r.Number))
+      .map(B.id)
+      .desc('identifier')
   },
 
   List: function (r) {

@@ -12,6 +12,7 @@ import RuntimeExpression from '../expression'
 import ElementAddress from '../../data/element-address'
 import { Model, ElementSymbol, ResidueIdentifier, VdwRadius, SecondaryStructure, BondCount } from '../../../structure/data'
 import { SecondaryStructureFlag } from '../../../structure/topology/secondary-structure'
+import toUpperCase from '../../../utils/upper-case'
 
 function prop(runtime: SymbolRuntime) { return runtime; }
 
@@ -68,14 +69,14 @@ export const Macromolecular: { [P in keyof typeof MolQL.structure.atomProperty.m
 
     id: prop((env, v) => env.context.atom_site.id.getInteger(getAddress(env, v).dataIndex)),
 
-    label_atom_id: prop((env, v) => env.context.atom_site.label_atom_id.getString(getAddress(env, v).dataIndex) || ''),
+    label_atom_id: prop((env, v) => toUpperCase(env.context.atom_site.label_atom_id.getString(getAddress(env, v).dataIndex) || '')),
     label_alt_id: prop((env, v) => env.context.atom_site.label_alt_id.getString(getAddress(env, v).dataIndex) || ''),
     label_asym_id: prop((env, v) => env.context.atom_site.label_asym_id.getString(getAddress(env, v).dataIndex) || ''),
     label_comp_id: prop((env, v) => env.context.atom_site.label_comp_id.getString(getAddress(env, v).dataIndex) || ''),
     label_entity_id: prop((env, v) => env.context.atom_site.label_entity_id.getString(getAddress(env, v).dataIndex) || ''),
     label_seq_id: prop((env, v) => env.context.atom_site.label_seq_id.getInteger(getAddress(env, v).dataIndex)),
 
-    auth_asym_id: prop((env, v) => env.context.atom_site.auth_asym_id.getString(getAddress(env, v).dataIndex) || ''),
+    auth_asym_id: prop((env, v) => toUpperCase(env.context.atom_site.auth_asym_id.getString(getAddress(env, v).dataIndex) || '')),
     auth_atom_id: prop((env, v) => env.context.atom_site.auth_atom_id.getString(getAddress(env, v).dataIndex) || ''),
     auth_comp_id: prop((env, v) => env.context.atom_site.auth_comp_id.getString(getAddress(env, v).dataIndex) || ''),
     auth_seq_id: prop((env, v) => env.context.atom_site.auth_seq_id.getInteger(getAddress(env, v).dataIndex)),

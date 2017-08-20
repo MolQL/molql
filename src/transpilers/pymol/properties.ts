@@ -10,6 +10,7 @@ import B from '../../molql/builder'
 const reFloat = /[-+]?[0-9]*\.?[0-9]+/
 const rePosInt = /[0-9]+/
 
+function listIdMap(x: string) { return x.split('+').map(B.id) }
 function listMap(x: string) { return x.split('+') }
 function rangeMap(x: string) {
   const [min, max] = x.split('-').map(parseInt)
@@ -43,7 +44,7 @@ const properties: PropertyDict = {
   name: {
     '@desc': 'atom-name-list: list of up to 4-letter codes for atoms in proteins or nucleic acids',
     '@examples': ['name CA+CB+CG+CD'],
-    abbr: ['n.'], regex: /[a-zA-Z0-9+]+/, map: listMap,
+    abbr: ['n.'], regex: /[a-zA-Z0-9+]+/, map: listIdMap,
     level: 'atom-test', property: B.ammp('label_atom_id')
   },
   resn: {

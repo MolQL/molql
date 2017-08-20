@@ -49,7 +49,7 @@ const operators: OperatorList = [
       return B.struct.filter.withSameAtomProperties({
         0: selection,
         source,
-        property: B.core.str.concat([
+        property: B.core.type.compositeKey([
           B.ammp('label_atom_id'),
           B.core.type.str([B.ammp('label_seq_id')]),
           B.ammp('label_comp_id'),
@@ -69,7 +69,7 @@ const operators: OperatorList = [
       return B.struct.filter.withSameAtomProperties({
         0: selection,
         source,
-        property: B.core.str.concat([
+        property: B.core.type.compositeKey([
           B.ammp('label_atom_id'),
           B.core.type.str([B.ammp('label_seq_id')])
         ])
@@ -175,7 +175,7 @@ const operators: OperatorList = [
         }),
         query: B.struct.generator.atomGroups({
           'atom-test': B.core.rel.eq([
-            'CA',
+            B.id('CA'),
             B.ammp('label_atom_id')
           ])
         })

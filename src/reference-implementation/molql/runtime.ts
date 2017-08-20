@@ -10,6 +10,7 @@ import { isSymbol } from '../../molql/symbol'
 import { FastSet } from '../utils/collections'
 import { ElementSymbol, ResidueIdentifier } from '../structure/data'
 import StructureRuntime from './runtime/structure'
+import toUpperCase from '../utils/upper-case'
 
 const staticAttr: Symbol.Attributes = { isStatic: true }
 
@@ -22,6 +23,7 @@ export const SymbolRuntime: Symbol.Info[] = [
     Symbol(MolQL.core.type.bool, staticAttr)((env, v) => !!v[0](env)),
     Symbol(MolQL.core.type.num, staticAttr)((env, v) => +v[0](env)),
     Symbol(MolQL.core.type.str, staticAttr)((env, v) => '' + v[0](env)),
+    Symbol(MolQL.core.type.identifier, staticAttr)((env, v) => toUpperCase(v[0](env))),
     Symbol(MolQL.core.type.list, staticAttr)((env, xs) => {
         const list: any[] = [];
         if (typeof xs.length === 'number') {

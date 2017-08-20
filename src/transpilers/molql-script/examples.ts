@@ -10,6 +10,11 @@ export default [{
   :residue-test (= atom.auth_comp_id ALA)
   :atom-test (set.has (set _C _N) atom.el))`
 }, {
+    name: 'Atoms named C N CA',
+    value: `;; The . in front of the names indicates that the value is 
+;; and identifer (fancy way of saying that case does not matter).
+(sel.atom.atoms (set.has (set .C .N .CA) atom.name))`
+}, {
     name: 'Residues 130 to 180',
     value: `(sel.atom.res (in-range atom.resno 130 180))`
 }, {

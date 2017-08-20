@@ -244,14 +244,14 @@ const atomProperty = {
 
         id: atomProp(Type.Num, '_atom_site.id'),
 
-        label_atom_id: atomProp(Type.Str),
+        label_atom_id: atomProp(Type.Identifier),
         label_alt_id: atomProp(Type.Str),
         label_comp_id: atomProp(Type.Str),
         label_asym_id: atomProp(Type.Str),
         label_entity_id: atomProp(Type.Str),
         label_seq_id: atomProp(Type.Num),
 
-        auth_atom_id: atomProp(Type.Str),
+        auth_atom_id: atomProp(Type.Identifier),
         auth_comp_id: atomProp(Type.Str),
         auth_asym_id: atomProp(Type.Str),
         auth_seq_id: atomProp(Type.Num),
