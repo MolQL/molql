@@ -66,6 +66,12 @@ export interface SecondaryStructure {
     key: number[]
 }
 
+export interface ModifiedResidues {
+    has(residueIndex: number): boolean,
+    /** get the data index into the modres table */
+    get(residueIndex: number): number | undefined
+}
+
 export interface Bonds {
     /**
      * Where bonds for atom A start and end.
@@ -93,7 +99,8 @@ export interface Model {
         secondaryStructure: {
             structConf: mmCIF.Category<mmCIF.StructConf>,
             sheetRange: mmCIF.Category<mmCIF.StructSheetRange>
-        }
+        },
+        pdbxStructModResidue: mmCIF.Category<mmCIF.PDBxStructModResidue>
     },
     positions: { x: number[], y: number[], z: number[] },
     atoms: Atoms,
@@ -101,6 +108,7 @@ export interface Model {
     secondaryStructure: SecondaryStructure,
     chains: Chains,
     entities: Entities,
+    modifiedResidues: ModifiedResidues,
 
     '@spatialLookup': SpatialLookup | undefined,
     '@connectedComponentKey': number[] | undefined,

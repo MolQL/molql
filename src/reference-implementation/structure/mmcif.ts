@@ -146,3 +146,17 @@ export const ChemCompBond = {
     'atom_id_2': '',
     'value_order': ''
 }
+
+export type PDBxStructModResidue = keyof typeof PDBxStructModResidue
+export const PDBxStructModResidue = {
+    'id': '',
+    'label_asym_id': '',
+    'label_seq_id': '',
+    'label_comp_id': '',
+    'auth_asym_id': '',
+    'auth_seq_id': '',
+    'auth_comp_id': '',
+    'PDB_ins_code': '',
+    'parent_comp_id': '',
+    'details': ''
+}

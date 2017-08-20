@@ -6,18 +6,13 @@
 
 import Language from './language'
 import Transpilers from '../../transpilers/all'
+import examples from '../../transpilers/jmol/examples'
 
 const lang: Language = {
     name: 'Jmol',
     editorMode: 'text',
     transpiler: Transpilers.jmol,
-    examples: [{
-        name: 'Residue 50 or 135',
-        value: '50 or 135'
-    }, {
-        name: 'atoms with no covalent bonds',
-        value: 'bondcount = 0'
-    }]
+    examples
 };
 
 export default lang;

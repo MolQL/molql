@@ -147,6 +147,9 @@ const list: MolQLScriptSymbol[] = [
 
     Alias(MolQL.structure.atomProperty.macromolecular.secondaryStructureKey, 'atom.key.sec-struct'),
 
+    Alias(MolQL.structure.atomProperty.macromolecular.isModified, 'atom.is-modified'),
+    Alias(MolQL.structure.atomProperty.macromolecular.modifiedParentName, 'atom.modified-parent'),
+
     Alias(MolQL.structure.bondProperty.order, 'bond.order'),
 
     Macro(Symbol('sel.atom.atoms', Arguments.Dictionary({

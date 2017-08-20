@@ -93,5 +93,13 @@ export const Macromolecular: { [P in keyof typeof MolQL.structure.atomProperty.m
     }),
 
     secondaryStructureKey: prop((env, v) => env.context.model.secondaryStructure.key[env.slots.element.residue]),
-    secondaryStructureFlags: prop((env, v) => SecondaryStructure.flags(env.context.model, env.slots.element.residue))
+    secondaryStructureFlags: prop((env, v) => SecondaryStructure.flags(env.context.model, env.slots.element.residue)),
+
+    isModified: prop((env, v) => env.context.model.modifiedResidues.has(env.slots.element.residue)),
+    modifiedParentName: prop((env, v) => {
+        const model = env.context.model;
+        const idx = model.modifiedResidues.get(env.slots.element.residue);
+        if (idx === void 0) return '';
+        return model.data.pdbxStructModResidue.parent_comp_id.getString(idx) || '';
+    }),
 }

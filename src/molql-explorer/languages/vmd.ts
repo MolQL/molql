@@ -6,15 +6,13 @@
 
 import Language from './language'
 import Transpilers from '../../transpilers/all'
+import examples from '../../transpilers/vmd/examples'
 
 const lang: Language = {
     name: 'VMD',
     editorMode: 'text',
     transpiler: Transpilers.vmd,
-    examples: [{
-        name: 'protein residues',
-        value: 'protein'
-    }]
+    examples
 };
 
 export default lang;
