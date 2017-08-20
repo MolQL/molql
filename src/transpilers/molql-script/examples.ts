@@ -12,7 +12,7 @@ export default [{
 }, {
     name: 'Atoms named C N CA',
     value: `;; The . in front of the names indicates that the value is 
-;; and identifer (fancy way of saying that case does not matter).
+;; an "AtomName" (fancy way of saying that case does not matter).
 (sel.atom.atoms (set.has (set .C .N .CA) atom.name))`
 }, {
     name: 'Residues 130 to 180',

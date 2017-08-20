@@ -385,6 +385,13 @@ structure.type.element-symbol :: (String) => ElementSymbol
 
 *Create element symbol representation from a string value.*
 
+### **atom-name**
+```
+structure.type.atom-name :: (Value) => AtomName
+```
+
+*Convert a value to an atom name.*
+
 ### **entity-type**
 ```
 structure.type.entity-type :: (EntityType) => EntityType
@@ -821,7 +828,7 @@ structure.atom-property.macromolecular.id :: (?AtomReference = slot.current-atom
 
 ### **label_atom_id**
 ```
-structure.atom-property.macromolecular.label_atom_id :: (?AtomReference = slot.current-atom) => String
+structure.atom-property.macromolecular.label_atom_id :: (?AtomReference = slot.current-atom) => AtomName
 ```
 
 ### **label_alt_id**
@@ -851,7 +858,7 @@ structure.atom-property.macromolecular.label_seq_id :: (?AtomReference = slot.cu
 
 ### **auth_atom_id**
 ```
-structure.atom-property.macromolecular.auth_atom_id :: (?AtomReference = slot.current-atom) => String
+structure.atom-property.macromolecular.auth_atom_id :: (?AtomReference = slot.current-atom) => AtomName
 ```
 
 ### **auth_comp_id**

@@ -109,7 +109,6 @@ function hasVariables(type: Type): boolean {
         case 'value':
         case 'any':
         case 'any-value':
-        case 'identifier':
         case 'oneof': return false;
         case 'container': return hasVariables(type.child);
         case 'union': {
@@ -142,13 +141,12 @@ function assignType(ctx: TypeContext, value: Expression, a: Type, b: Type): bool
 
     switch (b.kind) {
         case 'any': return true;
-        case 'any-value': return a.kind === 'value' || a.kind === 'any-value' || a.kind === 'oneof' || a.kind === 'identifier';
+        case 'any-value': return a.kind === 'value' || a.kind === 'any-value' || a.kind === 'oneof';
         case 'value': {
             if (a.kind === 'value') return a.name === b.name && a.namespace === b.namespace;
             else if (a.kind === 'oneof') return a.type.name === b.name && a.type.namespace === b.namespace;
             return false;
         }
-        case 'identifier': return a.kind === 'identifier';
         case 'container': return a.kind === 'container' && a.name === b.name && a.namespace === b.namespace && assignType(ctx, value, a.child, b.child);
         case 'union': {
             if (a.kind === 'union') {

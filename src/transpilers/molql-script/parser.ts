@@ -35,7 +35,7 @@ const lang = P.createLanguage({
       P.lookahead(P.regex(/[^:]/)),
       P.alt(
         // order matters
-        r.Identifier,
+        r.AtomName,
         r.ElementSymbol,
         r.Boolean,
         r.Number,
@@ -142,11 +142,11 @@ const lang = P.createLanguage({
   //     .desc('fn-symbol')
   // },
 
-  // '&e' => core.ctrl.fn(e)
-  Identifier: function (r) {
+  // '.e' => struct.type.atomName(e)
+  AtomName: function (r) {
     return P.string('.')
       .then(P.alt(r.String, r.QuotedString, r.Number))
-      .map(B.id)
+      .map(B.atomName)
       .desc('identifier')
   },
 

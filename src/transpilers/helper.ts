@@ -288,6 +288,6 @@ export function getNumericPropertyNameRules(properties: PropertyDict) {
   return numericList
 }
 
-export function idSet(ids: string[]) {
-  return B.core.type.set(ids.map(B.id));
+export function atomNameSet(ids: string[]) {
+  return B.core.type.set(ids.map(B.atomName));
 }

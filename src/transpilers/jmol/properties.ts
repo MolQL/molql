@@ -68,7 +68,7 @@ const properties: PropertyDict = {
   atomName: {
     '@desc': 'atom name',
     '@examples': [''],
-    regex: /[a-zA-Z0-9]+/, map: v => B.id(v),
+    regex: /[a-zA-Z0-9]+/, map: v => B.atomName(v),
     level: 'atom-test', property: B.ammp('label_atom_id')
   },
   atomno: {
@@ -81,7 +81,7 @@ const properties: PropertyDict = {
   atomType: {
     '@desc': 'atom type (mol2, AMBER files) or atom name (other file types)',
     '@examples': [''],
-    regex: /[a-zA-Z0-9]+/, map: v => B.id(v),
+    regex: /[a-zA-Z0-9]+/, map: v => B.atomName(v),
     level: 'atom-test', property: B.ammp('label_atom_id')
   },
   atomX: {

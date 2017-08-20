@@ -46,7 +46,6 @@ const type = {
     bool: symbol(Arguments.Dictionary({ 0: Argument(Type.AnyValue) }), Type.Bool, 'Convert a value to boolean.'),
     num: symbol(Arguments.Dictionary({ 0: Argument(Type.AnyValue) }), Type.Num, 'Convert a value to number.'),
     str: symbol(Arguments.Dictionary({ 0: Argument(Type.AnyValue) }), Type.Str, 'Convert a value to string.'),
-    identifier: symbol(Arguments.Dictionary({ 0: Argument(Type.AnyValue) }), Type.Identifier, 'Convert a value to an identifier.'),
     regex: symbol(
         Arguments.Dictionary({
             0: Argument(Type.Str, { description: 'Expression' }),

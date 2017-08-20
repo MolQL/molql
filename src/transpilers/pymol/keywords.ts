@@ -181,7 +181,7 @@ const keywords: KeywordDict = {
     map: () => B.struct.combinator.merge([
       B.struct.generator.atomGroups({
         'atom-test': B.core.rel.eq([
-          B.id('CA'),
+          B.atomName('CA'),
           B.ammp('label_atom_id')
         ]),
         'residue-test': B.core.set.has([
@@ -191,7 +191,7 @@ const keywords: KeywordDict = {
       }),
       B.struct.generator.atomGroups({
         'atom-test': B.core.set.has([
-          h.idSet(['C4*', 'C4']),
+          h.atomNameSet(['C4*', 'C4']),
           B.ammp('label_atom_id')
         ]),
         'residue-test': B.core.set.has([

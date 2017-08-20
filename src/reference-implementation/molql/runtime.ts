@@ -23,7 +23,6 @@ export const SymbolRuntime: Symbol.Info[] = [
     Symbol(MolQL.core.type.bool, staticAttr)((env, v) => !!v[0](env)),
     Symbol(MolQL.core.type.num, staticAttr)((env, v) => +v[0](env)),
     Symbol(MolQL.core.type.str, staticAttr)((env, v) => '' + v[0](env)),
-    Symbol(MolQL.core.type.identifier, staticAttr)((env, v) => toUpperCase(v[0](env))),
     Symbol(MolQL.core.type.list, staticAttr)((env, xs) => {
         const list: any[] = [];
         if (typeof xs.length === 'number') {
@@ -203,6 +202,7 @@ export const SymbolRuntime: Symbol.Info[] = [
 
     // ============= TYPES ================
     Symbol(MolQL.structure.type.elementSymbol, staticAttr)((env, v) => ElementSymbol(v[0](env))),
+    Symbol(MolQL.structure.type.atomName, staticAttr)((env, v) => toUpperCase(v[0](env))),
     Symbol(MolQL.structure.type.bondFlags, staticAttr)((env, v) => StructureRuntime.BondProperties.createFlags(env, v)),
     Symbol(MolQL.structure.type.secondaryStructureFlags, staticAttr)((env, v) => StructureRuntime.AtomProperties.createSecondaryStructureFlags(env, v)),
     Symbol(MolQL.structure.type.entityType, staticAttr)((env, v) => StructureRuntime.Common.entityType(v[0](env))),

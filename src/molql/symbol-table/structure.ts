@@ -11,6 +11,7 @@ import { symbol } from '../helpers'
 
 export namespace Types {
     export const ElementSymbol = Type.Value('Structure', 'ElementSymbol');
+    export const AtomName = Type.Value('Structure', 'AtomName');
 
     export const BondFlag = Type.OneOf('Structure', 'BondFlag', Type.Str, ['covalent', 'metallic', 'ion', 'hydrogen', 'sulfide', 'computed', 'aromatic']);
     export const BondFlags = Core.Types.Flags(BondFlag, 'BondFlags');
@@ -34,6 +35,9 @@ const type = {
     elementSymbol: symbol(
         Arguments.Dictionary({ 0: Argument(Type.Str) }),
         Types.ElementSymbol, 'Create element symbol representation from a string value.'),
+
+    atomName: symbol(
+        Arguments.Dictionary({ 0: Argument(Type.AnyValue) }), Types.AtomName, 'Convert a value to an atom name.'),
 
     entityType: symbol(
         Arguments.Dictionary({ 0: Argument(Types.EntityType) }),
@@ -244,14 +248,14 @@ const atomProperty = {
 
         id: atomProp(Type.Num, '_atom_site.id'),
 
-        label_atom_id: atomProp(Type.Identifier),
+        label_atom_id: atomProp(Types.AtomName),
         label_alt_id: atomProp(Type.Str),
         label_comp_id: atomProp(Type.Str),
         label_asym_id: atomProp(Type.Str),
         label_entity_id: atomProp(Type.Str),
         label_seq_id: atomProp(Type.Num),
 
-        auth_atom_id: atomProp(Type.Identifier),
+        auth_atom_id: atomProp(Types.AtomName),
         auth_comp_id: atomProp(Type.Str),
         auth_asym_id: atomProp(Type.Str),
         auth_seq_id: atomProp(Type.Num),

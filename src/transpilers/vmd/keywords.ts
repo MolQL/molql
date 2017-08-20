@@ -14,7 +14,7 @@ function proteinExpr() {
       'group-by': B.ammp('residueKey')
     }),
     test: B.core.set.isSubset([
-      h.idSet([ 'C', 'N', 'CA', 'O' ]),
+      h.atomNameSet([ 'C', 'N', 'CA', 'O' ]),
       B.struct.atomSet.propertySet({
         0: B.ammp('label_atom_id')
       })
@@ -30,20 +30,20 @@ function nucleicExpr() {
     test: B.core.logic.and([
       B.core.set.isSubset([
         // B.core.type.set([ 'P', 'O1P', 'O2P' ]),
-        h.idSet([ 'P' ]),
+        h.atomNameSet([ 'P' ]),
         B.struct.atomSet.propertySet([
           B.ammp('label_atom_id')
         ])
       ]),
       B.core.logic.or([
         B.core.set.isSubset([
-          h.idSet([ "O3'", "C3'", "C4'", "C5'", "O5'" ]),
+          h.atomNameSet([ "O3'", "C3'", "C4'", "C5'", "O5'" ]),
           B.struct.atomSet.propertySet([
             B.ammp('label_atom_id')
           ])
         ]),
         B.core.set.isSubset([
-          h.idSet([ 'O3*', 'C3*', 'C4*', 'C5*', 'O5*' ]),
+          h.atomNameSet([ 'O3*', 'C3*', 'C4*', 'C5*', 'O5*' ]),
           B.struct.atomSet.propertySet([
             B.ammp('label_atom_id')
           ])
@@ -59,7 +59,7 @@ function backboneExpr() {
       0: proteinExpr(),
       query: B.struct.generator.atomGroups({
         'atom-test': B.core.set.has([
-          h.idSet(Backbone.protein),
+          h.atomNameSet(Backbone.protein),
           B.ammp('label_atom_id')
         ])
       })
@@ -68,7 +68,7 @@ function backboneExpr() {
       0: nucleicExpr(),
       query: B.struct.generator.atomGroups({
         'atom-test': B.core.set.has([
-          h.idSet(Backbone.nucleic),
+          h.atomNameSet(Backbone.nucleic),
           B.ammp('label_atom_id')
         ])
       })

@@ -6,7 +6,7 @@
 
 type Type<T = any> =
     | Type.Any | Type.AnyValue | Type.Variable<T> | Type.Value<T>
-    | Type.Container<T> | Type.Union<T> | Type.OneOf<T> | Type.Identifier
+    | Type.Container<T> | Type.Union<T> | Type.OneOf<T>
 
 namespace Type {
     export interface Any { kind: 'any',  '@type': any }
@@ -34,8 +34,6 @@ namespace Type {
     export const Num = Value<number>('', 'Number');
     export const Str = Value<string>('', 'String');
     export const Bool = OneOf<boolean>('', 'Bool', Str as any, ['true', 'false']);
-
-    export const Identifier: Identifier = { kind: 'identifier' } as any;
 
     export function oneOfValues({ values }: OneOf<any>) { return Object.keys(values).sort(); }
 }
