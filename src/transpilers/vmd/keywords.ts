@@ -297,7 +297,7 @@ const keywords: KeywordDict = {
   },
   bridge_beta: {
     '@desc': "atom's residue is a beta sheet",
-    map: () => secStrucExpr(['bridge'])
+    map: () => secStrucExpr(['strand'])
   },
   sheet: {
     '@desc': "atom's residue is a beta sheet",
