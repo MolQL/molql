@@ -17,6 +17,9 @@ const lang: Language = {
   :residue-test (= atom.auth_comp_id ALA)
   :atom-test (set.has (set _C _N) atom.el))`
     }, {
+        name: 'Residues 130 to 180',
+        value: `(sel.atom.res (in-range atom.resno 130 180))`
+    }, {
         name: 'All residues within 5 ang from Fe atom',
         value: `(sel.atom.include-surroundings
   (sel.atom.atoms (= atom.el _Fe))
@@ -29,7 +32,7 @@ const lang: Language = {
   :max-distance 5)`
     }, {
         name: 'Residues with max b-factor < 45',
-        value: `(sel.atom.pick 
+        value: `(sel.atom.pick
   sel.atom.res
   :test (<
     (atom.set.reduce
