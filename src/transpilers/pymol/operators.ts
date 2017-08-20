@@ -14,7 +14,7 @@ import Expression from '../../mini-lisp/expression'
 const operators: OperatorList = [
   {
     '@desc': 'Selects atoms that are not included in s1.',
-    '@examples': ['NOT s1'],
+    '@examples': ['NOT resn ALA'],
     name: 'not',
     type: h.prefix,
     rule: P.alt(
@@ -25,7 +25,7 @@ const operators: OperatorList = [
   },
   {
     '@desc': 'Selects atoms included in both s1 and s2.',
-    '@examples': ['s1 AND s2'],
+    '@examples': ['chain A AND name CA'],
     name: 'and',
     type: h.binaryLeft,
     rule: h.infixOp(/AND|&/i),
@@ -33,7 +33,7 @@ const operators: OperatorList = [
   },
   {
     '@desc': 'Selects atoms included in either s1 or s2.',
-    '@examples': ['s1 OR s2'],
+    '@examples': ['chain A OR chain B'],
     name: 'or',
     type: h.binaryLeft,
     rule: h.infixOp(/OR|\|/i),
@@ -41,7 +41,7 @@ const operators: OperatorList = [
   },
   {
     '@desc': 'Selects atoms in s1 whose identifiers name, resi, resn, chain and segi all match atoms in s2.',
-    '@examples': ['s1 IN s2'],
+    '@examples': ['chain A IN chain B'],
     name: 'in',
     type: h.binaryLeft,
     rule: h.infixOp(/IN/i),
@@ -61,7 +61,7 @@ const operators: OperatorList = [
   },
   {
     '@desc': 'Selects atoms in s1 whose identifiers name and resi match atoms in s2.',
-    '@examples': ['s1 LIKE s2'],
+    '@examples': ['chain A LIKE chain B'],
     name: 'like',
     type: h.binaryLeft,
     rule: h.infixOp(/LIKE|l\./i),
@@ -78,7 +78,7 @@ const operators: OperatorList = [
   },
   {
     '@desc': 'Selects all atoms whose van der Waals radii are separated from the van der Waals radii of s1 by a minimum of X Angstroms.',
-    '@examples': ['s1 GAP X'],
+    '@examples': ['solvent  GAP 2'],
     name: 'gap',
     type: h.postfix,
     rule: h.postfixOp(/GAP\s+([-+]?[0-9]*\.?[0-9]+)/i, 1).map(parseFloat),
@@ -91,8 +91,8 @@ const operators: OperatorList = [
     }
   },
   {
-    '@desc': 'Selects atoms with centers within X Angstroms of the center of any atom ins1.',
-    '@examples': ['s1 AROUND X'],
+    '@desc': 'Selects atoms with centers within X Angstroms of the center of any atom in s1.',
+    '@examples': ['resname LIG AROUND 1'],
     name: 'around',
     type: h.postfix,
     rule: h.postfixOp(/(AROUND|a\.)\s+([-+]?[0-9]*\.?[0-9]+)/i, 2).map(parseFloat),
@@ -104,7 +104,7 @@ const operators: OperatorList = [
   },
   {
     '@desc': 'Expands s1 by all atoms within X Angstroms of the center of any atom in s1.',
-    '@examples': ['s1 EXPAND X'],
+    '@examples': ['chain A EXPAND 3'],
     name: 'expand',
     type: h.postfix,
     rule: h.postfixOp(/(EXPAND|x\.)\s+([-+]?[0-9]*\.?[0-9]+)/i, 2).map(parseFloat),
@@ -114,7 +114,7 @@ const operators: OperatorList = [
   },
   {
     '@desc': 'Selects atoms in s1 that are within X Angstroms of any atom in s2.',
-    '@examples': ['s1 WITHIN X OF s2'],
+    '@examples': ['chain A WITHIN 3 OF chain B'],
     name: 'within',
     type: h.binaryLeft,
     rule: h.ofOp('WITHIN', 'w.'),
@@ -124,7 +124,7 @@ const operators: OperatorList = [
   },
   {
     '@desc': 'Same as within, but excludes s2 from the selection (and thus is identical to s1 and s2 around X).',
-    '@examples': ['s1 NEAR_TO X OF s2'],
+    '@examples': ['chain A NEAR_TO 3 OF chain B'],
     name: 'near_to',
     type: h.binaryLeft,
     rule: h.ofOp('NEAR_TO', 'nto.'),
@@ -137,7 +137,7 @@ const operators: OperatorList = [
   },
   {
     '@desc': 'Selects atoms in s1 that are at least X Anstroms away from s2.',
-    '@examples': ['s1 BEYOND X OF s2'],
+    '@examples': ['solvent BEYOND 2 OF chain A'],
     name: 'beyond',
     type: h.binaryLeft,
     rule: h.ofOp('BEYOND', 'be.'),
@@ -150,7 +150,7 @@ const operators: OperatorList = [
   },
   {
     '@desc': 'Expands selection to complete residues.',
-    '@examples': ['BYRESIDUE s1'],
+    '@examples': ['BYRESIDUE name N'],
     name: 'byresidue',
     type: h.prefix,
     rule: h.prefixOp(/BYRESIDUE|byresi|byres|br\./i),
@@ -163,7 +163,7 @@ const operators: OperatorList = [
   },
   {
     '@desc': 'Completely selects all alpha carbons in all residues covered by a selection.',
-    '@examples': ['BYCALPHA s1'],
+    '@examples': ['BYCALPHA chain A'],
     name: 'bycalpha',
     type: h.prefix,
     rule: h.prefixOp(/BYCALPHA|bca\./i),
@@ -184,7 +184,7 @@ const operators: OperatorList = [
   },
   {
     '@desc': 'Expands selection to complete molecules.',
-    '@examples': ['BYMOLECULE s1'],
+    '@examples': ['BYMOLECULE resi 20-30'],
     name: 'bymolecule',
     type: h.prefix,
     rule: h.prefixOp(/BYMOLECULE|bymol|bm\./i),
@@ -197,7 +197,7 @@ const operators: OperatorList = [
   },
   {
     '@desc': 'Expands selection to complete fragments.',
-    '@examples': ['BYFRAGMENT s1'],
+    '@examples': ['BYFRAGMENT resi 10'],
     name: 'byfragment',
     isUnsupported: true,
     type: h.prefix,
@@ -206,7 +206,7 @@ const operators: OperatorList = [
   },
   {
     '@desc': 'Expands selection to complete segments.',
-    '@examples': ['BYSEGMENT s1'],
+    '@examples': ['BYSEGMENT resn CYS'],
     name: 'bysegment',
     type: h.prefix,
     rule: h.prefixOp(/BYSEGMENT|bysegi|byseg|bs\./i),
@@ -219,7 +219,7 @@ const operators: OperatorList = [
   },
   {
     '@desc': 'Expands selection to complete objects.',
-    '@examples': ['BYOBJECT s1'],
+    '@examples': ['BYOBJECT chain A'],
     name: 'byobject',
     isUnsupported: true,
     type: h.prefix,
@@ -228,7 +228,7 @@ const operators: OperatorList = [
   },
   {
     '@desc': 'Expands selection to unit cell.',
-    '@examples': ['BYCELL s1'],
+    '@examples': ['BYCELL chain A'],
     name: 'bycell',
     isUnsupported: true,
     type: h.prefix,
@@ -237,7 +237,7 @@ const operators: OperatorList = [
   },
   {
     '@desc': 'All rings of size ≤ 7 which have at least one atom in s1.',
-    '@examples': ['BYRING s1'],
+    '@examples': ['BYRING resn HEM'],
     name: 'byring',
     type: h.prefix,
     rule: h.prefixOp(/BYRING/i),
@@ -252,7 +252,7 @@ const operators: OperatorList = [
   },
   {
     '@desc': 'Selects atoms directly bonded to s1, excludes s1.',
-    '@examples': ['NEIGHBOUR s1'],
+    '@examples': ['NEIGHBOUR resn CYS'],
     name: 'neighbour',
     type: h.prefix,
     rule: h.prefixOp(/NEIGHBOUR|nbr\./i),
@@ -268,7 +268,7 @@ const operators: OperatorList = [
   },
   {
     '@desc': 'Selects atoms directly bonded to s1, may include s1.',
-    '@examples': ['BOUND_TO s1'],
+    '@examples': ['BOUND_TO resname CA'],
     name: 'bound_to',
     type: h.prefix,
     rule: h.prefixOp(/BOUND_TO|bto\./i),
@@ -280,7 +280,7 @@ const operators: OperatorList = [
   },
   {
     '@desc': 'Extends s1 by X bonds connected to atoms in s1.',
-    '@examples': ['s1 EXTEND X'],
+    '@examples': ['resname LIG EXTEND 3'],
     name: 'extend',
     type: h.postfix,
     rule: h.postfixOp(/(EXTEND|xt\.)\s+([0-9]+)/i, 2).map(parseInt),

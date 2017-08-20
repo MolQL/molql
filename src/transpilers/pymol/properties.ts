@@ -60,7 +60,7 @@ const properties: PropertyDict = {
   },
   alt: {
     '@desc': 'alternate-conformation-identifier-list list of single letters',
-    '@examples': ['alt A+""'],
+    '@examples': ['alt A+B'],
     abbr: ['alt'], regex: /[a-zA-Z0-9+]+/, map: listMap,
     level: 'atom-test', property: B.ammp('label_alt_id')
   },
@@ -112,7 +112,7 @@ const properties: PropertyDict = {
   },
   ss: {
     '@desc': 'secondary-structure-type list of single letters. Helical regions should be assigned H and sheet regions S. Loop regions can either be assigned L or be blank.',
-    '@examples': ['ss H+S+L+""'],
+    '@examples': ['ss H+S+L'],
     abbr: ['ss'], regex: /[a-zA-Z+]+/, map: sstrucListMap,
     level: 'residue-test', property: B.ammp('secondaryStructureFlags')
   },
