@@ -6,6 +6,7 @@
 
 import Symbol, { Arguments, Argument } from '../../molql/symbol'
 import B from '../../molql/builder'
+import * as M from './macro'
 import MolQL from '../../molql/symbol-table'
 import Type from '../../molql/type'
 import * as Struct from '../../molql/symbol-table/structure'
@@ -157,13 +158,13 @@ const list: MolQLScriptSymbol[] = [
     Macro(Symbol('sel.atom.atoms', Arguments.Dictionary({
         0: Argument(Type.Bool, { isOptional: true, defaultValue: true, description: 'Test applied to each atom.' })
     }), Struct.Types.AtomSelection, 'A selection of singleton atom sets.'),
-    args => B.struct.generator.atomGroups({ 'atom-test': (args && args[0] !== void 0) ? args[0] : true })),
+    args => B.struct.generator.atomGroups({ 'atom-test':  M.tryGetArg(args, 0, true) })),
 
     Macro(Symbol('sel.atom.res', Arguments.Dictionary({
         0: Argument(Type.Bool, { isOptional: true, defaultValue: true, description: 'Test applied to the 1st atom of each residue.' })
     }), Struct.Types.AtomSelection, 'A selection of atom sets grouped by residue.'),
     args => B.struct.generator.atomGroups({
-        'residue-test': (args && args[0] !== void 0) ? args[0] : true,
+        'residue-test':  M.tryGetArg(args, 0, true),
         'group-by': B.ammp('residueKey')
     })),
 
@@ -171,7 +172,7 @@ const list: MolQLScriptSymbol[] = [
         0: Argument(Type.Bool, { isOptional: true, defaultValue: true, description: 'Test applied to the 1st atom of each chain.' })
     }), Struct.Types.AtomSelection, 'A selection of atom sets grouped by chain.'),
     args => B.struct.generator.atomGroups({
-        'chain-test': (args && args[0] !== void 0) ? args[0] : true,
+        'chain-test': M.tryGetArg(args, 0, true),
         'group-by': B.ammp('chainKey')
     })),
 
@@ -181,28 +182,8 @@ const list: MolQLScriptSymbol[] = [
 
     Macro(Symbol('bond.is', Arguments.List(Struct.Types.BondFlag), Type.Bool,
         `Test if the current bond has at least one (or all if partial = false) of the specified flags: ${Type.oneOfValues(Struct.Types.BondFlag).join(', ')}`),
-    args => B.core.flags.hasAny([B.struct.bondProperty.flags(), B.struct.type.bondFlags(getPositionalArgs(args))])),
+    args => B.core.flags.hasAny([B.struct.bondProperty.flags(), B.struct.type.bondFlags(M.getPositionalArgs(args))])),
 ];
-
-function getPositionalArgs(args: any) {
-    const ret: any[] = [];
-    for (let k of Object.keys(args)) {
-        if (!isNaN(k as any)) ret.push(args[k]);
-    }
-    return ret.length ? ret : void 0;
-}
-
-// function pickArgs(args: any, ...names: string[]) {
-//     const ret = Object.create(null);
-//     let count = 0;
-//     for (let k of Object.keys(args)) {
-//         if (names.indexOf(k) >= 0) {
-//             ret[k] = args[k];
-//             count++;
-//         }
-//     }
-//     return count ? ret : void 0;
-// }
 
 const normalized = (function () {
     const symbolList: [string, MolQLScriptSymbol][] = [];
