@@ -135,14 +135,14 @@ export function VdwRadius(element: string): number {
 
 export function BondCount(model: Model, atomIndex: number, checkFlags: number): number {
     const { offset, flags } = Model.bonds(model);
-    const startIndex = offset[atomIndex];
-    const bCount = offset[atomIndex + 1] - startIndex;
+    const start = offset[atomIndex];
+    const end = offset[atomIndex + 1];
 
-    if (!checkFlags) return bCount;
+    if (!checkFlags) return end - start;
 
     let count = 0;
-    for (let bI = 0; bI < bCount; bI++) {
-        if ((flags[startIndex + bI] & checkFlags) !== 0) ++count;
+    for (let bI = start; bI < end; bI++) {
+        if ((flags[bI] & checkFlags) !== 0) ++count;
     }
     return count;
 }
