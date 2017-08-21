@@ -13,11 +13,11 @@ const rePosInt = /[0-9]+/
 function atomNameListMap(x: string) { return x.split('+').map(B.atomName) }
 function listMap(x: string) { return x.split('+') }
 function rangeMap(x: string) {
-  const [min, max] = x.split('-').map(parseInt)
+  const [min, max] = x.split('-').map(x => parseInt(x))
   return {min, max}
 }
 function listOrRangeMap(x: string) {
-  return x.includes('-') ? rangeMap(x) : listMap(x).map(parseInt)
+  return x.includes('-') ? rangeMap(x) : listMap(x).map(x => parseInt(x))
 }
 function elementListMap(x: string) {
   return x.split('+').map(B.struct.type.elementSymbol)

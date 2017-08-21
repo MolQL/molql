@@ -12,7 +12,7 @@ import compile from '../../reference-implementation/molql/compiler'
 import transpilers from '../all'
 
 function testTranspilerExamples(name: string, transpiler: Transpiler) {
-    describe(name, () => {
+    describe(`${name} examples`, () => {
         const examples = require(`../${name}/examples`).default;
         for (const e of examples) {
             it(e.name, () => {

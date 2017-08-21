@@ -14,4 +14,10 @@ export default [{
 }, {
     name: 'residues with helix or sheet secondary structure',
     value: 'ss h+s'
+}, {
+    name: 'C-alpha atoms of residues 100 to 180 in chain A',
+    value: 'A/100-180/CA'
+}, {
+    name: 'residues 100 to 180',
+    value: 'resi 100-180'
 }]

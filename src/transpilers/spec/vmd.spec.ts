@@ -12,6 +12,6 @@ import keywords from '../vmd/keywords'
 import properties from '../vmd/properties'
 import operators from '../vmd/operators'
 
-describe('vmd-keywords', () => u.testKeywords(keywords, transpiler));
-describe('vmd-properties',() => u.testProperties(properties, transpiler));
-describe('vmd-operators', () => u.testOperators(operators, transpiler));
+describe('vmd keywords', () => u.testKeywords(keywords, transpiler));
+describe('vmd properties',() => u.testProperties(properties, transpiler));
+describe('vmd operators', () => u.testOperators(operators, transpiler));
