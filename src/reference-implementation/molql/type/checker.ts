@@ -6,7 +6,6 @@
 
 import Expression from '../../../mini-lisp/expression'
 import Type from '../../../molql/type'
-import exprFormatter from '../../mini-lisp/expression-formatter'
 import format from './formatter'
 import { SymbolMap, Argument, Arguments } from '../../../molql/symbol'
 import { FastMap, UniqueArrayBuilder } from '../../utils/collections'
@@ -21,13 +20,13 @@ type TypeContext = FastMap<string, TypeContextEntry>
 function typeCheck(symbols: SymbolMap, ctx: TypeContext, expr: Expression, type: Type, hint: string) {
     if (Expression.isLiteral(expr)) {
         const l = getLiteralType(expr);
-        if (!assignType(ctx, expr, l, type)) notAssignable(ctx, hint, expr, l, type);
+        if (!assignType(ctx, expr, l, type)) notAssignable(ctx, hint, l, type);
     } else if (Expression.isApply(expr) && Expression.isLiteral(expr.head)) {
         const symbol = getSymbol(symbols, expr.head);
         const argsCtx: TypeContext = FastMap.create();
         assignArguments(symbols, argsCtx, symbol.id, expr.args, symbol.args);
         const t = resolveType(argsCtx, symbol.type);
-        if (!assignType(ctx, expr, t, type)) notAssignable(ctx, hint, expr, t, type);
+        if (!assignType(ctx, expr, t, type)) notAssignable(ctx, hint, t, type);
     }
 }
 
@@ -41,10 +40,9 @@ function throwError(msg: string) {
     throw new Error(msg);
 }
 
-function notAssignable(ctx: TypeContext, hint: string, expr: Expression, a: Type, b: Type) {
-    const e = exprFormatter(expr).substr(0, 10).replace(/\n.*/g, '');
+function notAssignable(ctx: TypeContext, hint: string, a: Type, b: Type) {
     const oneof = b.kind === 'oneof' ? ` Value must be one of: ${Type.oneOfValues(b).join(', ')}.` : '';
-    throwError(`${hint}${!!hint ? ': ' : ''}type '${format(resolveType(ctx, a))}' in '${e}' is not assignable to '${format(resolveType(ctx, b))}'.${oneof}`);
+    throwError(`${hint}${!!hint ? ': ' : ''}type '${format(resolveType(ctx, a))}' is not assignable to '${format(resolveType(ctx, b))}'.${oneof}`);
 }
 
 function assignArguments(symbols: SymbolMap, ctx: TypeContext, symbolId: string, exprArgs: Expression.Arguments | undefined, args: Arguments): void {

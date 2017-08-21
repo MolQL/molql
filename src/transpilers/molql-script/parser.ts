@@ -14,10 +14,6 @@ import B from '../../molql/builder'
 
 const ws = P.regex(/[\n\r\s]*/)
 
-// function getSymbol(name: string): MolQLScriptSymbol {
-//   const s = SymbolMap[name] && SymbolMap[name]!.symbol;
-// }
-
 function getSymbolExpression(s: MolQLScriptSymbol, args?: any) {
   switch (s.kind) {
     case 'alias': return args ? Expression.Apply(s.symbol.id, args) : Expression.Apply(s.symbol.id);
