@@ -227,7 +227,10 @@ const atomProperty = {
 
         atomKey: atomProp(Type.AnyValue, 'Unique value for each atom. Main use case is grouping of atoms.'),
 
-        bondCount: atomProp(Type.Num, 'Number of covalent bonds.')
+        bondCount: symbol(Arguments.Dictionary({
+            0: Argument(Types.AtomReference, { isOptional: true, defaultValue: 'slot.current-atom' }),
+            flags: Argument(Types.BondFlags, { isOptional: true, defaultValue: 'covalent' as any }),
+        }), Type.Num, 'Number of bonds (by default only covalent bonds are counted).')
     },
 
     topology: {

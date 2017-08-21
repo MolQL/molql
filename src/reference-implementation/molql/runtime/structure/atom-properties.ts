@@ -10,7 +10,7 @@ import SymbolRuntime, { RuntimeArguments, forEachPositionalArg } from '../../sym
 import Environment from '../environment'
 import RuntimeExpression from '../expression'
 import ElementAddress from '../../data/element-address'
-import { Model, ElementSymbol, ResidueIdentifier, VdwRadius, SecondaryStructure, BondCount } from '../../../structure/data'
+import { Model, ElementSymbol, ResidueIdentifier, VdwRadius, SecondaryStructure, BondCount, BondFlag } from '../../../structure/data'
 import { SecondaryStructureFlag } from '../../../structure/topology/secondary-structure'
 import toUpperCase from '../../../utils/upper-case'
 
@@ -47,7 +47,7 @@ export const Core: { [P in keyof typeof MolQL.structure.atomProperty.core]?: Sym
 
     atomKey: prop((env, v) => getAddress(env, v).atom),
 
-    bondCount: prop((env, v) => BondCount(env.context.model, getAddress(env, v).atom))
+    bondCount: prop((env, v) => BondCount(env.context.model, getAddress(env, v).atom, (v as any).flags ? (v as any).flags(env) : BondFlag.Covalent))
 }
 
 export const Topology: { [P in keyof typeof MolQL.structure.atomProperty.topology]?: SymbolRuntime } = {

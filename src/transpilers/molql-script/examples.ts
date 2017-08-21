@@ -73,4 +73,8 @@ export default [{
 }, {
   name: 'Modified residues',
   value: `(sel.atom.res atom.is-modified)`
+}, {
+  name: 'Atoms participating in metallic coordination',
+  value: `(sel.atom.atoms 
+  (> (atom.bond-count :flags (bond-flags metallic)) 0))`
 }]

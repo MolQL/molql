@@ -133,14 +133,18 @@ export function VdwRadius(element: string): number {
     return i === void 0 ? DefaultVdwRadius : ElementVdwRadii[i]!
 }
 
-export function BondCount(model: Model, atomIndex: number): number {
-    const { offset, flags } = Model.bonds(model)
-    const bCount = offset[atomIndex+1] - offset[atomIndex]
-    let count = 0
+export function BondCount(model: Model, atomIndex: number, checkFlags: number): number {
+    const { offset, flags } = Model.bonds(model);
+    const startIndex = offset[atomIndex];
+    const bCount = offset[atomIndex + 1] - startIndex;
+
+    if (!checkFlags) return bCount;
+
+    let count = 0;
     for (let bI = 0; bI < bCount; bI++) {
-        if ((flags[atomIndex + bI] & BondFlag.Covalent) !== 0) ++count
+        if ((flags[startIndex + bI] & checkFlags) !== 0) ++count;
     }
-    return count
+    return count;
 }
 
 export namespace SecondaryStructure {

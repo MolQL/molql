@@ -150,6 +150,7 @@ export namespace StructConn {
                 case 'covale_sugar':
                 case 'modres':
                     flags = BondFlag.Covalent;
+                    break;
                 case 'disulf': flags = BondFlag.Covalent | BondFlag.Sulfide; break;
                 case 'hydrog': flags = BondFlag.Hydrogen; break;
                 case 'metalc': flags = BondFlag.MetallicCoordination; break;
