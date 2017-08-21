@@ -2,8 +2,6 @@
  * Copyright (c) 2017 MolQL contributors, licensed under MIT, See LICENSE file for more info.
  *
  * @author David Sehnal <david.sehnal@gmail.com>
- * @author Alexander Rose <alexander.rose@weirdbyte.de>
- *
  */
 
 export default [{
@@ -11,11 +9,6 @@ export default [{
     value: `(sel.atom.atom-groups
   :residue-test (= atom.auth_comp_id ALA)
   :atom-test (set.has (set _C _N) atom.el))`
-}, {
-    name: 'Atoms named C N CA',
-    value: `;; The . in front of the names indicates that the value is
-;; an "AtomName" (fancy way of saying that case does not matter).
-(sel.atom.atoms (set.has (set .C .N .CA) atom.name))`
 }, {
     name: 'Residues 130 to 180',
     value: `(sel.atom.res (in-range atom.resno 130 180))`
@@ -33,32 +26,51 @@ export default [{
 }, {
     name: 'Residues with max b-factor < 45',
     value: `(sel.atom.pick
-  (sel.atom.atom-groups
-    :group-by (atom.key.res))
+  sel.atom.res
   :test (<
-    (atom.set.reduce
-      :initial (atom.B_iso_or_equiv)
-      :value (max
-        (atom.set.reduce.value)
-        (atom.B_iso_or_equiv)))
-    35))`
+  (atom.set.reduce
+    :initial atom.B_iso_or_equiv
+    :value (max atom.set.reduce.value atom.B_iso_or_equiv))
+  35))`
 }, {
-    name: 'Residues connected to HEM',
-    value: `(sel.atom.is-connected-to
-  (sel.atom.atom-groups
-    :residue-test true
-    :group-by (atom.key.res))
-    :target (sel.atom.res (= atom.label_comp_id HEM))
+  name: 'Residues connected to HEM',
+  value: `(sel.atom.is-connected-to
+  sel.atom.res
+  :target (sel.atom.res (= atom.label_comp_id HEM))
   ;; default bond test allows only covalent bonds
   :bond-test true
   :disjunct true)`
 }, {
-    name: 'HEM and 2 layers of connected residues',
-    value: `(sel.atom.include-connected
-  (sel.atom.atom-groups
-    :residue-test (= (atom.label_comp_id) HEM)
-    :group-by (atom.key.res))
+  name: 'HEM and 2 layers of connected residues',
+  value: `(sel.atom.include-connected
+  (sel.atom.res (= atom.label_comp_id HEM))
+  ;; default bond test allows only covalent bonds
+  ;; another option is to use :bond-test true to allow any connection
   :bond-test (bond.is metallic covalent)
   :layer-count 2
   :as-whole-residues true)`
-}];
+}, {
+  name: 'All rings',
+  value: `(sel.atom.rings)`
+}, {
+  name: 'CCCCN and CCNCN rings',
+  value: `(sel.atom.rings
+  (ringfp _C _N _C _N _C)
+  ;; the "rotation" of element symbols has no effect
+  ;; the following is the same as (ringfp _C _C _C _C _N)
+  (ringfp _C _C _C _N _C))`
+}, {
+  name: 'Sheets',
+  value: `(sel.atom.res
+  (atom.sec-struct.is sheet))`
+}, {
+  name: 'Helices formed by at least 30 residues',
+  value: `(sel.atom.pick
+  (sel.atom.atom-groups
+  :residue-test (atom.sec-struct.is helix)
+  :group-by atom.key.sec-struct)
+  :test (<= 30 (atom.set.count-query sel.atom.res)))`
+}, {
+  name: 'Modified residues',
+  value: `(sel.atom.res atom.is-modified)`
+}]
