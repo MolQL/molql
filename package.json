@@ -22,8 +22,8 @@
     "@types/react-dom": "^15.5.3",
     "@types/semver": "^5.3.34",
     "jasmine": "^2.7.0",
-    "typescript": "^2.5.0",
-    "uglify-js": "^3.0.27",
+    "typescript": "^2.5.1",
+    "uglify-js": "^3.0.28",
     "webpack": "^3.5.5"
   },
   "dependencies": {

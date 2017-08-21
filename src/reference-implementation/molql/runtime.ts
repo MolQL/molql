@@ -278,8 +278,8 @@ export const SymbolRuntime: Symbol.Info[] = [
 
 function props<S>(symbols: S, implementation: { [P in keyof S]?: any }) {
     return Object.keys(symbols)
-        .filter(k => isSymbol((symbols as any)[k]) && !!(implementation)[k])
-        .map(k => Symbol((symbols as any)[k])(implementation[k]));
+        .filter(k => isSymbol((symbols as any)[k]) && !!(implementation as any)[k])
+        .map(k => Symbol((symbols as any)[k])((implementation as any)[k]));
 }
 
 const table = (function() {
