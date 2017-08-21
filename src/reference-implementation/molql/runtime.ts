@@ -10,6 +10,7 @@ import { isSymbol } from '../../molql/symbol'
 import { FastSet } from '../utils/collections'
 import { ElementSymbol, ResidueIdentifier } from '../structure/data'
 import StructureRuntime from './runtime/structure'
+import toUpperCase from '../utils/upper-case'
 
 const staticAttr: Symbol.Attributes = { isStatic: true }
 
@@ -201,6 +202,7 @@ export const SymbolRuntime: Symbol.Info[] = [
 
     // ============= TYPES ================
     Symbol(MolQL.structure.type.elementSymbol, staticAttr)((env, v) => ElementSymbol(v[0](env))),
+    Symbol(MolQL.structure.type.atomName, staticAttr)((env, v) => toUpperCase(v[0](env))),
     Symbol(MolQL.structure.type.bondFlags, staticAttr)((env, v) => StructureRuntime.BondProperties.createFlags(env, v)),
     Symbol(MolQL.structure.type.secondaryStructureFlags, staticAttr)((env, v) => StructureRuntime.AtomProperties.createSecondaryStructureFlags(env, v)),
     Symbol(MolQL.structure.type.entityType, staticAttr)((env, v) => StructureRuntime.Common.entityType(v[0](env))),

@@ -4,6 +4,7 @@
  * @author Alexander Rose <alexander.rose@weirdbyte.de>
  */
 
+import * as h from '../helper'
 import { KeywordDict } from '../types'
 import B from '../../molql/builder'
 
@@ -180,7 +181,7 @@ const keywords: KeywordDict = {
     map: () => B.struct.combinator.merge([
       B.struct.generator.atomGroups({
         'atom-test': B.core.rel.eq([
-          'CA',
+          B.atomName('CA'),
           B.ammp('label_atom_id')
         ]),
         'residue-test': B.core.set.has([
@@ -190,7 +191,7 @@ const keywords: KeywordDict = {
       }),
       B.struct.generator.atomGroups({
         'atom-test': B.core.set.has([
-          B.core.type.set(['C4*', 'C4']),
+          h.atomNameSet(['C4*', 'C4']),
           B.ammp('label_atom_id')
         ]),
         'residue-test': B.core.set.has([

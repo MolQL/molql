@@ -9,6 +9,7 @@ import SpatialLookup from '../utils/spatial-lookup'
 import computeBonds from './topology/bonds/compute'
 import computeConnectedComponents from './topology/connected-components'
 import Rings from './topology/rings/collection'
+import toUpperCase from '../utils/upper-case'
 import { ElementIndex, ElementVdwRadii, DefaultVdwRadius } from './constants'
 import { SecondaryStructureFlag, SecondaryStructureMmcif, SecondaryStructurePdb } from './topology/secondary-structure'
 
@@ -66,6 +67,12 @@ export interface SecondaryStructure {
     key: number[]
 }
 
+export interface ModifiedResidues {
+    has(residueIndex: number): boolean,
+    /** get the data index into the modres table */
+    get(residueIndex: number): number | undefined
+}
+
 export interface Bonds {
     /**
      * Where bonds for atom A start and end.
@@ -93,7 +100,8 @@ export interface Model {
         secondaryStructure: {
             structConf: mmCIF.Category<mmCIF.StructConf>,
             sheetRange: mmCIF.Category<mmCIF.StructSheetRange>
-        }
+        },
+        pdbxStructModResidue: mmCIF.Category<mmCIF.PDBxStructModResidue>
     },
     positions: { x: number[], y: number[], z: number[] },
     atoms: Atoms,
@@ -101,6 +109,7 @@ export interface Model {
     secondaryStructure: SecondaryStructure,
     chains: Chains,
     entities: Entities,
+    modifiedResidues: ModifiedResidues,
 
     '@spatialLookup': SpatialLookup | undefined,
     '@connectedComponentKey': number[] | undefined,
@@ -115,13 +124,8 @@ export interface Structure {
 
 export type ElementSymbol = string
 
-const elementSymbolCache: { [value: string]: string } = Object.create(null);
-export function ElementSymbol(symbol: any): string {
-    let val = elementSymbolCache[symbol];
-    if (val) return val;
-    val = typeof symbol === 'string' ? symbol.toUpperCase() : `${symbol}`.toUpperCase();
-    elementSymbolCache[symbol] = val;
-    return val;
+export function ElementSymbol(symbol: any): ElementSymbol {
+    return toUpperCase(symbol);
 }
 
 export function VdwRadius(element: string): number {

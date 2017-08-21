@@ -7,21 +7,10 @@
 import 'jasmine'
 
 import transpiler from '../pymol/parser'
-import examples from '../pymol/examples'
 import keywords from '../pymol/keywords'
 import properties from '../pymol/properties'
 import operators from '../pymol/operators'
 import compile from '../../reference-implementation/molql/compiler'
-
-describe('pymol-examples', () => {
-    for (const e of examples) {
-        it(e.name, () => {
-            // check if it transpiles and compiles/typechecks.
-            const expr = transpiler(e.value);
-            compile(expr);
-        });
-    }
-});
 
 describe('pymol-keywords', () => {
     for (const name in keywords) {

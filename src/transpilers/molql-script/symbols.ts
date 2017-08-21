@@ -30,6 +30,7 @@ const list: MolQLScriptSymbol[] = [
     Alias(MolQL.core.type.regex, 'regex'),
     Alias(MolQL.core.type.list, 'list'),
     Alias(MolQL.core.type.set, 'set'),
+
     Alias(MolQL.core.type.compositeKey, 'composite-key'),
     Alias(MolQL.core.logic.not, 'not'),
     Alias(MolQL.core.logic.and, 'and'),
@@ -146,6 +147,9 @@ const list: MolQLScriptSymbol[] = [
     Alias(MolQL.structure.atomProperty.macromolecular.entityType, 'atom.entity-type'),
 
     Alias(MolQL.structure.atomProperty.macromolecular.secondaryStructureKey, 'atom.key.sec-struct'),
+
+    Alias(MolQL.structure.atomProperty.macromolecular.isModified, 'atom.is-modified'),
+    Alias(MolQL.structure.atomProperty.macromolecular.modifiedParentName, 'atom.modified-parent'),
 
     Alias(MolQL.structure.bondProperty.order, 'bond.order'),
 

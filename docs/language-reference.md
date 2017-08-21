@@ -12,6 +12,7 @@ Language Reference
      * [Strings](#strings)
      * [Lists](#lists)
      * [Sets](#sets)
+     * [Flags](#flags)
    * [Structure Queries](#structure-queries)
      * [Types](#types)
      * [Iteration Slots](#iteration-slots)
@@ -23,6 +24,7 @@ Language Reference
      * [Atom Properties](#atom-properties)
        * [Core Properties](#core-properties)
        * [Macromolecular Properties (derived from the mmCIF format)](#macromolecular-properties-(derived-from-the-mmcif-format))
+     * [Bond Properties](#bond-properties)
 # Language Primitives
 
 -------------------
@@ -33,21 +35,21 @@ Language Reference
 
 ### **bool**
 ```
-core.type.bool :: Value => Bool
+core.type.bool :: (Value) => Bool
 ```
 
 *Convert a value to boolean.*
 
 ### **num**
 ```
-core.type.num :: Value => Number
+core.type.num :: (Value) => Number
 ```
 
 *Convert a value to number.*
 
 ### **str**
 ```
-core.type.str :: Value => String
+core.type.str :: (Value) => String
 ```
 
 *Convert a value to string.*
@@ -72,13 +74,25 @@ core.type.list :: a* => List[a]
 core.type.set :: a* => Set[a]
 ```
 
+### **bitflags**
+```
+core.type.bitflags :: (Number) => BitFlags
+```
+
+*Interpret a number as bitflags.*
+
+### **composite-key**
+```
+core.type.composite-key :: Value* => Value
+```
+
 ## Logic
 
 -------------------
 
 ### **not**
 ```
-core.logic.not :: Bool => Bool
+core.logic.not :: (Bool) => Bool
 ```
 
 ### **and**
@@ -97,14 +111,14 @@ core.logic.or :: Bool+ => Bool
 
 ### **eval**
 ```
-core.ctrl.eval :: Fn[a] => a
+core.ctrl.eval :: (Fn[a]) => a
 ```
 
 *Evaluate a function.*
 
 ### **fn**
 ```
-core.ctrl.fn :: a => Fn[a]
+core.ctrl.fn :: (a) => Fn[a]
 ```
 
 *Wrap an expression to a "lazy" function.*
@@ -209,87 +223,87 @@ core.math.max :: Number+ => Number
 
 ### **floor**
 ```
-core.math.floor :: Number => Number
+core.math.floor :: (Number) => Number
 ```
 
 ### **ceil**
 ```
-core.math.ceil :: Number => Number
+core.math.ceil :: (Number) => Number
 ```
 
 ### **round-int**
 ```
-core.math.round-int :: Number => Number
+core.math.round-int :: (Number) => Number
 ```
 
 ### **abs**
 ```
-core.math.abs :: Number => Number
+core.math.abs :: (Number) => Number
 ```
 
 ### **sqrt**
 ```
-core.math.sqrt :: Number => Number
+core.math.sqrt :: (Number) => Number
 ```
 
 ### **sin**
 ```
-core.math.sin :: Number => Number
+core.math.sin :: (Number) => Number
 ```
 
 ### **cos**
 ```
-core.math.cos :: Number => Number
+core.math.cos :: (Number) => Number
 ```
 
 ### **tan**
 ```
-core.math.tan :: Number => Number
+core.math.tan :: (Number) => Number
 ```
 
 ### **asin**
 ```
-core.math.asin :: Number => Number
+core.math.asin :: (Number) => Number
 ```
 
 ### **acos**
 ```
-core.math.acos :: Number => Number
+core.math.acos :: (Number) => Number
 ```
 
 ### **atan**
 ```
-core.math.atan :: Number => Number
+core.math.atan :: (Number) => Number
 ```
 
 ### **sinh**
 ```
-core.math.sinh :: Number => Number
+core.math.sinh :: (Number) => Number
 ```
 
 ### **cosh**
 ```
-core.math.cosh :: Number => Number
+core.math.cosh :: (Number) => Number
 ```
 
 ### **tanh**
 ```
-core.math.tanh :: Number => Number
+core.math.tanh :: (Number) => Number
 ```
 
 ### **exp**
 ```
-core.math.exp :: Number => Number
+core.math.exp :: (Number) => Number
 ```
 
 ### **log**
 ```
-core.math.log :: Number => Number
+core.math.log :: (Number) => Number
 ```
 
 ### **log10**
 ```
-core.math.log10 :: Number => Number
+core.math.log10 :: (Number) => Number
 ```
 
 ### **atan2**
@@ -329,6 +343,33 @@ core.list.get-at :: (List[a], Number) => a
 core.set.has :: (Set[a], a) => Bool
 ```
 
+*Check if the the 1st argument includes the value of the 2nd.*
+
+### **is-subset**
+```
+core.set.is-subset :: (Set[a], Set[a]) => Bool
+```
+
+*Check if the the 1st argument is a subset of the 2nd.*
+
+## Flags
+
+-------------------
+
+### **has-any**
+```
+core.flags.has-any :: (Flags[a], Flags[a]) => Bool
+```
+
+*Check if the the 1st argument has at least one of the 2nd one's flags.*
+
+### **has-all**
+```
+core.flags.has-all :: (Flags[a], Flags[a]) => Bool
+```
+
+*Check if the the 1st argument has all 2nd one's flags.*
+
 # Structure Queries
 
 -------------------
@@ -339,10 +380,45 @@ core.set.has :: (Set[a], a) => Bool
 
 ### **element-symbol**
 ```
-structure.type.element-symbol :: String => ElementSymbol
+structure.type.element-symbol :: (String) => ElementSymbol
 ```
 
 *Create element symbol representation from a string value.*
+
+### **atom-name**
+```
+structure.type.atom-name :: (Value) => AtomName
+```
+
+*Convert a value to an atom name.*
+
+### **entity-type**
+```
+structure.type.entity-type :: (EntityType) => EntityType
+```
+
+*Create normalized representation of entity type: non-polymer, polymer, unknown, water.*
+
+### **bond-flags**
+```
+structure.type.bond-flags :: BondFlag* => BondFlags
+```
+
+*Create bond flags representation from a list of strings. Allowed flags: aromatic, computed, covalent, hydrogen, ion, metallic, sulfide.*
+
+### **ring-fingerprint**
+```
+structure.type.ring-fingerprint :: ElementSymbol+ => RingFingerprint
+```
+
+*Create ring fingerprint from the supplied atom element list.*
+
+### **secondary-structure-flags**
+```
+structure.type.secondary-structure-flags :: SecondaryStructureFlag* => SecondaryStructureFlag
+```
+
+*Create secondary structure flags representation from a list of strings. Allowed flags: 3-10, alpha, beta, helix, none, pi, sheet, strand, turn.*
 
 ### **auth-residue-id**
 ```
@@ -360,7 +436,7 @@ structure.type.auth-residue-id :: (
 structure.type.label-residue-id :: (
   String, (* label_entity_id *)
   String, (* label_asym_id *)
-  Number, (* label_auth_seq_id *)
+  Number, (* label_seq_id *)
   ?String (* pdbx_PDB_ins_code *)
 ) => ResidueId
 ```
@@ -402,16 +478,30 @@ structure.generator.atom-groups :: {
 
 *Return all atoms for which the tests are satisfied, grouped into sets.*
 
+### **rings**
+```
+structure.generator.rings :: RingFingerprint* => AtomSelectionQuery
+```
+
+*Return rings with the specified fingerprint(s). If no fingerprints are given, return all rings.*
+
 ### **query-in-selection**
 ```
 structure.generator.query-in-selection :: {
-  selection: AtomSelectionQuery, 
+  AtomSelectionQuery, 
   query: AtomSelectionQuery, 
   in-complement?: Bool = false
 } => AtomSelectionQuery
 ```
 
 *Executes query only on atoms that are in the source selection.*
+
+### **empty**
+```
+structure.generator.empty :: () => AtomSelectionQuery
+```
+
+*Nada.*
 
 ## Selection Modifications
 
@@ -420,7 +510,7 @@ structure.generator.query-in-selection :: {
 ### **query-each**
 ```
 structure.modifier.query-each :: {
-  selection: AtomSelectionQuery, 
+  AtomSelectionQuery, 
   query: AtomSelectionQuery
 } => AtomSelectionQuery
 ```
@@ -430,7 +520,7 @@ structure.modifier.query-each :: {
 ### **intersect-by**
 ```
 structure.modifier.intersect-by :: {
-  selection: AtomSelectionQuery, 
+  AtomSelectionQuery, 
   by: AtomSelectionQuery
 } => AtomSelectionQuery
 ```
@@ -440,7 +530,7 @@ structure.modifier.intersect-by :: {
 ### **except-by**
 ```
 structure.modifier.except-by :: {
-  selection: AtomSelectionQuery, 
+  AtomSelectionQuery, 
   by: AtomSelectionQuery
 } => AtomSelectionQuery
 ```
@@ -450,7 +540,7 @@ structure.modifier.except-by :: {
 ### **union-by**
 ```
 structure.modifier.union-by :: {
-  selection: AtomSelectionQuery, 
+  AtomSelectionQuery, 
   by: AtomSelectionQuery
 } => AtomSelectionQuery
 ```
@@ -459,9 +549,7 @@ structure.modifier.union-by :: {
 
 ### **union**
 ```
-structure.modifier.union :: {
-  selection: AtomSelectionQuery
-} => AtomSelectionQuery
+structure.modifier.union :: (AtomSelectionQuery) => AtomSelectionQuery
 ```
 
 *Collects all atom sets in the sequence into a single atom set.*
@@ -469,7 +557,7 @@ structure.modifier.union :: {
 ### **cluster**
 ```
 structure.modifier.cluster :: {
-  selection: AtomSelectionQuery, 
+  AtomSelectionQuery, 
   min-distance?: Number = 0, 
   max-distance: Number, 
   min-size?: Number = 2, (* Minimal number of sets to merge, must be at least 2 *)
@@ -482,13 +570,35 @@ structure.modifier.cluster :: {
 ### **include-surroundings**
 ```
 structure.modifier.include-surroundings :: {
-  selection: AtomSelectionQuery, 
+  AtomSelectionQuery, 
   radius: Number, 
   as-whole-residues?: Bool
 } => AtomSelectionQuery
 ```
 
 *For each atom set in the selection, include all surrouding atoms/residues that are within the specified radius.*
+
+### **include-connected**
+```
+structure.modifier.include-connected :: {
+  AtomSelectionQuery, 
+  bond-test?: Bool = true for covalent bonds, 
+  layer-count?: Number = 1, (* Number of bonded layers to include. *)
+  as-whole-residues?: Bool
+} => AtomSelectionQuery
+```
+
+*Pick all atom sets that are connected to the target.*
+
+### **expand-property**
+```
+structure.modifier.expand-property :: {
+  AtomSelectionQuery, 
+  property: Value
+} => AtomSelectionQuery
+```
+
+*To each atom set in the selection, add all atoms that have the same property value that was already present in the set.*
 
 ## Selection Filters
 
@@ -497,7 +607,7 @@ structure.modifier.include-surroundings :: {
 ### **pick**
 ```
 structure.filter.pick :: {
-  selection: AtomSelectionQuery, 
+  AtomSelectionQuery, 
   test: Bool
 } => AtomSelectionQuery
 ```
@@ -507,7 +617,7 @@ structure.filter.pick :: {
 ### **with-same-atom-properties**
 ```
 structure.filter.with-same-atom-properties :: {
-  selection: AtomSelectionQuery, 
+  AtomSelectionQuery, 
   source: AtomSelectionQuery, 
   property: Any
 } => AtomSelectionQuery
@@ -518,13 +628,27 @@ structure.filter.with-same-atom-properties :: {
 ### **within**
 ```
 structure.filter.within :: {
-  selection: AtomSelectionQuery, 
+  AtomSelectionQuery, 
   target: AtomSelectionQuery, 
-  radius: Number
+  radius: Number, 
+  invert?: Bool = false (* If true, pick only atom sets that are further than the specified radius. *)
 } => AtomSelectionQuery
 ```
 
 *Pick all atom sets from section that are within the radius of any atom from target.*
+
+### **is-connected-to**
+```
+structure.filter.is-connected-to :: {
+  AtomSelectionQuery, 
+  target: AtomSelectionQuery, 
+  bond-test?: Bool = true for covalent bonds, 
+  disjunct?: Bool = true, (* If true, there must exist a bond to an atom that lies outside the given atom set to pass test. *)
+  invert?: Bool = false (* If true, return atom sets that are not connected. *)
+} => AtomSelectionQuery
+```
+
+*Pick all atom sets that are connected to the target.*
 
 ## Selection Combinators
 
@@ -547,7 +671,7 @@ structure.combinator.merge :: AtomSelectionQuery* => AtomSelectionQuery
 ### **distance-cluster**
 ```
 structure.combinator.distance-cluster :: {
-  matrix: List[List[Number]], (* Distance matrix, represented as list of rows (num[][])). Lower triangle is min distance, upper triange is max distance. *)
+  matrix: List[List[Number]], (* Distance matrix, represented as list of rows (num[][])). Lower triangle is min distance, upper triangle is max distance. *)
   selections: List[AtomSelectionQuery] (* A list of held selections. *)
 } => AtomSelectionQuery
 ```
@@ -565,9 +689,7 @@ structure.atom-set.atom-count :: () => Number
 
 ### **count-query**
 ```
-structure.atom-set.count-query :: {
-  query: AtomSelectionQuery
-} => Number
+structure.atom-set.count-query :: (AtomSelectionQuery) => Number
 ```
 
 *Counts the number of occurences of a specific query inside the current atom set.*
@@ -582,6 +704,13 @@ structure.atom-set.reduce :: {
 
 *Execute the value expression for each atom in the current atom set and return the result.*
 
+### **property-set**
+```
+structure.atom-set.property-set :: (a) => Set[a]
+```
+
+*Returns a set with all values of the given property in the current atom set.*
+
 ## Atom Properties
 
 -------------------
@@ -592,36 +721,57 @@ structure.atom-set.reduce :: {
 
 ### **element-symbol**
 ```
-structure.atom-property.core.element-symbol :: ?AtomReference = slot.current-atom => ElementSymbol
+structure.atom-property.core.element-symbol :: (?AtomReference = slot.current-atom) => ElementSymbol
 ```
+
+### **vdw**
+```
+structure.atom-property.core.vdw :: (?AtomReference = slot.current-atom) => Number
+```
+
+*Van der Waals radius*
 
 ### **x**
 ```
-structure.atom-property.core.x :: ?AtomReference = slot.current-atom => Number
+structure.atom-property.core.x :: (?AtomReference = slot.current-atom) => Number
 ```
 
 *Cartesian X coordinate*
 
 ### **y**
 ```
-structure.atom-property.core.y :: ?AtomReference = slot.current-atom => Number
+structure.atom-property.core.y :: (?AtomReference = slot.current-atom) => Number
 ```
 
 *Cartesian Y coordinate*
 
 ### **z**
 ```
-structure.atom-property.core.z :: ?AtomReference = slot.current-atom => Number
+structure.atom-property.core.z :: (?AtomReference = slot.current-atom) => Number
 ```
 
 *Cartesian Z coordinate*
 
 ### **atom-key**
 ```
-structure.atom-property.core.atom-key :: ?AtomReference = slot.current-atom => Any
+structure.atom-property.core.atom-key :: (?AtomReference = slot.current-atom) => Value
 ```
 
 *Unique value for each atom. Main use case is grouping of atoms.*
+
+### **bond-count**
+```
+structure.atom-property.core.bond-count :: (?AtomReference = slot.current-atom) => Number
+```
+
+*Number of covalent bonds.*
+
+### **connected-component-key**
+```
+structure.atom-property.topology.connected-component-key :: (?AtomReference = slot.current-atom) => Value
+```
+
+*Unique value for each connected component.*
 
 ## Macromolecular Properties (derived from the mmCIF format)
 
@@ -629,127 +779,167 @@ structure.atom-property.core.atom-key :: ?AtomReference = slot.current-atom => A
 
 ### **auth-residue-id**
 ```
-structure.atom-property.macromolecular.auth-residue-id :: ?AtomReference = slot.current-atom => ResidueId
+structure.atom-property.macromolecular.auth-residue-id :: (?AtomReference = slot.current-atom) => ResidueId
 ```
 
 *type.auth-residue-id symbol executed on current atom's residue*
 
 ### **label-residue-id**
 ```
-structure.atom-property.macromolecular.label-residue-id :: ?AtomReference = slot.current-atom => ResidueId
+structure.atom-property.macromolecular.label-residue-id :: (?AtomReference = slot.current-atom) => ResidueId
 ```
 
 *type.label-residue-id symbol executed on current atom's residue*
 
 ### **residue-key**
 ```
-structure.atom-property.macromolecular.residue-key :: ?AtomReference = slot.current-atom => Any
+structure.atom-property.macromolecular.residue-key :: (?AtomReference = slot.current-atom) => Value
 ```
 
 *Unique value for each tuple ``(label_entity_id,auth_asym_id,auth_seq_id,pdbx_PDB_ins_code)``, main use case is grouping of atoms*
 
 ### **chain-key**
 ```
-structure.atom-property.macromolecular.chain-key :: ?AtomReference = slot.current-atom => Any
+structure.atom-property.macromolecular.chain-key :: (?AtomReference = slot.current-atom) => Value
 ```
 
 *Unique value for each tuple ``(label_entity_id,auth_asym_id)``, main use case is grouping of atoms*
 
 ### **entity-key**
 ```
-structure.atom-property.macromolecular.entity-key :: ?AtomReference = slot.current-atom => Any
+structure.atom-property.macromolecular.entity-key :: (?AtomReference = slot.current-atom) => Value
 ```
 
 *Unique value for each tuple ``label_entity_id``, main use case is grouping of atoms*
 
 ### **is-het**
 ```
-structure.atom-property.macromolecular.is-het :: ?AtomReference = slot.current-atom => Bool
+structure.atom-property.macromolecular.is-het :: (?AtomReference = slot.current-atom) => Bool
 ```
 
 *Equivalent to atom_site.group_PDB !== ATOM*
 
 ### **id**
 ```
-structure.atom-property.macromolecular.id :: ?AtomReference = slot.current-atom => Number
+structure.atom-property.macromolecular.id :: (?AtomReference = slot.current-atom) => Number
 ```
 
 *_atom_site.id*
 
 ### **label_atom_id**
 ```
-structure.atom-property.macromolecular.label_atom_id :: ?AtomReference = slot.current-atom => String
+structure.atom-property.macromolecular.label_atom_id :: (?AtomReference = slot.current-atom) => AtomName
 ```
 
 ### **label_alt_id**
 ```
-structure.atom-property.macromolecular.label_alt_id :: ?AtomReference = slot.current-atom => String
+structure.atom-property.macromolecular.label_alt_id :: (?AtomReference = slot.current-atom) => String
 ```
 
 ### **label_comp_id**
 ```
-structure.atom-property.macromolecular.label_comp_id :: ?AtomReference = slot.current-atom => String
+structure.atom-property.macromolecular.label_comp_id :: (?AtomReference = slot.current-atom) => String
 ```
 
 ### **label_asym_id**
 ```
-structure.atom-property.macromolecular.label_asym_id :: ?AtomReference = slot.current-atom => String
+structure.atom-property.macromolecular.label_asym_id :: (?AtomReference = slot.current-atom) => String
 ```
 
 ### **label_entity_id**
 ```
-structure.atom-property.macromolecular.label_entity_id :: ?AtomReference = slot.current-atom => String
+structure.atom-property.macromolecular.label_entity_id :: (?AtomReference = slot.current-atom) => String
 ```
 
 ### **label_seq_id**
 ```
-structure.atom-property.macromolecular.label_seq_id :: ?AtomReference = slot.current-atom => Number
+structure.atom-property.macromolecular.label_seq_id :: (?AtomReference = slot.current-atom) => Number
 ```
 
 ### **auth_atom_id**
 ```
-structure.atom-property.macromolecular.auth_atom_id :: ?AtomReference = slot.current-atom => String
+structure.atom-property.macromolecular.auth_atom_id :: (?AtomReference = slot.current-atom) => AtomName
 ```
 
 ### **auth_comp_id**
 ```
-structure.atom-property.macromolecular.auth_comp_id :: ?AtomReference = slot.current-atom => String
+structure.atom-property.macromolecular.auth_comp_id :: (?AtomReference = slot.current-atom) => String
 ```
 
 ### **auth_asym_id**
 ```
-structure.atom-property.macromolecular.auth_asym_id :: ?AtomReference = slot.current-atom => String
+structure.atom-property.macromolecular.auth_asym_id :: (?AtomReference = slot.current-atom) => String
 ```
 
 ### **auth_seq_id**
 ```
-structure.atom-property.macromolecular.auth_seq_id :: ?AtomReference = slot.current-atom => Number
+structure.atom-property.macromolecular.auth_seq_id :: (?AtomReference = slot.current-atom) => Number
 ```
 
 ### **pdbx_PDB_ins_code**
 ```
-structure.atom-property.macromolecular.pdbx_PDB_ins_code :: ?AtomReference = slot.current-atom => String
+structure.atom-property.macromolecular.pdbx_PDB_ins_code :: (?AtomReference = slot.current-atom) => String
 ```
 
 ### **pdbx_formal_charge**
 ```
-structure.atom-property.macromolecular.pdbx_formal_charge :: ?AtomReference = slot.current-atom => Number
+structure.atom-property.macromolecular.pdbx_formal_charge :: (?AtomReference = slot.current-atom) => Number
 ```
 
 ### **occupancy**
 ```
-structure.atom-property.macromolecular.occupancy :: ?AtomReference = slot.current-atom => Number
+structure.atom-property.macromolecular.occupancy :: (?AtomReference = slot.current-atom) => Number
 ```
 
 ### **B_iso_or_equiv**
 ```
-structure.atom-property.macromolecular.B_iso_or_equiv :: ?AtomReference = slot.current-atom => Number
+structure.atom-property.macromolecular.B_iso_or_equiv :: (?AtomReference = slot.current-atom) => Number
 ```
 
 ### **entity-type**
 ```
-structure.atom-property.macromolecular.entity-type :: ?AtomReference = slot.current-atom => String
+structure.atom-property.macromolecular.entity-type :: (?AtomReference = slot.current-atom) => EntityType
 ```
 
-*Type of the entity as defined in mmCIF (polymer, non-polymer, water)*
+*Type of the entity as defined in mmCIF (polymer, non-polymer, water, unknown)*
+
+### **secondary-structure-key**
+```
+structure.atom-property.macromolecular.secondary-structure-key :: (?AtomReference = slot.current-atom) => Value
+```
+
+*Unique value for each secondary structure element.*
+
+### **secondary-structure-flags**
+```
+structure.atom-property.macromolecular.secondary-structure-flags :: (?AtomReference = slot.current-atom) => SecondaryStructureFlag
+```
+
+### **is-modified**
+```
+structure.atom-property.macromolecular.is-modified :: (?AtomReference = slot.current-atom) => Bool
+```
+
+*True if the atom bolongs to modification of a standard residue.*
+
+### **modified-parent-name**
+```
+structure.atom-property.macromolecular.modified-parent-name :: (?AtomReference = slot.current-atom) => String
+```
+
+*'3-letter' code of the modifed parent residue.*
+
+## Bond Properties
+
+-------------------
+
+### **flags**
+```
+structure.bond-property.flags :: () => BondFlags
+```
+
+### **order**
+```
+structure.bond-property.order :: () => Number
+```
 

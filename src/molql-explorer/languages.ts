@@ -8,13 +8,13 @@
 import json from './languages/json'
 import molQLscript from './languages/molql-script'
 import pymol from './languages/pymol'
-import jmol from './languages/jmol'
 import vmd from './languages/vmd'
+import jmol from './languages/jmol'
 
 export default [
     molQLscript,
     pymol,
     jmol,
-    json,
-    vmd
+    vmd,
+    json
 ];

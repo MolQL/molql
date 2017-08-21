@@ -6,12 +6,9 @@
  */
 
 export default [{
-    name: 'ALA residues',
-    value: 'resn ALA'
+    name: 'Residue 50 or 135',
+    value: '50 or 135'
 }, {
-    name: 'atoms named "C","O","N", or "CA"',
-    value: 'name c+o+n+ca'
-}, {
-    name: 'residues with helix or sheet secondary structure',
-    value: 'ss h+s'
+    name: 'atoms with no covalent bonds',
+    value: 'bondcount = 0'
 }]

@@ -16,7 +16,7 @@ const properties: PropertyDict = {
   name: {
     '@desc': 'str    atom name',
     '@examples': ['name CA'],
-    regex: /[a-zA-Z0-9]+/, map: str,
+    regex: /[a-zA-Z0-9]+/, map: B.atomName,
     level: 'atom-test', property: B.ammp('label_atom_id')
   },
   type: {

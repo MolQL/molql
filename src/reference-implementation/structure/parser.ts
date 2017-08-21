@@ -97,6 +97,7 @@ function createModel(structureId: string, data: Data, startRow: number, rowCount
             index: new Int32Array(residue) as any,
             key: new Int32Array(residue) as any
         },
+        modifiedResidues: FastMap.create(),
         positions: { x, y, z },
         data,
         '@spatialLookup': void 0,
@@ -244,11 +245,11 @@ function assignSecondaryStructureRanges(model: Model) {
             const entries = map.get(asymId)!;
 
             for (let rI = resStart; rI < resEnd; rI++) {
-                let atomRowIndex = dataIndex[atomOffset[rI]];
-                let seqNumber = label_seq_id.getInteger(atomRowIndex);
+                const atomRowIndex = dataIndex[atomOffset[rI]];
+                const seqNumber = label_seq_id.getInteger(atomRowIndex);
                 if (entries.has(seqNumber)) {
                     const entry = entries.get(seqNumber)!;
-                    let insCode = pdbx_PDB_ins_code.getString(atomRowIndex);
+                    const insCode = pdbx_PDB_ins_code.getString(atomRowIndex);
                     if (entry.startInsCode !== insCode) continue;
                     assignSecondaryStructureEntry(model, entry, rI, resEnd);
                 }
@@ -293,6 +294,63 @@ function assignSecondaryStructure(model: Model) {
     assignSecondaryStructureKey(model);
 }
 
+function getModResMap(model: Model) {
+    const modRes = model.data.pdbxStructModResidue;
+
+    // map asymid/residue_number -> data index
+    const map = FastMap.create<string, FastMap<number, number>>()
+
+    const { label_asym_id, label_seq_id } = modRes;
+
+    for (let i = 0; i < modRes.rowCount; i++) {
+        const asymId = label_asym_id.getString(i)!, seqId = label_seq_id.getInteger(i);
+        if (map.has(asymId)) {
+            map.get(asymId)!.set(seqId, i);
+        } else {
+            map.set(asymId, FastMap.ofArray([[seqId, i]]));
+        }
+    }
+
+    return map;
+}
+
+function assignModifiedResidues(model: Model) {
+    const modRes = model.data.pdbxStructModResidue;
+    if (!modRes.rowCount) return model;
+
+    const map = getModResMap(model);
+
+    const modResEntries = model.modifiedResidues as FastMap<number, number>;
+
+    const { residueOffset, count: chainCount } = model.chains;
+    const { atomOffset } = model.residues;
+    const { dataIndex } = model.atoms;
+    const { label_asym_id, label_seq_id, pdbx_PDB_ins_code } = model.data.atom_site;
+
+    const { PDB_ins_code: modResInsCode } = modRes;
+
+    for (let cI = 0; cI < chainCount; cI++) {
+        const resStart = residueOffset[cI], resEnd = residueOffset[cI + 1];
+        const asymId = label_asym_id.getString(dataIndex[atomOffset[resStart]])!;
+
+        if (map.has(asymId)) {
+            const entries = map.get(asymId)!;
+
+            for (let rI = resStart; rI < resEnd; rI++) {
+                const atomRowIndex = dataIndex[atomOffset[rI]];
+                const seqNumber = label_seq_id.getInteger(atomRowIndex);
+                if (entries.has(seqNumber)) {
+                    const entry = entries.get(seqNumber)!;
+                    if (pdbx_PDB_ins_code.getString(atomRowIndex) !== modResInsCode.getString(entry)) continue;
+                    modResEntries.set(rI, entry);
+                }
+            }
+        }
+    }
+
+    return map;
+}
+
 export default function parseCIF(cifData: string): Structure {
     const file = CIF.Text.parse(cifData);
     if (file.isError) throw new Error(file.toString());
@@ -309,7 +367,8 @@ export default function parseCIF(cifData: string): Structure {
         secondaryStructure: {
             structConf: mmCIF.Category(dataBlock.getCategory('_struct_conf'), mmCIF.StructConf),
             sheetRange: mmCIF.Category(dataBlock.getCategory('_struct_sheet_range'), mmCIF.StructSheetRange)
-        }
+        },
+        pdbxStructModResidue: mmCIF.Category(dataBlock.getCategory('_pdbx_struct_mod_residue'), mmCIF.PDBxStructModResidue)
     };
 
     const models: Model[] = [];
@@ -318,6 +377,7 @@ export default function parseCIF(cifData: string): Structure {
         const model = createModel(dataBlock.header, data, modelStartIndex, data.atom_site.rowCount);
         assignKeysAndDataIndices(model);
         assignSecondaryStructure(model);
+        assignModifiedResidues(model);
         models.push(model);
         modelStartIndex += model.atoms.count;
     }

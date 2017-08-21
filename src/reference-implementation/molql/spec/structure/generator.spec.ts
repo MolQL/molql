@@ -53,12 +53,25 @@ describe('generator', () => {
     });
 
     testPropEq(B.struct.atomProperty.macromolecular.auth_asym_id, 'A', 'auth_asym_id');
-    testPropEq(B.struct.atomProperty.macromolecular.auth_atom_id, 'CA', 'auth_atom_id');
+    it(`auth_atom_id`, function() {
+        const q = B.struct.generator.atomGroups({ 'atom-test': B.core.rel.eq([B.ammp('auth_atom_id'), B.atomName('CA')]) })
+        const sel = Data.compileQuery(q)(Data.ctx);
+        expect(AtomSelection.atomSets(sel).length).toBeGreaterThan(0);
+        const check = Data.checkAtomSelection(Data.model, sel, (i, cols) => cols.auth_atom_id.getString(i) === 'CA');
+        expect(check).toBe(true);
+    });
+
     testPropEq(B.struct.atomProperty.macromolecular.auth_comp_id, 'CYS', 'auth_comp_id');
     testPropEq(B.struct.atomProperty.macromolecular.auth_seq_id, 125, 'auth_seq_id');
 
     testPropEq(B.struct.atomProperty.macromolecular.label_asym_id, 'A', 'label_asym_id');
-    testPropEq(B.struct.atomProperty.macromolecular.label_atom_id, 'CA', 'label_atom_id');
+    it(`label_atom_id`, function() {
+        const q = B.struct.generator.atomGroups({ 'atom-test': B.core.rel.eq([B.ammp('label_atom_id'), B.atomName('CA')]) })
+        const sel = Data.compileQuery(q)(Data.ctx);
+        expect(AtomSelection.atomSets(sel).length).toBeGreaterThan(0);
+        const check = Data.checkAtomSelection(Data.model, sel, (i, cols) => cols.label_atom_id.getString(i) === 'CA');
+        expect(check).toBe(true);
+    });
     testPropEq(B.struct.atomProperty.macromolecular.label_comp_id, 'CYS', 'label_comp_id');
     testPropEq(B.struct.atomProperty.macromolecular.label_seq_id, 125, 'label_seq_id');
     testPropEq(B.struct.atomProperty.macromolecular.label_entity_id, '2', 'label_entity_id');

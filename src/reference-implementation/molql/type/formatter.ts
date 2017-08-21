@@ -15,6 +15,5 @@ export default function format(type: Type): string {
         case 'container': return type.alias ? type.alias : `${type.name}[${format(type.child)}]`;
         case 'union': return type.types.map(format).join(' | ');
         case 'oneof': return type.name;
-        default: throw new Error(`unknown type kind`);
     }
 }

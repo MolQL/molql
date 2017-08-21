@@ -7,21 +7,10 @@
 import 'jasmine'
 
 import transpiler from '../vmd/parser'
-import examples from '../vmd/examples'
 import keywords from '../vmd/keywords'
 import properties from '../vmd/properties'
 import operators from '../vmd/operators'
 import compile from '../../reference-implementation/molql/compiler'
-
-describe('vmd-examples', () => {
-    for (const e of examples) {
-        it(e.name, () => {
-            // check if it transpiles and compiles/typechecks.
-            const expr = transpiler(e.value);
-            compile(expr);
-        });
-    }
-});
 
 describe('vmd-keywords', () => {
     for (const name in keywords) {

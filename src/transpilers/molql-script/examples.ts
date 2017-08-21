@@ -1,30 +1,34 @@
 /*
  * Copyright (c) 2017 MolQL contributors, licensed under MIT, See LICENSE file for more info.
  *
- * @author Alexander Rose <alexander.rose@weirdbyte.de>
  * @author David Sehnal <david.sehnal@gmail.com>
+ * @author Alexander Rose <alexander.rose@weirdbyte.de>
+ *
  */
 
 export default [{
     name: 'All C or N atoms in ALA residues',
     value: `(sel.atom.atom-groups
   :residue-test (= atom.auth_comp_id ALA)
-  :atom-test (set.has { _C _N } (atom.el)))`
+  :atom-test (set.has (set _C _N) atom.el))`
+}, {
+    name: 'Atoms named C N CA',
+    value: `;; The . in front of the names indicates that the value is
+;; an "AtomName" (fancy way of saying that case does not matter).
+(sel.atom.atoms (set.has (set .C .N .CA) atom.name))`
+}, {
+    name: 'Residues 130 to 180',
+    value: `(sel.atom.res (in-range atom.resno 130 180))`
 }, {
     name: 'All residues within 5 ang from Fe atom',
     value: `(sel.atom.include-surroundings
-  (sel.atom.atom-groups
-    :atom-test (= atom.el _Fe))
+  (sel.atom.atoms (= atom.el _Fe))
   :radius 5
   :as-whole-residues true)`
 }, {
     name: 'Cluster LYS residues within 5 ang',
     value: `(sel.atom.cluster
-  (sel.atom.atom-groups
-    :residue-test (eq
-      (atom.auth_comp_id)
-      LYS)
-    :group-by (atom.key.res))
+  (sel.atom.res (= atom.label_comp_id LYS))
   :max-distance 5)`
 }, {
     name: 'Residues with max b-factor < 45',

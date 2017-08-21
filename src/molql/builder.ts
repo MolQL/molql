@@ -12,6 +12,7 @@ namespace Builder {
     export const core = MolQL.core;
     export const struct = MolQL.structure;
 
+    export function atomName(s: string) { return struct.type.atomName([s]); }
     export function es(s: string) { return struct.type.elementSymbol([s]); }
     export function list(...xs: Expression[]) { return core.type.list(xs); }
     export function set(...xs: Expression[]) { return core.type.set(xs); }
