@@ -191,15 +191,16 @@ function strLenSortFn (a: string, b: string) {
 }
 
 function getNamesRegex(name: string, abbr?: string[]) {
-  const names = abbr ? [name].concat(abbr) : [name]
-  return RegExp(names.sort(strLenSortFn).map(escapeRegExp).join('|'), 'i')
+  const names = (abbr ? [name].concat(abbr) : [name])
+    .sort(strLenSortFn).map(escapeRegExp).join('|')
+  return RegExp( `${names}`, 'i')
 }
 
 export function getPropertyRules(properties: PropertyDict) {
   // in keyof typeof properties
   const propertiesDict: {[name: string]: P.Parser<any>} = {}
 
-  Object.keys(properties).forEach( name => {
+  Object.keys(properties).sort(strLenSortFn).forEach( name => {
     const ps = properties[name]
     const errorFn = makeError(`property '${name}' not supported`)
     const rule = P.regex(ps.regex).map(x => {
@@ -218,7 +219,7 @@ export function getPropertyRules(properties: PropertyDict) {
 export function getNamedPropertyRules(properties: PropertyDict) {
   const namedPropertiesList: P.Parser<any>[] = []
 
-  Object.keys(properties).forEach( name => {
+  Object.keys(properties).sort(strLenSortFn).forEach( name => {
     const ps = properties[name]
     const errorFn = makeError(`property '${name}' not supported`)
     const rule = P.regex(ps.regex).map(x => {
@@ -249,7 +250,7 @@ export function getNamedPropertyRules(properties: PropertyDict) {
 export function getKeywordRules (keywords: KeywordDict) {
   const keywordsList: P.Parser<any>[] = []
 
-  Object.keys(keywords).forEach( name => {
+  Object.keys(keywords).sort(strLenSortFn).forEach( name => {
     const ks = keywords[name]
     const mapFn = ks.map ? ks.map : makeError(`keyword '${name}' not supported`)
     const rule = P.regex(getNamesRegex(name, ks.abbr)).map(mapFn)
@@ -264,7 +265,7 @@ export function getFunctionRules (functions: FunctionDict, argRule: P.Parser<any
   const begRule = P.regex(/\(\s*/)
   const endRule = P.regex(/\s*\)/)
 
-  Object.keys(functions).forEach( name => {
+  Object.keys(functions).sort(strLenSortFn).forEach( name => {
     const fs = functions[name]
     const mapFn = fs.map ? fs.map : makeError(`function '${name}' not supported`)
     const rule = P.regex(new RegExp(name, 'i')).skip(begRule).then(argRule).skip(endRule).map(mapFn)
@@ -277,7 +278,7 @@ export function getFunctionRules (functions: FunctionDict, argRule: P.Parser<any
 export function getNumericPropertyNameRules(properties: PropertyDict) {
   const numericList: P.Parser<any>[] = []
 
-  Object.keys(properties).forEach( name => {
+  Object.keys(properties).sort(strLenSortFn).forEach( name => {
     const ps = properties[name]
     if (ps.isNumeric) {
       const errorFn = makeError(`property '${name}' not supported`)

@@ -3,4 +3,5 @@ node_modules/
 molql-explorer/index.js
 molql-explorer/index.min.js
 debug.log
+npm-debug.log
 package-lock.json

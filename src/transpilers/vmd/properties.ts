@@ -68,7 +68,7 @@ const properties: PropertyDict = {
   },
   residue: {
     '@desc': 'num  a set of connected atoms with the same residue number',
-    '@examples': ['residue 11'],
+    '@examples': ['residue < 11', 'residue 11'],
     isNumeric: true,
     regex: rePosInt, map: parseInt,
     level: 'residue-test', property: B.ammp('auth_seq_id')
