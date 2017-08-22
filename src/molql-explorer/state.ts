@@ -8,7 +8,6 @@ import LiteMol from 'litemol'
 import Expression from '../mini-lisp/expression'
 import { Model } from '../reference-implementation/structure/data'
 import AtomSelection from '../reference-implementation/molql/data/atom-selection'
-import AtomSet from '../reference-implementation/molql/data/atom-set'
 import parseCIF from '../reference-implementation/structure/parser'
 import compile, { Compiled } from '../reference-implementation/molql/compiler'
 import mmCIFwriter from '../reference-implementation/structure/writer'
@@ -87,7 +86,7 @@ class State {
 
             const ctx = Context.ofModel(model);
             const res = query.compiled(ctx);
-            const cif = mmCIFwriter(model, AtomSet.getIndices(AtomSelection.toAtomSet(res)));
+            const cif = mmCIFwriter(model, AtomSelection.getAtomIndices(res));
 
             this.queryResult.onNext({ kind: 'content', content: cif });
 

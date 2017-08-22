@@ -6,7 +6,6 @@ import _transpiler from './transpilers/all'
 import * as fs from 'fs'
 // import { Model } from './reference-implementation/structure/data'
 import AtomSelection from './reference-implementation/molql/data/atom-selection'
-import AtomSet from './reference-implementation/molql/data/atom-set'
 import parseCIF from './reference-implementation/structure/parser'
 import compile from './reference-implementation/molql/compiler'
 import Context from './reference-implementation/molql/runtime/context'
@@ -89,7 +88,7 @@ function run (query: Expression) {
       // const cif = mmCIFwriter(model, AtomSet.atomIndices(AtomSelection.toAtomSet(res)));
 
       // console.log(cif.substr(0, 100));
-      console.log(AtomSet.getIndices(AtomSelection.toAtomSet(res)));
+      console.log(AtomSelection.getAtomIndices(res));
       //console.log(model.entities);
       //console.log(model.chains);
     } catch (e) {

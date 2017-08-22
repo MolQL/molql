@@ -98,6 +98,10 @@ namespace Mask {
         return new SetMask(set);
     }
 
+    export function singleton(i: number) {
+        return new SingletonMask(i);
+    }
+
     export function ofUniqueIndices(indices: ArrayLike<number>): Mask {
         const len = indices.length;
         if (len === 0) return new EmptyMask();

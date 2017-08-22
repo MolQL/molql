@@ -131,7 +131,9 @@ export function unionBy(env: Environment, selection: Selection, by: Selection): 
 }
 
 export function union(env: Environment, selection: Selection): AtomSelection {
-    return AtomSelection([AtomSelection.toAtomSet(selection(env))]);
+    const sel = selection(env);
+    if (!AtomSelection.atomSets(sel).length) return AtomSelection.empty;
+    return AtomSelection([AtomSet(AtomSelection.getAtomIndices(selection(env)))]);
 }
 
 export interface ClusterParams {

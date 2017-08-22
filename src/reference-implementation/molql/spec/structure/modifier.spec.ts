@@ -60,7 +60,7 @@ describe('modifier', () => {
         const sel = Data.compileQuery(q)(Data.ctx) as AtomSelection;
         expect(AtomSelection.atomSets(sel).length).toBeGreaterThan(0);
         expect(AtomSelection.atomSets(sel).length).toBe(3);
-        expect(AtomSelection.atomSets(sel).reduce((c, s) => c + AtomSet.count(s), 0)).toBe(Data.model.atoms.count);
+        expect(AtomSelection.atomSets(sel).reduce<number>((c, s) => c + AtomSet.count(s), 0)).toBe(Data.model.atoms.count);
     });
 
     it('union ALAs', function() {

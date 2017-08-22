@@ -36,11 +36,11 @@ import AtomSetIt = AtomSet.Iterator;
 
 // _normalizeTable('', '', MolQL);
 
-// const a = AtomSet([1,5,7])
-// const b = AtomSet([4,6,8])
-// const v = AtomSet([5, 7, 9])
-// console.log(AtomSet.atomIndices(AtomSet.union(a, b)))
-// console.log(AtomSet.atomIndices(AtomSet.union(a, v)))
+const a = AtomSet([1,5,7])
+const b = AtomSet([4,6,8])
+const v = AtomSet([5, 7, 9])
+console.log(AtomSet.getIndices(AtomSet.union(a, b)))
+console.log(AtomSet.getIndices(AtomSet.union(a, v)))
 
 // const aResId = (c: string, r: number, i?: string) => B.struct.type.authResidueId([c, r, i]);
 // const resSet = B.core.type.set([aResId('A', 7), aResId('A', 9)]);
@@ -144,7 +144,7 @@ function run(model: Model) {
     const res = compiled(ctx);
     console.log('count', AtomSelection.atomSets(res).length);
     if (AtomSelection.atomSets(res).length) console.log('ac', AtomSet.count(AtomSelection.atomSets(res)[0]));
-    const cif = mmCIFwriter(model, AtomSet.getIndices(AtomSelection.toAtomSet(res)));
+    const cif = mmCIFwriter(model, AtomSelection.getAtomIndices(res));
 
     console.log(cif.substr(0, 450));
     //console.log(AtomSet.atomIndices(AtomSelection.toAtomSet(res)));

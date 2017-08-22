@@ -27,16 +27,16 @@ namespace AtomSelection {
 
     export function atomSets(selection: AtomSelection) { return (selection as AtomSelectionImpl).atomSets; }
 
-    export function toAtomSet(seq: AtomSelection): AtomSet {
+    export function getAtomIndices(seq: AtomSelection): ReadonlyArray<number> {
         const sets = atomSets(seq);
         const length = sets.length;
-        if (!length) return AtomSet.empty;
-        if (length === 1) return sets[0];
+        if (!length) return [];
+        if (length === 1) return AtomSet.getIndices(sets[0]);
 
         const mask = getMask(seq);
         const atoms = new Int32Array(mask.size);
         mask.forEach((i, ctx) => ctx!.atoms[ctx!.offset++] = i, { atoms, offset: 0 });
-        return AtomSet(sortAsc(atoms));
+        return sortAsc(atoms) as any;
     }
 
     export function getMask(seq: AtomSelection): Mask {
