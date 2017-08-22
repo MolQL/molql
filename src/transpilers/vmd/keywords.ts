@@ -184,7 +184,7 @@ const keywords: KeywordDict = {
   },
   bonded: {
     '@desc': 'atoms for which numbonds > 0',
-    map: () => B.struct.filter.pick({
+    map: () => h.asAtoms(B.struct.filter.pick({
       '0': B.struct.modifier.includeConnected({
         '0': B.struct.generator.atomGroups(),
         'bond-test': B.core.flags.hasAny([
@@ -195,7 +195,7 @@ const keywords: KeywordDict = {
       test: B.core.rel.gr([
         B.struct.atomSet.atomCount(), 1
       ])
-    })
+    }))
   },
   buried: {
     '@desc': 'residues named ALA LEU VAL ILE PHE CYS MET TRP',
