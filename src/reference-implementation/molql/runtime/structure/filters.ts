@@ -129,8 +129,7 @@ export interface AreWithinWithAtomRadiusContext {
 export function areWithinWithAtomRadius(ctx: AreWithinWithAtomRadiusContext, a: AtomSet, b: AtomSet) {
     if (a === b) return 0;
     const { env, model, slot, minRadius, maxRadius, atomRadius } = ctx;
-    const minRadiusSq = minRadius * minRadius;
-    let distSq = Number.POSITIVE_INFINITY;
+    let dist = Number.POSITIVE_INFINITY;
     const { x, y, z } = model.positions;
     const xs = AtomSet.atomIndices(a), ys = AtomSet.atomIndices(b);
     for (const i of xs) {
@@ -139,13 +138,13 @@ export function areWithinWithAtomRadius(ctx: AreWithinWithAtomRadiusContext, a: 
         for (const j of ys) {
             ElementAddress.setAtom(model, slot, j);
             const rB = atomRadius(env);
-            let d = AtomSet.atomDistanceSq(x, y, z, i, j) - rA - rB;
+            let d = Math.sqrt(AtomSet.atomDistanceSq(x, y, z, i, j)) - rA - rB;
             if (d < 0) d = 0;
-            if (d < minRadiusSq) return false;
-            if (d < distSq) distSq = d;
+            if (d < minRadius) return false;
+            if (d < dist) dist = d;
         }
     }
-    return distSq <= maxRadius * maxRadius;
+    return dist <= maxRadius;
 }
 
 function withinMinMaxRadius({ env, selection, target, minRadius, maxRadius, atomRadius, invert }: WithinContext) {

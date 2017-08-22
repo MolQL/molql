@@ -69,4 +69,16 @@ describe('filter', () => {
         const distanceCheck = AtomSelection.atomSets(sel).every(s => AtomSet.distance(Data.model, pivotAtomSet, s) > 5);
         expect(distanceCheck).toBe(true);
     });
+
+    it('within atoms 10 to 15 arg ang from Fe', function() {
+        const Fe = B.struct.generator.atomGroups({ 'atom-test': B.core.rel.eq([B.acp('elementSymbol'), B.es('Fe')]) });
+
+        const q = B.struct.filter.within({ 0: B.struct.generator.atomGroups(), target: Fe, 'min-radius': 10, 'max-radius': 15 });
+
+        const pivotAtomSet = AtomSelection.atomSets(Data.compileQuery(Fe)(Data.ctx) as AtomSelection)[0];
+        const sel = Data.compileQuery(q)(Data.ctx) as AtomSelection;
+        expect(AtomSelection.atomSets(sel).length).toBeGreaterThan(0);
+        const distanceCheck = AtomSelection.atomSets(sel).every(s => AtomSet.distance(Data.model, pivotAtomSet, s) >= 10 && AtomSet.distance(Data.model, pivotAtomSet, s) <= 15);
+        expect(distanceCheck).toBe(true);
+    });
 });

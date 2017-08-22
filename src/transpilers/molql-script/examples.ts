@@ -41,6 +41,12 @@ export default [{
   :bond-test true
   :disjunct true)`
 }, {
+  name: 'Atoms between 10 and 15 ang from Fe',
+  value: `(sel.atom.within sel.atom.atoms
+  :target (sel.atom.atoms (= atom.el _Fe))
+  :min-radius 10
+  :max-radius 15)`
+}, {
   name: 'HEM and 2 layers of connected residues',
   value: `(sel.atom.include-connected
   (sel.atom.res (= atom.label_comp_id HEM))
@@ -75,6 +81,6 @@ export default [{
   value: `(sel.atom.res atom.is-modified)`
 }, {
   name: 'Atoms participating in metallic coordination',
-  value: `(sel.atom.atoms 
+  value: `(sel.atom.atoms
   (> (atom.bond-count :flags (bond-flags metallic)) 0))`
 }]
