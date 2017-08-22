@@ -61,7 +61,7 @@ namespace AtomSet {
         return AtomSet(sortAsc(indices));
     }
 
-    function atomDistanceSq(x: number[], y: number[], z: number[], i: number, j: number) {
+    export function atomDistanceSq(x: number[], y: number[], z: number[], i: number, j: number) {
         const dx = x[i] - x[j], dy = y[i] - y[j], dz = z[i] - z[j];
         return dx * dx + dy * dy + dz * dz;
     }

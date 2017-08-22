@@ -38,7 +38,7 @@ describe('filter', () => {
     it('within residues 5 ang from HEM', function() {
         const HEM = B.struct.generator.atomGroups({ 'residue-test': B.core.rel.eq([B.ammp('auth_comp_id'), 'HEM']), 'group-by': B.ammp('residueKey') });
 
-        const q = B.struct.filter.within({ 0: residues, target: HEM, radius: 5 });
+        const q = B.struct.filter.within({ 0: residues, target: HEM, 'max-radius': 5 });
 
         const pivotAtomSet = AtomSelection.atomSets(Data.compileQuery(HEM)(Data.ctx) as AtomSelection)[0];
         const sel = Data.compileQuery(q)(Data.ctx) as AtomSelection;
@@ -50,7 +50,7 @@ describe('filter', () => {
     it('within(inverted) residues 5 ang from HEM', function() {
         const HEM = B.struct.generator.atomGroups({ 'residue-test': B.core.rel.eq([B.ammp('auth_comp_id'), 'HEM']), 'group-by': B.ammp('residueKey') });
 
-        const q = B.struct.filter.within({ 0: residues, target: HEM, radius: 5, invert: true });
+        const q = B.struct.filter.within({ 0: residues, target: HEM, 'max-radius': 5, invert: true });
 
         const pivotAtomSet = AtomSelection.atomSets(Data.compileQuery(HEM)(Data.ctx) as AtomSelection)[0];
         const sel = Data.compileQuery(q)(Data.ctx) as AtomSelection;

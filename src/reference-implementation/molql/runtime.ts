@@ -247,7 +247,14 @@ export const SymbolRuntime: Symbol.Info[] = [
     // ============= FILTERS ================
     Symbol(MolQL.structure.filter.pick)((env, v) => env => StructureRuntime.Filters.pick(env, v[0](env), v.test)),
     Symbol(MolQL.structure.filter.withSameAtomProperties)((env, v) => env => StructureRuntime.Filters.withSameAtomProperties(env, v[0](env), v.source(env), v.property)),
-    Symbol(MolQL.structure.filter.within)((env, v) => env => StructureRuntime.Filters.within(env, v[0](env), v.target(env), v.radius, v.invert)),
+    Symbol(MolQL.structure.filter.within)((env, v) => env => StructureRuntime.Filters.within(env, {
+        selection: v[0](env),
+        target: v.target(env),
+        minRadius: v['min-radius'],
+        maxRadius: v['max-radius'],
+        atomRadius: v['atom-radius'],
+        invert: v['invert']
+    })),
     Symbol(MolQL.structure.filter.isConnectedTo)((env, v) => env => StructureRuntime.Filters.isConnectedTo(env, {
         selection: v[0](env),
         target: v.target(env),

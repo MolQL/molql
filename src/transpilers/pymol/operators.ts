@@ -86,7 +86,8 @@ const operators: OperatorList = [
       return B.struct.filter.within({
         '0': B.struct.generator.atomGroups(),
         target,
-        radius: B.core.math.add([distance, B.acp('vdw')])
+        'atom-radius': B.acp('vdw'),
+        'max-radius': distance
       })
     }
   },
@@ -98,7 +99,7 @@ const operators: OperatorList = [
     rule: h.postfixOp(/(AROUND|a\.)\s+([-+]?[0-9]*\.?[0-9]+)/i, 2).map(parseFloat),
     map: (radius: number, target: Expression) => {
       return B.struct.filter.within({
-        '0': B.struct.generator.atomGroups(), target, radius
+        '0': B.struct.generator.atomGroups(), target, 'max-radius': radius
       })
     }
   },
@@ -119,7 +120,7 @@ const operators: OperatorList = [
     type: h.binaryLeft,
     rule: h.ofOp('WITHIN', 'w.'),
     map: (radius: number, selection: Expression, target: Expression) => {
-      return B.struct.filter.within({ 0: selection, target, radius })
+      return B.struct.filter.within({ 0: selection, target, 'max-radius': radius })
     }
   },
   {
@@ -130,7 +131,7 @@ const operators: OperatorList = [
     rule: h.ofOp('NEAR_TO', 'nto.'),
     map: (radius: number, selection: Expression, target: Expression) => {
       return B.struct.modifier.exceptBy({
-        '0': B.struct.filter.within({ '0': selection, target, radius }),
+        '0': B.struct.filter.within({ '0': selection, target, 'max-radius': radius }),
         by: target
       })
     }
@@ -143,7 +144,7 @@ const operators: OperatorList = [
     rule: h.ofOp('BEYOND', 'be.'),
     map: (radius: number, selection: Expression, target: Expression) => {
       return B.struct.modifier.exceptBy({
-        '0': B.struct.filter.within({ '0': selection, target, radius, invert: true }),
+        '0': B.struct.filter.within({ '0': selection, target, 'max-radius': radius, invert: true }),
         by: target
       })
     }

@@ -11,7 +11,7 @@ interface Mask {
     size: number;
     has(i: number): boolean;
     /** in-order iteration of all "masked elements". */
-    forEach<Ctx>(f: (i: number, ctx?: Ctx) => void, ctx?: Ctx): void;
+    forEach<Ctx>(f: (i: number, ctx?: Ctx) => void, ctx?: Ctx): Ctx | undefined;
 }
 
 namespace Mask {
@@ -19,7 +19,7 @@ namespace Mask {
         '@type': 'mask'
         size = 0;
         has(i: number) { return false; }
-        forEach<Ctx>(f: (i: number, ctx?: Ctx) => void, ctx?: Ctx) { }
+        forEach<Ctx>(f: (i: number, ctx?: Ctx) => void, ctx: Ctx) { return ctx; }
         constructor() { }
     }
 
@@ -27,7 +27,7 @@ namespace Mask {
         '@type': 'mask'
         size = 1;
         has(i: number) { return i === this.idx; }
-        forEach<Ctx>(f: (i: number, ctx?: Ctx) => void, ctx?: Ctx) { f(this.idx, ctx); }
+        forEach<Ctx>(f: (i: number, ctx?: Ctx) => void, ctx?: Ctx) { f(this.idx, ctx); return ctx; }
         constructor(private idx: number) { }
     }
 
@@ -43,6 +43,7 @@ namespace Mask {
         }
         forEach<Ctx>(f: (i: number, ctx?: Ctx) => void, ctx?: Ctx) {
             this._forEach(f, ctx);
+            return ctx;
         }
         constructor(private mask: boolean[], public size: number) { this.length = mask.length;  }
     }
@@ -57,6 +58,7 @@ namespace Mask {
         }
         forEach<Ctx>(f: (i: number, ctx?: Ctx) => void, ctx?: Ctx) {
             this._forEach(f, ctx);
+            return ctx;
         }
         constructor(public size: number) { }
     }
@@ -82,6 +84,7 @@ namespace Mask {
         }
         forEach<Ctx>(f: (i: number, ctx?: Ctx) => void, ctx?: Ctx) {
             this._forEach(f, ctx);
+            return ctx;
         }
         constructor(private set: FastSet<number>) {
             this.size = set.size;

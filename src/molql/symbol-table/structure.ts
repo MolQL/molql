@@ -169,7 +169,9 @@ const filter = {
     within: symbol(Arguments.Dictionary({
         0: Argument(Types.AtomSelectionQuery),
         target: Argument(Types.AtomSelectionQuery),
-        radius: Argument(Type.Num),
+        'min-radius': Argument(Type.Num, { isOptional: true, defaultValue: 0 }),
+        'max-radius': Argument(Type.Num),
+        'atom-radius': Argument(Type.Num, { isOptional: true, defaultValue: 0, description: 'Value added to each atom before the distance check, for example VDW radius.' }),
         invert: Argument(Type.Bool, { isOptional: true, defaultValue: false, description: 'If true, pick only atom sets that are further than the specified radius.' }),
     }), Types.AtomSelectionQuery, 'Pick all atom sets from section that are within the radius of any atom from target.'),
 

@@ -12,7 +12,7 @@ import AtomSelection from '../../data/atom-selection'
 import { FastSet } from '../../../utils/collections'
 import Mask from '../../../utils/mask'
 import { Model } from '../../../structure/data'
-import { defaultBondTest, testBond } from './common'
+import { defaultBondTest, testBond, areWithinWithAtomRadius, AreWithinWithAtomRadiusContext } from './common'
 
 type Selection = Expression<AtomSelection>
 
@@ -70,37 +70,123 @@ export function withSameAtomProperties(env: Environment, selection: Selection, s
     return ret.getSelection();
 }
 
-export function within(env: Environment, selection: Selection, target: Selection, radius: Expression<number>, invert?: Expression<boolean>) {
-    const sel = selection(env);
-    const mask = AtomSelection.getMask(target(env));
+interface WithinContext {
+    env: Environment,
+    selection: AtomSelection,
+    target: AtomSelection,
+    minRadius: number,
+    maxRadius: number,
+    invert: boolean,
+    atomRadius: Expression<number>
+}
+function withinMaxRadius({ env, selection, target, maxRadius, invert }: WithinContext) {
+    const { model } = env.context;
+    const { x, y, z } = model.positions;
+    const mask = AtomSelection.getMask(target);
     const checkWithin = Model.spatialLookup(env.context.model).check(mask);
-    const r = radius(env);
-    const { x, y, z } = env.context.model.positions;
-    const inverted = (!!invert && !!invert(env));
-
     const ret = AtomSelection.linearBuilder();
-    if (inverted) {
-        for (const atomSet of AtomSelection.atomSets(sel)) {
-            let include = true;
-            for (const a of AtomSet.atomIndices(atomSet)) {
-                if (checkWithin(x[a], y[a], z[a], r)) {
-                    include = false;
-                    break;
-                }
+
+    for (const atomSet of AtomSelection.atomSets(selection)) {
+        let withinRadius = false;
+        for (const a of AtomSet.atomIndices(atomSet)) {
+            if (checkWithin(x[a], y[a], z[a], maxRadius)) {
+                withinRadius = true;
+                break;
             }
-            if (include) ret.add(atomSet);
         }
-    } else {
-        for (const atomSet of AtomSelection.atomSets(sel)) {
-            for (const a of AtomSet.atomIndices(atomSet)) {
-                if (checkWithin(x[a], y[a], z[a], r)) {
-                    ret.add(atomSet);
-                    break;
-                }
-            }
+        if (withinRadius) {
+            if (!invert) ret.add(atomSet);
+        } else if (invert) ret.add(atomSet);
+    }
+
+    return ret.getSelection();
+}
+
+function withinMinMaxRadius({ env, selection, target, minRadius, maxRadius, atomRadius, invert }: WithinContext) {
+    const { model } = env.context;
+    const ret = AtomSelection.linearBuilder();
+
+    Environment.lockSlot(env, 'element');
+    const element = env.slots.element;
+
+    let maxAtomRadiusSrc = 0;
+    for (const atomSet of AtomSelection.atomSets(selection)) {
+        for (const a of AtomSet.atomIndices(atomSet)) {
+            ElementAddress.setAtom(model, element, a);
+            const r = atomRadius(env);
+            if (r > maxAtomRadiusSrc) maxAtomRadiusSrc = r;
         }
     }
+
+    let maxAtomRadiusTarget = 0;
+    for (const atomSet of AtomSelection.atomSets(target)) {
+        for (const a of AtomSet.atomIndices(atomSet)) {
+            ElementAddress.setAtom(model, element, a);
+            const r = atomRadius(env);
+            if (r > maxAtomRadiusTarget) maxAtomRadiusTarget = r;
+        }
+    }
+
+    const targetLookup = AtomSelection.lookup3d(model, target);
+    const radius = maxRadius + maxAtomRadiusSrc + maxAtomRadiusTarget;
+    const targetSets = AtomSelection.atomSets(target);
+
+    const distCtx: AreWithinWithAtomRadiusContext = {
+        env,
+        model,
+        atomRadius,
+        maxRadius,
+        minRadius,
+        slot: element
+    }
+
+    for (const atomSet of AtomSelection.atomSets(selection)) {
+        const within = targetLookup.queryAtomSet(atomSet, radius);
+
+        let withinRadius = false;
+        for (const setIndex of within) {
+            if (areWithinWithAtomRadius(distCtx, atomSet, targetSets[setIndex])) {
+                withinRadius = true;
+            }
+        }
+
+        if (withinRadius) {
+            if (!invert) ret.add(atomSet);
+        } else if (invert) ret.add(atomSet);
+    }
+
+    Environment.unlockSlot(env, 'element');
+
     return ret.getSelection();
+}
+
+function _zeroRadius(env: Environment) { return 0; }
+
+export interface WithinParams {
+    selection: Selection,
+    target: Selection,
+    minRadius?: Expression<number>,
+    maxRadius: Expression<number>,
+    atomRadius?: Expression<number>,
+    invert?: Expression<boolean>
+}
+
+export function within(env: Environment, params: WithinParams) {
+    const ctx: WithinContext = {
+        env,
+        selection: params.selection(env),
+        target: params.target(env),
+        maxRadius: params.maxRadius(env),
+        minRadius: params.minRadius ? params.minRadius(env) : 0,
+        atomRadius: params.atomRadius || _zeroRadius,
+        invert: params.invert ? params.invert(env) : false,
+    }
+
+    if (ctx.minRadius === 0 && ctx.atomRadius === _zeroRadius) {
+        return withinMaxRadius(ctx);
+    } else {
+        return withinMinMaxRadius(ctx);
+    }
 }
 
 export type IsConnectedToParams = {
