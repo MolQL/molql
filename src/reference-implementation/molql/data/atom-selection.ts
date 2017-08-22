@@ -10,6 +10,8 @@ import { Model } from '../../structure/data'
 import SpatialLookup, { FindFunc } from '../../utils/spatial-lookup'
 import AtomSet from './atom-set'
 
+import AtomSetIt = AtomSet.Iterator
+
 interface AtomSelection { '@type'?: 'atom-selection' }
 
 function AtomSelection(atomSets: AtomSet[]): AtomSelection { return AtomSelectionImpl(atomSets); }
@@ -42,11 +44,13 @@ namespace AtomSelection {
         if (!sets.length) return Mask.never;
         if (sets.length === 1) return AtomSet.getMask(sets[0]);
 
+        const it = AtomSetIt();
+
         let estSize = 0, max = 0;
         for (const atomSet of sets) {
             estSize += AtomSet.count(atomSet);
-            for (const i of AtomSet.atomIndices(atomSet)) {
-                if (i > max) max = i;
+            for (let a = AtomSetIt.init(it, atomSet); !it.done; a = AtomSetIt.getNext(it)) {
+                if (a > max) max = a;
             }
         }
 
@@ -54,7 +58,7 @@ namespace AtomSelection {
             const mask = new Uint8Array(max + 1);
             let size = 0;
             for (const atomSet of sets) {
-                for (const a of AtomSet.atomIndices(atomSet)) {
+                for (let a = AtomSetIt.init(it, atomSet); !it.done; a = AtomSetIt.getNext(it)) {
                     if (mask[a]) continue;
                     mask[a] = 1;
                     size++;
@@ -64,7 +68,7 @@ namespace AtomSelection {
         } else {
             const mask = FastSet.create<number>();
             for (const atomSet of sets) {
-                for (const a of AtomSet.atomIndices(atomSet)) {
+                for (let a = AtomSetIt.init(it, atomSet); !it.done; a = AtomSetIt.getNext(it)) {
                     mask.add(a);
                 }
             }

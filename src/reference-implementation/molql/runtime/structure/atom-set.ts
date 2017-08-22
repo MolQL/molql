@@ -13,6 +13,8 @@ import ElementAddress from '../../data/element-address'
 import { FastSet } from '../../../utils/collections'
 import { getAtomSetProperties } from './filters'
 
+import AtomSetIt = AtomSet.Iterator;
+
 export function atomCount(env: Environment) {
     return AtomSet.count(env.slots.atomSet);
 }
@@ -27,13 +29,14 @@ export function accumulateAtomSet(env: Environment, initial: Expression<any>, va
     Environment.lockSlot(env, 'atomSetReducer');
     Environment.lockSlot(env, 'element');
 
-    const atoms = AtomSet.atomIndices(slots.atomSet);
+    //const atoms = AtomSet.atomIndices(slots.atomSet);
+    const it = AtomSetIt.forSet(slots.atomSet);
     const element = env.slots.element;
 
-    ElementAddress.setAtom(context.model, element, atoms[0]);
+    ElementAddress.setAtom(context.model, element, it.value);
     slots.atomSetReducer = initial(env);
 
-    for (const a of atoms) {
+    for (let a = it.value; !it.done; a = AtomSetIt.getNext(it)) {
         ElementAddress.setAtom(context.model, element, a);
         slots.atomSetReducer = value(env);
     }

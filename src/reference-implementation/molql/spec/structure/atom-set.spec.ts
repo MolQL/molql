@@ -52,8 +52,6 @@ describe('atom-set', () => {
             Data.countAtomSet(Data.model, s, (i, cols) => cols.type_symbol.getString(i) === 'C') >= 3
             && Data.countAtomSet(Data.model, s, (i, cols) => cols.type_symbol.getString(i) === 'S') >= 1
         );
-
-        Data.checkAtomSelection(Data.model, sel, (i, cols) => cols.B_iso_or_equiv.getFloat(i) > 40);
         expect(check).toBe(true);
     });
 });

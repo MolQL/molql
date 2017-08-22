@@ -17,6 +17,8 @@ import typeCheck from './reference-implementation/molql/type/checker'
 import { SymbolMap } from './molql/symbol-table'
 import B from './molql/builder'
 
+import AtomSetIt = AtomSet.Iterator;
+
 // import { isSymbol } from './mini-lisp/symbol'
 // import MolQL from './molql/symbols'
 
@@ -47,6 +49,15 @@ import B from './molql/builder'
 
 // console.log(comp(0 as any));
 
+function testSet() {
+    console.log('testing set');
+    const atomSet = AtomSet([1, 2, 3, 4]);
+    const it = AtomSetIt();
+    for (let i = AtomSetIt.init(it, atomSet); !it.done; i = AtomSetIt.getNext(it)) {
+        console.log('set', i);
+    }
+}
+testSet();
 
 function run(model: Model) {
 
@@ -133,7 +144,7 @@ function run(model: Model) {
     const res = compiled(ctx);
     console.log('count', AtomSelection.atomSets(res).length);
     if (AtomSelection.atomSets(res).length) console.log('ac', AtomSet.count(AtomSelection.atomSets(res)[0]));
-    const cif = mmCIFwriter(model, AtomSet.atomIndices(AtomSelection.toAtomSet(res)));
+    const cif = mmCIFwriter(model, AtomSet.getIndices(AtomSelection.toAtomSet(res)));
 
     console.log(cif.substr(0, 450));
     //console.log(AtomSet.atomIndices(AtomSelection.toAtomSet(res)));

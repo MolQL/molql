@@ -16,6 +16,8 @@ import Environtment from '../runtime/environment'
 import _compile from '../../molql/compiler'
 import AtomSelection from '../data/atom-selection'
 
+import AtomSetIt = AtomSet.Iterator
+
 const molData = fs.readFileSync('spec/1tqn_updated.cif', 'utf-8')
 export const model = parseCIF(molData).models[0];
 
@@ -31,12 +33,21 @@ export function areAtomSetEqual(a: AtomSet, b: AtomSet) {
 
 export function checkAtomSet(model: Model, atomSet: AtomSet, f: (i: number, cols: mmCIF.Category<mmCIF.AtomSite>) => boolean) {
     const atom_site = model.data.atom_site;
-    return AtomSet.atomIndices(atomSet).every(a => f(a, atom_site));
+    const it = AtomSetIt()
+    for (let a = AtomSetIt.init(it, atomSet); !it.done; a = AtomSetIt.getNext(it)) {
+        if (!f(a, atom_site)) return false;
+    }
+    return true;
 }
 
 export function countAtomSet(model: Model, atomSet: AtomSet, f: (i: number, cols: mmCIF.Category<mmCIF.AtomSite>) => boolean) {
     const atom_site = model.data.atom_site;
-    return AtomSet.atomIndices(atomSet).filter(a => f(a, atom_site)).length;
+    const it = AtomSetIt()
+    let count = 0;
+    for (let a = AtomSetIt.init(it, atomSet); !it.done; a = AtomSetIt.getNext(it)) {
+        if (f(a, atom_site)) count++;
+    }
+    return count;
 }
 
 export function checkAtomSelection(model: Model, atomSel: AtomSelection, f: (i: number, cols: mmCIF.Category<mmCIF.AtomSite>) => boolean) {

@@ -14,6 +14,8 @@ import Mask from '../../../utils/mask'
 import { Model } from '../../../structure/data'
 import { defaultBondTest, testBond, maxAtomValueInSelection } from './common'
 
+import AtomSetIt = AtomSet.Iterator
+
 type Selection = Expression<AtomSelection>
 
 export function pick(env: Environment, selection: Selection, pred: Expression<boolean>) {
@@ -34,8 +36,8 @@ export function getAtomSetProperties(env: Environment, atomSet: AtomSet, prop: E
     const { model } = env.context;
     Environment.lockSlot(env, 'element');
     const element = env.slots.element;
-    for (const i of AtomSet.atomIndices(atomSet)) {
-        ElementAddress.setAtom(model, element, i);
+    for (let it = AtomSetIt.forSet(atomSet), a = AtomSetIt.init(it, atomSet); !it.done; a = AtomSetIt.getNext(it)) {
+        ElementAddress.setAtom(model, element, a);
         const p = prop(env);
         if (p !== void 0) set.add(p);
     }
@@ -73,8 +75,9 @@ export function withSameAtomProperties(env: Environment, selection: Selection, s
 export function areIntersectedBy(env: Environment, selection: Selection, by: Selection): AtomSelection {
     const mask = AtomSelection.getMask(by(env));
     const builder = AtomSelection.linearBuilder();
+    const it = AtomSetIt();
     for (const atomSet of AtomSelection.atomSets(selection(env))) {
-        for (const a of AtomSet.atomIndices(atomSet)) {
+        for (let a = AtomSetIt.init(it, atomSet); !it.done; a = AtomSetIt.getNext(it)) {
             if (mask.has(a)) {
                 builder.add(atomSet);
                 break;
@@ -100,9 +103,10 @@ function withinMaxRadius({ env, selection, target, maxRadius, invert }: WithinCo
     const checkWithin = Model.spatialLookup(env.context.model).check(mask);
     const ret = AtomSelection.linearBuilder();
 
+    const it = AtomSetIt();
     for (const atomSet of AtomSelection.atomSets(selection)) {
         let withinRadius = false;
-        for (const a of AtomSet.atomIndices(atomSet)) {
+        for (let a = AtomSetIt.init(it, atomSet); !it.done; a = AtomSetIt.getNext(it)) {
             if (checkWithin(x[a], y[a], z[a], maxRadius)) {
                 withinRadius = true;
                 break;
@@ -131,11 +135,14 @@ export function areWithinWithAtomRadius(ctx: AreWithinWithAtomRadiusContext, a: 
     const { env, model, slot, minRadius, maxRadius, atomRadius } = ctx;
     let dist = Number.POSITIVE_INFINITY;
     const { x, y, z } = model.positions;
-    const xs = AtomSet.atomIndices(a), ys = AtomSet.atomIndices(b);
-    for (const i of xs) {
+
+    const itA = AtomSetIt(), itB = AtomSetIt();
+
+    //const xs = AtomSet.atomIndices(a), ys = AtomSet.atomIndices(b);
+    for (let i = AtomSetIt.init(itA, a); !itA.done; i = AtomSetIt.getNext(itA)) {
         ElementAddress.setAtom(model, slot, i);
         const rA = atomRadius(env);
-        for (const j of ys) {
+        for (let j = AtomSetIt.init(itB, b); !itB.done; j = AtomSetIt.getNext(itB)) {
             ElementAddress.setAtom(model, slot, j);
             const rB = atomRadius(env);
             let d = Math.sqrt(AtomSet.atomDistanceSq(x, y, z, i, j)) - rA - rB;
@@ -240,10 +247,11 @@ export function isConnectedTo(env: Environment, { selection, target, disjunct, i
     const { bond } = env.slots;
 
     const ret = AtomSelection.linearBuilder();
+    const it = AtomSetIt();
     for (const atomSet of AtomSelection.atomSets(sel)) {
         const setMask = disjuncted ? AtomSet.getMask(atomSet) : Mask.never;
         let isConnected = false;
-        for (const a of AtomSet.atomIndices(atomSet)) {
+        for (let a = AtomSetIt.init(it, atomSet); !it.done; a = AtomSetIt.getNext(it)) {
             const start = bondAtomOffset[a], end = bondAtomOffset[a + 1];
             for (let t = start; t < end; t++) {
                 const b = neighbor[t];
@@ -264,7 +272,7 @@ export function isConnectedTo(env: Environment, { selection, target, disjunct, i
         } else if (inverted) {
             if (disjuncted) {
                 let isFullSubset = true;
-                for (const a of AtomSet.atomIndices(atomSet)) {
+                for (let a = AtomSetIt.init(it, atomSet); !it.done; a = AtomSetIt.getNext(it)) {
                     if (!targetMask.has(a)) {
                         isFullSubset = false;
                         break;

@@ -89,7 +89,7 @@ function run (query: Expression) {
       // const cif = mmCIFwriter(model, AtomSet.atomIndices(AtomSelection.toAtomSet(res)));
 
       // console.log(cif.substr(0, 100));
-      console.log(AtomSet.atomIndices(AtomSelection.toAtomSet(res)));
+      console.log(AtomSet.getIndices(AtomSelection.toAtomSet(res)));
       //console.log(model.entities);
       //console.log(model.chains);
     } catch (e) {

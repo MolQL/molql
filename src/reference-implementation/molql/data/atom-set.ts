@@ -4,7 +4,7 @@
  * @author David Sehnal <david.sehnal@gmail.com>
  */
 
-import { UniqueArrayBuilder, sortAsc } from '../../utils/collections'
+import { sortAsc } from '../../utils/collections'
 import { Model } from '../../structure/data'
 import Mask from '../../utils/mask'
 
@@ -16,7 +16,7 @@ interface AtomSetImpl extends AtomSet {
     atomIndices: ReadonlyArray<number>
     hashCodeComputed: boolean,
     hashCode: number,
-    hierarchy: { residueIndices: number[], chainIndices: number[], entityIndices: number[] } | undefined,
+    //hierarchy: { residueIndices: number[], chainIndices: number[], entityIndices: number[] } | undefined,
     boundingSphere: { center: [number, number, number], radius: number } | undefined
 }
 
@@ -25,7 +25,6 @@ function AtomSetImpl(indices: ArrayLike<number>): AtomSetImpl {
         atomIndices: indices as ReadonlyArray<number>,
         hashCode: 0,
         hashCodeComputed: false,
-        hierarchy: void 0,
         boundingSphere: void 0
     };
 }
@@ -37,9 +36,13 @@ namespace AtomSet {
         return (a as AtomSetImpl).atomIndices.length;
     }
 
-    export function atomIndices(a: AtomSet) {
+    export function getIndices(a: AtomSet) {
         return (a as AtomSetImpl).atomIndices;
     }
+
+    // export function atomIndices(a: AtomSet) {
+    //     return (a as AtomSetImpl).atomIndices;
+    // }
 
     export function getMask(a: AtomSet) {
         return Mask.ofUniqueIndices((a as AtomSetImpl).atomIndices);
@@ -78,24 +81,24 @@ namespace AtomSet {
         return code;
     }
 
-    export function hierarchy(model: Model, atomSet: AtomSet) {
-        const impl = atomSet as AtomSetImpl;
-        if (impl.hierarchy) return impl.hierarchy;
+    // export function hierarchy(model: Model, atomSet: AtomSet) {
+    //     const impl = atomSet as AtomSetImpl;
+    //     if (impl.hierarchy) return impl.hierarchy;
 
-        const residueIndices = UniqueArrayBuilder<number>();
-        const chainIndices = UniqueArrayBuilder<number>();
-        const entityIndices = UniqueArrayBuilder<number>();
-        const rIndices = model.atoms.residueIndex;
-        const cIndices = model.residues.chainIndex;
-        const eIndices = model.chains.entityIndex;
+    //     const residueIndices = UniqueArrayBuilder<number>();
+    //     const chainIndices = UniqueArrayBuilder<number>();
+    //     const entityIndices = UniqueArrayBuilder<number>();
+    //     const rIndices = model.atoms.residueIndex;
+    //     const cIndices = model.residues.chainIndex;
+    //     const eIndices = model.chains.entityIndex;
 
-        for (const i of impl.atomIndices) { UniqueArrayBuilder.add(residueIndices, rIndices[i], rIndices[i]); }
-        for (const i of residueIndices.array) { UniqueArrayBuilder.add(chainIndices, cIndices[i], cIndices[i]); }
-        for (const i of chainIndices.array) { UniqueArrayBuilder.add(entityIndices, eIndices[i], eIndices[i]); }
+    //     for (const i of impl.atomIndices) { UniqueArrayBuilder.add(residueIndices, rIndices[i], rIndices[i]); }
+    //     for (const i of residueIndices.array) { UniqueArrayBuilder.add(chainIndices, cIndices[i], cIndices[i]); }
+    //     for (const i of chainIndices.array) { UniqueArrayBuilder.add(entityIndices, eIndices[i], eIndices[i]); }
 
-        impl.hierarchy = { residueIndices: residueIndices.array, chainIndices: chainIndices.array, entityIndices: entityIndices.array };
-        return impl.hierarchy;
-    }
+    //     impl.hierarchy = { residueIndices: residueIndices.array, chainIndices: chainIndices.array, entityIndices: entityIndices.array };
+    //     return impl.hierarchy;
+    // }
 
     export function boundingSphere(model: Model, atomSet: AtomSet) {
         const impl = atomSet as AtomSetImpl;
@@ -131,7 +134,7 @@ namespace AtomSet {
         if (a === b) return 0;
         let distSq = Number.POSITIVE_INFINITY;
         const { x, y, z } = model.positions;
-        const xs = atomIndices(a), ys = atomIndices(b);
+        const xs = (a as AtomSetImpl).atomIndices, ys = (b as AtomSetImpl).atomIndices;
         for (const i of xs) {
             for (const j of ys) {
                 const d = atomDistanceSq(x, y, z, i, j);
@@ -146,7 +149,7 @@ namespace AtomSet {
         const dSq = maxDistance * maxDistance;
         const { x, y, z } = model.positions;
 
-        const xs = atomIndices(a), ys = atomIndices(b);
+        const xs = (a as AtomSetImpl).atomIndices, ys = (b as AtomSetImpl).atomIndices;
         for (const i of xs) {
             for (const j of ys) {
                 if (atomDistanceSq(x, y, z, i, j) <= dSq) return true;
@@ -156,7 +159,7 @@ namespace AtomSet {
     }
 
     export function union(a: AtomSet, b: AtomSet): AtomSet {
-        const xs = atomIndices(a), ys = atomIndices(b);
+        const xs = (a as AtomSetImpl).atomIndices, ys = (b as AtomSetImpl).atomIndices;
         const la = xs.length, lb = ys.length;
 
         let i = 0, j = 0, count = 0;
@@ -185,6 +188,47 @@ namespace AtomSet {
         for (; j < lb; j++) indices[offset++] = ys[j];
 
         return AtomSet(indices);
+    }
+
+    export interface Iterator {
+        done: boolean,
+        value: number
+    }
+
+    interface IteratorImpl extends Iterator {
+        atomSet: AtomSet,
+        index: number,
+        count: number
+    }
+
+    export function Iterator(): Iterator { const it: IteratorImpl = { done: true, value: 0, atomSet: void 0 as any, index: 0, count: 0 }; return it as Iterator; }
+
+    export namespace Iterator {
+        export function getNext(iterator: Iterator) {
+            const index = ++(iterator as IteratorImpl).index;
+            if (index >= (iterator as IteratorImpl).count) {
+                iterator.done = true;
+            } else {
+                iterator.value = ((iterator as IteratorImpl).atomSet as AtomSetImpl).atomIndices[index];
+            }
+            return iterator.value;
+        }
+
+        export function init(iterator: Iterator, set: AtomSet) {
+            const ind = (set as AtomSetImpl).atomIndices;
+            iterator.done = false;
+            iterator.value = ind[0];
+            (iterator as IteratorImpl).atomSet = set;
+            (iterator as IteratorImpl).index = 0;
+            (iterator as IteratorImpl).count = ind.length;
+            return iterator.value;
+        }
+
+        export function forSet(atomSet: AtomSet): Iterator {
+            const ind = (atomSet as AtomSetImpl).atomIndices;
+            const it: IteratorImpl = { done: false, value: ind[0], atomSet, index: 0, count: ind.length };
+            return it as Iterator;
+        }
     }
 }
 

@@ -13,6 +13,8 @@ import AtomSet from '../../data/atom-set'
 import AtomSelection from '../../data/atom-selection'
 import { getRingFingerprint } from '../../../structure/topology/rings/collection'
 
+import AtomSetIt = AtomSet.Iterator
+
 export type BondTest = (env: Environment) => boolean
 
 export function defaultBondTest(env: Environment) {
@@ -50,8 +52,10 @@ export function maxAtomValueInSelection(env: Environment, selection: AtomSelecti
     Environment.lockSlot(env, 'element');
     const element = env.slots.element;
     let ret = 0;
+
+    let it = AtomSetIt();
     for (const atomSet of AtomSelection.atomSets(selection)) {
-        for (const a of AtomSet.atomIndices(atomSet)) {
+        for (let a = AtomSetIt.init(it, atomSet); !it.done; a = AtomSetIt.getNext(it)) {
             ElementAddress.setAtom(model, element, a);
             const v = prop(env);
             if (v > ret) ret = v;

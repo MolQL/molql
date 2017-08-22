@@ -87,7 +87,7 @@ class State {
 
             const ctx = Context.ofModel(model);
             const res = query.compiled(ctx);
-            const cif = mmCIFwriter(model, AtomSet.atomIndices(AtomSelection.toAtomSet(res)));
+            const cif = mmCIFwriter(model, AtomSet.getIndices(AtomSelection.toAtomSet(res)));
 
             this.queryResult.onNext({ kind: 'content', content: cif });
 

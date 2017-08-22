@@ -16,6 +16,8 @@ import ElementAddress from '../../data/element-address'
 import BondAddress from '../../data/bond-address'
 import { defaultBondTest, testBond, BondTest, maxAtomValueInSelection } from './common'
 
+import AtomSetIt = AtomSet.Iterator
+
 type Selection = Expression<AtomSelection>
 
 export function queryEach(env: Environment, selection: Selection, query: Selection): AtomSelection {
@@ -32,17 +34,17 @@ export function queryEach(env: Environment, selection: Selection, query: Selecti
 export function intersectBy(env: Environment, selection: Selection, by: Selection): AtomSelection {
     const mask = AtomSelection.getMask(by(env));
     const builder = AtomSelection.uniqueBuilder();
+    const it = AtomSetIt();
     for (const atomSet of AtomSelection.atomSets(selection(env))) {
-        const indices = AtomSet.atomIndices(atomSet);
         let count = 0;
-        for (const a of indices) {
+        for (let a = AtomSetIt.init(it, atomSet); !it.done; a = AtomSetIt.getNext(it)) {
             if (mask.has(a)) count++;
         }
         if (!count) continue;
 
         const intersection = new Int32Array(count);
         let offset = 0;
-        for (const a of indices) {
+        for (let a = AtomSetIt.init(it, atomSet); !it.done; a = AtomSetIt.getNext(it)) {
             if (mask.has(a)) intersection[offset++] = a;
         }
         builder.add(AtomSet(intersection));
@@ -53,17 +55,17 @@ export function intersectBy(env: Environment, selection: Selection, by: Selectio
 export function exceptBy(env: Environment, selection: Selection, by: Selection): AtomSelection {
     const mask = AtomSelection.getMask(by(env));
     const builder = AtomSelection.uniqueBuilder();
+    const it = AtomSetIt();
     for (const atomSet of AtomSelection.atomSets(selection(env))) {
-        const indices = AtomSet.atomIndices(atomSet);
         let count = 0;
-        for (const a of indices) {
+        for (let a = AtomSetIt.init(it, atomSet); !it.done; a = AtomSetIt.getNext(it)) {
             if (!mask.has(a)) count++;
         }
         if (!count) continue;
 
         const complement = new Int32Array(count);
         let offset = 0;
-        for (const a of indices) {
+        for (let a = AtomSetIt.init(it, atomSet); !it.done; a = AtomSetIt.getNext(it)) {
             if (!mask.has(a)) complement[offset++] = a;
         }
         builder.add(AtomSet(complement));
@@ -77,8 +79,9 @@ export function unionBy(env: Environment, selection: Selection, by: Selection): 
     const glue = by(env);
 
     const occurenceCount = new Int32Array(atomCount);
+    const it = AtomSetIt();
     for (const atomSet of atomSets) {
-        for (const a of AtomSet.atomIndices(atomSet)) {
+        for (let a = AtomSetIt.init(it, atomSet); !it.done; a = AtomSetIt.getNext(it)) {
             occurenceCount[a]++;
         }
     }
@@ -94,7 +97,7 @@ export function unionBy(env: Environment, selection: Selection, by: Selection): 
     const atomMap = new Int32Array(totalOccurences);
     const atomFill = new Int32Array(atomCount);
     for (const atomSet of atomSets) {
-        for (const a of AtomSet.atomIndices(atomSet)) {
+        for (let a = AtomSetIt.init(it, atomSet); !it.done; a = AtomSetIt.getNext(it)) {
             offset = occurentOffsets[a] + atomFill[a];
             atomFill[a]++;
             atomMap[offset] = setIndex;
@@ -105,9 +108,9 @@ export function unionBy(env: Environment, selection: Selection, by: Selection): 
     const builder = AtomSelection.uniqueBuilder();
     for (const glueSet of AtomSelection.atomSets(glue)) {
         const toGlue = UniqueArrayBuilder<number>();
-        for (const g of AtomSet.atomIndices(glueSet)) {
-            const o = occurentOffsets[g];
-            for (let i = 0, _i = occurenceCount[g]; i < _i; i++) {
+        for (let a = AtomSetIt.init(it, glueSet); !it.done; a = AtomSetIt.getNext(it)) {
+            const o = occurentOffsets[a];
+            for (let i = 0, _i = occurenceCount[a]; i < _i; i++) {
                 const key = atomMap[o + i];
                 UniqueArrayBuilder.add(toGlue, key, key);
             }
@@ -116,7 +119,7 @@ export function unionBy(env: Environment, selection: Selection, by: Selection): 
         const indices = UniqueArrayBuilder<number>();
         let cnt = 0;
         for (const atomSetIndex of toGlue.array) {
-            for (const a of AtomSet.atomIndices(atomSets[atomSetIndex])) {
+            for (let a = AtomSetIt.init(it, atomSets[atomSetIndex]); !it.done; a = AtomSetIt.getNext(it)) {
                 cnt++;
                 UniqueArrayBuilder.add(indices, a, a);
             }
@@ -236,9 +239,10 @@ function includeSurroundingsNoRadius(ctx: IncludeSurroundingsContext) {
     const builder = AtomSelection.uniqueBuilder();
     const includedResides = FastSet.create<number>();
 
+    const it = AtomSetIt();
     for (const atomSet of AtomSelection.atomSets(selection)) {
         const atoms = UniqueArrayBuilder<number>();
-        for (const a of AtomSet.atomIndices(atomSet)) {
+        for (let a = AtomSetIt.init(it, atomSet); !it.done; a = AtomSetIt.getNext(it)) {
             const { count, indices } = findWithin(x[a], y[a], z[a], r);
             for (let i = 0, _i = count; i < _i; i++) {
                 const b = indices[i];
@@ -287,10 +291,10 @@ function includeSurroundingsWithRadius(ctx: IncludeSurroundingsContext) {
     }
 
     const extendedRadius = radius + maxSelectionAtomRadius + maxStructureAtomRadius;
-
+    const it = AtomSetIt();
     for (const atomSet of AtomSelection.atomSets(selection)) {
         const atoms = UniqueArrayBuilder<number>();
-        for (const a of AtomSet.atomIndices(atomSet)) {
+        for (let a = AtomSetIt.init(it, atomSet); !it.done; a = AtomSetIt.getNext(it)) {
             const { count, indices, squaredDistances } = findWithin(x[a], y[a], z[a], extendedRadius);
 
             ElementAddress.setAtom(model, element, a);
@@ -346,7 +350,8 @@ interface ExpandConnectedCtx {
     bonds: Bonds,
     mask: Mask,
     slot: BondAddress,
-    test: BondTest
+    test: BondTest,
+    it: AtomSetIt
 }
 
 function _expandFrontierAtoms({ env, mask, bonds, test, slot }: ExpandConnectedCtx, frontier: number[], atoms: UniqueArrayBuilder<number>) {
@@ -366,7 +371,11 @@ function _expandAtoms(ctx: ExpandConnectedCtx, atomSet: AtomSet, numLayers: numb
     if (!numLayers) return atomSet;
 
     const result = UniqueArrayBuilder<number>();
-    let frontier = AtomSet.atomIndices(atomSet) as number[];
+    let frontier: number[] = [];
+    const { it } = ctx;
+    for (let a = AtomSetIt.init(it, atomSet); !it.done; a = AtomSetIt.getNext(it)) {
+        frontier[frontier.length] = a;
+    }
 
     for (const a of frontier) UniqueArrayBuilder.add(result, a, a);
 
@@ -405,12 +414,13 @@ function _expandResidues(ctx: ExpandConnectedCtx, atomSet: AtomSet, numLayers: n
     if (!numLayers) return atomSet;
 
     const { atomOffset } = ctx.model.residues;
-    const { residueIndex } = ctx.model.atoms;
+    const { residueIndex } = ctx.model.atoms;    
 
     const residues = UniqueArrayBuilder<number>();
     let frontier: number[] = [];
 
-    for (const a of AtomSet.atomIndices(atomSet)) {
+    const { mask, it } = ctx
+    for (let a = AtomSetIt.init(it, atomSet); !it.done; a = AtomSetIt.getNext(it)) {
         const rI = residueIndex[a];
         if (UniqueArrayBuilder.add(residues, rI, rI)) frontier[frontier.length] = rI;
     }
@@ -419,7 +429,6 @@ function _expandResidues(ctx: ExpandConnectedCtx, atomSet: AtomSet, numLayers: n
         frontier = _expandFrontierResidues(ctx, frontier, residues);
     }
 
-    const { mask } = ctx;
     sortAsc(residues.array);
     const atoms: number[] = [];
     for (let rI of residues.array) {
@@ -456,7 +465,8 @@ export function includeConnected(env: Environment, { selection, layerCount, whol
         model,
         mask,
         slot: env.slots.bond,
-        test
+        test,
+        it: AtomSetIt()
     };
 
     for (const atomSet of AtomSelection.atomSets(src)) {
@@ -479,8 +489,9 @@ export function expandProperty(env: Environment, selection: Selection, property:
 
     let index = 0;
     const sets: number[][] = [];
+    const it = AtomSetIt();
     for (const atomSet of AtomSelection.atomSets(src)) {
-        for (const a of AtomSet.atomIndices(atomSet)) {
+        for (let a = AtomSetIt.init(it, atomSet); !it.done; a = AtomSetIt.getNext(it)) {
             ElementAddress.setAtom(context.model, element, a);
             const p = property(env);
             if (propertyToSetMap.has(p)) UniqueArrayBuilder.add(propertyToSetMap.get(p)!, index, index);
