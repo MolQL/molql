@@ -243,7 +243,7 @@ const operators: OperatorList = [
     type: h.prefix,
     rule: h.prefixOp(/BYRING/i),
     map: (op: string, selection: Expression) => {
-      return h.asAtoms(B.struct.filter.areIntersectedBy({
+      return h.asAtoms(B.struct.filter.intersectedBy({
         '0': B.struct.generator.rings(),
         by: selection
       }))

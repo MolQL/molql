@@ -36,7 +36,7 @@ describe('filter', () => {
     });
 
     it('areIntersctedBy C atoms by ALA residues', function() {
-        const q = B.struct.filter.areIntersectedBy({
+        const q = B.struct.filter.intersectedBy({
             0: B.struct.generator.atomGroups({ 'atom-test': B.core.rel.eq([B.acp('elementSymbol'), B.es('C')]) }),
             by: B.struct.generator.atomGroups({ 'residue-test': B.core.rel.eq([B.ammp('auth_comp_id'), 'ALA']), 'group-by': B.ammp('residueKey') })
         });
