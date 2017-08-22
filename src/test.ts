@@ -53,8 +53,8 @@ function testSet() {
     console.log('testing set');
     const atomSet = AtomSet([1, 2, 3, 4]);
     const it = AtomSetIt();
-    for (let i = AtomSetIt.init(it, atomSet); !it.done; i = AtomSetIt.getNext(it)) {
-        console.log('set', i);
+    for (let a = it.init(atomSet); !it.done; a = it.next().value) {
+        console.log('set', a);
     }
 }
 testSet();

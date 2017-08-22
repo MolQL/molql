@@ -49,7 +49,7 @@ namespace AtomSelection {
         let estSize = 0, max = 0;
         for (const atomSet of sets) {
             estSize += AtomSet.count(atomSet);
-            for (let a = AtomSetIt.init(it, atomSet); !it.done; a = AtomSetIt.getNext(it)) {
+            for (let a = it.init(atomSet); !it.done; a = it.next().value) {
                 if (a > max) max = a;
             }
         }
@@ -58,7 +58,7 @@ namespace AtomSelection {
             const mask = new Uint8Array(max + 1);
             let size = 0;
             for (const atomSet of sets) {
-                for (let a = AtomSetIt.init(it, atomSet); !it.done; a = AtomSetIt.getNext(it)) {
+                for (let a = it.init(atomSet); !it.done; a = it.next().value) {
                     if (mask[a]) continue;
                     mask[a] = 1;
                     size++;
@@ -68,7 +68,7 @@ namespace AtomSelection {
         } else {
             const mask = FastSet.create<number>();
             for (const atomSet of sets) {
-                for (let a = AtomSetIt.init(it, atomSet); !it.done; a = AtomSetIt.getNext(it)) {
+                for (let a = it.init(atomSet); !it.done; a = it.next().value) {
                     mask.add(a);
                 }
             }

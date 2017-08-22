@@ -33,6 +33,61 @@ function ArrayAtomSet(indices: ArrayLike<number>): ArrayAtomSet {
 }
 
 namespace AtomSet {
+    export interface Iterator {
+        done: boolean;
+        value: number;
+        next(): { done: boolean, value: number }
+        init(atomSet: AtomSet): number;
+    }
+
+    class IteratorImpl implements Iterator {
+        done = true;
+        value = 0;
+
+        private atomSet: AtomSet = void 0 as any;
+        private index: number = 0;
+        private count: number = 0;
+
+        next() {
+            if (typeof this.atomSet === 'number') {
+                this.done = true;
+            } else {
+                const index = ++this.index;
+                if (index >= this.count) {
+                    this.done = true;
+                } else {
+                    this.value = this.atomSet.atomIndices[index];
+                }
+            }
+            return this;
+        }
+
+        init(atomSet: AtomSet) {
+            if (typeof atomSet === 'number') {
+                this.value = atomSet;
+                this.count = 1;
+            } else {
+                const ind = atomSet.atomIndices;
+                this.value = ind[0];
+                this.count = ind.length;
+            }
+            this.done = false;
+            this.atomSet = atomSet;
+            this.index = 0;
+            return this.value;
+        }
+    }
+
+    export function Iterator(): Iterator { return new IteratorImpl(); }
+
+    export namespace Iterator {
+        export function forSet(atomSet: AtomSet): Iterator {
+            const it = Iterator();
+            it.init(atomSet);
+            return it;
+        }
+    }
+
     export function singleton(a: number): AtomSet { return a; }
 
     export function count(a: AtomSet) {
@@ -51,12 +106,12 @@ namespace AtomSet {
     export function areEqual(a: AtomSet, b: AtomSet) {
         const cnt = count(a);
         if (cnt !== count(b)) return false;
-        Iterator.init(gItA, a);
-        Iterator.init(gItB, b);
+        gItA.init(a);
+        gItB.init(b);
         for (let i = 0; i < cnt; i++) {
             if (gItA.value !== gItB.value) return false;
-            Iterator.getNext(gItA);
-            Iterator.getNext(gItB);
+            gItA.next();
+            gItB.next();
         }
         return true;
     }
@@ -145,8 +200,8 @@ namespace AtomSet {
         if (a === b) return 0;
         let distSq = Number.POSITIVE_INFINITY;
         const { x, y, z } = model.positions;
-        for (let i = Iterator.init(gItA, a); !gItA.done; i = Iterator.getNext(gItA)) {
-            for (let j = Iterator.init(gItB, b); !gItB.done; j = Iterator.getNext(gItB)) {
+        for (let i = gItA.init(a); !gItA.done; i = gItA.next().value) {
+            for (let j = gItB.init(b); !gItB.done; j = gItB.next().value) {
                 const d = atomDistanceSq(x, y, z, i, j);
                 if (d < distSq) distSq = d;
             }
@@ -159,8 +214,8 @@ namespace AtomSet {
         const dSq = maxDistance * maxDistance;
         const { x, y, z } = model.positions;
 
-        for (let i = Iterator.init(gItA, a); !gItA.done; i = Iterator.getNext(gItA)) {
-            for (let j = Iterator.init(gItB, b); !gItB.done; j = Iterator.getNext(gItB)) {
+        for (let i = gItA.init(a); !gItA.done; i = gItA.next().value) {
+            for (let j = gItB.init(b); !gItB.done; j = gItB.next().value) {
                 if (atomDistanceSq(x, y, z, i, j) <= dSq) return true;
             }
         }
@@ -172,15 +227,15 @@ namespace AtomSet {
 
         let i = 0, j = 0, resultSize = 0;
 
-        Iterator.init(gItA, a);
-        Iterator.init(gItB, b);
+        gItA.init(a);
+        gItB.init(b);
 
         while (i < la && j < lb) {
             const x = gItA.value, y = gItB.value;
             resultSize++;
-            if (x < y) { Iterator.getNext(gItA); i++; }
-            else if (x > y) { Iterator.getNext(gItB); j++; }
-            else { i++; j++; Iterator.getNext(gItA); Iterator.getNext(gItB); }
+            if (x < y) { gItA.next(); i++; }
+            else if (x > y) { gItB.next(); j++; }
+            else { i++; j++; gItA.next(); gItB.next(); }
         }
         resultSize += Math.max(la - i, lb - j);
 
@@ -188,75 +243,19 @@ namespace AtomSet {
         let offset = 0;
         i = 0;
         j = 0;
-        Iterator.init(gItA, a);
-        Iterator.init(gItB, b);
+        gItA.init(a);
+        gItB.init(b);
         while (i < la && j < lb) {
             const x = gItA.value, y = gItB.value;
             resultSize++;
-            if (x < y) { indices[offset++] = x; i++; Iterator.getNext(gItA); }
-            else if (x > y) { indices[offset++] = y; j++; Iterator.getNext(gItB); }
-            else { indices[offset++] = x; i++; j++;  Iterator.getNext(gItA); Iterator.getNext(gItB);  }
+            if (x < y) { indices[offset++] = x; i++; gItA.next(); }
+            else if (x > y) { indices[offset++] = y; j++; gItB.next(); }
+            else { indices[offset++] = x; i++; j++; gItA.next(); gItB.next();  }
         }
-        for (; i < la; i++) { indices[offset++] = gItA.value; Iterator.getNext(gItA); }
-        for (; j < lb; j++) { indices[offset++] = gItB.value; Iterator.getNext(gItB); }
+        for (; i < la; i++) { indices[offset++] = gItA.value; gItA.next(); }
+        for (; j < lb; j++) { indices[offset++] = gItB.value; gItB.next(); }
 
         return AtomSet(indices);
-    }
-
-    export interface Iterator {
-        done: boolean,
-        value: number
-    }
-
-    interface IteratorImpl extends Iterator {
-        atomSet: AtomSet,
-        index: number,
-        count: number
-    }
-
-    export function Iterator(): Iterator { const it: IteratorImpl = { done: true, value: 0, atomSet: void 0 as any, index: 0, count: 0 }; return it as Iterator; }
-
-    export namespace Iterator {
-        export function getNext(iterator: Iterator) {
-            if (typeof (iterator as IteratorImpl).atomSet === 'number') {
-                iterator.done = true;
-                return iterator.value;
-
-            }
-            const index = ++(iterator as IteratorImpl).index;
-            if (index >= (iterator as IteratorImpl).count) {
-                iterator.done = true;
-            } else {
-                iterator.value = ((iterator as IteratorImpl).atomSet as ArrayAtomSet).atomIndices[index];
-            }
-            return iterator.value;
-        }
-
-        export function init(iterator: Iterator, atomSet: AtomSet) {
-            if (typeof atomSet === 'number') {
-                iterator.value = atomSet;
-                (iterator as IteratorImpl).count = 1;
-            } else {
-                const ind = atomSet.atomIndices;
-                iterator.value = ind[0];
-                (iterator as IteratorImpl).count = ind.length;
-            }
-            iterator.done = false;
-            (iterator as IteratorImpl).atomSet = atomSet;
-            (iterator as IteratorImpl).index = 0;
-            return iterator.value;
-        }
-
-        export function forSet(atomSet: AtomSet): Iterator {
-            if (typeof atomSet === 'number') { 
-                const it: IteratorImpl = { done: false, value: atomSet, atomSet, index: 0, count: 1 };
-                return it as Iterator;
-            } else {
-                const ind = atomSet.atomIndices;
-                const it: IteratorImpl = { done: false, value: ind[0], atomSet, index: 0, count: ind.length };
-                return it as Iterator;
-            }
-        }
     }
 }
 

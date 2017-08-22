@@ -36,7 +36,8 @@ export function getAtomSetProperties(env: Environment, atomSet: AtomSet, prop: E
     const { model } = env.context;
     Environment.lockSlot(env, 'element');
     const element = env.slots.element;
-    for (let it = AtomSetIt.forSet(atomSet), a = AtomSetIt.init(it, atomSet); !it.done; a = AtomSetIt.getNext(it)) {
+    const it = AtomSetIt();
+    for (let a = it.init(atomSet); !it.done; a = it.next().value) {
         ElementAddress.setAtom(model, element, a);
         const p = prop(env);
         if (p !== void 0) set.add(p);
@@ -77,7 +78,7 @@ export function areIntersectedBy(env: Environment, selection: Selection, by: Sel
     const builder = AtomSelection.linearBuilder();
     const it = AtomSetIt();
     for (const atomSet of AtomSelection.atomSets(selection(env))) {
-        for (let a = AtomSetIt.init(it, atomSet); !it.done; a = AtomSetIt.getNext(it)) {
+        for (let a = it.init(atomSet); !it.done; a = it.next().value) {
             if (mask.has(a)) {
                 builder.add(atomSet);
                 break;
@@ -106,7 +107,7 @@ function withinMaxRadius({ env, selection, target, maxRadius, invert }: WithinCo
     const it = AtomSetIt();
     for (const atomSet of AtomSelection.atomSets(selection)) {
         let withinRadius = false;
-        for (let a = AtomSetIt.init(it, atomSet); !it.done; a = AtomSetIt.getNext(it)) {
+        for (let a = it.init(atomSet); !it.done; a = it.next().value) {
             if (checkWithin(x[a], y[a], z[a], maxRadius)) {
                 withinRadius = true;
                 break;
@@ -139,11 +140,10 @@ function areWithinWithAtomRadius(ctx: AreWithinWithAtomRadiusContext, a: AtomSet
 
     const itA = _itA, itB = _itB;
 
-    //const xs = AtomSet.atomIndices(a), ys = AtomSet.atomIndices(b);
-    for (let i = AtomSetIt.init(itA, a); !itA.done; i = AtomSetIt.getNext(itA)) {
+    for (let i = itA.init(a); !itA.done; a = itA.next().value) {
         ElementAddress.setAtom(model, slot, i);
         const rA = atomRadius(env);
-        for (let j = AtomSetIt.init(itB, b); !itB.done; j = AtomSetIt.getNext(itB)) {
+        for (let j = itB.init(b); !itB.done; b = itB.next().value) {
             ElementAddress.setAtom(model, slot, j);
             const rB = atomRadius(env);
             let d = Math.sqrt(AtomSet.atomDistanceSq(x, y, z, i, j)) - rA - rB;
@@ -252,7 +252,7 @@ export function isConnectedTo(env: Environment, { selection, target, disjunct, i
     for (const atomSet of AtomSelection.atomSets(sel)) {
         const setMask = disjuncted ? AtomSet.getMask(atomSet) : Mask.never;
         let isConnected = false;
-        for (let a = AtomSetIt.init(it, atomSet); !it.done; a = AtomSetIt.getNext(it)) {
+        for (let a = it.init(atomSet); !it.done; a = it.next().value) {
             const start = bondAtomOffset[a], end = bondAtomOffset[a + 1];
             for (let t = start; t < end; t++) {
                 const b = neighbor[t];
@@ -273,7 +273,7 @@ export function isConnectedTo(env: Environment, { selection, target, disjunct, i
         } else if (inverted) {
             if (disjuncted) {
                 let isFullSubset = true;
-                for (let a = AtomSetIt.init(it, atomSet); !it.done; a = AtomSetIt.getNext(it)) {
+                for (let a = it.init(atomSet); !it.done; a = it.next().value) {
                     if (!targetMask.has(a)) {
                         isFullSubset = false;
                         break;

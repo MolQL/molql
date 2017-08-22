@@ -36,7 +36,7 @@ export function accumulateAtomSet(env: Environment, initial: Expression<any>, va
     ElementAddress.setAtom(context.model, element, it.value);
     slots.atomSetReducer = initial(env);
 
-    for (let a = it.value; !it.done; a = AtomSetIt.getNext(it)) {
+    for (let a = it.value; !it.done; a = it.next().value) {
         ElementAddress.setAtom(context.model, element, a);
         slots.atomSetReducer = value(env);
     }
