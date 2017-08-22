@@ -39,6 +39,7 @@ export interface Operator {
   '@desc': string
   '@examples': string[]
   name: string
+  abbr?: string[]
   isUnsupported?: boolean
   type: (p1: P.Parser<any>, p2: P.Parser<any>, fn: any) => P.Parser<any>
   rule: P.Parser<any>

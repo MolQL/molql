@@ -6,7 +6,7 @@
 
 import * as P from 'parsimmon'
 
-import { KeywordDict, PropertyDict, FunctionDict } from './types'
+import { KeywordDict, PropertyDict, FunctionDict, OperatorList } from './types'
 import B from '../molql/builder'
 import Expression from '../mini-lisp/expression'
 
@@ -186,7 +186,7 @@ export function invertExpr (selection: Expression) {
   })
 }
 
-function strLenSortFn (a: string, b: string) {
+export function strLenSortFn (a: string, b: string) {
   return a.length < b.length ? 1 : -1
 }
 
@@ -275,12 +275,12 @@ export function getFunctionRules (functions: FunctionDict, argRule: P.Parser<any
   return functionsList
 }
 
-export function getNumericPropertyNameRules(properties: PropertyDict) {
+export function getPropertyNameRules(properties: PropertyDict, numeric?: boolean) {
   const numericList: P.Parser<any>[] = []
 
   Object.keys(properties).sort(strLenSortFn).forEach( name => {
     const ps = properties[name]
-    if (ps.isNumeric) {
+    if (!numeric || (numeric && ps.isNumeric)) {
       const errorFn = makeError(`property '${name}' not supported`)
       const rule = P.regex(new RegExp(name, 'i')).map(() => {
         if (ps.isUnsupported) errorFn()
@@ -291,6 +291,23 @@ export function getNumericPropertyNameRules(properties: PropertyDict) {
   })
 
   return numericList
+}
+
+export function getReservedWords(properties: PropertyDict, keywords: KeywordDict, operators: OperatorList, functions?: FunctionDict) {
+  const w: string[] = []
+  for (const name in properties) {
+    w.push(name)
+    if(properties[name].abbr) w.push(...properties[name].abbr!)
+  }
+  for (const name in keywords) {
+    w.push(name)
+    if(keywords[name].abbr) w.push(...keywords[name].abbr!)
+  }
+  operators.forEach(o => {
+    w.push(o.name)
+    if(o.abbr) w.push(...o.abbr)
+  })
+  return w
 }
 
 export function atomNameSet(ids: string[]) {

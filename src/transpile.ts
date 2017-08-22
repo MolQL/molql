@@ -46,69 +46,8 @@ const testStrings: {[index: string]: string[]} = {
     '.CA and (2 or 3) and ^A',
     '!32 or :A and .CA'
   ],
-  molQLscript: [
-    `
-    (sel.atom.atom-groups ;; comment
-      :residue-test (eq
-        (atom.auth_comp_id)
-        ALA)
-      :atom-test (set.has
-        (set _C _N)
-        (atom.el)))
-    `
-  ],
-  pymol: [
-    'resi 42',
-
-    '/pept/lig/',
-    '/pept/lig/a',
-    '/pept/lig/a/10',
-    '/pept/lig/a/10/ca',
-    '/pept//a/10',
-
-    '10/cb',
-    'a/10-12/ca',
-    'lig/b/6+8/c+o',
-    'pept/enz/c/3/n',
-    'pept/enz///n',
-
-    'resi 42 or chain A',
-    'not (resi 42 or chain A)',
-    '!resi 42 or chain A',
-
-    'b >= 0.3',
-    'b != 0.3',
-    'b>0.3',
-    'b <0.3',
-    'b <= 0.3',
-    'b = 1',
-    'fc.=.1',
-
-    'segi A IN segi B',
-    'segi A LIKE segi B',
-
-    'segi A GAP 2',
-    'segi A AROUND 2',
-    'segi A EXPAND 2',
-
-    'segi A WITHIN 3.01 OF segi B',
-    'segi A NEAR_TO 3.01 OF segi B',
-    'segi A BEYOND 3.01 OF segi B',
-
-    'BYRES name CA',
-    'BYMOLECULE name CA',
-    'BYFRAGMENT name CA',
-    'BYSEGMENT name CA',
-    'BYOBJECT name CA',
-    'BYCELL chain A',
-    'BYRING name N',
-    'NEIGHBOUR resn HOH',
-    'BOUND_TO resn CYS',
-
-    'resn ALA EXTEND 2',
-    'PEPSEQ FATEW',
-    'REP spheres'
-  ],
+  molQLscript: [],
+  pymol: [],
   vmd: [
     'name CA',
     'resid 35',

@@ -179,7 +179,7 @@ const filter = {
         'max-radius': Argument(Type.Num),
         'atom-radius': Argument(Type.Num, { isOptional: true, defaultValue: 0, description: 'Value added to each atom before the distance check, for example VDW radius. Using this argument is computationally demanding.' }),
         invert: Argument(Type.Bool, { isOptional: true, defaultValue: false, description: 'If true, pick only atom sets that are further than the specified radius.' }),
-    }), Types.AtomSelectionQuery, 'Pick all atom sets from section that are within the radius of any atom from target.'),
+    }), Types.AtomSelectionQuery, 'Pick all atom sets from selection that have any atom within the radius of any atom from target.'),
 
     isConnectedTo: symbol(Arguments.Dictionary({
         0: Argument(Types.AtomSelectionQuery),
