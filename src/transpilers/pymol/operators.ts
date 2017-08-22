@@ -94,6 +94,7 @@ const operators: OperatorList = [
     '@desc': 'Selects atoms with centers within X Angstroms of the center of any atom in s1.',
     '@examples': ['resname LIG AROUND 1'],
     name: 'around',
+    abbr: ['a.'],
     type: h.postfix,
     rule: h.postfixOp(/(AROUND|a\.)\s+([-+]?[0-9]*\.?[0-9]+)/i, 2).map(parseFloat),
     map: (radius: number, target: Expression) => {
@@ -106,6 +107,7 @@ const operators: OperatorList = [
     '@desc': 'Expands s1 by all atoms within X Angstroms of the center of any atom in s1.',
     '@examples': ['chain A EXPAND 3'],
     name: 'expand',
+    abbr: ['x.'],
     type: h.postfix,
     rule: h.postfixOp(/(EXPAND|x\.)\s+([-+]?[0-9]*\.?[0-9]+)/i, 2).map(parseFloat),
     map: (radius: number, selection: Expression) => {
@@ -116,6 +118,7 @@ const operators: OperatorList = [
     '@desc': 'Selects atoms in s1 that are within X Angstroms of any atom in s2.',
     '@examples': ['chain A WITHIN 3 OF chain B'],
     name: 'within',
+    abbr: ['w.'],
     type: h.binaryLeft,
     rule: h.ofOp('WITHIN', 'w.'),
     map: (radius: number, selection: Expression, target: Expression) => {
@@ -126,6 +129,7 @@ const operators: OperatorList = [
     '@desc': 'Same as within, but excludes s2 from the selection (and thus is identical to s1 and s2 around X).',
     '@examples': ['chain A NEAR_TO 3 OF chain B'],
     name: 'near_to',
+    abbr: ['nto.'],
     type: h.binaryLeft,
     rule: h.ofOp('NEAR_TO', 'nto.'),
     map: (radius: number, selection: Expression, target: Expression) => {
@@ -139,6 +143,7 @@ const operators: OperatorList = [
     '@desc': 'Selects atoms in s1 that are at least X Anstroms away from s2.',
     '@examples': ['solvent BEYOND 2 OF chain A'],
     name: 'beyond',
+    abbr: ['be.'],
     type: h.binaryLeft,
     rule: h.ofOp('BEYOND', 'be.'),
     map: (radius: number, selection: Expression, target: Expression) => {
@@ -152,6 +157,7 @@ const operators: OperatorList = [
     '@desc': 'Expands selection to complete residues.',
     '@examples': ['BYRESIDUE name N'],
     name: 'byresidue',
+    abbr: ['byresi', 'byres', 'br.'],
     type: h.prefix,
     rule: h.prefixOp(/BYRESIDUE|byresi|byres|br\./i),
     map: (op: string, selection: Expression) => {
@@ -165,6 +171,7 @@ const operators: OperatorList = [
     '@desc': 'Completely selects all alpha carbons in all residues covered by a selection.',
     '@examples': ['BYCALPHA chain A'],
     name: 'bycalpha',
+    abbr: ['bca.'],
     type: h.prefix,
     rule: h.prefixOp(/BYCALPHA|bca\./i),
     map: (op: string, selection: Expression) => {
@@ -186,6 +193,7 @@ const operators: OperatorList = [
     '@desc': 'Expands selection to complete molecules.',
     '@examples': ['BYMOLECULE resi 20-30'],
     name: 'bymolecule',
+    abbr: ['bymol', 'bm.'],
     type: h.prefix,
     rule: h.prefixOp(/BYMOLECULE|bymol|bm\./i),
     map: (op: string, selection: Expression) => {
@@ -199,6 +207,7 @@ const operators: OperatorList = [
     '@desc': 'Expands selection to complete fragments.',
     '@examples': ['BYFRAGMENT resi 10'],
     name: 'byfragment',
+    abbr: ['byfrag', 'bf.'],
     isUnsupported: true,
     type: h.prefix,
     rule: h.prefixOp(/BYFRAGMENT|byfrag|bf\./i),
@@ -208,6 +217,7 @@ const operators: OperatorList = [
     '@desc': 'Expands selection to complete segments.',
     '@examples': ['BYSEGMENT resn CYS'],
     name: 'bysegment',
+    abbr: ['bysegi', 'byseg', 'bs.'],
     type: h.prefix,
     rule: h.prefixOp(/BYSEGMENT|bysegi|byseg|bs\./i),
     map: (op: string, selection: Expression) => {
@@ -221,6 +231,7 @@ const operators: OperatorList = [
     '@desc': 'Expands selection to complete objects.',
     '@examples': ['BYOBJECT chain A'],
     name: 'byobject',
+    abbr: ['byobj', 'bo.'],
     isUnsupported: true,
     type: h.prefix,
     rule: h.prefixOp(/BYOBJECT|byobj|bo\./i),
@@ -255,6 +266,7 @@ const operators: OperatorList = [
     '@examples': ['NEIGHBOUR resn CYS'],
     name: 'neighbour',
     type: h.prefix,
+    abbr: ['nbr.'],
     rule: h.prefixOp(/NEIGHBOUR|nbr\./i),
     map: (op: string, selection: Expression) => {
       return B.struct.modifier.exceptBy({
@@ -270,6 +282,7 @@ const operators: OperatorList = [
     '@desc': 'Selects atoms directly bonded to s1, may include s1.',
     '@examples': ['BOUND_TO resname CA'],
     name: 'bound_to',
+    abbr: ['bto.'],
     type: h.prefix,
     rule: h.prefixOp(/BOUND_TO|bto\./i),
     map: (op: string, selection: Expression) => {
@@ -282,6 +295,7 @@ const operators: OperatorList = [
     '@desc': 'Extends s1 by X bonds connected to atoms in s1.',
     '@examples': ['resname LIG EXTEND 3'],
     name: 'extend',
+    abbr: ['xt.'],
     type: h.postfix,
     rule: h.postfixOp(/(EXTEND|xt\.)\s+([0-9]+)/i, 2).map(parseInt),
     map: (count: number, selection: Expression) => {
