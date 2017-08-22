@@ -11,7 +11,6 @@ import computeConnectedComponents from './topology/connected-components'
 import Rings from './topology/rings/collection'
 import toUpperCase from '../utils/upper-case'
 import { ElementIndex, ElementVdwRadii, DefaultVdwRadius } from './constants'
-import { SecondaryStructureFlag, SecondaryStructureMmcif, SecondaryStructurePdb } from './topology/secondary-structure'
 
 export const enum SecondaryStructureType {
     None = 0,
@@ -63,6 +62,7 @@ export interface Entities {
 export interface SecondaryStructure {
     type: number[],
     index: number[],
+    flags: number[],
     /** unique value for each "element". This is because single sheet is speficied by multiple records. */
     key: number[]
 }
@@ -145,29 +145,6 @@ export function BondCount(model: Model, atomIndex: number, checkFlags: number): 
         if ((flags[bI] & checkFlags) !== 0) ++count;
     }
     return count;
-}
-
-export namespace SecondaryStructure {
-    export function flags(model: Model, residueIndex: number) {
-        const type = model.secondaryStructure.type[residueIndex]
-
-        let flag = SecondaryStructureFlag.NA;
-        switch (type) {
-            case SecondaryStructureType.StructConf:
-                const index = model.secondaryStructure.index[residueIndex]
-                const helixClass = model.data.secondaryStructure.structConf.pdbx_PDB_helix_class.getString(index)
-                if (helixClass !== null) {
-                    flag = SecondaryStructurePdb[helixClass]
-                } else {
-                    const confType = model.data.secondaryStructure.structConf.conf_type_id.getString(index)
-                    if (confType !== null) flag = SecondaryStructureMmcif[confType]
-                }
-                break
-            case SecondaryStructureType.StructSheetRange:
-                return SecondaryStructureFlag.Beta | SecondaryStructureFlag.BetaSheet
-        }
-        return flag;
-    }
 }
 
 export type ResidueIdentifier = string

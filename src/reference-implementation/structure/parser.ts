@@ -8,6 +8,7 @@ import CIF from 'ciftools.js'
 import * as mmCIF from './mmcif'
 import { Structure, Model, SecondaryStructureType } from './data'
 import { FastMap } from '../utils/collections'
+import { SecondaryStructureFlag, SecondaryStructureMmcif, SecondaryStructurePdb } from './topology/secondary-structure'
 
 type Data = Model['data']
 
@@ -95,6 +96,7 @@ function createModel(structureId: string, data: Data, startRow: number, rowCount
         secondaryStructure: {
             type: new Uint8Array(residue) as any,
             index: new Int32Array(residue) as any,
+            flags: new Uint32Array(residue) as any,
             key: new Int32Array(residue) as any
         },
         modifiedResidues: FastMap.create(),
@@ -289,9 +291,35 @@ function assignSecondaryStructureKey(model: Model) {
     }
 }
 
+function assignSecondaryStructureFlags(model: Model) {
+    const { type: ssType, index: ssIndex, flags } = model.secondaryStructure;
+    const { pdbx_PDB_helix_class, conf_type_id } = model.data.secondaryStructure.structConf;
+
+    for (let rI = 0, _rI = model.residues.count; rI < _rI; rI++) {
+        const type = ssType[rI];
+        let flag = SecondaryStructureFlag.NA;
+        switch (type) {
+            case SecondaryStructureType.StructConf:
+                const index = ssIndex[rI]
+                const helixClass = pdbx_PDB_helix_class.getString(index)
+                if (helixClass !== null) {
+                    flag = SecondaryStructurePdb[helixClass]
+                } else {
+                    const confType = conf_type_id.getString(index)
+                    if (confType !== null) flag = SecondaryStructureMmcif[confType]
+                }
+                break
+            case SecondaryStructureType.StructSheetRange:
+                flag = SecondaryStructureFlag.Beta | SecondaryStructureFlag.BetaSheet
+        }
+        flags[rI] = flag;
+    }
+}
+
 function assignSecondaryStructure(model: Model) {
     assignSecondaryStructureRanges(model);
     assignSecondaryStructureKey(model);
+    assignSecondaryStructureFlags(model);
 }
 
 function getModResMap(model: Model) {

@@ -10,7 +10,7 @@ import SymbolRuntime, { RuntimeArguments, forEachPositionalArg } from '../../sym
 import Environment from '../environment'
 import RuntimeExpression from '../expression'
 import ElementAddress from '../../data/element-address'
-import { Model, ElementSymbol, ResidueIdentifier, VdwRadius, SecondaryStructure, BondCount, BondFlag } from '../../../structure/data'
+import { Model, ElementSymbol, ResidueIdentifier, VdwRadius, BondCount, BondFlag } from '../../../structure/data'
 import { SecondaryStructureFlag } from '../../../structure/topology/secondary-structure'
 import toUpperCase from '../../../utils/upper-case'
 
@@ -94,7 +94,7 @@ export const Macromolecular: { [P in keyof typeof MolQL.structure.atomProperty.m
     }),
 
     secondaryStructureKey: prop((env, v) => env.context.model.secondaryStructure.key[env.slots.element.residue]),
-    secondaryStructureFlags: prop((env, v) => SecondaryStructure.flags(env.context.model, env.slots.element.residue)),
+    secondaryStructureFlags: prop((env, v) => env.context.model.secondaryStructure.flags[env.slots.element.residue]),
 
     isModified: prop((env, v) => env.context.model.modifiedResidues.has(env.slots.element.residue)),
     modifiedParentName: prop((env, v) => {
