@@ -10,7 +10,7 @@ import examples from '../../transpilers/jmol/examples'
 
 const lang: Language = {
     name: 'Jmol',
-    editorMode: 'text',
+    editorMode: 'python',
     transpiler: Transpilers.jmol,
     examples
 };

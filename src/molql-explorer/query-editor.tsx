@@ -10,6 +10,7 @@ import * as CodeMirror from 'codemirror'
 require('codemirror/addon/hint/show-hint');
 require('codemirror/addon/edit/matchbrackets');
 require('codemirror/mode/javascript/javascript');
+require('codemirror/mode/python/python');
 require('codemirror/addon/edit/closebrackets');
 require('codemirror/addon/fold/brace-fold');
 require('codemirror/keymap/sublime');
@@ -66,7 +67,7 @@ export default class QueryEditor extends React.Component<QueryEditorProps, {}> {
             lineNumbers: true,
             tabSize: 2,
             theme: 'neat',
-            mode: 'molql-script',
+            mode: this.props.mode,
             keyMap: 'sublime',
             autoCloseBrackets: true,
             matchBrackets: true,
@@ -95,8 +96,8 @@ export default class QueryEditor extends React.Component<QueryEditorProps, {}> {
     componentDidUpdate(prevProps: QueryEditorProps) {
         this.ignoreChangeEvent = true;
         if (this.props.mode !== prevProps.mode) {
-            (this.editor as any).options.mode = this.props.mode;
-            CodeMirror.signal(this.editor, 'change', this.editor);
+            console.log('changing mode', this.props.mode);
+            this.editor.setOption('mode', this.props.mode);
         }
         if (this.props.value !== prevProps.value && this.props.value !== this.cachedValue) {
             this.cachedValue = this.props.value;
