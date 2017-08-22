@@ -6,6 +6,7 @@
 
 import { KeywordDict } from '../types'
 import B from '../../molql/builder'
+import * as h from '../helper'
 
 const keywords: KeywordDict = {
   // general terms
@@ -16,7 +17,7 @@ const keywords: KeywordDict = {
   },
   bonded: {
     '@desc': 'covalently bonded',
-    map: () => B.struct.filter.pick({
+    map: () => h.asAtoms(B.struct.filter.pick({
       '0': B.struct.modifier.includeConnected({
         '0': B.struct.generator.atomGroups(),
         'bond-test': B.core.flags.hasAny([
@@ -27,14 +28,14 @@ const keywords: KeywordDict = {
       test: B.core.rel.gr([
         B.struct.atomSet.atomCount(), 1
       ])
-    })
+    }))
   },
   clickable: {
     '@desc': 'actually visible -- having some visible aspect such as wireframe, spacefill, or a label showing, or the alpha-carbon or phosphorus atom in a biomolecule that is rendered with only cartoon, rocket, or other biomolecule-specific shape.'
   },
   connected: {
     '@desc': 'bonded in any way, including hydrogen bonds',
-    map: () => B.struct.filter.pick({
+    map: () => h.asAtoms(B.struct.filter.pick({
       '0': B.struct.modifier.includeConnected({
         '0': B.struct.generator.atomGroups(),
         'bond-test': true
@@ -42,7 +43,7 @@ const keywords: KeywordDict = {
       test: B.core.rel.gr([
         B.struct.atomSet.atomCount(), 1
       ])
-    })
+    }))
   },
   displayed: {
     '@desc': 'displayed using the display or hide command; not necessarily visible'
