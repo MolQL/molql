@@ -34,7 +34,7 @@ export function areAtomSetEqual(a: AtomSet, b: AtomSet) {
 export function checkAtomSet(model: Model, atomSet: AtomSet, f: (i: number, cols: mmCIF.Category<mmCIF.AtomSite>) => boolean) {
     const atom_site = model.data.atom_site;
     const it = AtomSetIt()
-    for (let a = AtomSetIt.init(it, atomSet); !it.done; a = AtomSetIt.getNext(it)) {
+    for (let a = AtomSetIt.start(it, atomSet); !it.done; a = it.next().value) {
         if (!f(a, atom_site)) return false;
     }
     return true;
@@ -44,7 +44,7 @@ export function countAtomSet(model: Model, atomSet: AtomSet, f: (i: number, cols
     const atom_site = model.data.atom_site;
     const it = AtomSetIt()
     let count = 0;
-    for (let a = AtomSetIt.init(it, atomSet); !it.done; a = AtomSetIt.getNext(it)) {
+    for (let a = AtomSetIt.start(it, atomSet); !it.done; a = it.next().value) {
         if (f(a, atom_site)) count++;
     }
     return count;

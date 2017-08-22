@@ -55,7 +55,7 @@ export function maxAtomValueInSelection(env: Environment, selection: AtomSelecti
 
     let it = AtomSetIt();
     for (const atomSet of AtomSelection.atomSets(selection)) {
-        for (let a = AtomSetIt.init(it, atomSet); !it.done; a = AtomSetIt.getNext(it)) {
+        for (let a = AtomSetIt.start(it, atomSet); !it.done; a = it.next().value) {
             ElementAddress.setAtom(model, element, a);
             const v = prop(env);
             if (v > ret) ret = v;
