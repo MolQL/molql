@@ -14,7 +14,7 @@ import Expression from '../../mini-lisp/expression'
 const operators: OperatorList = [
   {
     '@desc': 'Selects atoms that are not included in s1.',
-    '@examples': ['NOT resn ALA'],
+    '@examples': ['NOT resn ALA', 'not (resi 42 or chain A)', '!resi 42 or chain A'],
     name: 'not',
     type: h.prefix,
     rule: P.alt(
@@ -78,7 +78,7 @@ const operators: OperatorList = [
   },
   {
     '@desc': 'Selects all atoms whose van der Waals radii are separated from the van der Waals radii of s1 by a minimum of X Angstroms.',
-    '@examples': ['solvent  GAP 2'],
+    '@examples': ['solvent GAP 2'],
     name: 'gap',
     type: h.postfix,
     rule: h.postfixOp(/GAP\s+([-+]?[0-9]*\.?[0-9]+)/i, 1).map(parseFloat),
@@ -86,7 +86,8 @@ const operators: OperatorList = [
       return B.struct.filter.within({
         '0': B.struct.generator.atomGroups(),
         target,
-        radius: B.core.math.add([distance, B.acp('vdw')])
+        radius: B.core.math.add([distance, B.core.math.mult([B.acp('vdw'), 2])]),
+        invert: true
       })
     }
   },
@@ -98,8 +99,11 @@ const operators: OperatorList = [
     type: h.postfix,
     rule: h.postfixOp(/(AROUND|a\.)\s+([-+]?[0-9]*\.?[0-9]+)/i, 2).map(parseFloat),
     map: (radius: number, target: Expression) => {
-      return B.struct.filter.within({
-        '0': B.struct.generator.atomGroups(), target, radius
+      return B.struct.modifier.exceptBy({
+        '0': B.struct.filter.within({
+          '0': B.struct.generator.atomGroups(), target, radius
+        }),
+        by: target
       })
     }
   },
@@ -255,8 +259,9 @@ const operators: OperatorList = [
     map: (op: string, selection: Expression) => {
       return B.struct.filter.pick({
         '0': B.struct.generator.rings(),
-        test: B.core.rel.gr([
-          B.struct.atomSet.countQuery([ selection ]), 1
+        test: B.core.logic.and([
+          B.core.rel.lte([ B.struct.atomSet.atomCount(), 7 ]),
+          B.core.rel.gr([ B.struct.atomSet.countQuery([ selection ]), 1 ])
         ])
       })
     }
@@ -301,7 +306,8 @@ const operators: OperatorList = [
     map: (count: number, selection: Expression) => {
       return B.struct.modifier.includeConnected({
         '0': B.struct.modifier.union({ 0: selection }),
-        'layer-count': count
+        'layer-count': count,
+        'bond-test': true
       })
     }
   }

@@ -45,6 +45,17 @@ describe('pymol macros', () => {
     })
 });
 
+// check against builder output
+// 'not (resi 42 or chain A)'
+// '!resi 42 or chain A'
+// 'b >= 0.3',
+// 'b != 0.3',
+// 'b>0.3',
+// 'b <0.3',
+// 'b <= 0.3',
+// 'b = 1',
+// 'fc.=.1',
+
 describe('pymol keywords', () => u.testKeywords(keywords, transpiler));
 describe('pymol properties', () => u.testProperties(properties, transpiler));
 describe('pymol operators', () => u.testOperators(operators, transpiler));

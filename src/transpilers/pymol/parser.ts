@@ -127,7 +127,13 @@ const lang = P.createLanguage({
 
   Keywords: () => P.alt(...h.getKeywordRules(keywords)),
 
-  Object: () => P.regex(/[a-zA-Z0-9+]+/),
+  Object: () => {
+    // const w = h.getReservedWords(properties, keywords, operators)
+    //   .sort(h.strLenSortFn).map(h.escapeRegExp).join('|')
+    // console.log(w)
+    // return P.regex(new RegExp(`^(?!(${w}))[A-Z0-9_]+$`, 'i'))
+    return P.regex(/[a-zA-Z0-9_]+/i)
+  },
 
   // Selects peptide sequence matching upper-case one-letter
   // sequence SEQ (see also FindSeq).
@@ -145,7 +151,7 @@ const lang = P.createLanguage({
   },
 
   Operator: function(r) {
-    return h.combineOperators(operators, P.alt(r.Parens, r.Expression))
+    return h.combineOperators(operators, P.alt(r.Parens, r.Expression, r.Operator))
   },
 
   Query: function(r) {
