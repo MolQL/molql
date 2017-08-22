@@ -70,6 +70,20 @@ export function withSameAtomProperties(env: Environment, selection: Selection, s
     return ret.getSelection();
 }
 
+export function areIntersectedBy(env: Environment, selection: Selection, by: Selection): AtomSelection {
+    const mask = AtomSelection.getMask(by(env));
+    const builder = AtomSelection.linearBuilder();
+    for (const atomSet of AtomSelection.atomSets(selection(env))) {
+        for (const a of AtomSet.atomIndices(atomSet)) {
+            if (mask.has(a)) {
+                builder.add(atomSet);
+                break;
+            }
+        }
+    }
+    return builder.getSelection();
+}
+
 interface WithinContext {
     env: Environment,
     selection: AtomSelection,

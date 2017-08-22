@@ -30,7 +30,7 @@ const keywords: KeywordDict = {
     map: () => B.struct.generator.atomGroups({
       'atom-test': B.core.rel.eq([
         B.acp('elementSymbol'),
-        B.struct.type.elementSymbol('H')
+        B.es('H')
       ])
     })
   },
@@ -86,7 +86,7 @@ const keywords: KeywordDict = {
   },
   bonded: {
     '@desc': 'All bonded atoms',
-    map: () => B.struct.filter.pick({
+    map: () => h.asAtoms(B.struct.filter.pick({
       '0': B.struct.modifier.includeConnected({
         '0': B.struct.generator.atomGroups(),
         'bond-test': B.core.flags.hasAny([
@@ -97,7 +97,7 @@ const keywords: KeywordDict = {
       test: B.core.rel.gr([
         B.struct.atomSet.atomCount(), 1
       ])
-    })
+    }))
   },
   donors: {
     '@desc': 'All hydrogen bond donor atoms.',
@@ -118,7 +118,7 @@ const keywords: KeywordDict = {
   organic: {
     '@desc': 'All atoms in non-polymer organic compounds (e.g. ligands, buffers). Finds carbon-containing molecules that do not match known polymers.',
     abbr: ['org.'],
-    map: () => B.struct.modifier.expandProperty({
+    map: () => h.asAtoms(B.struct.modifier.expandProperty({
       '0': B.struct.modifier.union([
         B.struct.generator.queryInSelection({
           '0': B.struct.generator.atomGroups({
@@ -138,12 +138,12 @@ const keywords: KeywordDict = {
         })
       ]),
       property: B.ammp('residueKey')
-    })
+    }))
   },
   inorganic: {
     '@desc': 'All non-polymer inorganic atoms/ions. Finds atoms in molecules that do not contain carbon and do not match any known solvent residues.',
     abbr: ['ino.'],
-    map: () => B.struct.modifier.expandProperty({
+    map: () => h.asAtoms(B.struct.modifier.expandProperty({
       '0': B.struct.modifier.union([
         B.struct.filter.pick({
           '0': B.struct.generator.atomGroups({
@@ -164,7 +164,7 @@ const keywords: KeywordDict = {
         })
       ]),
       property: B.ammp('residueKey')
-    })
+    }))
   },
   solvent: {
     '@desc': 'All water molecules. The hardcoded solvent residue identifiers are currently: HOH, WAT, H20, TIP, SOL.',

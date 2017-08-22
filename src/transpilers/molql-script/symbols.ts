@@ -103,6 +103,7 @@ const list: MolQLScriptSymbol[] = [
 
     Alias(MolQL.structure.filter.pick, 'sel.atom.pick'),
     Alias(MolQL.structure.filter.withSameAtomProperties, 'sel.atom.with-same-atom-properties'),
+    Alias(MolQL.structure.filter.areIntersectedBy, 'sel.atom.are-intersected-by'),
     Alias(MolQL.structure.filter.within, 'sel.atom.within'),
     Alias(MolQL.structure.filter.isConnectedTo, 'sel.atom.is-connected-to'),
 

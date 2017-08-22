@@ -167,6 +167,11 @@ const filter = {
         property: Argument(Type.Any)
     }), Types.AtomSelectionQuery, 'Pick all atom sets for which the set of given atom properties is a subset of the source properties.'),
 
+    areIntersectedBy: symbol(Arguments.Dictionary({
+        0: Argument(Types.AtomSelectionQuery),
+        by: Argument(Types.AtomSelectionQuery)
+    }), Types.AtomSelectionQuery, 'Pick all atom sets that have non-zero intersection with the target.'),
+
     within: symbol(Arguments.Dictionary({
         0: Argument(Types.AtomSelectionQuery),
         target: Argument(Types.AtomSelectionQuery),

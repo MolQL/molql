@@ -296,3 +296,10 @@ export function getNumericPropertyNameRules(properties: PropertyDict) {
 export function atomNameSet(ids: string[]) {
   return B.core.type.set(ids.map(B.atomName));
 }
+
+export function asAtoms(e: Expression) {
+  return B.struct.generator.queryInSelection({
+    0: e,
+    query: B.struct.generator.atomGroups()
+  });
+}

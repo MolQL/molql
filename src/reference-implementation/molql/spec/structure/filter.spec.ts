@@ -35,6 +35,17 @@ describe('filter', () => {
         expect(check).toBe(true);
     });
 
+    it('areIntersctedBy C atoms by ALA residues', function() {
+        const q = B.struct.filter.areIntersectedBy({
+            0: B.struct.generator.atomGroups({ 'atom-test': B.core.rel.eq([B.acp('elementSymbol'), B.es('C')]) }),
+            by: B.struct.generator.atomGroups({ 'residue-test': B.core.rel.eq([B.ammp('auth_comp_id'), 'ALA']), 'group-by': B.ammp('residueKey') })
+        });
+        const sel = Data.compileQuery(q)(Data.ctx);
+        expect(AtomSelection.atomSets(sel).length).toBeGreaterThan(0);
+        const check = Data.checkAtomSelection(Data.model, sel, (i, cols) => cols.auth_comp_id.getString(i) === 'ALA' && cols.type_symbol.getString(i) === 'C');
+        expect(check).toBe(true);
+    });
+
     it('within residues 5 ang from HEM', function() {
         const HEM = B.struct.generator.atomGroups({ 'residue-test': B.core.rel.eq([B.ammp('auth_comp_id'), 'HEM']), 'group-by': B.ammp('residueKey') });
 

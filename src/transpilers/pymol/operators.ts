@@ -156,10 +156,10 @@ const operators: OperatorList = [
     type: h.prefix,
     rule: h.prefixOp(/BYRESIDUE|byresi|byres|br\./i),
     map: (op: string, selection: Expression) => {
-      return B.struct.modifier.expandProperty({
+      return h.asAtoms(B.struct.modifier.expandProperty({
         '0': B.struct.modifier.union({ 0: selection }),
         property: B.ammp('residueKey')
-      })
+      }))
     }
   },
   {
@@ -190,10 +190,10 @@ const operators: OperatorList = [
     type: h.prefix,
     rule: h.prefixOp(/BYMOLECULE|bymol|bm\./i),
     map: (op: string, selection: Expression) => {
-      return B.struct.modifier.expandProperty({
+      return h.asAtoms(B.struct.modifier.expandProperty({
         '0': B.struct.modifier.union({ 0: selection }),
         property: B.atp('connectedComponentKey')
-      })
+      }))
     }
   },
   {
@@ -212,10 +212,10 @@ const operators: OperatorList = [
     type: h.prefix,
     rule: h.prefixOp(/BYSEGMENT|bysegi|byseg|bs\./i),
     map: (op: string, selection: Expression) => {
-      return B.struct.modifier.expandProperty({
+      return h.asAtoms(B.struct.modifier.expandProperty({
         '0': B.struct.modifier.union({ 0: selection }),
         property: B.ammp('chainKey')
-      })
+      }))
     }
   },
   {
@@ -243,12 +243,10 @@ const operators: OperatorList = [
     type: h.prefix,
     rule: h.prefixOp(/BYRING/i),
     map: (op: string, selection: Expression) => {
-      return B.struct.filter.pick({
+      return h.asAtoms(B.struct.filter.areIntersectedBy({
         '0': B.struct.generator.rings(),
-        test: B.core.rel.gr([
-          B.struct.atomSet.countQuery([ selection ]), 1
-        ])
-      })
+        by: selection
+      }))
     }
   },
   {
@@ -259,11 +257,11 @@ const operators: OperatorList = [
     rule: h.prefixOp(/NEIGHBOUR|nbr\./i),
     map: (op: string, selection: Expression) => {
       return B.struct.modifier.exceptBy({
-        '0': B.struct.modifier.includeConnected({
+        '0': h.asAtoms(B.struct.modifier.includeConnected({
           '0': B.struct.modifier.union({ 0: selection }),
           'bond-test': true
-        }),
-        by: B.struct.modifier.union({ 0: selection })
+        })),
+        by: selection
       })
     }
   },
@@ -274,9 +272,9 @@ const operators: OperatorList = [
     type: h.prefix,
     rule: h.prefixOp(/BOUND_TO|bto\./i),
     map: (op: string, selection: Expression) => {
-      return B.struct.modifier.includeConnected({
+      return h.asAtoms(B.struct.modifier.includeConnected({
         '0': B.struct.modifier.union({ 0: selection })
-      })
+      }))
     }
   },
   {
@@ -286,10 +284,10 @@ const operators: OperatorList = [
     type: h.postfix,
     rule: h.postfixOp(/(EXTEND|xt\.)\s+([0-9]+)/i, 2).map(parseInt),
     map: (count: number, selection: Expression) => {
-      return B.struct.modifier.includeConnected({
+      return h.asAtoms(B.struct.modifier.includeConnected({
         '0': B.struct.modifier.union({ 0: selection }),
         'layer-count': count
-      })
+      }))
     }
   }
 ]
