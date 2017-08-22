@@ -2,7 +2,10 @@
  * Copyright (c) 2017 MolQL contributors, licensed under MIT, See LICENSE file for more info.
  *
  * @author David Sehnal <david.sehnal@gmail.com>
+ * @author Alexander Rose <alexander.rose@weirdbyte.de>
  */
+
+import B from '../../molql/builder'
 
 export function getPositionalArgs(args: any) {
     return Object.keys(args)
@@ -26,4 +29,12 @@ export function pickArgs(args: any, ...names: string[]) {
         }
     }
     return count ? ret : void 0;
+}
+
+export function aggregate(args: any, fn: any){
+    const property = getPositionalArgs(args)[0]
+    return B.struct.atomSet.reduce({
+        initial: property,
+        value: fn([ B.struct.slot.atomSetReduce(), property ])
+    })
 }

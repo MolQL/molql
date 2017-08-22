@@ -184,6 +184,26 @@ const list: MolQLScriptSymbol[] = [
     Macro(Symbol('bond.is', Arguments.List(Struct.Types.BondFlag), Type.Bool,
         `Test if the current bond has at least one (or all if partial = false) of the specified flags: ${Type.oneOfValues(Struct.Types.BondFlag).join(', ')}`),
     args => B.core.flags.hasAny([B.struct.bondProperty.flags(), B.struct.type.bondFlags(M.getPositionalArgs(args))])),
+
+    Macro(Symbol('atom.set.min', Arguments.Dictionary({
+        0: Argument(Type.Num, { description: 'Numeric atom property.'})
+    }), Type.Num, 'Minimum of the given property in the current atom set.'),
+    args => M.aggregate(args, B.core.math.min)),
+
+    Macro(Symbol('atom.set.max', Arguments.Dictionary({
+        0: Argument(Type.Num, { description: 'Numeric atom property.'})
+    }), Type.Num, 'Maximum of the given property in the current atom set.'),
+    args => M.aggregate(args, B.core.math.max)),
+
+    Macro(Symbol('atom.set.sum', Arguments.Dictionary({
+        0: Argument(Type.Num, { description: 'Numeric atom property.'})
+    }), Type.Num, 'Sum of the given property in the current atom set.'),
+    args => M.aggregate(args, B.core.math.add)),
+
+    Macro(Symbol('atom.set.avg', Arguments.Dictionary({
+        0: Argument(Type.Num, { description: 'Numeric atom property.'})
+    }), Type.Num, 'Average of the given property in the current atom set.'),
+    args => B.core.math.div([ M.aggregate(args, B.core.math.add), B.struct.atomSet.atomCount() ])),
 ];
 
 const normalized = (function () {
