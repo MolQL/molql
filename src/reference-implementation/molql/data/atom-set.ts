@@ -39,13 +39,9 @@ namespace AtomSet {
         return typeof a === 'number' ? 1 : a.atomIndices.length;
     }
 
-    export function getIndices(a: AtomSet): ReadonlyArray<number> {
+    export function toIndices(a: AtomSet): ReadonlyArray<number> {
         return typeof a === 'number' ? [a] : a.atomIndices;
     }
-
-    // export function atomIndices(a: AtomSet) {
-    //     return (a as AtomSetImpl).atomIndices;
-    // }
 
     export function getMask(a: AtomSet) {
         return typeof a === 'number' ? Mask.singleton(a) : Mask.ofUniqueIndices(a.atomIndices);
@@ -74,10 +70,7 @@ namespace AtomSet {
         return dx * dx + dy * dy + dz * dz;
     }
 
-    export function hashCode(atomSet: AtomSet) {
-        if (typeof atomSet === 'number') return atomSet;
-
-        if (atomSet.hashCodeComputed) return atomSet.hashCode!;
+    function computeHashCode(atomSet: ArrayAtomSet) {
         let code = 23;
         for (const i of atomSet.atomIndices) {
             code = (31 * code + i) | 0;
@@ -85,6 +78,12 @@ namespace AtomSet {
         atomSet.hashCode = code;
         atomSet.hashCodeComputed = true;
         return code;
+    }
+
+    export function hashCode(atomSet: AtomSet) {
+        if (typeof atomSet === 'number') return atomSet;
+        if (atomSet.hashCodeComputed) return atomSet.hashCode!;
+        return computeHashCode(atomSet);
     }
 
     // export function hierarchy(model: Model, atomSet: AtomSet) {
@@ -106,15 +105,8 @@ namespace AtomSet {
     //     return impl.hierarchy;
     // }
 
-    export function boundingSphere(model: Model, atomSet: AtomSet) {
+    function computeBoundingSphere(model: Model, atomSet: ArrayAtomSet) {
         const { x, y, z } = model.positions;
-        if (typeof atomSet === 'number') {
-            return { center: [x[atomSet], y[atomSet], z[atomSet]], radius: 0 };
-        }
-
-        if (atomSet.boundingSphere) return atomSet.boundingSphere;
-
-
         if (atomSet.atomIndices.length === 1) {
             const i = atomSet.atomIndices[0];
             atomSet.boundingSphere = { center: [x[i], y[i], z[i]], radius: 0 };
@@ -137,6 +129,16 @@ namespace AtomSet {
         }
         atomSet.boundingSphere = { center, radius };
         return atomSet.boundingSphere;
+    }
+
+    export function boundingSphere(model: Model, atomSet: AtomSet) {
+        if (typeof atomSet === 'number') {
+            const { x, y, z } = model.positions;
+            return { center: [x[atomSet], y[atomSet], z[atomSet]], radius: 0 };
+        }
+
+        if (atomSet.boundingSphere) return atomSet.boundingSphere;
+        return computeBoundingSphere(model, atomSet);
     }
 
     export function distance(model: Model, a: AtomSet, b: AtomSet) {
@@ -166,7 +168,6 @@ namespace AtomSet {
     }
 
     export function union(a: AtomSet, b: AtomSet): AtomSet {
-        //const xs = (a as AtomSetImpl).atomIndices, ys = (b as AtomSetImpl).atomIndices;
         const la = count(a), lb = count(b);
 
         let i = 0, j = 0, resultSize = 0;

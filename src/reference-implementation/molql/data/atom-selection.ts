@@ -31,7 +31,7 @@ namespace AtomSelection {
         const sets = atomSets(seq);
         const length = sets.length;
         if (!length) return [];
-        if (length === 1) return AtomSet.getIndices(sets[0]);
+        if (length === 1) return AtomSet.toIndices(sets[0]);
 
         const mask = getMask(seq);
         const atoms = new Int32Array(mask.size);

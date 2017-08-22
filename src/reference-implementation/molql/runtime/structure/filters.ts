@@ -130,13 +130,14 @@ export interface AreWithinWithAtomRadiusContext {
     atomRadius: Expression<number>
 }
 
-export function areWithinWithAtomRadius(ctx: AreWithinWithAtomRadiusContext, a: AtomSet, b: AtomSet) {
+const _itA = AtomSetIt(), _itB = AtomSetIt();
+function areWithinWithAtomRadius(ctx: AreWithinWithAtomRadiusContext, a: AtomSet, b: AtomSet) {
     if (a === b) return 0;
     const { env, model, slot, minRadius, maxRadius, atomRadius } = ctx;
     let dist = Number.POSITIVE_INFINITY;
     const { x, y, z } = model.positions;
 
-    const itA = AtomSetIt(), itB = AtomSetIt();
+    const itA = _itA, itB = _itB;
 
     //const xs = AtomSet.atomIndices(a), ys = AtomSet.atomIndices(b);
     for (let i = AtomSetIt.init(itA, a); !itA.done; i = AtomSetIt.getNext(itA)) {

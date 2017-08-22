@@ -39,8 +39,8 @@ import AtomSetIt = AtomSet.Iterator;
 const a = AtomSet([1,5,7])
 const b = AtomSet([4,6,8])
 const v = AtomSet([5, 7, 9])
-console.log(AtomSet.getIndices(AtomSet.union(a, b)))
-console.log(AtomSet.getIndices(AtomSet.union(a, v)))
+console.log(AtomSet.toIndices(AtomSet.union(a, b)))
+console.log(AtomSet.toIndices(AtomSet.union(a, v)))
 
 // const aResId = (c: string, r: number, i?: string) => B.struct.type.authResidueId([c, r, i]);
 // const resSet = B.core.type.set([aResId('A', 7), aResId('A', 9)]);
