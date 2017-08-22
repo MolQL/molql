@@ -96,7 +96,6 @@ export default class QueryEditor extends React.Component<QueryEditorProps, {}> {
     componentDidUpdate(prevProps: QueryEditorProps) {
         this.ignoreChangeEvent = true;
         if (this.props.mode !== prevProps.mode) {
-            console.log('changing mode', this.props.mode);
             this.editor.setOption('mode', this.props.mode);
         }
         if (this.props.value !== prevProps.value && this.props.value !== this.cachedValue) {
