@@ -30,7 +30,8 @@ export function accumulateAtomSet(env: Environment, initial: Expression<any>, va
     Environment.lockSlot(env, 'element');
 
     //const atoms = AtomSet.atomIndices(slots.atomSet);
-    const it = AtomSetIt.forSet(slots.atomSet);
+    const it = AtomSetIt();
+    AtomSetIt.start(it, slots.atomSet);
     const element = env.slots.element;
 
     ElementAddress.setAtom(context.model, element, it.value);

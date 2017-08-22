@@ -51,10 +51,26 @@ console.log(AtomSet.toIndices(AtomSet.union(a, v)))
 
 function testSet() {
     console.log('testing set');
-    const atomSet = AtomSet([1, 2, 3, 4]);
+    let atomSet = AtomSet([1]);
     const it = AtomSetIt();
-    for (let a = it.init(atomSet); !it.done; a = it.next().value) {
-        console.log('set', a);
+
+    // it.reset(atomSet);
+    // for (const a of it) {
+    //     console.log('set', a);
+    // }
+
+    it.reset(atomSet);
+    for (let a = AtomSetIt.start(it, atomSet); !it.done; a = it.next().value) {
+        console.log('set for', a);
+    }
+    atomSet = AtomSet([2, 3, 4]);
+    // it.reset(atomSet);
+    // for (const a of it) {
+    //     console.log('set m', a);
+    // }
+    it.reset(atomSet);
+    for (let a = AtomSetIt.start(it, atomSet); !it.done; a = it.next().value) {
+        console.log('set m for', a);
     }
 }
 testSet();
