@@ -235,7 +235,11 @@ export const SymbolRuntime: Symbol.Info[] = [
         minSize: v['min-size'],
         maxSize: v['max-size'],
     })),
-    Symbol(MolQL.structure.modifier.includeSurroundings)((env, v) => env => StructureRuntime.Modifiers.includeSurroundings(env, v[0](env), v.radius, v['as-whole-residues'])),
+    Symbol(MolQL.structure.modifier.includeSurroundings)((env, v) => env => StructureRuntime.Modifiers.includeSurroundings(env, {
+        selection: v[0](env),
+        radius: v.radius,
+        wholeResidues: v['as-whole-residues']
+    })),
     Symbol(MolQL.structure.modifier.includeConnected)((env, v) => env => StructureRuntime.Modifiers.includeConnected(env, {
         selection: v[0](env),
         bondTest: v['bond-test'],

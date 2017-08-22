@@ -208,12 +208,19 @@ export function cluster(env: Environment, params: ClusterParams): AtomSelection 
     return cCtx.builder.getSelection();
 }
 
-export function includeSurroundings(env: Environment, selection: Selection, radius: Expression<number>, wholeResidues?: Expression<boolean>): AtomSelection {
-    const src = selection(env);
+export interface IncludeSurroundingsParams {
+    selection: Selection,
+    radius: Expression<number>,
+    atomRadius?: Expression<number>,
+    wholeResidues?: Expression<boolean>
+}
+
+export function includeSurroundings(env: Environment, params: IncludeSurroundingsParams): AtomSelection {
+    const src = params.selection(env);
     const { model, mask } = env.context;
     const findWithin = Model.spatialLookup(model).find(mask);
-    const r = radius(env);
-    const asResidues = !!wholeResidues && !!wholeResidues(env);
+    const r = params.radius(env);
+    const asResidues = !!params.wholeResidues && !!params.wholeResidues(env);
     const { x, y, z } = model.positions;
     const { residueIndex } = model.atoms;
     const { atomOffset } = model.residues;
