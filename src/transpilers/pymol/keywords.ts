@@ -86,18 +86,11 @@ const keywords: KeywordDict = {
   },
   bonded: {
     '@desc': 'All bonded atoms',
-    map: () => h.asAtoms(B.struct.filter.pick({
-      '0': B.struct.modifier.includeConnected({
-        '0': B.struct.generator.atomGroups(),
-        'bond-test': B.core.flags.hasAny([
-          B.struct.bondProperty.flags(),
-          B.struct.type.bondFlags(['covalent', 'metallic', 'sulfide'])
-        ])
-      }),
-      test: B.core.rel.gr([
-        B.struct.atomSet.atomCount(), 1
-      ])
-    }))
+    map: () => B.struct.generator.atomGroups({
+      'atom-test': B.core.rel.gr([B.struct.atomProperty.core.bondCount({
+        flags: B.struct.type.bondFlags(['covalent', 'metallic', 'sulfide'])
+      }), 0])
+    })
   },
   donors: {
     '@desc': 'All hydrogen bond donor atoms.',
