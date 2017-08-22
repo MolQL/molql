@@ -275,12 +275,12 @@ export function getFunctionRules (functions: FunctionDict, argRule: P.Parser<any
   return functionsList
 }
 
-export function getNumericPropertyNameRules(properties: PropertyDict) {
+export function getPropertyNameRules(properties: PropertyDict, numeric?: boolean) {
   const numericList: P.Parser<any>[] = []
 
   Object.keys(properties).sort(strLenSortFn).forEach( name => {
     const ps = properties[name]
-    if (ps.isNumeric) {
+    if (!numeric || (numeric && ps.isNumeric)) {
       const errorFn = makeError(`property '${name}' not supported`)
       const rule = P.regex(new RegExp(name, 'i')).map(() => {
         if (ps.isUnsupported) errorFn()
