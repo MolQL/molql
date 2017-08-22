@@ -137,6 +137,7 @@ const modifier = {
     includeSurroundings: symbol(Arguments.Dictionary({
         0: Argument(Types.AtomSelectionQuery),
         radius: Argument(Type.Num),
+        'atom-radius': Argument(Type.Num, { isOptional: true, defaultValue: 0, description: 'Value added to each atom before the distance check, for example VDW radius. Using this argument is computationally demanding.' }),
         'as-whole-residues': Argument(Type.Bool, { isOptional: true })
     }), Types.AtomSelectionQuery, 'For each atom set in the selection, include all surrouding atoms/residues that are within the specified radius.'),
 
@@ -171,7 +172,7 @@ const filter = {
         target: Argument(Types.AtomSelectionQuery),
         'min-radius': Argument(Type.Num, { isOptional: true, defaultValue: 0 }),
         'max-radius': Argument(Type.Num),
-        'atom-radius': Argument(Type.Num, { isOptional: true, defaultValue: 0, description: 'Value added to each atom before the distance check, for example VDW radius.' }),
+        'atom-radius': Argument(Type.Num, { isOptional: true, defaultValue: 0, description: 'Value added to each atom before the distance check, for example VDW radius. Using this argument is computationally demanding.' }),
         invert: Argument(Type.Bool, { isOptional: true, defaultValue: false, description: 'If true, pick only atom sets that are further than the specified radius.' }),
     }), Types.AtomSelectionQuery, 'Pick all atom sets from section that are within the radius of any atom from target.'),
 

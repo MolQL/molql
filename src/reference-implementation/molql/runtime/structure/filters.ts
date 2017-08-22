@@ -12,7 +12,7 @@ import AtomSelection from '../../data/atom-selection'
 import { FastSet } from '../../../utils/collections'
 import Mask from '../../../utils/mask'
 import { Model } from '../../../structure/data'
-import { defaultBondTest, testBond } from './common'
+import { defaultBondTest, testBond, maxAtomValueInSelection } from './common'
 
 type Selection = Expression<AtomSelection>
 
@@ -138,30 +138,14 @@ function withinMinMaxRadius({ env, selection, target, minRadius, maxRadius, atom
     const { model } = env.context;
     const ret = AtomSelection.linearBuilder();
 
-    Environment.lockSlot(env, 'element');
-    const element = env.slots.element;
-
-    let maxAtomRadiusSrc = 0;
-    for (const atomSet of AtomSelection.atomSets(selection)) {
-        for (const a of AtomSet.atomIndices(atomSet)) {
-            ElementAddress.setAtom(model, element, a);
-            const r = atomRadius(env);
-            if (r > maxAtomRadiusSrc) maxAtomRadiusSrc = r;
-        }
-    }
-
-    let maxAtomRadiusTarget = 0;
-    for (const atomSet of AtomSelection.atomSets(target)) {
-        for (const a of AtomSet.atomIndices(atomSet)) {
-            ElementAddress.setAtom(model, element, a);
-            const r = atomRadius(env);
-            if (r > maxAtomRadiusTarget) maxAtomRadiusTarget = r;
-        }
-    }
-
+    const maxAtomRadiusSrc = maxAtomValueInSelection(env, selection, atomRadius);
+    const maxAtomRadiusTarget = maxAtomValueInSelection(env, target, atomRadius);
     const targetLookup = AtomSelection.lookup3d(model, target);
     const radius = maxRadius + maxAtomRadiusSrc + maxAtomRadiusTarget;
     const targetSets = AtomSelection.atomSets(target);
+
+    Environment.lockSlot(env, 'element');
+    const element = env.slots.element;
 
     const distCtx: AreWithinWithAtomRadiusContext = {
         env,

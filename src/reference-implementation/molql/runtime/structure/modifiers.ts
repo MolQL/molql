@@ -14,7 +14,7 @@ import Mask from '../../../utils/mask'
 import { Model, Bonds } from '../../../structure/data'
 import ElementAddress from '../../data/element-address'
 import BondAddress from '../../data/bond-address'
-import { defaultBondTest, testBond, BondTest } from './common'
+import { defaultBondTest, testBond, BondTest, maxAtomValueInSelection } from './common'
 
 type Selection = Expression<AtomSelection>
 
@@ -215,12 +215,20 @@ export interface IncludeSurroundingsParams {
     wholeResidues?: Expression<boolean>
 }
 
-export function includeSurroundings(env: Environment, params: IncludeSurroundingsParams): AtomSelection {
-    const src = params.selection(env);
+interface IncludeSurroundingsContext {
+    env: Environment,
+    selection: AtomSelection,
+    radius: number,
+    atomRadius: Expression<number>,
+    wholeResidues: boolean
+}
+
+function _zeroRadius(env: Environment) { return 0; }
+
+function includeSurroundingsNoRadius(ctx: IncludeSurroundingsContext) {
+    const { env, selection, radius: r, wholeResidues } = ctx;
     const { model, mask } = env.context;
     const findWithin = Model.spatialLookup(model).find(mask);
-    const r = params.radius(env);
-    const asResidues = !!params.wholeResidues && !!params.wholeResidues(env);
     const { x, y, z } = model.positions;
     const { residueIndex } = model.atoms;
     const { atomOffset } = model.residues;
@@ -228,13 +236,13 @@ export function includeSurroundings(env: Environment, params: IncludeSurrounding
     const builder = AtomSelection.uniqueBuilder();
     const includedResides = FastSet.create<number>();
 
-    for (const atomSet of AtomSelection.atomSets(src)) {
+    for (const atomSet of AtomSelection.atomSets(selection)) {
         const atoms = UniqueArrayBuilder<number>();
         for (const a of AtomSet.atomIndices(atomSet)) {
             const { count, indices } = findWithin(x[a], y[a], z[a], r);
             for (let i = 0, _i = count; i < _i; i++) {
                 const b = indices[i];
-                if (asResidues) {
+                if (wholeResidues) {
                     const rI = residueIndex[b];
                     if (includedResides.has(rI)) continue;
                     includedResides.add(rI);
@@ -251,6 +259,85 @@ export function includeSurroundings(env: Environment, params: IncludeSurrounding
     }
 
     return builder.getSelection();
+}
+
+function includeSurroundingsWithRadius(ctx: IncludeSurroundingsContext) {
+    const { env, selection, radius, wholeResidues, atomRadius } = ctx;
+    const { model, mask } = env.context;
+    const findWithin = Model.spatialLookup(model).find(mask);
+    const { x, y, z } = model.positions;
+    const { residueIndex } = model.atoms;
+    const { atomOffset } = model.residues;
+
+    const builder = AtomSelection.uniqueBuilder();
+    const includedResides = FastSet.create<number>();
+
+    const maxSelectionAtomRadius = maxAtomValueInSelection(env, selection, atomRadius);
+
+    Environment.lockSlot(env, 'element');
+    const element = env.slots.element;
+
+    let maxStructureAtomRadius = 0;
+
+    for (let i = 0, _i = model.atoms.count; i < _i; i++) {
+        if (!mask.has(i)) continue;
+        ElementAddress.setAtom(model, element, i);
+        const r = atomRadius(env);
+        if (r > maxStructureAtomRadius) maxStructureAtomRadius = r;
+    }
+
+    const extendedRadius = radius + maxSelectionAtomRadius + maxStructureAtomRadius;
+
+    for (const atomSet of AtomSelection.atomSets(selection)) {
+        const atoms = UniqueArrayBuilder<number>();
+        for (const a of AtomSet.atomIndices(atomSet)) {
+            const { count, indices, squaredDistances } = findWithin(x[a], y[a], z[a], extendedRadius);
+
+            ElementAddress.setAtom(model, element, a);
+            const rA = atomRadius(env);
+
+            for (let i = 0, _i = count; i < _i; i++) {
+                const b = indices[i];
+
+                ElementAddress.setAtom(model, element, b);
+                const rB = atomRadius(env);
+
+                if (Math.sqrt(squaredDistances[i]) - rA - rB > radius) continue;
+
+                if (wholeResidues) {
+                    const rI = residueIndex[b];
+                    if (includedResides.has(rI)) continue;
+                    includedResides.add(rI);
+                    for (let j = atomOffset[rI], _j = atomOffset[rI + 1]; j < _j; j++) {
+                        if (!mask.has(j)) continue;
+                        UniqueArrayBuilder.add(atoms, j, j);
+                    }
+                } else {
+                    UniqueArrayBuilder.add(atoms, b, b);
+                }
+            }
+        }
+        builder.add(AtomSet(sortAsc(atoms.array)));
+    }
+    Environment.unlockSlot(env, 'element');
+
+    return builder.getSelection();
+}
+
+export function includeSurroundings(env: Environment, params: IncludeSurroundingsParams): AtomSelection {
+    const ctx: IncludeSurroundingsContext = {
+        env,
+        selection: params.selection(env),
+        radius: params.radius(env),
+        atomRadius: params.atomRadius || _zeroRadius,
+        wholeResidues: params.wholeResidues ? params.wholeResidues(env) : false
+    };
+
+    if (ctx.atomRadius === _zeroRadius) {
+        return includeSurroundingsNoRadius(ctx);
+    } else {
+        return includeSurroundingsWithRadius(ctx);
+    }
 }
 
 interface ExpandConnectedCtx {

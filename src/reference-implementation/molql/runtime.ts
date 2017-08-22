@@ -238,6 +238,7 @@ export const SymbolRuntime: Symbol.Info[] = [
     Symbol(MolQL.structure.modifier.includeSurroundings)((env, v) => env => StructureRuntime.Modifiers.includeSurroundings(env, {
         selection: v[0](env),
         radius: v.radius,
+        atomRadius: v['atom-radius'],
         wholeResidues: v['as-whole-residues']
     })),
     Symbol(MolQL.structure.modifier.includeConnected)((env, v) => env => StructureRuntime.Modifiers.includeConnected(env, {
