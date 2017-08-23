@@ -15,7 +15,7 @@ export function getPositionalArgs(args: any) {
         .map(k => args[k]);
 }
 
-export function tryGetArg(args: any, name: string | number, defaultValue: any) {
+export function tryGetArg(args: any, name: string | number, defaultValue?: any) {
     return (args && args[name] !== void 0) ? args[name] : defaultValue;
 }
 
@@ -32,7 +32,7 @@ export function pickArgs(args: any, ...names: string[]) {
 }
 
 export function aggregate(args: any, fn: any){
-    const property = getPositionalArgs(args)[0]
+    const property = tryGetArg(args, 0)
     return B.struct.atomSet.reduce({
         initial: property,
         value: fn([ B.struct.slot.atomSetReduce(), property ])

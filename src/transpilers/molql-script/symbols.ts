@@ -177,6 +177,16 @@ const list: MolQLScriptSymbol[] = [
         'group-by': B.ammp('chainKey')
     })),
 
+    Macro(Symbol('sel.atom.around', Arguments.Dictionary({
+        0: Argument(Type.Bool, { isOptional: true, defaultValue: true, description: 'Test applied to the 1st atom of each chain.' })
+    }), Struct.Types.AtomSelection, 'A selection of singleton atom sets with centers within "radius" of the center of any atom in the given selection.'),
+    args => B.struct.modifier.exceptBy({
+        '0': B.struct.filter.within({
+          '0': B.struct.generator.atomGroups(), target: M.tryGetArg(args, 0), 'max-radius': M.tryGetArg(args, 'radius')
+        }),
+        by: M.tryGetArg(args, 0)
+    })),
+
     Macro(Symbol('atom.sec-struct.is', Arguments.List(Struct.Types.SecondaryStructureFlag), Type.Bool,
         `Test if the current atom is part of an secondary structure. Optionally specify allowed sec. struct. types: ${Type.oneOfValues(Struct.Types.SecondaryStructureFlag).join(', ')}`),
     args => B.core.flags.hasAny([B.struct.atomProperty.macromolecular.secondaryStructureFlags(), B.struct.type.secondaryStructureFlags(args)])),
