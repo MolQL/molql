@@ -572,6 +572,7 @@ structure.modifier.cluster :: {
 structure.modifier.include-surroundings :: {
   AtomSelectionQuery, 
   radius: Number, 
+  atom-radius?: Number = 0, (* Value added to each atom before the distance check, for example VDW radius. Using this argument is computationally demanding. *)
   as-whole-residues?: Bool
 } => AtomSelectionQuery
 ```
@@ -625,17 +626,29 @@ structure.filter.with-same-atom-properties :: {
 
 *Pick all atom sets for which the set of given atom properties is a subset of the source properties.*
 
+### **intersected-by**
+```
+structure.filter.intersected-by :: {
+  AtomSelectionQuery, 
+  by: AtomSelectionQuery
+} => AtomSelectionQuery
+```
+
+*Pick all atom sets that have non-zero intersection with the target.*
+
 ### **within**
 ```
 structure.filter.within :: {
   AtomSelectionQuery, 
   target: AtomSelectionQuery, 
-  radius: Number, 
+  min-radius?: Number = 0, 
+  max-radius: Number, 
+  atom-radius?: Number = 0, (* Value added to each atom before the distance check, for example VDW radius. Using this argument is computationally demanding. *)
   invert?: Bool = false (* If true, pick only atom sets that are further than the specified radius. *)
 } => AtomSelectionQuery
 ```
 
-*Pick all atom sets from section that are within the radius of any atom from target.*
+*Pick all atom sets from selection that have any atom within the radius of any atom from target.*
 
 ### **is-connected-to**
 ```
@@ -702,7 +715,7 @@ structure.atom-set.reduce :: {
 } => a: Value
 ```
 
-*Execute the value expression for each atom in the current atom set and return the result.*
+*Execute the value expression for each atom in the current atom set and return the result. Works the same way as Array.reduce in JavaScript (``result = value(value(...value(initial)))``)*
 
 ### **property-set**
 ```
@@ -761,10 +774,13 @@ structure.atom-property.core.atom-key :: (?AtomReference = slot.current-atom) =>
 
 ### **bond-count**
 ```
-structure.atom-property.core.bond-count :: (?AtomReference = slot.current-atom) => Number
+structure.atom-property.core.bond-count :: {
+  ?AtomReference = slot.current-atom, 
+  flags?: BondFlags = covalent
+} => Number
 ```
 
-*Number of covalent bonds.*
+*Number of bonds (by default only covalent bonds are counted).*
 
 ### **connected-component-key**
 ```
