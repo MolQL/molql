@@ -79,6 +79,19 @@ export default [{
   value: `(sel.atom.atoms
   (> (atom.bond-count :flags (bond-flags metallic)) 0))`
 }, {
+  name: 'LYS and ALA residues that are between 2 and 5 ang apart',
+  value: `(sel.atom.dist-cluster
+  ;; upper triangular matrix are maximum distances of corresponding selections
+  ;; lower triangular matrix are minumum distances of corresponding selections
+  :matrix [
+    [0 5]
+    [2 0]
+  ]
+  :selections [
+    (sel.atom.res (= atom.resname LYS))
+    (sel.atom.res (= atom.resname ALA))
+  ])`
+}, {
   name: 'Clusters of 3 LYS residues that are mutually no more than 5 ang apart',
   value: `(sel.atom.dist-cluster
   :matrix [[0 5 5] [0 0 5] [0 0 0]]
