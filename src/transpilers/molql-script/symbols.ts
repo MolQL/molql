@@ -198,22 +198,22 @@ const list: MolQLScriptSymbol[] = [
     Macro(Symbol('atom.set.min', Arguments.Dictionary({
         0: Argument(Type.Num, { description: 'Numeric atom property.'})
     }), Type.Num, 'Minimum of the given property in the current atom set.'),
-    args => M.aggregate(args, B.core.math.min)),
+    args => M.aggregate(M.tryGetArg(args, 0), B.core.math.min)),
 
     Macro(Symbol('atom.set.max', Arguments.Dictionary({
         0: Argument(Type.Num, { description: 'Numeric atom property.'})
     }), Type.Num, 'Maximum of the given property in the current atom set.'),
-    args => M.aggregate(args, B.core.math.max)),
+    args => M.aggregate(M.tryGetArg(args, 0), B.core.math.max)),
 
     Macro(Symbol('atom.set.sum', Arguments.Dictionary({
         0: Argument(Type.Num, { description: 'Numeric atom property.'})
     }), Type.Num, 'Sum of the given property in the current atom set.'),
-    args => M.aggregate(args, B.core.math.add)),
+    args => M.aggregate(M.tryGetArg(args, 0), B.core.math.add, 0)),
 
     Macro(Symbol('atom.set.avg', Arguments.Dictionary({
         0: Argument(Type.Num, { description: 'Numeric atom property.'})
     }), Type.Num, 'Average of the given property in the current atom set.'),
-    args => B.core.math.div([ M.aggregate(args, B.core.math.add), B.struct.atomSet.atomCount() ])),
+    args => B.core.math.div([ M.aggregate(M.tryGetArg(args, 0), B.core.math.add, 0), B.struct.atomSet.atomCount() ])),
 ];
 
 const normalized = (function () {

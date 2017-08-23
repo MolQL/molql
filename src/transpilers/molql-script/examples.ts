@@ -25,8 +25,7 @@ export default [{
   :max-distance 5)`
 }, {
     name: 'Residues with max b-factor < 45',
-    value: `(sel.atom.pick
-  sel.atom.res
+    value: `(sel.atom.pick sel.atom.res
   :test (< (atom.set.max atom.B_iso_or_equiv) 45))`
 }, {
   name: 'Residues connected to HEM',

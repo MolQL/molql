@@ -31,10 +31,10 @@ export function pickArgs(args: any, ...names: string[]) {
     return count ? ret : void 0;
 }
 
-export function aggregate(args: any, fn: any){
-    const property = tryGetArg(args, 0)
+export function aggregate(property: any, fn: any, initial?: any){
+    //const property = tryGetArg(args, 0);
     return B.struct.atomSet.reduce({
-        initial: property,
+        initial: initial !== void 0 ? initial : property,
         value: fn([ B.struct.slot.atomSetReduce(), property ])
-    })
+    });
 }
