@@ -45,10 +45,11 @@ CodeMirror.defineMode('molql-script', (config) => {
         if (stream.eatSpace()) { type = 'ws'; return null; }
         if (stream.match(numLiteral)) return 'number';
         let ch: string = stream.next()!;
+        if (ch === '0')  return 'number';
         if (ch === '\\') ch = stream.next()!;
 
         if (ch === '`') return (state.tokenize = inString)(stream, state);
-        else if (ch === '(') { type = 'open'; return 'bracket'; }
+        else if (ch === '(' || ch === '[') { type = 'open'; return 'bracket'; }
         else if (ch === ')' || ch === ']') { type = 'close'; return 'bracket'; }
         else if (ch === ';') { stream.skipToEnd(); type = 'ws'; return 'comment'; }
         //else if (/['`,@]/.test(ch)) return null;

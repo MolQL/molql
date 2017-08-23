@@ -78,4 +78,13 @@ export default [{
   name: 'Atoms participating in metallic coordination',
   value: `(sel.atom.atoms
   (> (atom.bond-count :flags (bond-flags metallic)) 0))`
+}, {
+  name: 'Clusters of 3 LYS residues that are mutually no more than 5 ang apart',
+  value: `(sel.atom.dist-cluster
+  :matrix [[0 5 5] [0 0 5] [0 0 0]]
+  :selections [
+    (sel.atom.res (= atom.resname LYS))
+    (sel.atom.res (= atom.resname LYS))
+    (sel.atom.res (= atom.resname LYS))
+  ])`
 }]
