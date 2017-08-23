@@ -27,7 +27,7 @@ const numericComparisons: OperatorList = [
     name: '=',
     abbr: ['=='],
     type: h.binaryLeft,
-    rule: P.alt( h.infixOp(/==|=|!=|>|<|>=|<=/), P.whitespace.result('=')),
+    rule: P.alt( h.infixOp(/==|>=|<=|=|!=|>|</), P.whitespace.result('=')),
     map: (op, e1, e2) => {
       // TODO very brittle...
       // console.log(op, e1, e2)

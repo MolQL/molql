@@ -213,7 +213,6 @@ const keywords: KeywordDict = {
     '@desc': 'residues named HIS PHE PRO TRP TYR',
     map: () => resnameExpr(ResDict.cyclic)
   },
-
   hetero: {
     '@desc': '`not (protein or nucleic)`',
     map: () => h.invertExpr(

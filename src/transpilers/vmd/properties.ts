@@ -7,8 +7,9 @@
 import { PropertyDict } from '../types'
 import B from '../../molql/builder'
 
-// const reFloat = /[-+]?[0-9]*\.?[0-9]+/
-const rePosInt = /[0-9]+/
+const reFloat = /[-+]?[0-9]*\.?[0-9]+/
+const rePosInt = /[+]?[0-9]+/
+const reInt = /[-+]?[0-9]+/
 
 function str(x: string) { return x }
 
@@ -37,7 +38,7 @@ const properties: PropertyDict = {
     '@desc': 'num    the atom number, starting at 1',
     '@examples': ['serial 11'],
     isNumeric: true,
-    regex: rePosInt, map: parseInt,
+    regex: rePosInt, map: x => parseInt(x),
     level: 'atom-test', property: B.ammp('id')
   },
   atomicnumber: {
@@ -45,7 +46,7 @@ const properties: PropertyDict = {
     '@examples': ['atomicnumber 13'],
     isUnsupported: true,
     isNumeric: true,
-    regex: rePosInt, map: parseInt,
+    regex: rePosInt, map: x => parseInt(x),
     level: 'atom-test'//, property: B.acp('atomicNumber')
   },
   element: {
@@ -70,8 +71,130 @@ const properties: PropertyDict = {
     '@desc': 'num  a set of connected atoms with the same residue number',
     '@examples': ['residue < 11', 'residue 11'],
     isNumeric: true,
-    regex: rePosInt, map: parseInt,
+    regex: reInt, map: x => parseInt(x),
     level: 'residue-test', property: B.ammp('auth_seq_id')
+  },
+  fragment: {
+    '@desc': 'num  a set of connected residues',
+    '@examples': ['fragment 42'],
+    isUnsupported: true,
+    isNumeric: true,
+    regex: reInt, map: x => parseInt(x),
+    level: 'residue-test'
+  },
+  pfrag: {
+    '@desc': 'num  a set of connected protein residues',
+    '@examples': ['pfrag 42'],
+    isUnsupported: true,
+    isNumeric: true,
+    regex: reInt, map: x => parseInt(x),
+    level: 'residue-test'
+  },
+  nfrag: {
+    '@desc': 'num  a set of connected nucleic residues',
+    '@examples': ['nfrag 42'],
+    isUnsupported: true,
+    isNumeric: true,
+    regex: reInt, map: x => parseInt(x),
+    level: 'residue-test'
+  },
+  sequence: {
+    '@desc': 'str  a sequence given by one letter names',
+    '@examples': ['sequence PGATTACA'],
+    isUnsupported: true,
+    regex: /[a-zA-Z0-9]+/, map: str,
+    level: 'residue-test'
+  },
+  numbonds: {
+    '@desc': 'num  number of bonds',
+    '@examples': ['numbonds = 2', 'numbonds >= 3'],
+    isNumeric: true,
+    regex: rePosInt, map: x => parseInt(x),
+    level: 'atom-test', property: B.acp('bondCount')
+  },
+  resname: {
+    '@desc': 'str  residue name',
+    '@examples': ['resname ALA'],
+    regex: /[a-zA-Z0-9]+/, map: str,
+    level: 'residue-test', property: B.ammp('auth_comp_id')
+  },
+  resid: {
+    '@desc': 'num  residue id',
+    '@examples': ['resid 42'],
+    isNumeric: true,
+    regex: reInt, map: x => parseInt(x),
+    level: 'residue-test', property: B.ammp('auth_seq_id')
+  },
+  segname: {
+    '@desc': 'str  segment name',
+    '@examples': ['segname B'],
+    regex: /[a-zA-Z0-9]+/, map: str,
+    level: 'residue-test', property: B.ammp('label_asym_id')
+  },
+  x: {
+    '@desc': 'float  x coordinate',
+    '@examples': ['x 42'],
+    isNumeric: true,
+    regex: reFloat, map: x => parseFloat(x),
+    level: 'atom-test', property: B.acp('x')
+  },
+  y: {
+    '@desc': 'float  y coordinate',
+    '@examples': ['y > 1.7'],
+    isNumeric: true,
+    regex: reFloat, map: x => parseFloat(x),
+    level: 'atom-test', property: B.acp('y')
+  },
+  z: {
+    '@desc': 'float  z coordinate',
+    '@examples': ['z < 11', 'z > -21'],
+    isNumeric: true,
+    regex: reFloat, map: x => parseFloat(x),
+    level: 'atom-test', property: B.acp('z')
+  },
+  radius: {
+    '@desc': 'float  atomic radius',
+    '@examples': ['radius > 1.3'],
+    isNumeric: true,
+    regex: reFloat, map: x => parseFloat(x),
+    level: 'atom-test', property: B.acp('vdw')
+  },
+  mass: {
+    '@desc': 'float  atomic mass',
+    '@examples': ['mass > 2'],
+    isUnsupported: true,
+    isNumeric: true,
+    regex: reFloat, map: x => parseFloat(x),
+    level: 'atom-test'//, property: B.ammp('atomicMass')
+  },
+  charge: {
+    '@desc': 'float  atomic charge',
+    '@examples': ['charge > 0', 'charge 1'],
+    isNumeric: true,
+    regex: reFloat, map: x => parseFloat(x),
+    level: 'atom-test', property: B.ammp('pdbx_formal_charge')
+  },
+  beta: {
+    '@desc': 'float  temperature factor',
+    '@examples': ['beta < 20', 'beta > 35'],
+    isNumeric: true,
+    regex: reFloat, map: x => parseFloat(x),
+    level: 'atom-test', property: B.ammp('B_iso_or_equiv')
+  },
+  occupancy: {
+    '@desc': 'float  occupancy',
+    '@examples': ['occupancy 1', 'occupancy < 1'],
+    isNumeric: true,
+    regex: reFloat, map: x => parseFloat(x),
+    level: 'atom-test', property: B.ammp('occupancy')
+  },
+  user: {
+    '@desc': 'float  time-varying user-specified value',
+    '@examples': ['user < 0.1'],
+    isUnsupported: true,
+    isNumeric: true,
+    regex: reFloat, map: x => parseFloat(x),
+    level: 'atom-test'
   },
 }
 
