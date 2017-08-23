@@ -130,11 +130,16 @@ function cluster(env: Environment, matrix: Float64Array, selections: AtomSelecti
     return ctx.builder.getSelection();
 }
 
+function invalidMatrixDims(d: number) {
+    throw new Error(`'distance-cluster': invalid matrix dimensions (expected ${d}x${d})'`);
+}
+
 export function distanceCluster(env: Environment,
         matrix: Expression<ArrayLike<ArrayLike<number>>>,
         selections: Expression<ArrayLike<Expression<AtomSelection>>>): AtomSelection {
     const atomSelections: AtomSelection[] = [];
     const selList = selections(env);
+    if (!selList.length) return AtomSelection.empty;
     for (let i = 0; i < selList.length; i++) {
         const sel = selList[i](env);
         if (!AtomSelection.atomSets(sel).length) return AtomSelection.empty;
@@ -143,11 +148,14 @@ export function distanceCluster(env: Environment,
     const w = atomSelections.length;
     const m = new Float64Array(w * w);
     const rows = matrix(env);
+    if (rows.length !== w) invalidMatrixDims(w);
     for (let i = 0; i < w; i++) {
         const row = rows[i];
+        if (row.length !== w) invalidMatrixDims(w);
         for (let j = 0; j < w; j++) {
             m[i * w + j] = row[j];
         }
     }
+
     return cluster(env, m, atomSelections);
 }

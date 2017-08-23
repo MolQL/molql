@@ -96,7 +96,7 @@ function groupAtomsSingleton(env: Environment, atomTest: Pred) {
              result.add(AtomSet([i]));
         } else {
             ElementAddress.setAtom(model, element, i);
-            if (atomTest(env)) result.add(AtomSet.singleton(i));
+            if (atomTest(env)) result.add(AtomSet(i));
         }
     }
     Environment.unlockSlot(env, 'element');

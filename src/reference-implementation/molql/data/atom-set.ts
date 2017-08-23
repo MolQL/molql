@@ -10,7 +10,8 @@ import Mask from '../../utils/mask'
 
 type AtomSet = number | ArrayAtomSet
 
-function AtomSet(indices: ArrayLike<number>): AtomSet {
+function AtomSet(indices: number | ArrayLike<number>): AtomSet {
+    if (typeof indices === 'number') return indices;
     if (indices.length === 1) return indices[0];
     return ArrayAtomSet(indices as ReadonlyArray<number>);
 }
@@ -86,8 +87,6 @@ namespace AtomSet {
     export namespace Iterator {
         export function start(it: Iterator, atomSet: AtomSet) { return it.reset(atomSet).next().value; }
     }
-
-    export function singleton(a: number): AtomSet { return a; }
 
     export function count(a: AtomSet) {
         return typeof a === 'number' ? 1 : a.atomIndices.length;
