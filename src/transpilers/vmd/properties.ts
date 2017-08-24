@@ -44,10 +44,9 @@ const properties: PropertyDict = {
   atomicnumber: {
     '@desc': 'num    atomic number (0 if undefined)',
     '@examples': ['atomicnumber 13'],
-    isUnsupported: true,
     isNumeric: true,
     regex: rePosInt, map: x => parseInt(x),
-    level: 'atom-test'//, property: B.acp('atomicNumber')
+    level: 'atom-test', property: B.acp('atomicNumber')
   },
   element: {
     '@desc': 'str  atomic element symbol string ("X" if undefined)',
@@ -162,10 +161,9 @@ const properties: PropertyDict = {
   mass: {
     '@desc': 'float  atomic mass',
     '@examples': ['mass > 2'],
-    isUnsupported: true,
     isNumeric: true,
     regex: reFloat, map: x => parseFloat(x),
-    level: 'atom-test'//, property: B.ammp('atomicMass')
+    level: 'atom-test', property: B.acp('mass')
   },
   charge: {
     '@desc': 'float  atomic charge',

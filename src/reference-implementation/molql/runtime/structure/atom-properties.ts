@@ -10,7 +10,7 @@ import SymbolRuntime, { RuntimeArguments, forEachPositionalArg } from '../../sym
 import Environment from '../environment'
 import RuntimeExpression from '../expression'
 import ElementAddress from '../../data/element-address'
-import { Model, ElementSymbol, ResidueIdentifier, VdwRadius, BondCount, BondFlag } from '../../../structure/data'
+import { Model, ElementSymbol, ResidueIdentifier, VdwRadius, AtomWeight, AtomNumber, BondCount, BondFlag } from '../../../structure/data'
 import { SecondaryStructureFlag } from '../../../structure/topology/secondary-structure'
 import toUpperCase from '../../../utils/upper-case'
 
@@ -36,10 +36,16 @@ export function createSecondaryStructureFlags(env: Environment, args: RuntimeArg
     }).flag;
 }
 
-export const Core: { [P in keyof typeof MolQL.structure.atomProperty.core]?: SymbolRuntime } = {
-    elementSymbol: prop((env, v) => ElementSymbol(env.context.atom_site.type_symbol.getString(getAddress(env, v).dataIndex) || '')),
+function getAtomSymbol(env: Environment, v: { 0?: RuntimeExpression }) {
+    return env.context.atom_site.type_symbol.getString(getAddress(env, v).dataIndex) || ''
+}
 
-    vdw: prop((env, v) => VdwRadius(env.context.atom_site.type_symbol.getString(getAddress(env, v).dataIndex) || '')),
+export const Core: { [P in keyof typeof MolQL.structure.atomProperty.core]?: SymbolRuntime } = {
+    elementSymbol: prop((env, v) => ElementSymbol(getAtomSymbol(env, v))),
+
+    vdw: prop((env, v) => VdwRadius(getAtomSymbol(env, v))),
+    mass: prop((env, v) => AtomWeight(getAtomSymbol(env, v))),
+    atomicNumber: prop((env, v) => AtomNumber(getAtomSymbol(env, v))),
 
     x: prop((env, v) => env.context.model.positions.x[getAddress(env, v).atom]),
     y: prop((env, v) => env.context.model.positions.y[getAddress(env, v).atom]),
