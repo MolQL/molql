@@ -13,6 +13,16 @@ const reInt = /[-+]?[0-9]+/
 
 function str(x: string) { return x }
 
+const secStruct: {[key: string]: string} = {
+  T: 'turn',  // Turn
+  E: 'sheet',  // Extended conformation ($\beta$ sheets)
+  B: 'strand',  // Isolated bridge
+  H: 'alpha',  // Alpha helix
+  G: '3-10',  // 3-10 helix
+  I: 'pi',  // Pi helix
+  C: 'none',  // Coil
+}
+
 const properties: PropertyDict = {
   name: {
     '@desc': 'str    atom name',
@@ -192,6 +202,60 @@ const properties: PropertyDict = {
     isUnsupported: true,
     isNumeric: true,
     regex: reFloat, map: x => parseFloat(x),
+    level: 'atom-test'
+  },
+  rasmol: {
+    '@desc': 'str  translates Rasmol selection string to VMD',
+    '@examples': ["rasmol 'all'"],
+    isUnsupported: true,
+    regex: /[^']*/, map: str,
+    level: 'atom-test'
+  },
+  structure: {
+    '@desc': 'str  single letter name for the secondary structure',
+    '@examples': ['structure H'],
+    isNumeric: true,
+    regex: /T|E|B|H|G|I|C/i, map: x => secStruct[x],
+    level: 'atom-test',  property: B.ammp('secondaryStructureFlags')
+  },
+  phi: {
+    '@desc': 'float  phi backbone conformational angles',
+    '@examples': ['phi < 160'],
+    isUnsupported: true,
+    isNumeric: true,
+    regex: reFloat, map: x => parseFloat(x),
+    level: 'residue-test'
+  },
+  psi: {
+    '@desc': 'float  psi backbone conformational angles',
+    '@examples': ['psi < 160'],
+    isUnsupported: true,
+    isNumeric: true,
+    regex: reFloat, map: x => parseFloat(x),
+    level: 'residue-test'
+  },
+  ufx: {
+    '@desc': 'num  force to apply in the x coordinate',
+    '@examples': ['ufx 1'],
+    isUnsupported: true,
+    isNumeric: true,
+    regex: reFloat, map: x => parseInt(x),
+    level: 'atom-test'
+  },
+  ufy: {
+    '@desc': 'num  force to apply in the y coordinate',
+    '@examples': ['ufy 1'],
+    isUnsupported: true,
+    isNumeric: true,
+    regex: reFloat, map: x => parseInt(x),
+    level: 'atom-test'
+  },
+  ufz: {
+    '@desc': 'num  force to apply in the z coordinate',
+    '@examples': ['ufz 1'],
+    isUnsupported: true,
+    isNumeric: true,
+    regex: reFloat, map: x => parseInt(x),
     level: 'atom-test'
   },
 }

@@ -36,6 +36,9 @@ const operators: OperatorList = [
     rule: h.infixOp(/OR|\|/i),
     map: (op, s1, s2) => B.struct.combinator.merge([s1, s2])
   }
+  // within  str  selects atoms within a specified distance of a selection (i.e within 5 of name FE).
+  // exwithin  str  exclusive within, equivalent to (within 3 of X) and not X.
+  // same  str  selects atoms which have the same keyword as the atoms in a given selection (i.e. same segname as resid 35)
 ]
 
 export default operators
