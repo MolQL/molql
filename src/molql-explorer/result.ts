@@ -101,7 +101,7 @@ export namespace ResultEntry {
         a.download = 'atomset.cif';
         document.body.appendChild(a);
         a.click();
-        setTimeout(() => a.remove(), 1000);
+        setTimeout(() => a.remove(), 20000);
     }
 }
 

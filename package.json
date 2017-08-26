@@ -29,7 +29,7 @@
   "dependencies": {
     "ciftools.js": "github:dsehnal/CIFTools.js#34cd913",
     "codemirror": "^5.29.0",
-    "litemol": "github:dsehnal/LiteMol#aae32f5",
+    "litemol": "github:dsehnal/LiteMol#ce5818d",
     "parsimmon": "^1.6.2",
     "react": "^15.6.1",
     "react-dom": "^15.6.1",
