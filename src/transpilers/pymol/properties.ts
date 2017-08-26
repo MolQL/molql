@@ -81,14 +81,14 @@ const properties: PropertyDict = {
     '@desc': 'flag-number a single integer from 0 to 31',
     '@examples': ['flag 0'],
     isUnsupported: true,
-    abbr: ['f.'], regex: /[0-9]+/, map: parseInt,
+    abbr: ['f.'], regex: /[0-9]+/, map: x => parseInt(x),
     level: 'atom-test'
   },
   numeric_type: {
     '@desc': 'type-number a single integer',
     '@examples': ['nt. 5'],
     isUnsupported: true,
-    abbr: ['nt.'], regex: /[0-9]+/, map: parseInt,
+    abbr: ['nt.'], regex: /[0-9]+/, map: x => parseInt(x),
     level: 'atom-test'
   },
   text_type: {
@@ -101,14 +101,14 @@ const properties: PropertyDict = {
   id: {
     '@desc': 'external-index-number a single integer',
     '@examples': ['id 23'],
-    abbr: ['id'], regex: rePosInt, map: parseInt,
+    abbr: ['id'], regex: rePosInt, map: x => parseInt(x),
     level: 'atom-test', property: B.ammp('id')
   },
   index: {
     '@desc': 'internal-index-number a single integer',
     '@examples': ['index 11'],
     isUnsupported: true,
-    abbr: ['idx.'], regex: rePosInt, map: parseInt,
+    abbr: ['idx.'], regex: rePosInt, map: x => parseInt(x),
     level: 'atom-test'
   },
   ss: {
@@ -122,21 +122,21 @@ const properties: PropertyDict = {
     '@desc': 'comparison-operator b-factor-value a real number',
     '@examples': ['b > 10'],
     isNumeric: true,
-    abbr: ['b'], regex: reFloat, map: parseFloat,
+    abbr: ['b'], regex: reFloat, map: x => parseFloat(x),
     level: 'atom-test', property: B.ammp('B_iso_or_equiv')
   },
   q: {
     '@desc': 'comparison-operator occupancy-value a real number',
     '@examples': ['q <0.50'],
     isNumeric: true,
-    abbr: ['q'], regex: reFloat, map: parseFloat,
+    abbr: ['q'], regex: reFloat, map: x => parseFloat(x),
     level: 'atom-test', property: B.ammp('occupancy')
   },
   formal_charge: {
     '@desc': 'comparison-operator formal charge-value an integer',
     '@examples': ['fc. = -1'],
     isNumeric: true,
-    abbr: ['fc.'], regex: reFloat, map: parseFloat,
+    abbr: ['fc.'], regex: reFloat, map: x => parseFloat(x),
     level: 'atom-test', property: B.ammp('pdbx_formal_charge')
   },
   partial_charge: {
@@ -144,7 +144,7 @@ const properties: PropertyDict = {
     '@examples': ['pc. > 1'],
     isUnsupported: true,
     isNumeric: true,
-    abbr: ['pc.'], regex: reFloat, map: parseFloat,
+    abbr: ['pc.'], regex: reFloat, map: x => parseFloat(x),
     level: 'atom-test'
   }
 }

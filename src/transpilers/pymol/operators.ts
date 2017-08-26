@@ -81,7 +81,7 @@ const operators: OperatorList = [
     '@examples': ['solvent GAP 2'],
     name: 'gap',
     type: h.postfix,
-    rule: h.postfixOp(/GAP\s+([-+]?[0-9]*\.?[0-9]+)/i, 1).map(parseFloat),
+    rule: h.postfixOp(/GAP\s+([-+]?[0-9]*\.?[0-9]+)/i, 1).map(x => parseFloat(x)),
     map: (distance: number, target: Expression) => {
       return B.struct.filter.within({
         '0': B.struct.generator.atomGroups(),
@@ -98,7 +98,7 @@ const operators: OperatorList = [
     name: 'around',
     abbr: ['a.'],
     type: h.postfix,
-    rule: h.postfixOp(/(AROUND|a\.)\s+([-+]?[0-9]*\.?[0-9]+)/i, 2).map(parseFloat),
+    rule: h.postfixOp(/(AROUND|a\.)\s+([-+]?[0-9]*\.?[0-9]+)/i, 2).map(x => parseFloat(x)),
     map: (radius: number, target: Expression) => {
       return B.struct.modifier.exceptBy({
         '0': B.struct.filter.within({
@@ -114,7 +114,7 @@ const operators: OperatorList = [
     name: 'expand',
     abbr: ['x.'],
     type: h.postfix,
-    rule: h.postfixOp(/(EXPAND|x\.)\s+([-+]?[0-9]*\.?[0-9]+)/i, 2).map(parseFloat),
+    rule: h.postfixOp(/(EXPAND|x\.)\s+([-+]?[0-9]*\.?[0-9]+)/i, 2).map(x => parseFloat(x)),
     map: (radius: number, selection: Expression) => {
       return B.struct.modifier.includeSurroundings({ 0: selection, radius })
     }
@@ -306,7 +306,7 @@ const operators: OperatorList = [
     name: 'extend',
     abbr: ['xt.'],
     type: h.postfix,
-    rule: h.postfixOp(/(EXTEND|xt\.)\s+([0-9]+)/i, 2).map(parseInt),
+    rule: h.postfixOp(/(EXTEND|xt\.)\s+([0-9]+)/i, 2).map(x => parseInt(x)),
     map: (count: number, selection: Expression) => {
       return h.asAtoms(B.struct.modifier.includeConnected({
         '0': B.struct.modifier.union({ 0: selection }),
