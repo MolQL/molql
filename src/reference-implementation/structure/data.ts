@@ -10,7 +10,7 @@ import computeBonds from './topology/bonds/compute'
 import computeConnectedComponents from './topology/connected-components'
 import Rings from './topology/rings/collection'
 import toUpperCase from '../utils/upper-case'
-import { ElementIndex, ElementVdwRadii, ElementAtomWeights, DefaultVdwRadius, DefaultAtomWeight, DefaultAtomNumber } from './constants'
+import { AtomicNumbers, ElementVdwRadii, ElementAtomWeights, DefaultVdwRadius, DefaultAtomWeight, DefaultAtomNumber } from './constants'
 
 export const enum SecondaryStructureType {
     None = 0,
@@ -129,17 +129,17 @@ export function ElementSymbol(symbol: any): ElementSymbol {
 }
 
 export function VdwRadius(element: string): number {
-    const i = ElementIndex[element];
+    const i = AtomicNumbers[element];
     return i === void 0 ? DefaultVdwRadius : ElementVdwRadii[i]!
 }
 
 export function AtomWeight(element: string): number {
-    const i = ElementIndex[element];
+    const i = AtomicNumbers[element];
     return i === void 0 ? DefaultAtomWeight : ElementAtomWeights[i]!
 }
 
 export function AtomNumber(element: string): number {
-    const i = ElementIndex[element];
+    const i = AtomicNumbers[element];
     return i === void 0 ? DefaultAtomNumber : i
 }
 
