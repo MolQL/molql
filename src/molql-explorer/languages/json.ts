@@ -7,11 +7,14 @@
 import Language from './language'
 import Transpilers from '../../transpilers/all'
 import examples from '../../transpilers/json/examples'
+import getDocs from '../../reference-implementation/molql/markdown-docs'
 
 const lang: Language = {
     name: 'JSON',
     editorMode: 'javascript',
+    docs: getDocs(false),
     transpiler: Transpilers.json,
+    mergeSelection: false,
     examples
 }
 

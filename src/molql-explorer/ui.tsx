@@ -10,12 +10,14 @@ import * as React from 'react'
 import Expression from '../mini-lisp/expression'
 import lispFormat from '../reference-implementation/mini-lisp/expression-formatter'
 import Container from '../reference-implementation/molql/container'
-import getDocs, { formatSymbol } from '../reference-implementation/molql/markdown-docs'
+import { formatSymbol } from '../reference-implementation/molql/markdown-docs'
 import Language, { Example } from './languages/language'
 import Languages from './languages'
 import * as ReactMarkdown from 'react-markdown'
 import QueryEditor from './query-editor'
 import * as MolQLScript from '../transpilers/molql-script/symbols'
+
+import Result, { ResultEntry } from './Result'
 
 import Rx = LiteMol.Core.Rx
 
@@ -43,29 +45,24 @@ export default class Root extends React.Component<{ state: State }, { }> {
                 <div style={{ textAlign: 'right', fontSize: '30px', paddingRight: '30px', lineHeight: '60px', position: 'absolute', left: 0, right: 0, bottom: 20, top: 0, height: 60, color: 'rgb(250,250,250)' }}>
                     Language Reference
                 </div>
-                <OffsetBox className='docs'><ReactMarkdown source={getDocs(false)} /></OffsetBox>
+                <OffsetBox className='docs'><Docs state={this.props.state} /></OffsetBox>
             </div>
-            <div className='layout-box' style={{ position: 'absolute', top: heightTop, left: 0, width: col1, height: heightBottom, overflowX: 'hidden', overflowY: 'hidden' }}>
+            <div className='layout-box' style={{ position: 'absolute', top: heightTop, left: 0, width: '66%', height: heightBottom, overflowX: 'hidden', overflowY: 'hidden', borderTop: '10px solid black' }}>
+                <LiteMolPlugin {...this.props} />
+            </div>
+            <div className='layout-box' style={{ position: 'absolute', top: heightTop, left: '66%', width: '34%', height: heightBottom, overflowX: 'hidden', overflowY: 'hidden', backgroundColor: '#F1F1F1', borderTop: '10px solid black' }}>
                 <LoadMolecule {...this.props} />
-                <OffsetBox><LiteMolPlugin {...this.props} isMain={true} /></OffsetBox>
-            </div>
-            <div className='layout-box' style={{ position: 'absolute', top: heightTop, left: col1, width: col2, height: heightBottom, overflowX: 'hidden', overflowY: 'hidden' }}>
                 <ExecuteQuery {...this.props} />
-                <OffsetBox><LiteMolPlugin {...this.props} isMain={false} /></OffsetBox>
-            </div>
-            <div className='layout-box' style={{ position: 'absolute', top: heightTop, left: col12, width: col3, height: heightBottom, overflowX: 'hidden', overflowY: 'hidden' }}>
-                <div style={{ textAlign: 'right', fontSize: '30px', paddingRight: '30px', lineHeight: '60px', position: 'absolute', left: 0, right: 0, bottom: 20, top: 0, height: 60, color: 'rgb(250,250,250)' }}>
-                    Result
-                </div>
-                <OffsetBox><QueryResult {...this.props} /></OffsetBox>
+
+                <OffsetBox offset='120px'><QueryResult {...this.props} /></OffsetBox>
             </div>
         </div>
     }
 }
 
-function OffsetBox(props: { children: JSX.Element | JSX.Element[], className?: string }) {
+function OffsetBox(props: { children: JSX.Element | JSX.Element[], className?: string, offset?: string }) {
     const padding = '0';
-    return <div className={props.className} style={{ position: 'absolute', left: padding, right: padding, bottom: padding, top: '60px' }}>{props.children}</div>
+    return <div className={props.className} style={{ position: 'absolute', left: padding, right: padding, bottom: padding, top: props.offset || '60px' }}>{props.children}</div>
 }
 
 class Observer<S, P> extends React.Component<S, P> {
@@ -110,17 +107,29 @@ class LanguageSelection extends Observer<{ state: State}, { language: Language, 
     }
 }
 
-class LiteMolPlugin extends React.Component<{ state: State, isMain: boolean }, {}> {
+class LiteMolPlugin extends React.Component<{ state: State }, {}> {
     private target: HTMLDivElement;
 
     componentDidMount() {
         const plugin = LiteMol.Plugin.create({ target: this.target, layoutState: { hideControls: true, collapsedControlsLayout: LiteMol.Bootstrap.Components.CollapsedControlsLayout.Landscape }, viewportBackground: '#F1F1F1' });
-        if (this.props.isMain) this.props.state.fullPlugin = plugin;
-        else this.props.state.resultPlugin = plugin;
+        this.props.state.plugin = plugin;
     }
 
     render() {
         return <div style={{ position: 'absolute',  top: 0, right: 0, left: 0, bottom: 0 }} ref={ref => this.target = ref!} />
+    }
+}
+
+class Docs extends Observer<{ state: State }, { docs: string }> {
+    state = { docs: '' }
+    componentDidMount() {
+        this.subscribe(this.props.state.currentLanguage, lang => {
+            this.setState({ docs: lang.language.docs });
+        });
+    }
+
+    render() {
+        return <ReactMarkdown source={this.state.docs} />
     }
 }
 
@@ -244,16 +253,67 @@ class CompiledQuery extends Observer<{ state: State }, { error?: string, express
     }
 }
 
-class QueryResult extends Observer<{ state: State }, { content: string, isError: boolean }> {
-    state = { content: '', isError: false }
+class QueryResult extends Observer<{ state: State }, { result: Result }> {
+    state = { result: Result.empty }
     componentDidMount() {
-        this.subscribe(this.props.state.queryResult, ({ content, kind }) => {
-            this.setState({ content, isError: kind === 'error' });
+        this.subscribe(this.props.state.queryResult, result => {
+            this.setState({ result });
         });
     }
     render() {
-        return <pre style={{ position: 'absolute', left: 0, right: 0, bottom: 0, top: 0, background: 'white', margin: 0, padding: '10px', color: this.state.isError ? 'red' : void 0, backgroundColor: '#F1F1F1' }}>
-            {this.state.content}
-        </pre>;
+        let content: any = void 0;
+        const result = this.state.result;
+        switch (result.kind) {
+            case 'empty': content = <i>Load molecule and execute a query...</i>; break;
+            case 'error': content = <div style={{ color: 'red' }}>{result.message}</div>; break;
+            case 'selection': {
+                const maxShown = 100;
+                const entries = result.entries.slice(0, maxShown).map((e, i) => <QueryResultEntry key={i} state={this.props.state} entry={e} />);
+                if (result.entries.length <= maxShown) {
+                    content = <ol className='result-entry-list'>{entries}</ol>;
+                } else {
+                    content = <div>
+                        <ol className='result-entry-list'>
+                            {entries}
+                            <li><i>...and {result.entries.length - maxShown} more.</i></li>
+                        </ol>
+                    </div>
+                }
+            }
+        }
+
+        return <div style={{ position: 'absolute', left: 0, right: 0, bottom: 0, top: 0, margin: 0, padding: '10px', overflowY: 'scroll', overflowX: 'hidden' }}>
+            {content}
+        </div>
+    }
+}
+
+class QueryResultEntry extends Observer<{ state: State, entry: ResultEntry }, { result: Result }> {
+
+    mouseEnter = () => {
+        ResultEntry.highlight(this.props.state.plugin, this.props.entry, true);
+    }
+
+    mouseLeave = () => {
+        ResultEntry.highlight(this.props.state.plugin, this.props.entry, false);
+    }
+
+    mouseClick = (e: React.MouseEvent<any>) => {
+        ResultEntry.focus(this.props.state.plugin, this.props.entry);
+    }
+
+    showCif: React.EventHandler<React.MouseEvent<any>> = e => {
+        e.preventDefault();
+        e.stopPropagation();
+        ResultEntry.showCIF(this.props.state.structureData!.model, this.props.entry);
+    }
+
+    render() {
+        const entry = this.props.entry;
+        return <li onMouseEnter={this.mouseEnter} onMouseLeave={this.mouseLeave} onClick={this.mouseClick} title={entry.info}>
+            <span><a href='#' onClick={this.showCif}>mmCIF</a></span>
+            <span>{entry.signature}</span>
+            <span>({entry.info})</span>
+        </li>;
     }
 }

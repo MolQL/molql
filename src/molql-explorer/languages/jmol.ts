@@ -7,11 +7,14 @@
 import Language from './language'
 import Transpilers from '../../transpilers/all'
 import examples from '../../transpilers/jmol/examples'
+import docs from '../../transpilers/jmol/markdown-docs'
 
 const lang: Language = {
     name: 'Jmol',
     editorMode: 'jmol',
+    docs,
     transpiler: Transpilers.jmol,
+    mergeSelection: true,
     examples
 };
 

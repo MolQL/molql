@@ -7,11 +7,14 @@
 import Language from './language'
 import Transpilers from '../../transpilers/all'
 import examples from '../../transpilers/pymol/examples'
+import docs from '../../transpilers/pymol/markdown-docs'
 
 const lang: Language = {
     name: 'PyMOL',
     editorMode: 'pymol',
+    docs,
     transpiler: Transpilers.pymol,
+    mergeSelection: true,
     examples
 };
 

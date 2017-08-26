@@ -61,3 +61,40 @@
     background-position-x: 5px;
     padding-left: 170px;
 }
+
+.result-entry-list li {
+    font-family: 'Consolas', 'Inconsolata', 'Droid Sans Mono', 'Monaco', monospace;
+    height: 40px;
+    line-height: 40px;
+    border-bottom: 1px solid #e1e1e1;
+    margin-bottom: 0;
+    position: relative;
+    clear: both;
+    cursor: default !important;
+    padding: 0 12px;
+    overflow: hidden;
+}
+
+.result-entry-list li:hover {
+    background: #ffee5d
+}
+
+.result-entry-list li span:nth-child(2) {
+    font-weight: bold;
+}
+
+.result-entry-list li span:nth-child(3) {
+    margin-left: 10px;
+    font-size: smaller;
+    color: #999;
+}
+
+.result-entry-list li span:first-child {
+    float: right;
+    font-size: 9pt;
+}
+
+.result-entry-list li a:hover {
+    font-weight: bold;
+    color: black;
+}

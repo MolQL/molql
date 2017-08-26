@@ -10,9 +10,9 @@ import { Model } from '../reference-implementation/structure/data'
 import AtomSelection from '../reference-implementation/molql/data/atom-selection'
 import parseCIF from '../reference-implementation/structure/parser'
 import compile, { Compiled } from '../reference-implementation/molql/compiler'
-import mmCIFwriter from '../reference-implementation/structure/writer'
 import Context from '../reference-implementation/molql/runtime/context'
 
+import Result from './Result'
 import Language, { Example } from './languages/language'
 import Languages from './languages'
 
@@ -31,8 +31,7 @@ export type Query =
 class State {
     queryString = new Rx.BehaviorSubject<string>('');
 
-    fullPlugin: LiteMol.Plugin.Controller;
-    resultPlugin: LiteMol.Plugin.Controller;
+    plugin: LiteMol.Plugin.Controller;
 
     query = new Rx.BehaviorSubject<Query>({ kind: 'error', message: 'Enter query' });
     compileTarget = new Rx.BehaviorSubject<'lisp' | 'json'>('lisp');
@@ -45,26 +44,26 @@ class State {
     currentSymbol = new Rx.BehaviorSubject<string>('');
     editorActive = new Rx.BehaviorSubject<boolean>(false);
 
-    queryResult = new Rx.BehaviorSubject<{ kind: 'content' | 'error', content: string }>({ kind: 'content', content: 'No query executed yet...'});
+    queryResult = new Rx.BehaviorSubject<Result>(Result.empty);
 
     async loadStructure() {
         try {
-            this.fullPlugin.clear();
-            this.resultPlugin.clear();
-            this.queryResult.onNext({ kind: 'content', content: 'No query executed yet...'});
+            this.plugin.clear();
+            this.plugin.clear();
+            this.queryResult.onNext(Result.empty);
 
+            const plugin = this.plugin;
             let url = `https://webchem.ncbr.muni.cz/CoordinateServer/${this.pdbId}/full`;
-            const data = await LiteMol.Bootstrap.Utils.ajaxGetString(url).run(this.fullPlugin.context);
+            const data = await LiteMol.Bootstrap.Utils.ajaxGetString(url).run(plugin.context);
 
-            const main = this.fullPlugin;
-            const t = this.fullPlugin.createTransform();
-            t.add(main.context.tree.root, Transformer.Data.FromData, { data })
+            const t = plugin.createTransform();
+            t.add(plugin.context.tree.root, Transformer.Data.FromData, { data })
                 .then(Transformer.Data.ParseCif, {})
                 .then(Transformer.Molecule.CreateFromMmCif, { blockIndex: 0 }, {})
-                .then(Transformer.Molecule.CreateModel, { modelIndex: 0 }, {})
-                .then(Transformer.Molecule.CreateMacromoleculeVisual, { het: true, polymer: true, water: true }, {})
+                .then(Transformer.Molecule.CreateModel, { modelIndex: 0 }, { ref: 'model' })
+                .then(Transformer.Molecule.CreateMacromoleculeVisual, { het: true, polymer: true, water: true, groupRef: 'cartoons' })
 
-            await main.applyTransform(t);
+            await plugin.applyTransform(t);
             const model = parseCIF(data).models[0];
             this.structureData = { data, model };
             this.loaded.onNext(true);
@@ -79,21 +78,23 @@ class State {
             const query = this.query.getValue();
             if (query.kind !== 'ok') return;
 
-            this.resultPlugin.command(LiteMol.Bootstrap.Command.Tree.RemoveNode, 'selection');
-            this.queryResult.onNext({ kind: 'content', content: 'No query executed yet...'});
+            this.plugin.command(LiteMol.Bootstrap.Command.Tree.RemoveNode, 'selection');
+            this.plugin.command(LiteMol.Bootstrap.Command.Tree.RemoveNode, 'cartoons');
+            this.queryResult.onNext(Result.empty);
 
             const model = this.structureData!.model;
 
             const ctx = Context.ofModel(model);
-            const res = query.compiled(ctx);
-            const cif = mmCIFwriter(model, AtomSelection.getAtomIndices(res));
+            const selection = query.compiled(ctx);
 
-            this.queryResult.onNext({ kind: 'content', content: cif });
+            const lang = this.currentLanguage.getValue().language;
+            const result = Result(model, selection, lang.mergeSelection);
+            this.queryResult.onNext(result);
 
-            const queryP = this.resultPlugin;
+            const queryP = this.plugin;
             const tQ = queryP.createTransform();
 
-            if (!this.resultPlugin.selectEntities('whole').length) {
+            if (!this.plugin.selectEntities('background').length) {
                 const backgroundStyle: LiteMol.Bootstrap.Visualization.Molecule.Style<LiteMol.Bootstrap.Visualization.Molecule.BallsAndSticksParams> = {
                     type: 'BallsAndSticks',
                     taskType: 'Silent',
@@ -102,23 +103,16 @@ class State {
                     isNotSelectable: true
                 }
 
-                tQ.add(queryP.context.tree.root, Transformer.Data.FromData, { data: this.structureData!.data }, { ref: 'whole' })
-                    .then(Transformer.Data.ParseCif, {})
-                    .then(Transformer.Molecule.CreateFromMmCif, { blockIndex: 0 }, {})
-                    .then(Transformer.Molecule.CreateModel, { modelIndex: 0 }, {})
-                    .then(Transformer.Molecule.CreateVisual, { style: backgroundStyle }, {});
+                tQ.add('model', Transformer.Molecule.CreateVisual, { style: backgroundStyle }, { ref: 'background' });
             }
 
-            tQ.add(queryP.context.tree.root, Transformer.Data.FromData, { data: cif }, { ref: 'selection' })
-                .then(Transformer.Data.ParseCif, {})
-                .then(Transformer.Molecule.CreateFromMmCif, { blockIndex: 0 }, {})
-                .then(Transformer.Molecule.CreateModel, { modelIndex: 0 }, {})
+            tQ.add('model', Transformer.Molecule.CreateSelectionFromQuery, { query: LiteMol.Core.Structure.Query.atomsFromIndices(result.allIndices) }, { ref: 'selection' })
                 .then(Transformer.Molecule.CreateVisual, { style: LiteMol.Bootstrap.Visualization.Molecule.Default.ForType.get('BallsAndSticks') }, {});
 
             queryP.applyTransform(tQ);
         } catch (e) {
             console.error(e);
-            this.queryResult.onNext({ kind: 'error', content: '' + e.message });
+            this.queryResult.onNext(Result.error(e.message));
         }
     }
 

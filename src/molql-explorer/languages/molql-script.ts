@@ -7,11 +7,14 @@
 import Language from './language'
 import Transpilers from '../../transpilers/all'
 import examples from '../../transpilers/molql-script/examples'
+import docs from '../../transpilers/molql-script/markdown-docs'
 
 const lang: Language = {
     name: 'MolQL Script',
     editorMode: 'molql-script',
+    docs,
     transpiler: Transpilers.molQLscript,
+    mergeSelection: false,
     examples
 }
 

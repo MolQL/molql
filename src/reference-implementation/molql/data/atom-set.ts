@@ -4,7 +4,7 @@
  * @author David Sehnal <david.sehnal@gmail.com>
  */
 
-import { sortAsc } from '../../utils/collections'
+import { sortAsc, UniqueArrayBuilder } from '../../utils/collections'
 import { Model } from '../../structure/data'
 import Mask from '../../utils/mask'
 
@@ -139,24 +139,22 @@ namespace AtomSet {
         return computeHashCode(atomSet);
     }
 
-    // export function hierarchy(model: Model, atomSet: AtomSet) {
-    //     const impl = atomSet as AtomSetImpl;
-    //     if (impl.hierarchy) return impl.hierarchy;
+    export function hierarchy(model: Model, atomSet: AtomSet) {
+        const residueIndices = UniqueArrayBuilder<number>();
+        const chainIndices = UniqueArrayBuilder<number>();
+        const entityIndices = UniqueArrayBuilder<number>();
+        const rIndices = model.atoms.residueIndex;
+        const cIndices = model.residues.chainIndex;
+        const eIndices = model.chains.entityIndex;
 
-    //     const residueIndices = UniqueArrayBuilder<number>();
-    //     const chainIndices = UniqueArrayBuilder<number>();
-    //     const entityIndices = UniqueArrayBuilder<number>();
-    //     const rIndices = model.atoms.residueIndex;
-    //     const cIndices = model.residues.chainIndex;
-    //     const eIndices = model.chains.entityIndex;
+        const it = Iterator();
 
-    //     for (const i of impl.atomIndices) { UniqueArrayBuilder.add(residueIndices, rIndices[i], rIndices[i]); }
-    //     for (const i of residueIndices.array) { UniqueArrayBuilder.add(chainIndices, cIndices[i], cIndices[i]); }
-    //     for (const i of chainIndices.array) { UniqueArrayBuilder.add(entityIndices, eIndices[i], eIndices[i]); }
+        for (let i = Iterator.start(it, atomSet); !it.done; i = it.next().value) { UniqueArrayBuilder.add(residueIndices, rIndices[i], rIndices[i]); }
+        for (const i of residueIndices.array) { UniqueArrayBuilder.add(chainIndices, cIndices[i], cIndices[i]); }
+        for (const i of chainIndices.array) { UniqueArrayBuilder.add(entityIndices, eIndices[i], eIndices[i]); }
 
-    //     impl.hierarchy = { residueIndices: residueIndices.array, chainIndices: chainIndices.array, entityIndices: entityIndices.array };
-    //     return impl.hierarchy;
-    // }
+        return { residueIndices: residueIndices.array, chainIndices: chainIndices.array, entityIndices: entityIndices.array };
+    }
 
     function computeBoundingSphere(model: Model, atomSet: ArrayAtomSet) {
         const { x, y, z } = model.positions;

@@ -55,8 +55,8 @@ function formatArgs(args: Arguments) {
     return formatted.join('');
 }
 
-export function formatSymbol(symbol: Symbol, alias: string) {
-    return `${alias} :: ${formatArgs(symbol.args)} => ${typeFormatter(symbol.type)}`;
+export function formatSymbol(symbol: Symbol, alias: string | string[]) {
+    return `${typeof alias === 'string' ? alias : alias.join(', ')} :: ${formatArgs(symbol.args)} => ${typeFormatter(symbol.type)}`;
 }
 
 function _getDocs(includeToC: boolean) {
@@ -95,7 +95,10 @@ Language Reference
     }
     format(0, MolQL);
 
-    const docs = (includeToC ? ToC.join('\n') + '\n' : '') + implemented.join('\n');
+    const docs = `
+MolQL
+=====
+------------------------------\n\n` + (includeToC ? ToC.join('\n') + '\n' : '') + implemented.join('\n');
     return docs;
 }
 

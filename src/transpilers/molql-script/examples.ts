@@ -5,6 +5,14 @@
  */
 
 export default [{
+    name: 'Residues connected to HEM',
+    value: `(sel.atom.is-connected-to
+  sel.atom.res
+  :target (sel.atom.res (= atom.label_comp_id HEM))
+  ;; default bond test allows only covalent bonds
+  :bond-test true
+  :disjunct true)`
+}, {
     name: 'All C or N atoms in ALA residues',
     value: `(sel.atom.atom-groups
   :residue-test (= atom.auth_comp_id ALA)
@@ -27,14 +35,6 @@ export default [{
     name: 'Residues with max b-factor < 45',
     value: `(sel.atom.pick sel.atom.res
   :test (< (atom.set.max atom.B_iso_or_equiv) 45))`
-}, {
-  name: 'Residues connected to HEM',
-  value: `(sel.atom.is-connected-to
-  sel.atom.res
-  :target (sel.atom.res (= atom.label_comp_id HEM))
-  ;; default bond test allows only covalent bonds
-  :bond-test true
-  :disjunct true)`
 }, {
   name: 'Atoms between 10 and 15 ang from Fe',
   value: `(sel.atom.within sel.atom.atoms
@@ -62,8 +62,9 @@ export default [{
   (ringfp _C _C _C _N _C))`
 }, {
   name: 'Sheets',
-  value: `(sel.atom.res
-  (atom.sec-struct.is sheet))`
+  value: `(sel.atom.atom-groups
+  :residue-test (atom.sec-struct.is sheet)
+  :group-by (atom.key.sec-struct))`
 }, {
   name: 'Helices formed by at least 30 residues',
   value: `(sel.atom.pick

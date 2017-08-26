@@ -10,8 +10,6 @@ import PyMol from '../../transpilers/pymol/symbols'
 import Jmol from '../../transpilers/jmol/symbols'
 import VMD from '../../transpilers/vmd/symbols'
 
-console.log('aotocom');
-
 function createSymbolTest(symbols: string[]) {
     const chars = Object.create(null);
     const alphanum = /[a-zA-Z0-9]/;

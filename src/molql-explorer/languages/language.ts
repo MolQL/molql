@@ -11,8 +11,10 @@ export type Example = { name: string, value: string }
 interface Language {
     name: string,
     editorMode: string,
+    docs: string,
     transpiler: Transpiler,
-    examples: Example[]
+    examples: Example[],
+    mergeSelection: boolean
 }
 
 export default Language
