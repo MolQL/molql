@@ -277,22 +277,20 @@ export function getFunctionRules (functions: FunctionDict, argRule: P.Parser<any
   return functionsList
 }
 
-export function getPropertyNameRules(properties: PropertyDict, numeric?: boolean) {
-  const numericList: P.Parser<any>[] = []
+export function getPropertyNameRules(properties: PropertyDict, lookahead: RegExp) {
+  const list: P.Parser<any>[] = []
 
   Object.keys(properties).sort(strLenSortFn).forEach( name => {
     const ps = properties[name]
-    if (!numeric || (numeric && ps.isNumeric)) {
-      const errorFn = makeError(`property '${name}' not supported`)
-      const rule = P.regex(new RegExp(name, 'i')).lookahead(/=~|==|>=|<=|=|!=|>|<|\)|\s|\+|-|\*|\//i).map(() => {
-        if (ps.isUnsupported) errorFn()
-        return ps.property
-      })
-      numericList.push(rule)
-    }
+    const errorFn = makeError(`property '${name}' not supported`)
+    const rule = P.regex(getNamesRegex(name, ps.abbr)).lookahead(lookahead).map(() => {
+      if (ps.isUnsupported) errorFn()
+      return ps.property
+    })
+    list.push(rule)
   })
 
-  return numericList
+  return list
 }
 
 export function getReservedWords(properties: PropertyDict, keywords: KeywordDict, operators: OperatorList, functions?: FunctionDict) {

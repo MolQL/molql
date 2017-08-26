@@ -54,8 +54,7 @@ const valueOperators: OperatorList = [
   {
     '@desc': 'value comparisons',
     '@examples': [],
-    name: '=',
-    abbr: ['=='],
+    name: 'comparison',
     type: h.binaryLeft,
     rule: P.alt(P.regex(/\s*(=~|==|>=|<=|=|!=|>|<)\s*/, 1), P.whitespace.result('=')),
     map: (op, e1, e2) => {
@@ -131,10 +130,6 @@ const lang = P.createLanguage({
     )
   },
 
-  NamedAtomProperties: function() {
-    return P.alt(...h.getNamedPropertyRules(properties))
-  },
-
   Keywords: () => P.alt(...h.getKeywordRules(keywords)),
 
   Operator: function(r) {
@@ -178,7 +173,7 @@ const lang = P.createLanguage({
   },
 
   ValuePropertyNames: function() {
-    return P.alt(...h.getPropertyNameRules(properties))
+    return P.alt(...h.getPropertyNameRules(properties, /=~|==|>=|<=|=|!=|>|<|\)|\s|\+|-|\*|\//i))
   },
 
   ValueOperator: function(r) {
@@ -199,7 +194,14 @@ const lang = P.createLanguage({
 
   ValueQuery: function(r) {
     return P.alt(
-      r.ValueOperator
+      r.ValueOperator.map(x => {
+        // if (!x.head || x.head.startsWith('core.math') || x.head.startsWith('structure.atom-property')) {
+        if (!x.head || !x.head.startsWith('structure.generator')) {
+          throw new Error(`values must be part of an comparison, value '${x}'`);
+        } else {
+          return x
+        }
+      })
     )
   }
 })

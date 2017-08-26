@@ -23,7 +23,20 @@ const general = {
     unsupported: [
         // variables
         'name $atomname',
-        'protein and @myselection'
+        'protein and @myselection',
+
+        // values outside of comparisons
+        'foobar',
+        '34',
+        'name',
+        'abs(-42)',
+        'abs(21+21)',
+        'sqr(3)',
+        'sqr(x)',
+        'sqr(x+33)',
+        'protein or foobar',
+        '34 and protein',
+        'name or protein',
     ]
 }
 

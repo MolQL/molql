@@ -19,7 +19,9 @@ export function testKeywords(keywords: KeywordDict, transpiler: Transpiler) {
                 compile(expr);
                 expect(expr).toEqual(k.map());
             } else {
-                expect(() => transpiler(name)).toThrow()
+                const transpile = () => transpiler(name)
+                expect(transpile).toThrow()
+                expect(transpile).not.toThrowError(RangeError, 'Maximum call stack size exceeded')
             }
         });
     }
@@ -34,7 +36,9 @@ export function testProperties(properties: PropertyDict, transpiler: Transpiler)
                     const expr = transpiler(example);
                     compile(expr);
                 } else {
-                    expect(() => transpiler(example)).toThrow()
+                    const transpile = () => transpiler(example)
+                    expect(transpile).toThrow()
+                    expect(transpile).not.toThrowError(RangeError, 'Maximum call stack size exceeded')
                 }
             })
         })
@@ -54,7 +58,9 @@ export function testOperators(operators: OperatorList, transpiler: Transpiler) {
                     const expr = transpiler(example);
                     compile(expr);
                 } else {
-                    expect(() => transpiler(example)).toThrow()
+                    const transpile = () => transpiler(example)
+                    expect(transpile).toThrow()
+                    expect(transpile).not.toThrowError(RangeError, 'Maximum call stack size exceeded')
                 }
             })
         })
