@@ -50,9 +50,11 @@ function atomSelectionQuery(x: any) {
 
 const lang = P.createLanguage({
   Parens: function (r) {
-    return P.string('(')
-      .then(P.alt(r.Parens, r.Operator, r.Expression))
-      .skip(P.string(')'))
+    return P.alt(
+      r.Parens,
+      r.Operator,
+      r.Expression
+    ).wrap(P.string('('), P.string(')'))
   },
 
   Expression: function(r) {
@@ -61,7 +63,8 @@ const lang = P.createLanguage({
       r.NamedAtomProperties,
       r.Pepseq,
       r.Rep,
-      r.Keywords
+      r.Keywords,
+      r.Object
     )
   },
 
@@ -69,34 +72,34 @@ const lang = P.createLanguage({
     return P.alt(
       slash.then(P.alt(
         P.seq(
-          orNull(r.Object).skip(slash),
+          orNull(r.ObjectProperty).skip(slash),
           orNull(propertiesDict.segi).skip(slash),
           orNull(propertiesDict.chain).skip(slash),
           orNull(propertiesDict.resi).skip(slash),
           orNull(propertiesDict.name)
         ).map(x => {return {object: x[0], segi: x[1], chain: x[2], resi: x[3], name: x[4]}}),
         P.seq(
-          orNull(r.Object).skip(slash),
+          orNull(r.ObjectProperty).skip(slash),
           orNull(propertiesDict.segi).skip(slash),
           orNull(propertiesDict.chain).skip(slash),
           orNull(propertiesDict.resi)
         ).map(x => {return {object: x[0], segi: x[1], chain: x[2], resi: x[3]}}),
         P.seq(
-          orNull(r.Object).skip(slash),
+          orNull(r.ObjectProperty).skip(slash),
           orNull(propertiesDict.segi).skip(slash),
           orNull(propertiesDict.chain)
         ).map(x => {return {object: x[0], segi: x[1], chain: x[2]}}),
         P.seq(
-          orNull(r.Object).skip(slash),
+          orNull(r.ObjectProperty).skip(slash),
           orNull(propertiesDict.segi)
         ).map(x => {return {object: x[0], segi: x[1]}}),
         P.seq(
-          orNull(r.Object)
+          orNull(r.ObjectProperty)
         ).map(x => {return {object: x[0]}}),
       )),
       P.alt(
         P.seq(
-          orNull(r.Object).skip(slash),
+          orNull(r.ObjectProperty).skip(slash),
           orNull(propertiesDict.segi).skip(slash),
           orNull(propertiesDict.chain).skip(slash),
           orNull(propertiesDict.resi).skip(slash),
@@ -127,12 +130,15 @@ const lang = P.createLanguage({
 
   Keywords: () => P.alt(...h.getKeywordRules(keywords)),
 
-  Object: () => {
-    // const w = h.getReservedWords(properties, keywords, operators)
-    //   .sort(h.strLenSortFn).map(h.escapeRegExp).join('|')
-    // console.log(w)
-    // return P.regex(new RegExp(`^(?!(${w}))[A-Z0-9_]+$`, 'i'))
-    return P.regex(/[a-zA-Z0-9_]+/i)
+  ObjectProperty: () => {
+    const w = h.getReservedWords(properties, keywords, operators)
+      .sort(h.strLenSortFn).map(h.escapeRegExp).join('|')
+    return P.regex(new RegExp(`(?!(${w}))[A-Z0-9_]+`, 'i'))
+  },
+
+  Object: (r) => {
+    return r.ObjectProperty.notFollowedBy(slash)
+      .map(x => { throw new Error(`property 'object' not supported, value '${x}'`) })
   },
 
   // Selects peptide sequence matching upper-case one-letter

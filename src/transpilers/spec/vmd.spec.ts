@@ -11,16 +11,34 @@ import transpiler from '../vmd/parser'
 import keywords from '../vmd/keywords'
 import properties from '../vmd/properties'
 import operators from '../vmd/operators'
+import compile from '../../reference-implementation/molql/compiler'
 
-const variables = [
-    'name $atomname',
-    'protein and @myselection'
-]
+const general = {
+    supported: [
+        // trimming
+        '    name CA   ',
+        'name CA   ',
+        '    name CA',
+    ],
+    unsupported: [
+        // variables
+        'name $atomname',
+        'protein and @myselection'
+    ]
+}
 
-describe('vmd variables', () => {
-    variables.forEach(str => {
+describe('vmd general', () => {
+    general.supported.forEach(str => {
         it(str, () => {
-            expect(() => transpiler(str)).toThrow()
+            const expr = transpiler(str);
+            compile(expr);
+        });
+    })
+    general.unsupported.forEach(str => {
+        it(str, () => {
+            const transpileStr = () => transpiler(str)
+            expect(transpileStr).toThrow()
+            expect(transpileStr).not.toThrowError(RangeError, 'Maximum call stack size exceeded')
         });
     })
 });

@@ -146,7 +146,7 @@ const lang = P.createLanguage({
       r.Operator,
       r.Parens,
       r.Expression
-    )//.trim(P.optWhitespace)
+    ).trim(P.optWhitespace)
   },
 
   Number: function () {
