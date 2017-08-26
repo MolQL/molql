@@ -14,7 +14,7 @@ import B from '../../molql/builder'
 const operators: OperatorList = [
   {
     '@desc': 'Selects atoms that are not included in s1.',
-    '@examples': [],
+    '@examples': ['not ARG'],
     name: 'not',
     type: h.prefix,
     rule: P.alt(P.regex(/NOT/i).skip(P.whitespace), P.string('!').skip(P.optWhitespace)),
@@ -22,7 +22,7 @@ const operators: OperatorList = [
   },
   {
     '@desc': 'Selects atoms included in both s1 and s2.',
-    '@examples': [],
+    '@examples': ['ASP and .CA'],
     name: 'and',
     type: h.binaryLeft,
     rule: h.infixOp(/AND|&/i),
@@ -30,7 +30,7 @@ const operators: OperatorList = [
   },
   {
     '@desc': 'Selects atoms included in either s1 or s2.',
-    '@examples': [],
+    '@examples': ['ASP or GLU'],
     name: 'or',
     type: h.binaryLeft,
     rule: h.infixOp(/OR|\|/i),

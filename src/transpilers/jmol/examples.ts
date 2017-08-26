@@ -9,6 +9,9 @@ export default [{
     name: 'Residue 50 or 135',
     value: '50 or 135'
 }, {
-    name: 'atoms with no covalent bonds',
+    name: 'Atoms with no covalent bonds',
     value: 'bondcount = 0'
+}, {
+    name: 'All 3-10 helices',
+    value: 'substructure = helix310'
 }]
