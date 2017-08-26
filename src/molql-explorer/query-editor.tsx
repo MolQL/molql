@@ -15,7 +15,8 @@ require('codemirror/addon/edit/closebrackets');
 require('codemirror/addon/fold/brace-fold');
 require('codemirror/keymap/sublime');
 
-import './query-editor/molql-script'
+import './query-editor/autocompletion'
+import './query-editor/highlight'
 
 export interface QueryEditorProps {
     mode: string,
@@ -50,9 +51,8 @@ export default class QueryEditor extends React.Component<QueryEditorProps, {}> {
     };
 
     autoComplete = (editor: CodeMirror.Editor) => {
-        if (this.props.mode !== 'molql-script') return;
-
-        const hint = (CodeMirror as any).hint['molql-script'];
+        const hint = (CodeMirror as any).hint[this.props.mode];
+        if (!hint) return;
         (this.editor as any).showHint({ hint, closeCharacters: /[\s()\[\];]/ });
 
         if (editor.state.completionActive && editor.state.completionActive.data) {

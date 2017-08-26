@@ -35,3 +35,6 @@ for (const name in functions) {
     if (!functions[name].map) continue
     Functions.push(name)
 }
+
+const _all = { Properties, Operators: [...Operators, ...Functions], Keywords }
+export default _all

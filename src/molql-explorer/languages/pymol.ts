@@ -10,7 +10,7 @@ import examples from '../../transpilers/pymol/examples'
 
 const lang: Language = {
     name: 'PyMOL',
-    editorMode: 'python',
+    editorMode: 'pymol',
     transpiler: Transpilers.pymol,
     examples
 };

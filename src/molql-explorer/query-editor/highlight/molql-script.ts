@@ -5,7 +5,7 @@
  */
 
 import * as CodeMirror from 'codemirror'
-import * as MolQLScript from '../../transpilers/molql-script/symbols'
+import { SymbolList, Constants } from '../../../transpilers/molql-script/symbols'
 
 /**
  * Adapted from the CodeMirror source code
@@ -14,20 +14,13 @@ import * as MolQLScript from '../../transpilers/molql-script/symbols'
 
 const SymbolTest = /[^\s'`,@()\[\]';]/;
 
-const MolQLsymbols = MolQLScript.SymbolList.map(s => s[0]).sort((a, b) => {
-    if (a.length === b.length) return (a < b) as any;
-    return a.length - b.length;
-});
-const MolQLnamedArgs = MolQLScript.NamedArgs.map(a => ':' + a);
-const MolQLfull = [...MolQLsymbols, ...MolQLnamedArgs, ...MolQLScript.Constants];
-
 CodeMirror.defineMode('molql-script', (config) => {
     //const specialForm = /^(block|let*|return-from|catch|load-time-value|setq|eval-when|locally|symbol-macrolet|flet|macrolet|tagbody|function|multiple-value-call|the|go|multiple-value-prog1|throw|if|progn|unwind-protect|labels|progv|let|quote)$/;
     //const assumeBody = /^with|^def|^do|^prog|case$|^cond$|bind$|when$|unless$/;
     const symbols = Object.create(null);
-    for (const s of MolQLsymbols) symbols[s] = true;
+    for (const s of SymbolList) symbols[s[0]] = true;
     const constants = Object.create(null);
-    for (const s of MolQLScript.Constants) constants[s] = true;
+    for (const s of Constants) constants[s] = true;
     const numLiteral = /^(?:[+\-]?(?:\d+|\d*\.\d+)(?:[efd][+\-]?\d+)?|[+\-]?\d+(?:\/[+\-]?\d+)?|#b[+\-]?[01]+|#o[+\-]?[0-7]+|#x[+\-]?[\da-f]+)/;
     const elementSymbol = /^\_[0-9a-zA-Z]+/;
     let type: string | null = null;
@@ -72,7 +65,7 @@ CodeMirror.defineMode('molql-script', (config) => {
             if (constants[name] || elementSymbol.test(name)) return 'atom';
             if (name.charAt(0) === ':') return 'special';
             if (/*state.lastType === 'open' &&*/ symbols[name]) return 'keyword';
-            if (name.charAt(0) === '&') return 'variable-2';
+            // if (name.charAt(0) === '&') return 'variable-2';
             return 'variable';
         }
     }
@@ -135,16 +128,4 @@ CodeMirror.defineMode('molql-script', (config) => {
         blockCommentStart: '#|',
         blockCommentEnd: '|#'
     };
-});
-
-CodeMirror.registerHelper('hint', 'molql-script', function (document: CodeMirror.Doc) {
-    const cur = document.getCursor(), curLine = document.getLine(cur.line);
-    let end = cur.ch, start = end;
-    while (start && SymbolTest.test(curLine.charAt(start - 1))) --start;
-    while (end < curLine.length && SymbolTest.test(curLine.charAt(end))) ++end;
-
-    const w = document.getRange(CodeMirror.Pos(cur.line, start), CodeMirror.Pos(cur.line, end));
-    const test = new RegExp(w, 'i');
-    const list = MolQLfull.filter(s => test.test(s));
-    return { list, from: CodeMirror.Pos(cur.line, start), to: CodeMirror.Pos(cur.line, end) };
 });

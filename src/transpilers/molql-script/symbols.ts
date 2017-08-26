@@ -253,3 +253,9 @@ export const Constants = normalized.constants;
 export const NamedArgs = normalized.namedArgs;
 export const SymbolMap = normalized.symbolMap;
 export const SymbolList = normalized.symbolList;
+
+const sortedSymbols = SymbolList.map(s => s[0]).sort((a, b) => {
+    if (a.length === b.length) return (a < b) as any;
+    return a.length - b.length;
+});
+export default [...sortedSymbols, ...NamedArgs.map(a => ':' + a), ...Constants];

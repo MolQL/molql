@@ -10,7 +10,7 @@ import examples from '../../transpilers/vmd/examples'
 
 const lang: Language = {
     name: 'VMD',
-    editorMode: 'python',
+    editorMode: 'vmd',
     transpiler: Transpilers.vmd,
     examples
 };
