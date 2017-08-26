@@ -138,7 +138,164 @@ const properties: PropertyDict = {
     '@examples': [''],
     regex: /[a-zA-Z0-9]+/, map: str,
     level: 'chain-test', property: B.ammp('auth_asym_id')
-  }
+  },
+
+
+  // TODO
+  chainNo: {
+    '@desc': 'chain number; sequentially counted from 1 for each model; chainNo == 0 means"no chain" or PDB chain identifier indicated as a blank (Jmol 14.0).',
+    '@examples': [''],
+    isUnsupported: true,
+    regex: /[0-9\s{}-]+/, map: str,
+    level: 'atom-test'
+  },
+  color: {
+    '@desc': 'the atom color',
+    '@examples': [''],
+    isUnsupported: true,
+    regex: /[0-9\s{}-]+/, map: str,
+    level: 'atom-test'
+  },
+  covalentRadius: {
+    '@desc': 'covalent bonding radius, synonymous with covalent. Not used by Jmol, but could be used, for example, in {*}.spacefill={*}.covalentRadius.all.',
+    '@examples': [''],
+    isUnsupported: true,
+    regex: /[0-9\s{}-]+/, map: str,
+    level: 'atom-test'
+  },
+  cs: {
+    '@desc': 'chemical shift calculated using computational results that include magnetic shielding tensors.',
+    '@examples': [''],
+    isUnsupported: true,
+    regex: /[0-9\s{}-]+/, map: str,
+    level: 'atom-test'
+  },
+  element: {
+    '@desc': 'element symbol. The value of this parameter depends upon the context. Used with select structure=x, x can be either the quoted element symbol, "H", "He", "Li", etc. or atomic number. In all other contexts, the value is the element symbol. When the atom is a specific isotope, the string will contain the isotope number -- "13C", for example.',
+    '@examples': [''],
+    isUnsupported: true,
+    regex: /[0-9\s{}-]+/, map: str,
+    level: 'atom-test'
+  },
+  elemno: {
+    '@desc': 'atomic element number',
+    '@examples': [''],
+    isUnsupported: true,
+    regex: /[0-9\s{}-]+/, map: str,
+    level: 'atom-test'
+  },
+  eta: {
+    '@desc': 'Based on Carlos M. Duarte, Leven M. Wadley, and Anna Marie Pyle, RNA structure comparison, motif search and discovery using a reduced representation of RNA conformational space, Nucleic Acids Research, 2003, Vol. 31, No. 16 4755-4761. The parameter eta is the C4\'[i-1]-P[i]-C4\'[i]-P[i+1] dihedral angle; theta is the P[i]-C4\'[i]-P[i+1]-C4\'[i+1] dihedral angle. Both are measured on a 0-360 degree scale because they are commonly near 180 degrees. Using the commands plot PROPERTIES eta theta resno; select visible;wireframe only one can create these authors\' "RNA worm" graph.',
+    '@examples': [''],
+    isUnsupported: true,
+    regex: /[0-9\s{}-]+/, map: str,
+    level: 'atom-test'
+  },
+  theta: {
+    '@desc': 'Based on Carlos M. Duarte, Leven M. Wadley, and Anna Marie Pyle, RNA structure comparison, motif search and discovery using a reduced representation of RNA conformational space, Nucleic Acids Research, 2003, Vol. 31, No. 16 4755-4761. The parameter eta is the C4\'[i-1]-P[i]-C4\'[i]-P[i+1] dihedral angle; theta is the P[i]-C4\'[i]-P[i+1]-C4\'[i+1] dihedral angle. Both are measured on a 0-360 degree scale because they are commonly near 180 degrees. Using the commands plot PROPERTIES eta theta resno; select visible;wireframe only one can create these authors\' "RNA worm" graph.',
+    '@examples': [''],
+    isUnsupported: true,
+    regex: /[0-9\s{}-]+/, map: str,
+    level: 'atom-test'
+  },
+  file: {
+    '@desc': 'file number containing this atom',
+    '@examples': [''],
+    isUnsupported: true,
+    regex: /[0-9\s{}-]+/, map: str,
+    level: 'atom-test'
+  },
+  formalCharge: {
+    '@desc': 'formal charge',
+    '@examples': [''],
+    isUnsupported: true,
+    regex: /[0-9\s{}-]+/, map: str,
+    level: 'atom-test'
+  },
+  format: {
+    '@desc': 'format (label) of the atom.',
+    '@examples': [''],
+    isUnsupported: true,
+    regex: /[0-9\s{}-]+/, map: str,
+    level: 'atom-test'
+  },
+  fXyz: {
+    '@desc': 'fractional XYZ coordinates',
+    '@examples': [''],
+    isUnsupported: true,
+    regex: /[0-9\s{}-]+/, map: str,
+    level: 'atom-test'
+  },
+  fX: {
+    '@desc': 'fractional X coordinate',
+    '@examples': [''],
+    isUnsupported: true,
+    regex: /[0-9\s{}-]+/, map: str,
+    level: 'atom-test'
+  },
+  fY: {
+    '@desc': 'fractional Y coordinate',
+    '@examples': [''],
+    isUnsupported: true,
+    regex: /[0-9\s{}-]+/, map: str,
+    level: 'atom-test'
+  },
+  fZ: {
+    '@desc': 'fractional Z coordinate',
+    '@examples': [''],
+    isUnsupported: true,
+    regex: /[0-9\s{}-]+/, map: str,
+    level: 'atom-test'
+  },
+  fuxyz: {
+    '@desc': 'fractional XYZ coordinates in the unitcell coordinate system',
+    '@examples': [''],
+    isUnsupported: true,
+    regex: /[0-9\s{}-]+/, map: str,
+    level: 'atom-test'
+  },
+  fux: {
+    '@desc': 'fractional X coordinate in the unitcell coordinate system',
+    '@examples': [''],
+    isUnsupported: true,
+    regex: /[0-9\s{}-]+/, map: str,
+    level: 'atom-test'
+  },
+  fuy: {
+    '@desc': 'fractional Y coordinate in the unitcell coordinate system',
+    '@examples': [''],
+    isUnsupported: true,
+    regex: /[0-9\s{}-]+/, map: str,
+    level: 'atom-test'
+  },
+  fuz: {
+    '@desc': 'fractional Z coordinate in the unit cell coordinate system',
+    '@examples': [''],
+    isUnsupported: true,
+    regex: /[0-9\s{}-]+/, map: str,
+    level: 'atom-test'
+  },
+  group: {
+    '@desc': '3-letter residue code',
+    '@examples': [''],
+    isUnsupported: true,
+    regex: /[0-9\s{}-]+/, map: str,
+    level: 'atom-test'
+  },
+  group1: {
+    '@desc': 'single-letter residue code (amino acids only)',
+    '@examples': [''],
+    isUnsupported: true,
+    regex: /[0-9\s{}-]+/, map: str,
+    level: 'atom-test'
+  },
+  groupID: {
+    '@desc': 'group ID number: A unique ID for each amino acid or nucleic acid residue in a PDB file. 0  noGroup 1-5  ALA, ARG, ASN, ASP, CYS 6-10  GLN, GLU, GLY, HIS, ILE 11-15  LEU, LYS, MET, PHE, PRO 16-20  SER, THR, TRP, TYR, VAL 21-23  ASX, GLX, UNK 24-29  A, +A, G, +G, I, +I 30-35  C, +C, T, +T, U, +U Additional unique numbers are assigned arbitrarily by Jmol and cannot be used reproducibly.',
+    '@examples': [''],
+    isUnsupported: true,
+    regex: /[0-9\s{}-]+/, map: str,
+    level: 'atom-test'
+  },
 }
 
 export default properties
