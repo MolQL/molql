@@ -26,8 +26,8 @@ export default [{
     name: 'Protein backbone or hydrogen atoms',
     value: 'protein (backbone or name H)'
 }, {
-    name: 'Atoms lighter than 5',
-    value: 'mass < 5'
+    name: 'Atoms heavier than 20',
+    value: 'mass > 20'
 }, {
     name: 'Atoms with two bonds',
     value: 'numbonds = 2'
@@ -35,6 +35,36 @@ export default [{
     name: 'Atoms with an absolute charge greater 1',
     value: 'abs(charge) > 1'
 }, {
-    name: 'Atoms with an x coordinate between 3 and 6',
-    value: 'x < 6 and x > 3'
-}]
+    name: 'Atoms with an x coordinate between -25 and -20',
+    value: 'x < -20 and x > -25'
+}, {
+    name: 'Helices',
+    value: 'structure H'
+}, {
+    name: 'Atoms with name "A 1"',
+    value: "name 'A 1'"
+}, {
+    name: 'Atoms with name "A *"',
+    value: "name 'A *'"
+}, {
+    name: 'Atoms with names starting with C',
+    value: 'name "C.*"'
+}, {
+    name: 'Atoms within 10 ang of [25, 15, 10]',
+    value: 'sqr(x+25)+sqr(y+15)+sqr(z+10) <= sqr(10)'
+}/*, {
+    name: '',
+    value: 'mass 5 to 11.5'
+}, {
+    name: 'Residues ala, arg, asn, asp, cys, and tyr',
+    value: 'resname ALA to CYS TYR'
+}, {
+    name: '',
+    value: 'within 5 of name FE'
+}, {
+    name: '',
+    value: 'protein within 5 of nucleic'
+}, {
+    name: '',
+    value: 'same resname as (protein within 5 of nucleic)'
+}*/]

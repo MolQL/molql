@@ -119,6 +119,8 @@ export function combineOperators (opList: any[], rule: P.Parser<any>) {
 
 export function infixOp (re: RegExp, group: number = 0) {
   return P.whitespace.then(P.regex(re, group).skip(P.whitespace))
+  // return P.optWhitespace.then(P.regex(re, group).lookahead(P.whitespace))
+  // return P.regex(re, group).skip(P.whitespace)
 }
 
 export function prefixOp (re: RegExp, group: number = 0) {
@@ -282,7 +284,7 @@ export function getPropertyNameRules(properties: PropertyDict, numeric?: boolean
     const ps = properties[name]
     if (!numeric || (numeric && ps.isNumeric)) {
       const errorFn = makeError(`property '${name}' not supported`)
-      const rule = P.regex(new RegExp(name, 'i')).map(() => {
+      const rule = P.regex(new RegExp(name, 'i')).lookahead(/=~|==|>=|<=|=|!=|>|<|\)|\s|\+|-|\*|\//i).map(() => {
         if (ps.isUnsupported) errorFn()
         return ps.property
       })

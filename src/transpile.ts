@@ -47,18 +47,7 @@ const testStrings: {[index: string]: string[]} = {
   ],
   molQLscript: [],
   pymol: [],
-  vmd: [
-    "name 'A 1'",
-    "name 'A *'",
-    'name "C.*"',
-    'sqr(x-5)+sqr(y+4)+sqr(z) > sqr(5)',
-    'within 5 of name FE',
-    'protein within 5 of nucleic',
-    'same resname as (protein within 5 of nucleic)',
-    'protein sequence "C..C"',
-    'name eq $atomname',
-    'protein and @myselection'
-  ]
+  vmd: []
 }
 
 function run (query: Expression) {
@@ -98,7 +87,7 @@ function parse(lang: string, str: string) {
   } catch (e) {
     console.log(str)
     console.log(e.message)
-    console.log(e)
+    // console.log(e)
     console.log('\n')
   }
 }

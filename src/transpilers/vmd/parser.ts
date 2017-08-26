@@ -10,6 +10,7 @@ import * as h from '../helper'
 import { OperatorList } from '../types'
 
 import properties from './properties'
+import { sstrucMap } from './properties'
 import operators from './operators'
 import keywords from './keywords'
 import functions from './functions'
@@ -20,63 +21,99 @@ import B from '../../molql/builder'
 // const propertiesDict = h.getPropertyRules(properties)
 
 // <, <=, = or ==, >=, >, and !=
-const numericComparisons: OperatorList = [
+// lt, le, eq, ge, gt, and ne, =~
+const valueOperators: OperatorList = [
+  {
+    '@desc': 'multiplication, division',
+    '@examples': [],
+    name: 'mul-div',
+    type: h.binaryLeft,
+    rule: P.regex(/\s*(\*|\/)\s*/, 1),
+    map: (op, e1, e2) => {
+      switch (op) {
+        case '*': return B.core.math.mult([e1, e2])
+        case '/': return B.core.math.div([e1, e2])
+        default: throw new Error(`value operator '${op}' not supported`);
+      }
+    }
+  },
+  {
+    '@desc': 'addition, substraction',
+    '@examples': [],
+    name: 'add-sub',
+    type: h.binaryLeft,
+    rule: P.regex(/\s*(-|\+)\s*/, 1),
+    map: (op, e1, e2) => {
+      switch (op) {
+        case '-': return B.core.math.sub([e1, e2])
+        case '+': return B.core.math.add([e1, e2])
+        default: throw new Error(`value operator '${op}' not supported`);
+      }
+    }
+  },
   {
     '@desc': 'value comparisons',
     '@examples': [],
     name: '=',
     abbr: ['=='],
     type: h.binaryLeft,
-    rule: P.alt( h.infixOp(/==|>=|<=|=|!=|>|</), P.whitespace.result('=')),
+    rule: P.alt(P.regex(/\s*(=~|==|>=|<=|=|!=|>|<)\s*/, 1), P.whitespace.result('=')),
     map: (op, e1, e2) => {
-      // TODO very brittle...
       // console.log(op, e1, e2)
-      if(e1.head === 'structure.atom-property.macromolecular.label_atom_id') e2 = B.atomName(e2)
-      if(e2.head === 'structure.atom-property.macromolecular.label_atom_id') e1 = B.atomName(e1)
-      if(e1.head === 'structure.atom-property.core.element-symbol') e2 = B.es(e2)
-      if(e2.head === 'structure.atom-property.core.element-symbol') e1 = B.es(e1)
-      switch (op) {
-        case '=':
-        case '==':
-          return B.core.rel.eq([e1, e2])
-        case '!=': return B.core.rel.neq([e1, e2])
-        case '>': return B.core.rel.gr([e1, e2])
-        case '<': return B.core.rel.lt([e1, e2])
-        case '>=': return B.core.rel.gre([e1, e2])
-        case '<=': return B.core.rel.lte([e1, e2])
-        default: throw new Error(`value operator '${op}' not supported`);
+      let expr
+      if (e1.head === 'structure.atom-property.macromolecular.secondary-structure-flags') {
+        expr = B.core.flags.hasAny([e1, sstrucMap(e2)])
+      } else if (e2.head === 'structure.atom-property.macromolecular.secondary-structure-flags') {
+        expr = B.core.flags.hasAny([e2, sstrucMap(e1)])
+      } else if (e1.head === 'core.type.regex') {
+        expr = B.core.str.match([ e1, B.core.type.str([e2]) ])
+      } else if (e2.head === 'core.type.regex') {
+        expr = B.core.str.match([ e2, B.core.type.str([e1]) ])
+      } else if (op === '=~') {
+        if (e1.head) {
+          expr = B.core.str.match([
+            B.core.type.regex([`^${e2}$`, 'i']),
+            B.core.type.str([e1])
+          ])
+        } else {
+          expr = B.core.str.match([
+            B.core.type.regex([`^${e1}$`, 'i']),
+            B.core.type.str([e2])
+          ])
+        }
       }
+      if (e1.head === 'structure.atom-property.macromolecular.label_atom_id') e2 = B.atomName(e2)
+      if (e2.head === 'structure.atom-property.macromolecular.label_atom_id') e1 = B.atomName(e1)
+      if (e1.head === 'structure.atom-property.core.element-symbol') e2 = B.es(e2)
+      if (e2.head === 'structure.atom-property.core.element-symbol') e1 = B.es(e1)
+      if (!expr) {
+        switch (op) {
+          case '=':
+          case '==':
+            expr = B.core.rel.eq([e1, e2])
+            break
+          case '!=':
+            expr = B.core.rel.neq([e1, e2])
+            break
+          case '>':
+            expr = B.core.rel.gr([e1, e2])
+            break
+          case '<':
+            expr = B.core.rel.lt([e1, e2])
+            break
+          case '>=':
+            expr = B.core.rel.gre([e1, e2])
+            break
+          case '<=':
+            expr = B.core.rel.lte([e1, e2])
+            break
+          default: throw new Error(`value operator '${op}' not supported`);
+        }
+      }
+      return B.struct.generator.atomGroups({ 'atom-test': expr })
     }
-  },
-  // {
-  //   '@desc': 'numeric less than comparison',
-  //   '@examples': [],
-  //   name: '<',
-  //   type: h.binaryLeft,
-  //   rule: h.infixOp(/</),
-  //   map: (op, e1, e2) => B.core.rel.lt([e1, e2])
-  // },
-  // {
-  //   '@desc': 'default numeric equality comparison',
-  //   '@examples': [],
-  //   name: '=',
-  //   type: h.binaryLeft,
-  //   rule: P.whitespace,
-  //   map: (op, e1, e2) => B.core.rel.eq([e1, e2])
-  // }
+  }
 ]
-
-// lt, le, eq, ge, gt, and ne, =~
-// const stringComparisons: OperatorList = [
-//   {
-//     '@desc': 'string less than comparison',
-//     '@examples': [],
-//     type: h.binaryLeft,
-//     rule: h.infixOp(/lt/i),
-//     map: (op, e1, e2) => B.core.rel.lt([e1, e2])
-//   }
-// ]
-
 
 const lang = P.createLanguage({
   Parens: function (r) {
@@ -125,9 +162,11 @@ const lang = P.createLanguage({
   String: function () {
     const w = h.getReservedWords(properties, keywords, operators)
       .sort(h.strLenSortFn).map(h.escapeRegExp).join('|')
-    return P.regex(new RegExp(`^(?!(${w}))[A-Z0-9_]+$`, 'i'))
-    // return P.regexp(/[a-zA-Z0-9]+/)
-    //   .desc('string')
+    return P.alt(
+      P.regex(new RegExp(`(?!(${w}))[A-Z0-9_]+`, 'i')),
+      P.regex(/'((?:[^"\\]|\\.)*)'/, 1),
+      P.regex(/"((?:[^"\\]|\\.)*)"/, 1).map(x => B.core.type.regex([`^${x}$`, 'i']))
+    )
   },
 
   Value: function (r) {
@@ -147,12 +186,7 @@ const lang = P.createLanguage({
   },
 
   ValueOperator: function(r) {
-    return h.combineOperators(numericComparisons, P.alt(r.ValueParens, r.ValueExpressions))
-    // const next = P.alt(r.ValueParens, r.ValueExpressions, r.ValueOperator)
-    // return P.alt(...numericComparisons.map(o => {
-    //   const map = o.isUnsupported ? h.makeError(`operator '${o.name}' not supported`) : o.map
-    //   return o.type(o.rule, next, map)
-    // }))
+    return h.combineOperators(valueOperators, P.alt(r.ValueParens, r.ValueExpressions))
   },
 
   ValueExpressions: function(r) {
@@ -164,7 +198,7 @@ const lang = P.createLanguage({
   },
 
   ValueFunctions: function(r) {
-    return P.alt(...h.getFunctionRules(functions, r.ValueExpressions))
+    return P.alt(...h.getFunctionRules(functions, r.ValueOperator))
   },
 
   ValueQuery: function(r) {
@@ -172,7 +206,7 @@ const lang = P.createLanguage({
       r.ValueOperator,
       // r.ValueParens,
       // r.ValueExpression
-    ).trim(P.optWhitespace)
+    )
   }
 })
 

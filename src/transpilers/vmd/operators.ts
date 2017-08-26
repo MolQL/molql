@@ -25,7 +25,7 @@ const operators: OperatorList = [
     '@examples': ['backbone and protein'],
     name: 'and',
     type: h.binaryLeft,
-    rule: h.infixOp(/AND|&/i),
+    rule: P.alt(h.infixOp(/AND|&/i), P.whitespace),
     map: (op, selection, by) => B.struct.modifier.intersectBy({ 0: selection, by })
   },
   {

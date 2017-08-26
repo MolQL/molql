@@ -12,6 +12,19 @@ import keywords from '../vmd/keywords'
 import properties from '../vmd/properties'
 import operators from '../vmd/operators'
 
+const variables = [
+    'name $atomname',
+    'protein and @myselection'
+]
+
+describe('vmd variables', () => {
+    variables.forEach(str => {
+        it(str, () => {
+            expect(() => transpiler(str)).toThrow()
+        });
+    })
+});
+
 describe('vmd keywords', () => u.testKeywords(keywords, transpiler));
 describe('vmd properties',() => u.testProperties(properties, transpiler));
 describe('vmd operators', () => u.testOperators(operators, transpiler));

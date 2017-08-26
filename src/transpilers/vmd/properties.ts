@@ -13,7 +13,7 @@ const reInt = /[-+]?[0-9]+/
 
 function str(x: string) { return x }
 
-const secStruct: {[key: string]: string} = {
+const sstrucDict: {[key: string]: string} = {
   T: 'turn',  // Turn
   E: 'sheet',  // Extended conformation ($\beta$ sheets)
   B: 'strand',  // Isolated bridge
@@ -21,6 +21,11 @@ const secStruct: {[key: string]: string} = {
   G: '3-10',  // 3-10 helix
   I: 'pi',  // Pi helix
   C: 'none',  // Coil
+}
+export function sstrucMap(x: string) {
+  return B.struct.type.secondaryStructureFlags(
+    [sstrucDict[x.toUpperCase()] || 'none']
+  )
 }
 
 const properties: PropertyDict = {
@@ -214,8 +219,7 @@ const properties: PropertyDict = {
   structure: {
     '@desc': 'str  single letter name for the secondary structure',
     '@examples': ['structure H'],
-    isNumeric: true,
-    regex: /T|E|B|H|G|I|C/i, map: x => secStruct[x],
+    regex: /T|E|B|H|G|I|C/i, map: sstrucMap,
     level: 'atom-test',  property: B.ammp('secondaryStructureFlags')
   },
   phi: {
