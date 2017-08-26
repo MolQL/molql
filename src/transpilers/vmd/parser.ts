@@ -126,7 +126,6 @@ const lang = P.createLanguage({
 
   Expression: function(r) {
     return P.alt(
-      // r.NamedAtomProperties,
       r.ValueQuery,
       r.Keywords,
     )
@@ -144,13 +143,10 @@ const lang = P.createLanguage({
 
   Query: function(r) {
     return P.alt(
-      // r.ValueQuery,
-      P.alt(
-        r.Operator,
-        r.Parens,
-        r.Expression
-      ).trim(P.optWhitespace)
-    )
+      r.Operator,
+      r.Parens,
+      r.Expression
+    )//.trim(P.optWhitespace)
   },
 
   Number: function () {
@@ -203,9 +199,7 @@ const lang = P.createLanguage({
 
   ValueQuery: function(r) {
     return P.alt(
-      r.ValueOperator,
-      // r.ValueParens,
-      // r.ValueExpression
+      r.ValueOperator
     )
   }
 })

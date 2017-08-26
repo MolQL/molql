@@ -52,19 +52,22 @@ export default [{
 }, {
     name: 'Atoms within 10 ang of [25, 15, 10]',
     value: 'sqr(x+25)+sqr(y+15)+sqr(z+10) <= sqr(10)'
+}, {
+    name: 'Atoms within 5 ang of iron atoms',
+    value: 'within 5 of name FE'
+}, {
+    name: 'Atoms around 10 ang of HEM residue',
+    value: 'exwithin 10 of resname HEM'
+}, {
+    name: 'ALA residues within 15 ang of HEM',
+    value: 'resname ALA within 15 of resname HEM'
+}, {
+    name: 'All groups that include an iron atom',
+    value: 'same resid as name FE'
 }/*, {
     name: '',
     value: 'mass 5 to 11.5'
 }, {
     name: 'Residues ala, arg, asn, asp, cys, and tyr',
     value: 'resname ALA to CYS TYR'
-}, {
-    name: '',
-    value: 'within 5 of name FE'
-}, {
-    name: '',
-    value: 'protein within 5 of nucleic'
-}, {
-    name: '',
-    value: 'same resname as (protein within 5 of nucleic)'
 }*/]
