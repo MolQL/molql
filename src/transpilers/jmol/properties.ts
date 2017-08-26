@@ -87,6 +87,7 @@ const properties: PropertyDict = {
   atomX: {
     '@desc': 'Cartesian X coordinate (or just X)',
     '@examples': [''],
+    abbr: ['X'],
     isNumeric: true,
     regex: reFloat, map: x => parseFloat(x),
     level: 'atom-test', property: B.acp('x')
@@ -94,13 +95,15 @@ const properties: PropertyDict = {
   atomY: {
     '@desc': 'Cartesian Y coordinate (or just Y)',
     '@examples': [''],
+    abbr: ['Y'],
     isNumeric: true,
     regex: reFloat, map: x => parseFloat(x),
     level: 'atom-test', property: B.acp('y')
   },
   atomZ: {
-    '@desc': 'Cartesian Z coordinate (or just Z',
+    '@desc': 'Cartesian Z coordinate (or just Z)',
     '@examples': [''],
+    abbr: ['Z'],
     isNumeric: true,
     regex: reFloat, map: x => parseFloat(x),
     level: 'atom-test', property: B.acp('z')

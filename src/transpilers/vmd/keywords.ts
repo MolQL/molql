@@ -156,7 +156,7 @@ const keywords: KeywordDict = {
     map: () => resnameExpr(ResDict.acidic)
   },
   acyclic: {
-    '@desc': '`protein and not cyclic`',
+    '@desc': '"protein and not cyclic"',
     map: () => B.struct.modifier.intersectBy({
       0: proteinExpr(),
       by: h.invertExpr(resnameExpr(ResDict.cyclic))
@@ -206,7 +206,7 @@ const keywords: KeywordDict = {
     map: () => resnameExpr(ResDict.cg)
   },
   charged: {
-    '@desc': '`basic or acidic`',
+    '@desc': '"basic or acidic"',
     map: () => resnameExpr(ResDict.basic.concat(ResDict.acidic))
   },
   cyclic: {
@@ -214,7 +214,7 @@ const keywords: KeywordDict = {
     map: () => resnameExpr(ResDict.cyclic)
   },
   hetero: {
-    '@desc': '`not (protein or nucleic)`',
+    '@desc': '"not (protein or nucleic)"',
     map: () => h.invertExpr(
       B.struct.combinator.merge([proteinExpr(), nucleicExpr()])
     )
@@ -229,7 +229,7 @@ const keywords: KeywordDict = {
     })
   },
   large: {
-    '@desc': '`protein and not (small or medium)`',
+    '@desc': '"protein and not (small or medium)"',
     map: () => B.struct.modifier.intersectBy({
       0: proteinExpr(),
       by: h.invertExpr(
@@ -250,7 +250,7 @@ const keywords: KeywordDict = {
     map: () => resnameExpr(ResDict.hydrophobic)
   },
   polar: {
-    '@desc': '`protein and not hydrophobic`',
+    '@desc': '"protein and not hydrophobic"',
     map: () => B.struct.modifier.intersectBy({
       0: proteinExpr(),
       by: h.invertExpr(resnameExpr(ResDict.hydrophobic))
@@ -269,7 +269,7 @@ const keywords: KeywordDict = {
     map: () => resnameExpr(ResDict.small)
   },
   surface: {
-    '@desc': '`protein and not buried`',
+    '@desc': '"protein and not buried"',
     map: () => B.struct.modifier.intersectBy({
       0: proteinExpr(),
       by: h.invertExpr(resnameExpr(ResDict.buried))
