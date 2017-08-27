@@ -12,7 +12,7 @@ import parseCIF from '../reference-implementation/structure/parser'
 import compile, { Compiled } from '../reference-implementation/molql/compiler'
 import Context from '../reference-implementation/molql/runtime/context'
 
-import Result from './Result'
+import Result from './result'
 import Language, { Example } from './languages/language'
 import Languages from './languages'
 
