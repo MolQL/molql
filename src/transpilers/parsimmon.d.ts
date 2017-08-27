@@ -164,12 +164,12 @@ declare namespace Parsimmon {
 		 * For example, string('x').desc('the letter x') will indicate that 'the letter x' was expected.
 		 */
         desc(description: string): Parser<T>;
-        
+
         // added
         node(name: string): Parser<T>;
         thru<U>(wrapper: (p: Parser<T>) => Parser<U>): Parser<U>;
-        sepBy(separator: string): Parser<T>;
-        sepBy1(separator: string): Parser<T>;
+        sepBy(separator: Parser<T>): Parser<any[]>;
+        sepBy1(separator: Parser<T>): Parser<any[]>;
         tie(): Parser<T>;
         trim(arg: Parser<string>): Parser<T>;
         wrap(before: Parser<any>, after: Parser<any>): Parser<T>;
@@ -372,7 +372,7 @@ declare namespace Parsimmon {
     function takeWhile(predicate: (char: string) => boolean): Parser<string>;
 
     function range(begin: number, end: number): Parser<string>;
-	function seqObj(...parsers: Array<Parser<any> | [String, Parser<any>]>): Parser<any[]>;	
+	function seqObj(...parsers: Array<Parser<any> | [String, Parser<any>]>): Parser<any[]>;
 	function createLanguage<T extends { [name: string]: (r: { [name: string]: Parser<any> }) => Parser<any> }>(parsers: T): { [P in keyof T]: Parser<any> };
 }
 

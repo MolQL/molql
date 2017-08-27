@@ -50,11 +50,9 @@ const valueOperators: OperatorList = [
           ])
         }
       }
-      if (e1.head === 'structure.atom-property.macromolecular.label_atom_id') e2 = B.atomName(e2)
-      if (e2.head === 'structure.atom-property.macromolecular.label_atom_id') e1 = B.atomName(e1)
-      if (e1.head === 'structure.atom-property.core.element-symbol') e2 = B.es(e2)
-      if (e2.head === 'structure.atom-property.core.element-symbol') e1 = B.es(e1)
       if (!expr) {
+        if (e1.head) e2 = h.wrapValue(e1, e2)
+        if (e2.head) e1 = h.wrapValue(e2, e1)
         switch (op) {
           case '=':
             expr = B.core.rel.eq([e1, e2])

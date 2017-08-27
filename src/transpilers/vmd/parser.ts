@@ -10,7 +10,7 @@ import * as h from '../helper'
 import { OperatorList } from '../types'
 
 import properties from './properties'
-import { sstrucMap } from './properties'
+import { sstrucMap, sstrucDict } from './properties'
 import operators from './operators'
 import keywords from './keywords'
 import functions from './functions'
@@ -81,11 +81,9 @@ const valueOperators: OperatorList = [
           ])
         }
       }
-      if (e1.head === 'structure.atom-property.macromolecular.label_atom_id') e2 = B.atomName(e2)
-      if (e2.head === 'structure.atom-property.macromolecular.label_atom_id') e1 = B.atomName(e1)
-      if (e1.head === 'structure.atom-property.core.element-symbol') e2 = B.es(e2)
-      if (e2.head === 'structure.atom-property.core.element-symbol') e1 = B.es(e1)
       if (!expr) {
+        if (e1.head) e2 = h.wrapValue(e1, e2)
+        if (e2.head) e1 = h.wrapValue(e2, e1)
         switch (op) {
           case '=':
           case '==':
@@ -125,12 +123,58 @@ const lang = P.createLanguage({
 
   Expression: function(r) {
     return P.alt(
+      r.RangeListProperty,
       r.ValueQuery,
       r.Keywords,
     )
   },
 
   Keywords: () => P.alt(...h.getKeywordRules(keywords)),
+
+  ValueRange: function(r) {
+    return P.seq(
+      r.Value
+        .skip(P.regex(/\s+TO\s+/i)),
+      r.Value
+    ).map(x => ({range: x}))
+  },
+
+  RangeListProperty: function(r) {
+    return P.seq(
+      P.alt(...h.getPropertyNameRules(properties, /\s/))
+        .skip(P.whitespace),
+      P.alt(
+        r.ValueRange,
+        r.Value
+      ).sepBy1(P.whitespace)
+    ).map(x => {
+      const [property, values] = x
+      const listValues: (string|number)[] = []
+      const rangeValues: any[] = []
+
+      values.forEach(v => {
+        if (v.range) {
+          rangeValues.push(
+            B.core.rel.inRange([property, v.range[0], v.range[1]])
+          )
+        } else {
+          listValues.push(h.wrapValue(property, v, sstrucDict))
+        }
+      })
+
+      const rangeTest = h.orExpr(rangeValues)
+      const listTest = h.valuesTest(property, listValues)
+
+      let test
+      if (rangeTest && listTest) {
+        test = B.core.logic.or([rangeTest, listTest])
+      } else {
+        test = rangeTest ? rangeTest : listTest
+      }
+
+      return B.struct.generator.atomGroups({ [h.testLevel(property)]: test })
+    })
+  },
 
   Operator: function(r) {
     return h.combineOperators(operators, P.alt(r.Parens, r.Expression, r.ValueQuery))
@@ -157,7 +201,7 @@ const lang = P.createLanguage({
       P.regex(new RegExp(`(?!(${w}))[A-Z0-9_]+`, 'i')),
       P.regex(/'((?:[^"\\]|\\.)*)'/, 1),
       P.regex(/"((?:[^"\\]|\\.)*)"/, 1).map(x => B.core.type.regex([`^${x}$`, 'i']))
-    )
+    ).desc('string')
   },
 
   Value: function (r) {

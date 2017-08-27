@@ -64,10 +64,13 @@ export default [{
 }, {
     name: 'All groups that include an iron atom',
     value: 'same resid as name FE'
-}/*, {
-    name: '',
-    value: 'mass 5 to 11.5'
 }, {
+    name: 'Atoms with mass between 12 and 17.5',
+    value: 'mass 12 to 17.5'
+}, {
+    name: 'Residues 60, 80, 90 and 142',
+    value: 'resid 60 80 90 142'
+}/*, {
     name: 'Residues ala, arg, asn, asp, cys, and tyr',
     value: 'resname ALA to CYS TYR'
 }*/]

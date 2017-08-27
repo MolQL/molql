@@ -13,7 +13,7 @@ const reInt = /[-+]?[0-9]+/
 
 function str(x: string) { return x }
 
-const sstrucDict: {[key: string]: string} = {
+export const sstrucDict: {[key: string]: string} = {
   T: 'turn',  // Turn
   E: 'sheet',  // Extended conformation ($\beta$ sheets)
   B: 'strand',  // Isolated bridge
@@ -218,7 +218,7 @@ const properties: PropertyDict = {
   },
   structure: {
     '@desc': 'str  single letter name for the secondary structure',
-    '@examples': ['structure H'],
+    '@examples': ['structure H', 'structure H E'],
     regex: /T|E|B|H|G|I|C/i, map: sstrucMap,
     level: 'atom-test',  property: B.ammp('secondaryStructureFlags')
   },

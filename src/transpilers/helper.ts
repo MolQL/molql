@@ -157,6 +157,16 @@ export function andExpr (selections: any[]) {
   }
 }
 
+export function orExpr (selections: any[]) {
+  if (selections.length === 1){
+    return selections[0]
+  }else if (selections.length > 1) {
+    return B.core.logic.or(selections)
+  }else {
+    return undefined
+  }
+}
+
 export function testExpr (property: any, args: any) {
   if (args && args.op !== undefined && args.val !== undefined) {
     const opArgs = [ property, args.val ]
@@ -319,4 +329,52 @@ export function asAtoms(e: Expression) {
     0: e,
     query: B.struct.generator.atomGroups()
   });
+}
+
+export function wrapValue(property: any, value: any, sstrucDict?: any) {
+  switch (property.head) {
+    case 'structure.atom-property.macromolecular.label_atom_id':
+      return B.atomName(value)
+    case 'structure.atom-property.core.element-symbol':
+      return B.es(value)
+    case 'structure.atom-property.macromolecular.secondary-structure-flags':
+      if(sstrucDict) {
+        value = [sstrucDict[value.toUpperCase()] || 'none']
+      }
+      return B.struct.type.secondaryStructureFlags([value])
+    default:
+      return value
+  }
+}
+
+const propPrefix = 'structure.atom-property.macromolecular.'
+const entityProps = ['entityKey', 'label_entity_id', 'entityType']
+const chainProps = ['chainKey', 'label_asym_id', 'label_entity_id', 'auth_asym_id', 'entityType']
+const residueProps = ['residueKey', 'label_comp_id', 'label_seq_id', 'auth_comp_id', 'auth_seq_id', 'pdbx_formal_charge', 'secondaryStructureKey', 'secondaryStructureFlags', 'isModified', 'modifiedParentName']
+export function testLevel(property: any) {
+  if (property.head.startsWith(propPrefix)){
+    const name = property.head.substr(propPrefix.length)
+    if (entityProps.indexOf(name) !== -1) return 'entity-test'
+    if (chainProps.indexOf(name) !== -1) return 'chain-test'
+    if (residueProps.indexOf(name) !== -1) return 'residue-test'
+  }
+  return 'atom-test'
+}
+
+const flagProps = [
+  'structure.atom-property.macromolecular.secondary-structure-flags'
+]
+export function valuesTest(property: any, values: any[]) {
+  if (flagProps.indexOf(property.head) !== -1) {
+    const name = values[0].head
+    const flags: any[] = []
+    values.forEach(v => flags.push(...v.args[0]))
+    return B.core.flags.hasAny([property, { head: name, args: flags }])
+  } else {
+    if (values.length === 1) {
+      return B.core.rel.eq([property, values[0]])
+    } else if (values.length > 1) {
+      return B.core.set.has([B.core.type.set(values), property])
+    }
+  }
 }
