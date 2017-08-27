@@ -17,7 +17,7 @@ import * as ReactMarkdown from 'react-markdown'
 import QueryEditor from './query-editor'
 import * as MolQLScript from '../transpilers/molql-script/symbols'
 
-import Result, { ResultEntry } from './Result'
+import Result, { ResultEntry } from './result'
 
 import Rx = LiteMol.Core.Rx
 

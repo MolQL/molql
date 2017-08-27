@@ -62,7 +62,7 @@ const properties: PropertyDict = {
   alt: {
     '@desc': 'alternate-conformation-identifier-list list of single letters',
     '@examples': ['alt A+B'],
-    abbr: ['alt'], regex: /[a-zA-Z0-9+]+/, map: listMap,
+    abbr: [], regex: /[a-zA-Z0-9+]+/, map: listMap,
     level: 'atom-test', property: B.ammp('label_alt_id')
   },
   chain: {
@@ -101,7 +101,7 @@ const properties: PropertyDict = {
   id: {
     '@desc': 'external-index-number a single integer',
     '@examples': ['id 23'],
-    abbr: ['id'], regex: rePosInt, map: x => parseInt(x),
+    abbr: [], regex: rePosInt, map: x => parseInt(x),
     level: 'atom-test', property: B.ammp('id')
   },
   index: {
@@ -114,7 +114,7 @@ const properties: PropertyDict = {
   ss: {
     '@desc': 'secondary-structure-type list of single letters. Helical regions should be assigned H and sheet regions S. Loop regions can either be assigned L or be blank.',
     '@examples': ['ss H+S+L'],
-    abbr: ['ss'], regex: /[a-zA-Z+]+/, map: sstrucListMap,
+    abbr: [], regex: /[a-zA-Z+]+/, map: sstrucListMap,
     level: 'residue-test', property: B.ammp('secondaryStructureFlags')
   },
 
@@ -122,14 +122,14 @@ const properties: PropertyDict = {
     '@desc': 'comparison-operator b-factor-value a real number',
     '@examples': ['b > 10'],
     isNumeric: true,
-    abbr: ['b'], regex: reFloat, map: x => parseFloat(x),
+    abbr: [], regex: reFloat, map: x => parseFloat(x),
     level: 'atom-test', property: B.ammp('B_iso_or_equiv')
   },
   q: {
     '@desc': 'comparison-operator occupancy-value a real number',
     '@examples': ['q <0.50'],
     isNumeric: true,
-    abbr: ['q'], regex: reFloat, map: x => parseFloat(x),
+    abbr: [], regex: reFloat, map: x => parseFloat(x),
     level: 'atom-test', property: B.ammp('occupancy')
   },
   formal_charge: {

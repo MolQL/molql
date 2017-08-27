@@ -13,13 +13,20 @@ import properties from '../pymol/properties'
 import operators from '../pymol/operators'
 import compile from '../../reference-implementation/molql/compiler'
 
-const macros = {
+const general = {
     supported: [
+        // macros
         '10/cb',
         'a/10-12/ca',
         'lig/b/6+8/c+o',
+
+        // trimming
+        '    name CA   ',
+        'name CA   ',
+        '    name CA',
     ],
     unsupported: [
+        // macros
         'pept/enz/c/3/n',
         'pept/enz///n',
 
@@ -28,19 +35,25 @@ const macros = {
         '/pept/lig/a/10',
         '/pept/lig/a/10/ca',
         '/pept//a/10',
+
+        // object
+        'foobar',
+        'protein and bazbar',
     ]
 }
 
-describe('pymol macros', () => {
-    macros.supported.forEach(str => {
+describe('pymol general', () => {
+    general.supported.forEach(str => {
         it(str, () => {
             const expr = transpiler(str);
             compile(expr);
         });
     })
-    macros.unsupported.forEach(str => {
+    general.unsupported.forEach(str => {
         it(str, () => {
-            expect(() => transpiler(str)).toThrow()
+            const transpileStr = () => transpiler(str)
+            expect(transpileStr).toThrow()
+            expect(transpileStr).not.toThrowError(RangeError, 'Maximum call stack size exceeded')
         });
     })
 });
