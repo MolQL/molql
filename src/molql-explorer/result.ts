@@ -95,13 +95,17 @@ export namespace ResultEntry {
         const cif = btoa(mmCIFwriter(model, set.indices));
         const uri = 'data:text/plain;base64,' + cif;
         const a = document.createElement('a');
-        a.style.visibility = 'hidden';
-        a.href = uri;
-        a.target = '_blank';
-        a.download = 'atomset.cif';
-        document.body.appendChild(a);
-        a.click();
-        setTimeout(() => a.remove(), 20000);
+        if ('download' in a) {
+            a.style.visibility = 'hidden';
+            a.href = uri;
+            a.target = '_blank';
+            a.download = 'atomset.cif';
+            document.body.appendChild(a);
+            a.click();
+            a.remove()
+        } else {
+            window.open(uri, '_blank');
+        }
     }
 }
 
