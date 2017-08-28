@@ -12,6 +12,8 @@ the [language reference](docs/language-reference.md).
 The language is based on work described in this [dissertation](https://is.muni.cz/th/140435/fi_d/thesis.pdf)
 that was implemented as part the [PattenQuery](http://webchem.ncbr.muni.cz/Platform/PatternQuery/Index) service ([publication](http://dx.doi.org/10.1093/nar/gkv561)), the [CoordinateServer](https://cs.litemol.org) ([@PDB](https://www.ebi.ac.uk/pdbe/coordinates/)) and [LiteMol](https://github.com/dsehnal/LiteMol).
 
+You can play with MolQL in your browser using the [MolQL Explorer](https://molql.github.io/explorer.html).
+
 Project Structure
 ========
 

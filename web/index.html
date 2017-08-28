@@ -41,7 +41,7 @@
         <div class="row">
             <div class="six columns">
                 <h5>Jmol</h5>
-                <pre><code>helix</code></pre>
+                <pre><code>substructure = helix</code></pre>
                 <h5>PyMol</h5>
                 <pre><code>ss h</code></pre>
                 <h5>VMD</h5>
@@ -50,7 +50,7 @@
             <div class="six columns">
                 <h5>MolQL (Script)</h5>
                 <pre><code>(sel.atom.res
-  (atom.sec-struct.is helix))</code></pre>
+  (atom.sec-struct.is alpha))</code></pre>
                 <h5>... all compile to MolQL:</h5>
                 <pre><code>(structure.generator.atom-groups
   :atom-test (core.flags.has-any
