@@ -13,7 +13,7 @@ export default [{
     value: 'bondcount = 0'
 }, {
     name: 'All 3-10 helices',
-    value: 'substructure = helix310'
+    value: 'substructure = "helix310"'
 }, {
     name: 'Metal atoms',
     value: 'metal'
