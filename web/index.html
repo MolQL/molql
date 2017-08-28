@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <link rel="shortcut icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAABgCAMAAADVRocKAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAABaUExURQAAAAIAAAAAAAEAAAEAAQEAAQAAAAIAAQEAAAIAAVDqx////wIAAfj6+RcVFub69nrv1ZGQkNra2l9eXo/y3F/szDY0NcHBwUpJSqj143Z1dampqdb68sL47Ms0UM0AAAAKdFJOUwBWIzrBmw7zbt64KGdtAAAC+UlEQVRo3u2ZyXaDMAxFw2gwxkyBQCj//5sVPSkzWFJgx1t1UyvX2E+Dh59bt259Kd/y3DB0Peei9YNQfRRaFyxvu7ByVbzftYY/XP/09eHnF3nUK24hREiOYAWHCpVoo3/FBTAQ13eUSa9oIogQ0ALADutDZdP1o1grQdokC35hfKhorpaI4Ko6IgkQXCIALQB8hfBKgCh5K0UCyC8NENIBIIBgAMTJnpanKKoI3yBUxee/nnJPz8X6uVIeHSCR+0qWh0g5ZwJImS53CH2TcQDLTXqht8jHAfQMs12qlbJxeWoA+JEmPbtkcCUsAh7gX82I4JwMMD9POSrpAMD784tSbIAn5aQyAEgIvqADjAjgd5YRQCdkACl/PvdGm/yIBzDe6syUN5kAAwLkzcP6iAuARPAtlwsgZWeuXqy+lGUCjAj71YsHy9fZx1c6KZkIu7YN69djnk/pAcpj2w7G3SHY3KbnVVu2bYvBQtkRyiPb9pSeVwlxyUfYyjxCZYsioeEjbHge9AKLGsGQjqm2bSm9KtQYe7Rv24GqVgHSLxBWtn1WgN27cNYWTW7z/BzZ62qd85EnfuStisX398d0khRWdhQokZ8GsJUToFipplc5TvmHdDsxQ8Fbxxed0cFOdRt/46am4igQEKLI2Z+gMZZ3f+OZgotw4HQTz/OQrcfBHauXd4zTPNETJrl72q1ajJ3a2IE/mSYRnNMA8irH+RSkod+xDDEzGuc4SUk2CYWZJjAQJrkYMT91BgRs6YK6YzOEioJQUttYCkLZJJxZAhqhiRfTENwooUdoMQjdcqyJnhfhEBr+YBaFkEbseVFfbP9n6C7dU7ee/OIfEewBgTD5JXyDjX4BoYoyWgaEjBqgJo2WGQgkgr5poyJoyjdgILyI7wd935kdqV1N95FDx2nnj3/C6QGIr0S+OJbS03o812irw2+hHhlemvwIZTYsMTzU5bD/tCOEfgpUui7+XhpF8Dhf/vBYKjz7cY2cwHNdz/Ift27d2tcvK5TMcJLre7cAAAAASUVORK5CYII="
+    />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=1" />
+    <title>MolQL</title>
+    <link href='https://fonts.googleapis.com/css?family=Raleway:400,300,600' rel='stylesheet' type='text/css'>    
+    <link rel="stylesheet" href="assets/css/normalize.css" type="text/css" />
+    <link rel="stylesheet" href="assets/css/skeleton.css" type="text/css" />
+    <link rel="stylesheet" href="assets/css/landing.css" type="text/css" />
+</head>
+
+<body style="margin: 5rem 0">
+    <div class="container">
+        <div class="row" style="text-align: center">
+            <img src="assets/img/logo.png" alt="MolQL" />
+        </div>
+        <div class="row" style="text-align: justify; margin-top: 5rem">
+            <p>
+                <b>MolQL</b> (Molecular Query Language) is a declarative language for describing selections/substructures of
+                molecular data. The language provides a wide range queries and can be used as a compilation target for 
+                various selection expressions such as these provided by PyMol, JMOL, or VMD.
+            </p>
+        </div>
+        <div class="row">
+            <div class="six columns">
+                <a class="u-full-width button" href="explorer.html">Explore MolQL in your browser</a>
+            </div>
+            <div class="six columns">
+                <a class="u-full-width button" href="https://github.com/molql/molql">Learn more &amp; browse the source code</a>
+            </div>
+        </div>
+        <div class="row" style="text-align: center; margin-top: 3rem">
+            <h2>Example: Select helices</h2>
+        </div>
+        <div class="row">
+            <div class="six columns">
+                <h5>Jmol</h5>
+                <pre><code>substructure = helix</code></pre>
+                <h5>PyMol</h5>
+                <pre><code>ss h</code></pre>
+                <h5>VMD</h5>
+                <pre><code>structure H</code></pre>                
+            </div>
+            <div class="six columns">
+                <h5>MolQL (Script)</h5>
+                <pre><code>(sel.atom.res 
+  (atom.sec-struct.is helix))</code></pre>
+                <h5>... all compile to MolQL:</h5>
+                <pre><code>(structure.generator.atom-groups
+  :atom-test (core.flags.has-any
+    (structure.atom-property.macromolecular
+      .secondary-structure-flags)
+    (structure.type
+      .secondary-structure-flags alpha)))</code></pre>
+            </div>
+        </div>        
+        <div class="row">
+            <hr style="margin-bottom: 0.5rem" />
+        </div>
+        
+        <div class="row" style="text-align: right; color: #999; font-size: smaller">
+            &copy; 2017 David Sehnal &amp; Alexander Rose
+        </div>
+    </div>
+</body>
+
+</html>

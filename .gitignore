@@ -1,7 +1,7 @@
 build/
 node_modules/
-molql-explorer/index.js
-molql-explorer/index.min.js
+web/explorer.js
+web/explorer.min.js
 debug.log
 npm-debug.log
 package-lock.json

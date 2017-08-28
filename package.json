@@ -8,8 +8,8 @@
     "watch": "./node_modules/.bin/tsc -watch",
     "docs": "node ./build/reference-implementation/molql/markdown-docs.js -print > ./docs/language-reference.md",
     "test": "jasmine",
-    "app": "node_modules/.bin/webpack build/molql-explorer/index.js molql-explorer/index.js",
-    "appmin": "./node_modules/.bin/uglifyjs molql-explorer/index.js > molql-explorer/index.min.js"
+    "app": "node_modules/.bin/webpack build/molql-explorer/index.js web/explorer.js",
+    "appmin": "./node_modules/.bin/uglifyjs web/explorer.js > web/explorer.min.js"
   },
   "author": "",
   "license": "MIT",
