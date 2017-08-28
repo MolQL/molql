@@ -11,7 +11,7 @@ const reFloat = /[-+]?[0-9]*\.?[0-9]+/
 const rePosInt = /[0-9]+/
 
 function atomNameListMap(x: string) { return x.split('+').map(B.atomName) }
-function listMap(x: string) { return x.split('+') }
+function listMap(x: string) { return x.split('+').map(x => x.replace(/^["']|["']$/g, '')) }
 function rangeMap(x: string) {
   const [min, max] = x.split('-').map(x => parseInt(x))
   return {min, max}
@@ -38,19 +38,19 @@ const properties: PropertyDict = {
   symbol: {
     '@desc': 'chemical-symbol-list: list of 1- or 2-letter chemical symbols from the periodic table',
     '@examples': ['symbol O+N'],
-    abbr: ['e.'], regex: /[a-zA-Z+]+/, map: elementListMap,
+    abbr: ['e.'], regex: /[a-zA-Z'"+]+/, map: elementListMap,
     level: 'atom-test', property: B.acp('elementSymbol')
   },
   name: {
     '@desc': 'atom-name-list: list of up to 4-letter codes for atoms in proteins or nucleic acids',
     '@examples': ['name CA+CB+CG+CD'],
-    abbr: ['n.'], regex: /[a-zA-Z0-9+]+/, map: atomNameListMap,
+    abbr: ['n.'], regex: /[a-zA-Z0-9'"+]+/, map: atomNameListMap,
     level: 'atom-test', property: B.ammp('label_atom_id')
   },
   resn: {
     '@desc': 'residue-name-list: list of 3-letter codes for amino acids or list of up to 2-letter codes for nucleic acids',
     '@examples': ['resn ASP+GLU+ASN+GLN', 'resn A+G'],
-    abbr: ['resname', 'r.'], regex: /[a-zA-Z0-9+]+/, map: listMap,
+    abbr: ['resname', 'r.'], regex: /[a-zA-Z0-9'"+]+/, map: listMap,
     level: 'residue-test', property: B.ammp('label_comp_id')
   },
   resi: {
@@ -61,20 +61,20 @@ const properties: PropertyDict = {
   },
   alt: {
     '@desc': 'alternate-conformation-identifier-list list of single letters',
-    '@examples': ['alt A+B'],
-    abbr: [], regex: /[a-zA-Z0-9+]+/, map: listMap,
+    '@examples': ['alt A+B', 'alt ""', 'alt ""+A'],
+    abbr: [], regex: /[a-zA-Z0-9'"+]+/, map: listMap,
     level: 'atom-test', property: B.ammp('label_alt_id')
   },
   chain: {
     '@desc': 'chain-identifier-list list of single letters or sometimes numbers',
     '@examples': ['chain A'],
-    abbr: ['c.'], regex: /[a-zA-Z0-9+]+/, map: listMap,
+    abbr: ['c.'], regex: /[a-zA-Z0-9'"+]+/, map: listMap,
     level: 'chain-test', property: B.ammp('auth_asym_id')
   },
   segi: {
     '@desc': 'segment-identifier-list list of up to 4 letter identifiers',
     '@examples': ['segi lig'],
-    abbr: ['segid', 's.'], regex: /[a-zA-Z0-9+]+/, map: listMap,
+    abbr: ['segid', 's.'], regex: /[a-zA-Z0-9'"+]+/, map: listMap,
     level: 'chain-test', property: B.ammp('label_asym_id')
   },
   flag: {
@@ -95,7 +95,7 @@ const properties: PropertyDict = {
     '@desc': 'type-string a list of up to 4 letter codes',
     '@examples': ['text_type HA+HC'],
     isUnsupported: true,
-    abbr: ['tt.'], regex: /[a-zA-Z0-9+]+/, map: listMap,
+    abbr: ['tt.'], regex: /[a-zA-Z0-9'"+]+/, map: listMap,
     level: 'atom-test'
   },
   id: {
@@ -113,8 +113,8 @@ const properties: PropertyDict = {
   },
   ss: {
     '@desc': 'secondary-structure-type list of single letters. Helical regions should be assigned H and sheet regions S. Loop regions can either be assigned L or be blank.',
-    '@examples': ['ss H+S+L'],
-    abbr: [], regex: /[a-zA-Z+]+/, map: sstrucListMap,
+    '@examples': ['ss H+S+L', 'ss S+""'],
+    abbr: [], regex: /[a-zA-Z'"+]+/, map: sstrucListMap,
     level: 'residue-test', property: B.ammp('secondaryStructureFlags')
   },
 
