@@ -9,7 +9,7 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=1" />
     <title>MolQL</title>
-    <link href='https://fonts.googleapis.com/css?family=Raleway:400,300,600' rel='stylesheet' type='text/css'>    
+    <link href='https://fonts.googleapis.com/css?family=Raleway:400,300,600' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" href="assets/css/normalize.css" type="text/css" />
     <link rel="stylesheet" href="assets/css/skeleton.css" type="text/css" />
     <link rel="stylesheet" href="assets/css/landing.css" type="text/css" />
@@ -41,15 +41,15 @@
         <div class="row">
             <div class="six columns">
                 <h5>Jmol</h5>
-                <pre><code>substructure = helix</code></pre>
+                <pre><code>helix</code></pre>
                 <h5>PyMol</h5>
                 <pre><code>ss h</code></pre>
                 <h5>VMD</h5>
-                <pre><code>structure H</code></pre>                
+                <pre><code>structure H</code></pre>
             </div>
             <div class="six columns">
                 <h5>MolQL (Script)</h5>
-                <pre><code>(sel.atom.res 
+                <pre><code>(sel.atom.res
   (atom.sec-struct.is helix))</code></pre>
                 <h5>... all compile to MolQL:</h5>
                 <pre><code>(structure.generator.atom-groups
@@ -57,13 +57,13 @@
     (structure.atom-property.macromolecular
       .secondary-structure-flags)
     (structure.type
-      .secondary-structure-flags alpha)))</code></pre>
+      .secondary-structure-flags helix)))</code></pre>
             </div>
-        </div>        
+        </div>
         <div class="row">
             <hr style="margin-bottom: 0.5rem" />
         </div>
-        
+
         <div class="row" style="text-align: right; color: #999; font-size: smaller">
             &copy; 2017 David Sehnal &amp; Alexander Rose
         </div>

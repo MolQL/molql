@@ -47,4 +47,7 @@ export default [{
 }, {
     name: 'HEM and atoms up to 7 bonds away',
     value: 'resn HEM extend 7'
+}, {
+    name: 'Atoms with alternate location A or none',
+    value: 'alt A+""'
 }]

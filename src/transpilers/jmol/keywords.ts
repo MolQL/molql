@@ -374,18 +374,42 @@ const keywords: KeywordDict = {
     '@desc': 'HIS PHE PRO TRP TYR',
     map: () => h.resnameExpr(ResDict.cyclic)
   },
-  // helix: {
-  //   '@desc': 'secondary structure-related.'
-  // },
-  // helixalpha: {
-  //   '@desc': 'secondary structure-related.'
-  // },
-  // helix310: {
-  //   '@desc': 'secondary structure-related.'
-  // },
-  // helixpi: {
-  //   '@desc': 'secondary structure-related.'
-  // },
+  helix: {
+    '@desc': 'secondary structure-related.',
+    map: () => B.struct.generator.atomGroups({
+      'residue-test': B.core.flags.hasAny([
+        B.struct.type.secondaryStructureFlags(['helix']),
+        B.ammp('secondaryStructureFlags')
+      ])
+    })
+  },
+  helixalpha: {
+    '@desc': 'secondary structure-related.',
+    map: () => B.struct.generator.atomGroups({
+      'residue-test': B.core.flags.hasAny([
+        B.struct.type.secondaryStructureFlags(['alpha']),
+        B.ammp('secondaryStructureFlags')
+      ])
+    })
+  },
+  helix310: {
+    '@desc': 'secondary structure-related.',
+    map: () => B.struct.generator.atomGroups({
+      'residue-test': B.core.flags.hasAny([
+        B.struct.type.secondaryStructureFlags(['3-10']),
+        B.ammp('secondaryStructureFlags')
+      ])
+    })
+  },
+  helixpi: {
+    '@desc': 'secondary structure-related.',
+    map: () => B.struct.generator.atomGroups({
+      'residue-test': B.core.flags.hasAny([
+        B.struct.type.secondaryStructureFlags(['pi']),
+        B.ammp('secondaryStructureFlags')
+      ])
+    })
+  },
   hetero: {
     '@desc': 'PDB atoms designated as HETATM',
     map: () => B.struct.generator.atomGroups({
@@ -426,9 +450,15 @@ const keywords: KeywordDict = {
     '@desc': 'same as basic -- ARG HIS LYS',
     map: () => h.resnameExpr(ResDict.basic)
   },
-  // sheet: {
-  //   '@desc': 'secondary structure-related'
-  // },
+  sheet: {
+    '@desc': 'secondary structure-related',
+    map: () => B.struct.generator.atomGroups({
+      'residue-test': B.core.flags.hasAny([
+        B.struct.type.secondaryStructureFlags(['sheet']),
+        B.ammp('secondaryStructureFlags')
+      ])
+    })
+  },
   small: {
     '@desc': 'ALA GLY SER',
     map: () => h.resnameExpr(ResDict.small)
@@ -440,12 +470,24 @@ const keywords: KeywordDict = {
       by: h.invertExpr(h.resnameExpr(ResDict.buried))
     })
   },
-  // turn: {
-  //   '@desc': 'secondary structure-related'
-  // },
-  // alpha: {
-  //   '@desc': '(*.CA)'
-  // },
+  turn: {
+    '@desc': 'secondary structure-related',
+    map: () => B.struct.generator.atomGroups({
+      'residue-test': B.core.flags.hasAny([
+        B.struct.type.secondaryStructureFlags(['turn']),
+        B.ammp('secondaryStructureFlags')
+      ])
+    })
+  },
+  alpha: {
+    '@desc': '(*.CA)',
+    map: () => B.struct.generator.atomGroups({
+      'atom-test': B.core.rel.eq([
+        B.atomName('CA'),
+        B.ammp('label_atom_id')
+      ])
+    })
+  },
   base: {
     '@desc': '(nucleic bases)'
   },

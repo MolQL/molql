@@ -35,7 +35,8 @@ const structureDict: {[key: string]: string} = {
   8: 'alpha',
   9: 'pi',
 }
-export function structureMap(x: string) {
+export function structureMap(x: any) {
+  if (x.head && x.head === 'core.type.regex') x = x.args[0].replace(/^\^|\$$/g, '')
   x = structureDict[x.toLowerCase()] || 'none'
   if (['dna', 'rna', 'carbohydrate'].indexOf(x) !== -1) {
     return B.struct.type.entityType(x)
@@ -529,13 +530,13 @@ const properties: PropertyDict = {
   },
   structure: {
     '@desc': 'The value of this parameter depends upon the context. Used with select structure=x, x can be either the quoted keyword "none", "turn", "sheet", "helix", "dna", "rna", or "carbohydrate" or a respective number 0-6. In the context {*}.structure, the return value is a number; in the context label %[structure], the return is one of the six keywords.',
-    '@examples': ['structure=helix'],
+    '@examples': ['structure="helix"'],
     regex: /none|turn|sheet|helix|dna|rna|carbohydrate|[0-6]/i, map: str,
     level: 'residue-test', property: 'structure'
   },
   substructure: {
     '@desc': 'like structure, the value of this parameter depends upon the context. Used with select substructure=x, x can be either the quoted keyword "none", "turn", "sheet", "helix", "dna", "rna", "carbohydrate", "helix310", "helixalpha", or "helixpi", or the respective number 0-9. In the context {*}.substructure, the return value is a number; in the context label %[substructure], the return is one of the nine keywords.',
-    '@examples': ['substructure = alphahelix'],
+    '@examples': ['substructure = "alphahelix"'],
     regex: /none|turn|sheet|helix|dna|rna|carbohydrate|helix310|helixalpha|helixpi|[0-9]/i, map: str,
     level: 'residue-test', property: 'structure'
   },
