@@ -378,3 +378,12 @@ export function valuesTest(property: any, values: any[]) {
     }
   }
 }
+
+export function resnameExpr(resnameList: string[]) {
+  return B.struct.generator.atomGroups({
+    'residue-test': B.core.set.has([
+      B.core.type.set(resnameList),
+      B.ammp('label_comp_id')
+    ])
+  })
+}

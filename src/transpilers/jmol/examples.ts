@@ -20,4 +20,7 @@ export default [{
 }, {
     name: 'Atoms invloved in aromatic bonds',
     value: 'isAromatic'
+}, {
+    name: 'Pyrimidine residues',
+    value: 'pyrimidine'
 }]

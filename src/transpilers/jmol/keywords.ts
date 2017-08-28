@@ -8,6 +8,56 @@ import * as h from '../helper'
 import { KeywordDict } from '../types'
 import B from '../../molql/builder'
 
+function nucleicExpr() {
+  return B.struct.combinator.merge([
+    B.struct.generator.atomGroups({
+      'residue-test': B.core.set.has([
+        B.set(...['G', 'C', 'A', 'T', 'U', 'I', 'DG', 'DC', 'DA', 'DT', 'DU', 'DI', '+G', '+C', '+A', '+T', '+U', '+I']),
+        B.ammp('label_comp_id')
+      ])
+    }),
+    B.struct.filter.pick({
+      0: B.struct.generator.atomGroups({
+        'group-by': B.ammp('residueKey')
+      }),
+      test: B.core.logic.and([
+        B.core.rel.eq([ B.struct.atomSet.atomCount(), 1 ]),
+        B.core.rel.eq([ B.ammp('label_atom_id'), B.atomName('P') ]),
+      ])
+    }),
+    B.struct.filter.pick({
+      0: B.struct.generator.atomGroups({
+        'group-by': B.ammp('residueKey')
+      }),
+      test: B.core.logic.or([
+        B.core.set.isSubset([
+          h.atomNameSet([ "C1'", "C2'", "O3'", "C3'", "C4'", "C5'", "O5'" ]),
+          B.ammpSet('label_atom_id')
+        ]),
+        B.core.set.isSubset([
+          h.atomNameSet([ 'C1*', 'C2*', 'O3*', 'C3*', 'C4*', 'C5*', 'O5*' ]),
+          B.ammpSet('label_atom_id')
+        ])
+      ])
+    })
+  ])
+}
+
+const ResDict = {
+  acidic: ['ASP', 'GLU'],
+  aliphatic: ['ALA', 'GLY', 'ILE', 'LEU', 'VAL'],
+  amino: ['ALA', 'ARG', 'ASN', 'ASP', 'CYS', 'GLN', 'GLU', 'GLY', 'HIS', 'ILE', 'LEU', 'LYS', 'MET', 'PHE', 'PRO', 'SER', 'THR', 'TRP', 'TYR', 'VAL', 'ASX', 'GLX', 'UNK', ],
+  aromatic: ['HIS', 'PHE', 'TRP', 'TYR'],
+  basic: ['ARG', 'HIS', 'LYS'],
+  buried: ['ALA','CYS', 'ILE', 'LEU', 'MET', 'PHE', 'TRP', 'VAL'],
+  cg: ['CYT', 'C', 'GUA', 'G'],
+  cyclic: ['HIS', 'PHE', 'PRO', 'TRP', 'TYR'],
+  hydrophobic: ['ALA', 'GLY', 'ILE', 'LEU', 'MET', 'PHE', 'PRO', 'TRP', 'TYR', 'VAL'],
+  large: ['ARG', 'GLU', 'GLN', 'HIS', 'ILE', 'LEU', 'LYS', 'MET', 'PHE', 'TRP', 'TYR'],
+  medium: ['ASN', 'ASP', 'CYS', 'PRO', 'THR', 'VAL'],
+  small: ['ALA', 'GLY', 'SER'],
+}
+
 const keywords: KeywordDict = {
   // general terms
   all: {
@@ -168,80 +218,161 @@ const keywords: KeywordDict = {
   },
   nucleic: {
     '@desc': 'any group that (a) has one of the following group names: G, C, A, T, U, I, DG, DC, DA, DT, DU, DI, +G, +C, +A, +T, +U, +I; or (b) can be identified as a group that is only one atom, with name "P"; or (c) has all of the following atoms (prime, \', can replace * here): C1*, C2*, C3*, O3*, C4*, C5*, and O5*.',
-    map: () => B.struct.combinator.merge([
-      B.struct.generator.atomGroups({
-        'residue-test': B.core.set.has([
-          B.set(...['G', 'C', 'A', 'T', 'U', 'I', 'DG', 'DC', 'DA', 'DT', 'DU', 'DI', '+G', '+C', '+A', '+T', '+U', '+I']),
-          B.ammp('label_comp_id')
-        ])
-      }),
-      B.struct.filter.pick({
-        0: B.struct.generator.atomGroups({
-          'group-by': B.ammp('residueKey')
-        }),
-        test: B.core.logic.and([
-          B.core.rel.eq([ B.struct.atomSet.atomCount(), 1 ]),
-          B.core.rel.eq([ B.ammp('label_atom_id'), B.atomName('P') ]),
-        ])
-      }),
-      B.struct.filter.pick({
-        0: B.struct.generator.atomGroups({
-          'group-by': B.ammp('residueKey')
-        }),
-        test: B.core.logic.or([
-          B.core.set.isSubset([
-            h.atomNameSet([ "C1'", "C2'", "O3'", "C3'", "C4'", "C5'", "O5'" ]),
-            B.ammpSet('label_atom_id')
-          ]),
-          B.core.set.isSubset([
-            h.atomNameSet([ 'C1*', 'C2*', 'O3*', 'C3*', 'C4*', 'C5*', 'O5*' ]),
-            B.ammpSet('label_atom_id')
-          ])
-        ])
-      })
-    ])
+    map: () => nucleicExpr()
   },
   purine: {
-    '@desc': 'any nucleic group that (a) has one of the following group names: A, G, I, DA, DG, DI, +A, +G, or +I; or (b) also has atoms N7, C8, and N9.'
+    '@desc': 'any nucleic group that (a) has one of the following group names: A, G, I, DA, DG, DI, +A, +G, or +I; or (b) also has atoms N7, C8, and N9.',
+    map: () => B.struct.modifier.intersectBy({
+      0: nucleicExpr(),
+      by: B.struct.combinator.merge([
+        B.struct.generator.atomGroups({
+          'residue-test': B.core.set.has([
+            B.set(...['A', 'G', 'I', 'DA', 'DG', 'DI', '+A', '+G', '+I']),
+            B.ammp('label_comp_id')
+          ])
+        }),
+        B.struct.filter.pick({
+          0: B.struct.generator.atomGroups({
+            'group-by': B.ammp('residueKey')
+          }),
+          test: B.core.set.isSubset([
+            h.atomNameSet([ 'N7', 'C8', 'N9' ]),
+            B.ammpSet('label_atom_id')
+          ])
+        })
+      ])
+    })
   },
   pyrimidine: {
-    '@desc': 'any nucleic group that (a) has one of the following group names: C, T, U, DC, DT, DU, +C, +T, +U; or (b) also has atom O2.'
+    '@desc': 'any nucleic group that (a) has one of the following group names: C, T, U, DC, DT, DU, +C, +T, +U; or (b) also has atom O2.',
+    map: () => B.struct.modifier.intersectBy({
+      0: nucleicExpr(),
+      by: B.struct.combinator.merge([
+        B.struct.generator.atomGroups({
+          'residue-test': B.core.set.has([
+            B.set(...['C', 'T', 'U', 'DC', 'DT', 'DU', '+C', '+T', '+U']),
+            B.ammp('label_comp_id')
+          ])
+        }),
+        B.struct.filter.pick({
+          0: B.struct.generator.atomGroups({
+            'group-by': B.ammp('residueKey')
+          }),
+          test: B.core.logic.or([
+            B.core.set.has([
+              B.ammpSet('label_atom_id'),
+              B.atomName('O2*')
+            ]),
+            B.core.set.has([
+              B.ammpSet('label_atom_id'),
+              B.atomName("O2'")
+            ])
+          ])
+        })
+      ])
+    })
   },
   dna: {
-    '@desc': 'any nucleic group that (a) has one of the following group names: DG, DC, DA, DT, DU, DI, T, +G, +C, +A, +T; or (b) has neither atom O2* or O2\'.'
+    '@desc': 'any nucleic group that (a) has one of the following group names: DG, DC, DA, DT, DU, DI, T, +G, +C, +A, +T; or (b) has neither atom O2* or O2\'.',
+    map: () => B.struct.modifier.intersectBy({
+      0: nucleicExpr(),
+      by: B.struct.combinator.merge([
+        B.struct.generator.atomGroups({
+          'residue-test': B.core.set.has([
+            B.set(...['DG', 'DC', 'DA', 'DT', 'DU', 'DI', 'T', '+G', '+C', '+A', '+T']),
+            B.ammp('label_comp_id')
+          ])
+        }),
+        B.struct.filter.pick({
+          0: B.struct.generator.atomGroups({
+            'group-by': B.ammp('residueKey')
+          }),
+          test: B.core.logic.not([
+            B.core.logic.or([
+              B.core.set.has([
+                B.ammpSet('label_atom_id'),
+                B.atomName('O2*')
+              ]),
+              B.core.set.has([
+                B.ammpSet('label_atom_id'),
+                B.atomName("O2'")
+              ])
+            ])
+          ])
+        })
+      ])
+    })
   },
   rna: {
-    '@desc': 'any nucleic group that (a) has one of the following group names: G, C, A, U, I, +U, +I; or (b) has atom O2* or O2\'.'
+    '@desc': 'any nucleic group that (a) has one of the following group names: G, C, A, U, I, +U, +I; or (b) has atom O2* or O2\'.',
+    map: () => B.struct.modifier.intersectBy({
+      0: nucleicExpr(),
+      by: B.struct.combinator.merge([
+        B.struct.generator.atomGroups({
+          'residue-test': B.core.set.has([
+            B.set(...['G', 'C', 'A', 'U', 'I', '+U', '+I']),
+            B.ammp('label_comp_id')
+          ])
+        }),
+        B.struct.filter.pick({
+          0: B.struct.generator.atomGroups({
+            'group-by': B.ammp('residueKey')
+          }),
+          test: B.core.logic.or([
+            B.core.set.has([
+              B.ammpSet('label_atom_id'),
+              B.atomName('O2*')
+            ]),
+            B.core.set.has([
+              B.ammpSet('label_atom_id'),
+              B.atomName("O2'")
+            ])
+          ])
+        })
+      ])
+    })
   },
   protein: {
     '@desc': 'defined as a group that (a) has one of the following group names: ALA, ARG, ASN, ASP, CYS, GLN, GLU, GLY, HIS, ILE, LEU, LYS, MET, PHE, PRO, SER, THR, TRP, TYR, VAL, ASX, GLX, or UNK; or (b) contains PDB atom designations [C, O, CA, and N] bonded correctly; or (c) does not contain "O" but contains [C, CA, and N] bonded correctly; or (d) has only one atom, which has name CA and does not have the group name CA (indicating a calcium atom).'
   },
   acidic: {
-    '@desc': 'ASP GLU'
+    '@desc': 'ASP GLU',
+    map: () => h.resnameExpr(ResDict.acidic)
   },
   acyclic: {
-    '@desc': 'amino and not cyclic'
+    '@desc': 'amino and not cyclic',
+    map: () => B.struct.modifier.intersectBy({
+      0: h.resnameExpr(ResDict.amino),
+      by: h.invertExpr(h.resnameExpr(ResDict.cyclic))
+    })
   },
   aliphatic: {
-    '@desc': 'ALA GLY ILE LEU VAL'
+    '@desc': 'ALA GLY ILE LEU VAL',
+    map: () => h.resnameExpr(ResDict.aliphatic)
   },
   amino: {
-    '@desc': 'all twenty standard amino acids, plus ASX, GLX, UNK'
+    '@desc': 'all twenty standard amino acids, plus ASX, GLX, UNK',
+    map: () => h.resnameExpr(ResDict.amino)
   },
   aromatic: {
-    '@desc': 'HIS PHE TRP TYR (see also "isaromatic" for aromatic bonds)'
+    '@desc': 'HIS PHE TRP TYR (see also "isaromatic" for aromatic bonds)',
+    map: () => h.resnameExpr(ResDict.aromatic)
   },
   basic: {
-    '@desc': 'ARG HIS LYS'
+    '@desc': 'ARG HIS LYS',
+    map: () => h.resnameExpr(ResDict.basic)
   },
   buried: {
-    '@desc': 'ALA CYS ILE LEU MET PHE TRP VAL'
+    '@desc': 'ALA CYS ILE LEU MET PHE TRP VAL',
+    map: () => h.resnameExpr(ResDict.buried)
   },
   charged: {
-    '@desc': 'same as acidic or basic -- ASP GLU, ARG HIS LYS'
+    '@desc': 'same as acidic or basic -- ASP GLU, ARG HIS LYS',
+    map: () => h.resnameExpr(ResDict.acidic.concat(ResDict.basic))
   },
   cyclic: {
-    '@desc': 'HIS PHE PRO TRP TYR'
+    '@desc': 'HIS PHE PRO TRP TYR',
+    map: () => h.resnameExpr(ResDict.cyclic)
   },
   // helix: {
   //   '@desc': 'secondary structure-related.'
@@ -256,37 +387,58 @@ const keywords: KeywordDict = {
   //   '@desc': 'secondary structure-related.'
   // },
   hetero: {
-    '@desc': 'PDB atoms designated as HETATM'
+    '@desc': 'PDB atoms designated as HETATM',
+    map: () => B.struct.generator.atomGroups({
+      'atom-test': B.ammp('isHet')
+    })
   },
   hydrophobic: {
-    '@desc': 'ALA GLY ILE LEU MET PHE PRO TRP TYR VAL'
+    '@desc': 'ALA GLY ILE LEU MET PHE PRO TRP TYR VAL',
+    map: () => h.resnameExpr(ResDict.hydrophobic)
   },
   large: {
-    '@desc': 'ARG GLU GLN HIS ILE LEU LYS MET PHE TRP TYR'
+    '@desc': 'ARG GLU GLN HIS ILE LEU LYS MET PHE TRP TYR',
+    map: () => h.resnameExpr(ResDict.large)
   },
   medium: {
-    '@desc': 'ASN ASP CYS PRO THR VAL'
+    '@desc': 'ASN ASP CYS PRO THR VAL',
+    map: () => h.resnameExpr(ResDict.medium)
   },
   negative: {
-    '@desc': 'same as acidic -- ASP GLU'
+    '@desc': 'same as acidic -- ASP GLU',
+    map: () => h.resnameExpr(ResDict.acidic)
   },
   neutral: {
-    '@desc': 'amino and not (acidic or basic)'
+    '@desc': 'amino and not (acidic or basic)',
+    map: () => B.struct.modifier.intersectBy({
+      0: h.resnameExpr(ResDict.amino),
+      by: h.invertExpr(h.resnameExpr(ResDict.acidic.concat(ResDict.basic)))
+    })
   },
   polar: {
-    '@desc': 'amino and not hydrophobic'
+    '@desc': 'amino and not hydrophobic',
+    map: () => B.struct.modifier.intersectBy({
+      0: h.resnameExpr(ResDict.amino),
+      by: h.invertExpr(h.resnameExpr(ResDict.hydrophobic))
+    })
   },
   positive: {
-    '@desc': 'same as basic -- ARG HIS LYS'
+    '@desc': 'same as basic -- ARG HIS LYS',
+    map: () => h.resnameExpr(ResDict.basic)
   },
   // sheet: {
   //   '@desc': 'secondary structure-related'
   // },
   small: {
-    '@desc': 'ALA GLY SER'
+    '@desc': 'ALA GLY SER',
+    map: () => h.resnameExpr(ResDict.small)
   },
   surface: {
-    '@desc': 'amino and not buried'
+    '@desc': 'amino and not buried',
+    map: () => B.struct.modifier.intersectBy({
+      0: h.resnameExpr(ResDict.amino),
+      by: h.invertExpr(h.resnameExpr(ResDict.buried))
+    })
   },
   // turn: {
   //   '@desc': 'secondary structure-related'

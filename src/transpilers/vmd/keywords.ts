@@ -68,15 +68,6 @@ function backboneExpr() {
   ])
 }
 
-function resnameExpr(resnameList: string[]) {
-  return B.struct.generator.atomGroups({
-    'residue-test': B.core.set.has([
-      B.core.type.set(resnameList),
-      B.ammp('label_comp_id')
-    ])
-  })
-}
-
 function secStrucExpr(flags: string[]) {
   return B.struct.generator.atomGroups({
     'residue-test': B.core.flags.hasAll([
@@ -137,26 +128,26 @@ const keywords: KeywordDict = {
   water: {
     '@desc': 'all atoms with the resname H2O, HH0, OHH, HOH, OH2, SOL, WAT, TIP, TIP2, TIP3 or TIP4',
     abbr: ['waters'],
-    map: () => resnameExpr(ResDict.water)
+    map: () => h.resnameExpr(ResDict.water)
   },
   at: {
     '@desc': 'residues named ADA A THY T',
-    map: () => resnameExpr(ResDict.at)
+    map: () => h.resnameExpr(ResDict.at)
   },
   acidic: {
     '@desc': 'residues named ASP GLU',
-    map: () => resnameExpr(ResDict.acidic)
+    map: () => h.resnameExpr(ResDict.acidic)
   },
   acyclic: {
     '@desc': '"protein and not cyclic"',
     map: () => B.struct.modifier.intersectBy({
       0: proteinExpr(),
-      by: h.invertExpr(resnameExpr(ResDict.cyclic))
+      by: h.invertExpr(h.resnameExpr(ResDict.cyclic))
     })
   },
   aliphatic : {
     '@desc': 'residues named ALA GLY ILE LEU VAL',
-    map: () => resnameExpr(ResDict.aliphatic)
+    map: () => h.resnameExpr(ResDict.aliphatic)
   },
   alpha: {
     '@desc': "atom's residue is an alpha helix",
@@ -168,11 +159,11 @@ const keywords: KeywordDict = {
   },
   aromatic: {
     '@desc': 'residues named HIS PHE TRP TYR',
-    map: () => resnameExpr(ResDict.aromatic)
+    map: () => h.resnameExpr(ResDict.aromatic)
   },
   basic: {
     '@desc': 'residues named ARG HIS LYS',
-    map: () => resnameExpr(ResDict.basic)
+    map: () => h.resnameExpr(ResDict.basic)
   },
   bonded: {
     '@desc': 'atoms for which numbonds > 0',
@@ -191,19 +182,19 @@ const keywords: KeywordDict = {
   },
   buried: {
     '@desc': 'residues named ALA LEU VAL ILE PHE CYS MET TRP',
-    map: () => resnameExpr(ResDict.buried)
+    map: () => h.resnameExpr(ResDict.buried)
   },
   cg: {
     '@desc': 'residues named CYT C GUA G',
-    map: () => resnameExpr(ResDict.cg)
+    map: () => h.resnameExpr(ResDict.cg)
   },
   charged: {
     '@desc': '"basic or acidic"',
-    map: () => resnameExpr(ResDict.basic.concat(ResDict.acidic))
+    map: () => h.resnameExpr(ResDict.basic.concat(ResDict.acidic))
   },
   cyclic: {
     '@desc': 'residues named HIS PHE PRO TRP TYR',
-    map: () => resnameExpr(ResDict.cyclic)
+    map: () => h.resnameExpr(ResDict.cyclic)
   },
   hetero: {
     '@desc': '"not (protein or nucleic)"',
@@ -225,46 +216,46 @@ const keywords: KeywordDict = {
     map: () => B.struct.modifier.intersectBy({
       0: proteinExpr(),
       by: h.invertExpr(
-        resnameExpr(ResDict.small.concat(ResDict.medium))
+        h.resnameExpr(ResDict.small.concat(ResDict.medium))
       )
     })
   },
   medium : {
     '@desc': 'residues named VAL THR ASP ASN PRO CYS ASX PCA HYP',
-    map: () => resnameExpr(ResDict.medium)
+    map: () => h.resnameExpr(ResDict.medium)
   },
   neutral: {
     '@desc': 'residues named VAL PHE GLN TYR HIS CYS MET TRP ASX GLX PCA HYP',
-    map: () => resnameExpr(ResDict.neutral)
+    map: () => h.resnameExpr(ResDict.neutral)
   },
   hydrophobic: {
     '@desc': "hydrophobic resname ALA LEU VAL ILE PRO PHE MET TRP",
-    map: () => resnameExpr(ResDict.hydrophobic)
+    map: () => h.resnameExpr(ResDict.hydrophobic)
   },
   polar: {
     '@desc': '"protein and not hydrophobic"',
     map: () => B.struct.modifier.intersectBy({
       0: proteinExpr(),
-      by: h.invertExpr(resnameExpr(ResDict.hydrophobic))
+      by: h.invertExpr(h.resnameExpr(ResDict.hydrophobic))
     })
   },
   purine: {
     '@desc': 'residues named ADE A GUA G',
-    map: () => resnameExpr(ResDict.purine)
+    map: () => h.resnameExpr(ResDict.purine)
   },
   pyrimidine: {
     '@desc': 'residues named CYT C THY T URI U',
-    map: () => resnameExpr(ResDict.pyrimidine)
+    map: () => h.resnameExpr(ResDict.pyrimidine)
   },
   small: {
     '@desc': 'residues named ALA GLY SER',
-    map: () => resnameExpr(ResDict.small)
+    map: () => h.resnameExpr(ResDict.small)
   },
   surface: {
     '@desc': '"protein and not buried"',
     map: () => B.struct.modifier.intersectBy({
       0: proteinExpr(),
-      by: h.invertExpr(resnameExpr(ResDict.buried))
+      by: h.invertExpr(h.resnameExpr(ResDict.buried))
     })
   },
   alpha_helix: {
