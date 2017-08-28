@@ -15,9 +15,7 @@ function proteinExpr() {
     }),
     test: B.core.set.isSubset([
       h.atomNameSet([ 'C', 'N', 'CA', 'O' ]),
-      B.struct.atomSet.propertySet({
-        0: B.ammp('label_atom_id')
-      })
+      B.ammpSet('label_atom_id')
     ])
   })
 }
@@ -31,22 +29,16 @@ function nucleicExpr() {
       B.core.set.isSubset([
         // B.core.type.set([ 'P', 'O1P', 'O2P' ]),
         h.atomNameSet([ 'P' ]),
-        B.struct.atomSet.propertySet([
-          B.ammp('label_atom_id')
-        ])
+        B.ammpSet('label_atom_id')
       ]),
       B.core.logic.or([
         B.core.set.isSubset([
           h.atomNameSet([ "O3'", "C3'", "C4'", "C5'", "O5'" ]),
-          B.struct.atomSet.propertySet([
-            B.ammp('label_atom_id')
-          ])
+          B.ammpSet('label_atom_id')
         ]),
         B.core.set.isSubset([
           h.atomNameSet([ 'O3*', 'C3*', 'C4*', 'C5*', 'O5*' ]),
-          B.struct.atomSet.propertySet([
-            B.ammp('label_atom_id')
-          ])
+          B.ammpSet('label_atom_id')
         ])
       ])
     ])

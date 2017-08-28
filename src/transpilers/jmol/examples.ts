@@ -14,4 +14,10 @@ export default [{
 }, {
     name: 'All 3-10 helices',
     value: 'substructure = helix310'
+}, {
+    name: 'Metal atoms',
+    value: 'metal'
+}, {
+    name: 'Atoms invloved in aromatic bonds',
+    value: 'isAromatic'
 }]

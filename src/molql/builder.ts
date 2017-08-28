@@ -29,6 +29,12 @@ namespace Builder {
 
     // atom macromolecular property
     export function ammp(p: keyof typeof _ammp) { return (_ammp[p] as Symbol)() };
+
+    // atom property sets
+    const _aps = MolQL.structure.atomSet.propertySet
+    export function acpSet(p: keyof typeof _acp) { return _aps([ acp(p) ]) };
+    export function atpSet(p: keyof typeof _atp) { return _aps([ atp(p) ]) };
+    export function ammpSet(p: keyof typeof _ammp) { return _aps([ ammp(p) ]) };
 }
 
 export default Builder
