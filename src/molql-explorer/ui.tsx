@@ -42,8 +42,8 @@ export default class Root extends React.Component<{ state: State }, { }> {
                 <QueryHint {...this.props} />
             </div>
             <div className='layout-box' style={{ position: 'absolute', top: 0, left: col12, width: col3, height: heightTop, overflowX: 'hidden', overflowY: 'hidden' }}>
-                <div style={{ textAlign: 'right', fontSize: '30px', paddingRight: '30px', lineHeight: '60px', position: 'absolute', left: 0, right: 0, bottom: 20, top: 0, height: 60, color: 'rgb(250,250,250)' }}>
-                    Language Reference
+                <div className='social-links' style={{ textAlign: 'right', paddingRight: '10px', lineHeight: '60px', position: 'absolute', left: 0, right: 0, bottom: 20, top: 0, height: 60, }}>
+                    <a className='button' style={{ color: '#ccc' }} href='https://github.com/molql/molql'>GitHub</a> <a className='button' style={{ color: '#ccc' }} href='https://twitter.com/molql'>Twitter</a>
                 </div>
                 <OffsetBox className='docs'><Docs state={this.props.state} /></OffsetBox>
             </div>
@@ -133,23 +133,21 @@ class Docs extends Observer<{ state: State }, { docs: string }> {
     }
 }
 
-class LoadMolecule extends Observer<{ state: State }, { }> {
+class LoadMolecule extends Observer<{ state: State }, { downloading: boolean }> {
+    state = { downloading: false }
     componentDidMount() {
-        this.subscribe(this.props.state.loaded, loaded => {
-            this.setState({ loaded });
-        });
-        this.subscribe(this.props.state.query, query => {
-            this.setState({ queryOk: query.kind === 'ok' });
+        this.subscribe(this.props.state.loadState, state => {
+           this.setState({ downloading: state === 'downloading' });
         });
     }
 
     render() {
         return <div className='row'>
             <div className='six columns'>
-                 <input className='u-full-width' type='text' placeholder='PDB id...' defaultValue={this.props.state.pdbId} onChange={e => this.props.state.pdbId = e.target.value }  />
+                 <input className='u-full-width' type='text' placeholder='PDB id...' defaultValue={this.props.state.pdbId} onChange={e => this.props.state.pdbId = e.target.value } disabled={this.state.downloading}  />
             </div>
             <div className='six columns'>
-                <button className='u-full-width button-primary' onClick={() => this.props.state.loadStructure()}>Download</button>
+                <button className={`u-full-width ${!this.state.downloading ? 'button-primary' : ''}`} onClick={() => this.props.state.loadStructure()} disabled={this.state.downloading}>Download</button>
             </div>
         </div>;
     }
@@ -159,8 +157,8 @@ class ExecuteQuery extends Observer<{ state: State }, { loaded: boolean, queryOk
     state = { loaded: false, queryOk: false }
 
     componentDidMount() {
-        this.subscribe(this.props.state.loaded, loaded => {
-            this.setState({ loaded });
+        this.subscribe(this.props.state.loadState, state => {
+            this.setState({ loaded: state === 'loaded' });
         });
         this.subscribe(this.props.state.query, query => {
             this.setState({ queryOk: query.kind === 'ok' });

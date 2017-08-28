@@ -39,7 +39,7 @@ class State {
 
     pdbId = '1tqn';
     structureData: StructureData | undefined = void 0;
-    loaded = new Rx.BehaviorSubject<boolean>(false);
+    loadState = new Rx.BehaviorSubject<'none' | 'downloading' | 'loaded'>('none');
 
     currentSymbol = new Rx.BehaviorSubject<string>('');
     editorActive = new Rx.BehaviorSubject<boolean>(false);
@@ -48,6 +48,7 @@ class State {
 
     async loadStructure() {
         try {
+            this.loadState.onNext('downloading');
             this.plugin.clear();
             this.plugin.clear();
             this.queryResult.onNext(Result.empty);
@@ -66,10 +67,10 @@ class State {
             await plugin.applyTransform(t);
             const model = parseCIF(data).models[0];
             this.structureData = { data, model };
-            this.loaded.onNext(true);
+            this.loadState.onNext('loaded');
         } catch (e) {
             console.error(e);
-            this.loaded.onNext(false);
+            this.loadState.onNext('none');
         }
     }
 
