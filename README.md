@@ -48,9 +48,9 @@ Project Structure
 
     npm run app
 
-Then just open ``molql-explorer/index-dev.html``.
+Then just open ``web/explorer-dev.html``.
 
-To build the minified version, also call ``npm run appmin``, then ``molql-explorer/index.html`` will work.
+To build the minified version, also call ``npm run appmin``, then ``web/explorer.html`` will work.
 
 # FAQ
 
