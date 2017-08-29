@@ -5,3 +5,4 @@ web/explorer.min.js
 debug.log
 npm-debug.log
 package-lock.json
+*.sublime-workspace
