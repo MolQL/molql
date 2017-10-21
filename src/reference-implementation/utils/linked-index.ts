@@ -28,8 +28,8 @@ function LinkedIndex(size: number): LinkedIndex {
 }
 
 namespace LinkedIndex {
-    export function has({ prev, next }: LinkedIndex, i: number) {
-        return prev[i] >= 0 || next[i] >= 0;
+    export function has(idx: LinkedIndex, i: number) {
+        return idx.prev[i] >= 0 || idx.next[i] >= 0 || idx.head === i;
     }
 
     export function remove(index: LinkedIndex, i: number) {
