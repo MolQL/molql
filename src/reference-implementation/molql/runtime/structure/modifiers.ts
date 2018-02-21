@@ -117,10 +117,8 @@ export function unionBy(env: Environment, selection: Selection, by: Selection): 
         }
 
         const indices = UniqueArrayBuilder<number>();
-        let cnt = 0;
         for (const atomSetIndex of toGlue.array) {
             for (let a = AtomSetIt.start(it, atomSets[atomSetIndex]); !it.done; a = it.next().value) {
-                cnt++;
                 UniqueArrayBuilder.add(indices, a, a);
             }
         }

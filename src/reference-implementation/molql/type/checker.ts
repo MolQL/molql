@@ -62,11 +62,12 @@ function assignArguments(symbols: SymbolMap, ctx: TypeContext, symbolId: string,
         }
     } else {
         const keys = Object.keys(args.map);
-        let isArrayLike = true, i = 0, isAnyRest = false;
+        // let isArrayLike = true, 
+        let i = 0, isAnyRest = false;
         let optionalCount = 0;
         for (const k of keys) {
             const arg = (args.map as any)[k] as Argument;
-            if (isNaN(k as any) || +k !== i) isArrayLike = false;
+            // if (isNaN(k as any) || +k !== i) isArrayLike = false;
             if (arg.isOptional) optionalCount++;
             if (arg.isRest) isAnyRest = true;
             i++;

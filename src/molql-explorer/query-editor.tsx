@@ -34,7 +34,7 @@ export default class QueryEditor extends React.Component<QueryEditorProps, {}> {
     private ignoreChangeEvent = false;
 
     constructor(props: QueryEditorProps) {
-        super();
+        super(props);
         this.cachedValue = props.value || '';
     }
 

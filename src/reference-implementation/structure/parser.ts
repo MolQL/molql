@@ -22,10 +22,6 @@ function createModel(structureId: string, data: Data, startRow: number, rowCount
     const { auth_asym_id, auth_seq_id, pdbx_PDB_ins_code, pdbx_PDB_model_num, label_entity_id, Cartn_x, Cartn_y, Cartn_z } = data.atom_site;
 
     let atom = 0, residue = 0, chain = 0, entity = 0;
-    let residueStartAtom = 0;
-    let chainStartResidue = 0;
-    let entityStartChain = 0;
-
     let currentResidueRow = startRow, currentChainRow = startRow, currentEntityRow = startRow;
 
     for (let i = startRow; i < rowCount; i++) {
@@ -41,7 +37,6 @@ function createModel(structureId: string, data: Data, startRow: number, rowCount
         if (newResidue) {
             atomOffset.push(atom)
             chainIndex.push(chain)
-            residueStartAtom = atom;
             residue++;
             currentResidueRow = i;
         }
@@ -50,14 +45,12 @@ function createModel(structureId: string, data: Data, startRow: number, rowCount
             residueOffset.push(residue);
             entityIndex.push(entity);
             currentChainRow = i;
-            chainStartResidue = residue;
             chain++;
         }
 
         if (newEntity) {
             chainOffset.push(chain);
             currentEntityRow = i;
-            entityStartChain = chain;
             entity++;
         }
 

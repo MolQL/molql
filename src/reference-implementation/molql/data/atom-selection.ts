@@ -158,7 +158,6 @@ namespace AtomSelection {
 
     export class Lookup3d {
         private lookup: FindFunc;
-        private mask: Mask;
         private maxRadius: number = 0;
 
         queryAtomSet(a: AtomSet, radius: number): number[]  {
@@ -195,7 +194,6 @@ namespace AtomSelection {
                 if (bs.radius > radius) radius = bs.radius;
             }
             this.maxRadius = radius;
-            this.mask = Mask.always(sets.length);
             this.lookup = SpatialLookup(positions).find(Mask.always(sets.length));
         }
     }
