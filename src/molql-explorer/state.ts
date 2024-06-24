@@ -54,7 +54,7 @@ class State {
             this.queryResult.onNext(Result.empty);
 
             const plugin = this.plugin;
-            let url = `https://webchem.ncbr.muni.cz/CoordinateServer/${this.pdbId}/full`;
+            let url = `https://models.rcsb.org/v1/${this.pdbId.toLowerCase()}/full?encoding=cif&copy_all_categories=false&download=false`;
             const data = await LiteMol.Bootstrap.Utils.ajaxGetString(url).run(plugin.context);
 
             const t = plugin.createTransform();
